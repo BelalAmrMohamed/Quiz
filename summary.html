@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+
+<body>
+    <div class="container" style="text-align: center; margin-top: 50px;">
+        <div class="header">
+            <h1>🎉 Quiz Complete!</h1>
+        </div>
+
+        <div id="scoreHeader" class="question-card"
+            style="display:flex; align-items:center; justify-content:center; gap:20px">
+            <!-- Rendered by summary.js -->
+        </div>
+
+        <div class="question-card" style="margin-top:20px;">
+            <h2>Your Score</h2>
+            <h1 id="scoreDisplay" style="font-size: 3em; color: #4caf50;">0/0</h1>
+            <p id="statsDisplay"></p>
+
+            <div style="margin-top: 30px;">
+                <button class="nav-btn" id="backHomeBtn">Back to Home</button>
+            </div>
+        </div>
+
+        <div id="reviewContainer" style="margin-top:20px"></div>
+    </div>
+    <script type="module" src="Script/summary.js"></script>
+</body>
+
+</html>

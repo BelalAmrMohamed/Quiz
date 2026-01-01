@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Running</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1 id="quizTitle">Loading...</h1>
+                <button id="finishBtn" class="finish-btn" onclick="finishEarly()" style="display:none">Finish
+                    Here</button>
+            </div>
+            <div id="timer">Time: 00:00</div>
+            <div class="progress-container" style="width:100%; margin-top:12px">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+            <div class="progress-label" id="progressText" style="width:100%; text-align:right; margin-top:6px">Progress:
+                0% (0/0)</div>
+        </div>
+
+        <div id="questionContainer"></div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+        </div>
+    </div>
+
+    <script type="module" src="Script/quiz.js"></script>
+</body>
+
+</html>
