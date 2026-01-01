@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 /* 
+This line runs this file which generates Script/examManifest.js
 node tools/generateExamManifest.js; 
+
+
 git add Script/examManifest.js; 
 git commit -m "chore: regenerate examManifest.js"
 */

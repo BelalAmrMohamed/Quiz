@@ -3,6 +3,30 @@
 
 export const examList = [
   {
+    "id": "Introduction and Structure",
+    "category": "Operatings Systems",
+    "title": "Introduction And Structure",
+    "path": "../Exams/Operatings Systems/Introduction and Structure.js"
+  },
+  {
+    "id": "Process Concept and Management",
+    "category": "Operatings Systems",
+    "title": "Process Concept And Management",
+    "path": "../Exams/Operatings Systems/Process Concept and Management.js"
+  },
+  {
+    "id": "Quiz on the First Chapter",
+    "category": "Operatings Systems",
+    "title": "Quiz On The First Chapter",
+    "path": "../Exams/Operatings Systems/Quiz on the First Chapter.js"
+  },
+  {
+    "id": "Threads and CPU Scheduling",
+    "category": "Operatings Systems",
+    "title": "Threads And CPU Scheduling",
+    "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
+  },
+  {
     "id": "Quiz 1",
     "category": "Programming 2",
     "title": "Quiz 1",
