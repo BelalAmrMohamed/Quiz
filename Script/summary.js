@@ -82,6 +82,17 @@ function renderHeader(
     statsDisplay.textContent = `Correct: ${correct}    Wrong: ${wrong}    Skipped: ${skipped}`;
 }
 
+// Escape HTML so any tags in question text/options render as text
+function escapeHTML(input) {
+  if (input === undefined || input === null) return "";
+  return String(input)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderReview(container, questions, userAnswers) {
   if (!container) return;
   let html = "";
@@ -93,28 +104,31 @@ function renderReview(container, questions, userAnswers) {
     const statusClass = isCorrect ? "correct" : isSkipped ? "skipped" : "wrong";
     const statusIcon = isCorrect ? "✅" : isSkipped ? "⚪" : "❌";
 
+    const qText = escapeHTML(q.q);
+    const userText = isSkipped ? "Skipped" : escapeHTML(q.options[userAns]);
+    const correctText = escapeHTML(q.options[q.correct]);
+    const explanationText = q.explanation ? escapeHTML(q.explanation) : "";
+
     html += `
             <div class="review-card ${statusClass}">
                 <div class="review-header" style="display:flex; justify-content:space-between; align-items:center">
                     <span class="q-num">#${index + 1}</span>
                     <span class="status-icon">${statusIcon}</span>
                 </div>
-                <p class="q-text">${q.q}</p>
+                <p class="q-text">${qText}</p>
                 <div class="ans-comparison">
                     <div class="ans-box your-ans">
                         <small>Your Answer:</small>
-                        <span>${
-                          isSkipped ? "Skipped" : q.options[userAns]
-                        }</span>
+                        <span>${userText}</span>
                     </div>
                     <div class="ans-box correct-ans">
                         <small>Correct Answer:</small>
-                        <span>${q.options[q.correct]}</span>
+                        <span>${correctText}</span>
                     </div>
                 </div>
                 ${
-                  q.explanation
-                    ? `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`
+                  explanationText
+                    ? `<div class="explanation"><strong>💡 Explanation:</strong> ${explanationText}</div>`
                     : ""
                 }
             </div>
