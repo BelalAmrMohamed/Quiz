@@ -1,2 +1,3 @@
-.vs/
-Needed Changes.txt
+*.txt
+*.md
+!Readme.md

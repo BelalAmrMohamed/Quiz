@@ -27,6 +27,30 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
   },
   {
+    "id": "First Chapter quiz",
+    "category": "Programming 2",
+    "title": "First Chapter Quiz",
+    "path": "../Exams/Programming 2/First Chapter quiz.js"
+  },
+  {
+    "id": "Forth and 5th Ch Quiz",
+    "category": "Programming 2",
+    "title": "Forth And 5th Ch Quiz",
+    "path": "../Exams/Programming 2/Forth and 5th Ch Quiz.js"
+  },
+  {
+    "id": "General Quiz",
+    "category": "Programming 2",
+    "title": "General Quiz",
+    "path": "../Exams/Programming 2/General Quiz.js"
+  },
+  {
+    "id": "General Quiz (Hard)",
+    "category": "Programming 2",
+    "title": "General Quiz (Hard)",
+    "path": "../Exams/Programming 2/General Quiz (Hard).js"
+  },
+  {
     "id": "Quiz 1",
     "category": "Programming 2",
     "title": "Quiz 1",
@@ -55,5 +79,23 @@ export const examList = [
     "category": "Programming 2",
     "title": "Quiz 5",
     "path": "../Exams/Programming 2/Quiz 5.js"
+  },
+  {
+    "id": "Second Chapter Quiz",
+    "category": "Programming 2",
+    "title": "Second Chapter Quiz",
+    "path": "../Exams/Programming 2/Second Chapter Quiz.js"
+  },
+  {
+    "id": "Sixth and 7th Ch Quiz",
+    "category": "Programming 2",
+    "title": "Sixth And 7th Ch Quiz",
+    "path": "../Exams/Programming 2/Sixth and 7th Ch Quiz.js"
+  },
+  {
+    "id": "Third Chapter Quiz",
+    "category": "Programming 2",
+    "title": "Third Chapter Quiz",
+    "path": "../Exams/Programming 2/Third Chapter Quiz.js"
   }
 ];
