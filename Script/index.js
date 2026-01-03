@@ -1,4 +1,4 @@
-// Website/Script/index.js
+// Script/index.js
 import { examList } from "./examManifest.js";
 
 // Ensure these IDs match the HTML exactly
@@ -22,7 +22,7 @@ renderCategories();
 function renderCategories() {
   if (!title || !container) return; // Safety check
 
-  title.textContent = "📚 Select a Topic";
+  title.textContent = "Select a Topic"; // 📚
   breadcrumb.style.display = "none";
   container.innerHTML = "";
   container.className = "grid-container";
@@ -41,7 +41,7 @@ function renderCategories() {
 }
 
 function renderExams(category) {
-  title.textContent = `📝 ${category} Exams`;
+  title.textContent = `${category} Exams`; // 📝
   breadcrumb.textContent = "← Back to Categories";
   breadcrumb.style.display = "block";
   breadcrumb.onclick = renderCategories;

@@ -3,33 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Quiz results</title>
-    <link rel="stylesheet" href="CSS/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/summary.css">
 </head>
 
 <body>
-    <div class="container" style="text-align: center; margin-top: 50px;">
+    <div class="container">
+        <!-- Premium Header -->
         <div class="header">
             <h1>🎉 Quiz Complete!</h1>
         </div>
 
-        <div id="scoreHeader" class="question-card"
-            style="display:flex; align-items:center; justify-content:center; gap:20px">
+        <!-- Score Header Card -->
+        <div id="scoreHeader">
             <!-- Rendered by summary.js -->
         </div>
 
-        <div class="question-card" style="margin-top:20px;">
-            <h2>Your Score</h2>
-            <h1 id="scoreDisplay" style="font-size: 3em; color: #4caf50;">0/0</h1>
-            <p id="statsDisplay"></p>
+        <!-- Score Details Card -->
+        <div class="question-card">
+            <h2>Your Performance</h2>
+            <div id="scoreDisplay">0/0</div>
+            <div id="statsDisplay">
+                <!-- Stats will be rendered here -->
+            </div>
 
-            <div style="margin-top: 30px;">
-                <button class="nav-btn" id="backHomeBtn">Back to Home</button>
+            <div class="action-buttons">
+                <button class="nav-btn primary" id="backHomeBtn">
+                    ← Back to Home
+                </button>
             </div>
         </div>
 
-        <div id="reviewContainer" style="margin-top:20px"></div>
+        <!-- Review Section -->
+        <div id="reviewContainer">
+            <!-- Review cards will be rendered here -->
+        </div>
+
+        <!-- Premium Footer -->
+        <div class="watermark">Crafted by Belal Amr</div>
     </div>
+
     <script type="module" src="Script/summary.js"></script>
 </body>
 

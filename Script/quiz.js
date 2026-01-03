@@ -1,4 +1,4 @@
-// Website/Script/quiz.js
+// Script/quiz.js
 import { examList } from "./examManifest.js";
 
 // --- State Management ---
@@ -6,6 +6,7 @@ let questions = [];
 let metaData = {};
 let currentIdx = 0;
 let userAnswers = {};
+let lockedQuestions = {};
 let timeElapsed = 0;
 let timerInterval = null;
 let examId = null;
@@ -61,6 +62,7 @@ async function init() {
       if (confirm("Resume your previous session?")) {
         currentIdx = state.currentIdx || 0;
         userAnswers = state.userAnswers || {};
+        lockedQuestions = state.lockedQuestions || {};
         timeElapsed = state.timeElapsed || 0;
       } else {
         localStorage.removeItem(`quiz_state_${examId}`);
@@ -74,6 +76,18 @@ async function init() {
     window.prevQuestion = window.prevQuestion || (() => window.nav(-1));
     window.nextQuestion = window.nextQuestion || (() => window.nav(1));
     window.finishEarly = window.finishEarly || (() => window.finish());
+
+    // Keyboard navigation: Enter -> Next
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        try {
+          window.nextQuestion();
+        } catch (err) {
+          console.error("Enter -> Next failed:", err);
+        }
+      }
+    });
   } catch (err) {
     console.error("Initialization Error:", err);
     if (els.questionContainer) {
@@ -105,25 +119,30 @@ function renderQuestion() {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
 
-  // Generate Question HTML (escape any user-provided HTML tags)
   els.questionContainer.innerHTML = `
         <div class="question-card">
             <h2 class="question-text">${escapeHtml(q.q)}</h2>
             <div class="options-grid">
                 ${q.options
-                  .map(
-                    (opt, i) => `
-                    <div class="option-row ${
-                      userAnswers[currentIdx] === i ? "selected" : ""
-                    }" 
-                         onclick="window.handleSelect(${i})">
+                  .map((opt, i) => {
+                    const isSelected = userAnswers[currentIdx] === i;
+                    const isLocked = !!lockedQuestions[currentIdx];
+
+                    return `
+                     <div class="option-row ${isSelected ? "selected" : ""} ${
+                      isLocked ? "locked" : ""
+                    }" ${
+                      isLocked ? "" : `onclick=\"window.handleSelect(${i})\"`
+                    }>
                         <input type="radio" name="answer" ${
-                          userAnswers[currentIdx] === i ? "checked" : ""
-                        } aria-label="Option ${i + 1}">
+                          isSelected ? "checked" : ""
+                        } ${isLocked ? "disabled" : ""} aria-label="Option ${
+                      i + 1
+                    }">
                         <label>${escapeHtml(opt)}</label>
                     </div>
-                `
-                  )
+                `;
+                  })
                   .join("")}
             </div>
             <div style="margin-top:10px; color:#666; font-size:0.9em">Question ${
@@ -140,26 +159,75 @@ function renderQuestion() {
   const checkBtn = document.getElementById("checkBtn");
   if (checkBtn) checkBtn.onclick = () => window.checkAnswer();
 
+  // attach per-option handlers and ensure proper tabindex/aria state
+  const optionRows = Array.from(
+    els.questionContainer.querySelectorAll(".option-row")
+  );
+  optionRows.forEach((row) => {
+    const input = row.querySelector('input[role="radio"]');
+    const idx = Number(row.getAttribute("data-index"));
+    if (!input) return;
+
+    // Click on row focuses the input and selects it
+    row.onclick = (e) => {
+      if (lockedQuestions[currentIdx]) return;
+      input.focus();
+      window.handleSelect(idx);
+    };
+
+    // Ensure input reflects locked state
+    if (lockedQuestions[currentIdx]) {
+      input.disabled = true;
+      input.setAttribute("aria-disabled", "true");
+      input.setAttribute("tabindex", -1);
+    } else {
+      input.disabled = false;
+      input.removeAttribute("aria-disabled");
+    }
+
+    // When the native input receives focus, ensure it has tabindex 0 and others -1
+    input.addEventListener("focus", () => {
+      const radios = Array.from(
+        els.questionContainer.querySelectorAll('input[role="radio"]')
+      );
+      radios.forEach((r) =>
+        r.setAttribute("tabindex", r === input ? "0" : "-1")
+      );
+    });
+  });
+
   updateNav();
 }
 
 // --- Event Handlers (Attached to window for HTML access) ---
 // Exposed handlers for inline HTML (keeps module CSP-safe)
 window.handleSelect = (index) => {
+  if (lockedQuestions[currentIdx]) return; // don't allow changing locked answers
   userAnswers[currentIdx] = index;
   saveState();
   renderQuestion();
-  // auto-submit when all questions answered
+  maybeAutoSubmit();
+};
+
+// After selecting an answer, if all questions are answered prompt to submit
+// (keeps logic intact but auto-prompts the user before submitting)
+const maybeAutoSubmit = () => {
   const answered = Object.keys(userAnswers).length;
-  if (answered === questions.length) {
-    // give a short delay to show selection
+  if (answered === questions.length && questions.length > 0) {
     setTimeout(() => {
       try {
-        window.finishEarly();
+        if (
+          confirm(
+            "You have answered all questions. Do you want to submit your answers now?"
+          )
+        ) {
+          // skipConfirm true prevents double confirmation
+          window.finishEarly(true);
+        }
       } catch (e) {
-        console.error("Auto-finish failed:", e);
+        console.error("Auto-submit prompt failed:", e);
       }
-    }, 700);
+    }, 300);
   }
 };
 
@@ -176,8 +244,12 @@ window.nextQuestion = () => window.nav(1);
 
 window.finish = () => window.finishEarly();
 
-window.finishEarly = () => {
-  if (!confirm("Are you sure you want to submit your answers?")) return;
+window.finishEarly = (skipConfirm) => {
+  // Confirm before finishing unless caller set skipConfirm=true
+  if (!skipConfirm) {
+    if (!confirm("Are you sure you want to submit your answers?")) return;
+  }
+
   stopTimer();
 
   let correctCount = 0;
@@ -241,23 +313,50 @@ window.checkAnswer = () => {
       isCorrect ? "Correct ✅" : `Wrong ❌ — Correct: ${correctText}`
     }${explanation}`;
   }
+
+  // Lock this question so the user cannot change their answer after seeing feedback
+  lockedQuestions[currentIdx] = true;
+  // disable option inputs and clicks for current question in the DOM
+  optionRows.forEach((el) => {
+    const input = el.querySelector("input");
+    if (input) input.disabled = true;
+    el.classList.add("locked");
+    el.onclick = null;
+  });
+  saveState();
+
+  // If all questions are locked, update finish button text to indicate completion
+  const totalLocked = Object.keys(lockedQuestions).length;
+  if (els.finishBtn) {
+    if (totalLocked === questions.length) {
+      els.finishBtn.textContent = "Finish Exam";
+    } else {
+      els.finishBtn.textContent = "Finish Here";
+    }
+  }
 };
 
 // --- Utilities ---
 function updateNav() {
   if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
 
-  if (currentIdx === questions.length - 1) {
-    if (els.nextBtn) els.nextBtn.style.display = "none";
-    if (els.finishBtn) els.finishBtn.style.display = "inline-block";
-  } else {
-    if (els.nextBtn) els.nextBtn.style.display = "inline-block";
-    if (els.finishBtn) els.finishBtn.style.display = "none";
+  // Keep Next visible for consistent keyboard behavior;
+  if (els.nextBtn) els.nextBtn.style.display = "inline-block";
+
+  // Finish button remains visible throughout; change label when all locked
+  if (els.finishBtn) {
+    els.finishBtn.style.display = "inline-block";
+    const totalLocked = Object.keys(lockedQuestions).length;
+    if (totalLocked === questions.length && questions.length > 0) {
+      els.finishBtn.textContent = "Finish Exam";
+    } else {
+      els.finishBtn.textContent = "Finish Here";
+    }
   }
 }
 
 function saveState() {
-  const state = { currentIdx, userAnswers, timeElapsed };
+  const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
   localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
 }
 
