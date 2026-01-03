@@ -76,6 +76,7 @@ async function init() {
     window.prevQuestion = window.prevQuestion || (() => window.nav(-1));
     window.nextQuestion = window.nextQuestion || (() => window.nav(1));
     window.finishEarly = window.finishEarly || (() => window.finish());
+    window.checkAnswer = window.checkAnswer || (() => {});
 
     // Keyboard navigation: Enter -> Next
     document.addEventListener("keydown", (e) => {
@@ -101,8 +102,8 @@ function renderQuestion() {
   if (!questions.length) return;
   const q = questions[currentIdx];
 
-  // Update Progress Bar (Solved / Total)
-  const solvedCount = Object.keys(userAnswers).length;
+  // Update Progress Bar (Solved / Total) - Use lockedQuestions for consistency with second version
+  const solvedCount = Object.keys(lockedQuestions).length;
   const progressPercent = (solvedCount / questions.length) * 100;
   if (els.progressFill) els.progressFill.style.width = `${progressPercent}%`;
   if (els.progressText)
@@ -110,73 +111,101 @@ function renderQuestion() {
       progressPercent
     )}% (${solvedCount}/${questions.length})`;
 
-  // Helper to escape any HTML in question/options/explanation
   const escapeHtml = (str) =>
-    String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+    String(str).replace(
+      /[&<>"']/g,
+      (m) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[m])
+    );
+
+  const isLocked = !!lockedQuestions[currentIdx];
+  const userSelected = userAnswers[currentIdx];
+
+  // Feedback Logic (enhanced with first version's details)
+  let feedbackClass = "feedback";
+  let feedbackText = "";
+  // Support multiple explanation fields for flexibility
+  const explanationText =
+    q.explanation || q.desc || q.info || "No explanation provided.";
+
+  if (isLocked) {
+    const isCorrect = userSelected === (q.correct || q.answer); // Support both field names
+    feedbackClass += isCorrect ? " correct show" : " wrong show";
+    const statusMsg = isCorrect
+      ? "Correct ✅"
+      : `Wrong ❌ — Correct: ${escapeHtml(q.options[q.correct || q.answer])}`;
+    feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
+      explanationText
+    )}</div>`;
+  }
 
   els.questionContainer.innerHTML = `
         <div class="question-card">
-            <h2 class="question-text">${escapeHtml(q.q)}</h2>
+            <div class="question-header">
+                <div class="question-number">Question ${currentIdx + 1} of ${
+    questions.length
+  }</div>
+                <h2 class="question-text">${escapeHtml(q.q)}</h2>
+            </div>
+
             <div class="options-grid">
                 ${q.options
                   .map((opt, i) => {
-                    const isSelected = userAnswers[currentIdx] === i;
-                    const isLocked = !!lockedQuestions[currentIdx];
+                    const isSelected = userSelected === i;
+                    let optionClass = "option-row";
+                    if (isSelected) optionClass += " selected";
+                    if (isLocked) {
+                      optionClass += " locked";
+                      if (i === (q.correct || q.answer))
+                        optionClass += " correct";
+                      if (isSelected && i !== (q.correct || q.answer))
+                        optionClass += " wrong";
+                    }
 
                     return `
-                     <div class="option-row ${isSelected ? "selected" : ""} ${
-                      isLocked ? "locked" : ""
-                    }" ${
-                      isLocked ? "" : `onclick=\"window.handleSelect(${i})\"`
+                    <div class="${optionClass}" ${
+                      isLocked ? "" : `onclick="window.handleSelect(${i})"`
                     }>
                         <input type="radio" name="answer" ${
                           isSelected ? "checked" : ""
                         } ${isLocked ? "disabled" : ""} aria-label="Option ${
                       i + 1
                     }">
-                        <label>${escapeHtml(opt)}</label>
-                    </div>
-                `;
+                        <span class="option-label">${escapeHtml(opt)}</span>
+                    </div>`;
                   })
                   .join("")}
             </div>
-            <div style="margin-top:10px; color:#666; font-size:0.9em">Question ${
-              currentIdx + 1
-            } of ${questions.length}</div>
-            <div style="margin-top:12px; display:flex; gap:8px; align-items:center">
-              <button id="checkBtn" class="nav-btn">Check Answer</button>
-              <div id="feedback" class="feedback" style="margin-left:8px"></div>
+
+            <button class="check-answer-btn ${isLocked ? "hidden" : ""}"
+                    id="checkBtn"
+                    onclick="window.checkAnswer()"
+                    ${userSelected === undefined ? "disabled" : ""}>
+                Check Answer
+            </button>
+
+            <div class="${feedbackClass}">
+                ${feedbackText}
             </div>
         </div>
     `;
 
-  // attach check handler
-  const checkBtn = document.getElementById("checkBtn");
-  if (checkBtn) checkBtn.onclick = () => window.checkAnswer();
-
-  // attach per-option handlers and ensure proper tabindex/aria state
+  // Re-attach any necessary post-render handlers for accessibility (from first version)
   const optionRows = Array.from(
     els.questionContainer.querySelectorAll(".option-row")
   );
-  optionRows.forEach((row) => {
-    const input = row.querySelector('input[role="radio"]');
-    const idx = Number(row.getAttribute("data-index"));
+  optionRows.forEach((row, idx) => {
+    const input = row.querySelector('input[type="radio"]');
     if (!input) return;
 
-    // Click on row focuses the input and selects it
-    row.onclick = (e) => {
-      if (lockedQuestions[currentIdx]) return;
-      input.focus();
-      window.handleSelect(idx);
-    };
-
     // Ensure input reflects locked state
-    if (lockedQuestions[currentIdx]) {
+    if (isLocked) {
       input.disabled = true;
       input.setAttribute("aria-disabled", "true");
       input.setAttribute("tabindex", -1);
@@ -188,7 +217,7 @@ function renderQuestion() {
     // When the native input receives focus, ensure it has tabindex 0 and others -1
     input.addEventListener("focus", () => {
       const radios = Array.from(
-        els.questionContainer.querySelectorAll('input[role="radio"]')
+        els.questionContainer.querySelectorAll('input[type="radio"]')
       );
       radios.forEach((r) =>
         r.setAttribute("tabindex", r === input ? "0" : "-1")
@@ -210,7 +239,6 @@ window.handleSelect = (index) => {
 };
 
 // After selecting an answer, if all questions are answered prompt to submit
-// (keeps logic intact but auto-prompts the user before submitting)
 const maybeAutoSubmit = () => {
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
@@ -254,7 +282,7 @@ window.finishEarly = (skipConfirm) => {
 
   let correctCount = 0;
   questions.forEach((q, i) => {
-    if (userAnswers[i] === q.correct) correctCount++;
+    if (userAnswers[i] === (q.correct || q.answer)) correctCount++;
   });
 
   const finalResult = {
@@ -272,68 +300,11 @@ window.finishEarly = (skipConfirm) => {
 
 // Check the current question and show feedback (per-question submit)
 window.checkAnswer = () => {
-  if (!questions.length) return;
-  const q = questions[currentIdx];
-  const sel = userAnswers[currentIdx];
-  const feedbackEl = document.getElementById("feedback");
-  const escapeHtml = (str) =>
-    String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-
-  if (sel === undefined) {
-    if (feedbackEl) {
-      feedbackEl.className = "feedback show wrong";
-      feedbackEl.textContent = "Please select an option first.";
-    } else alert("Please select an option first.");
-    return;
-  }
-
-  const isCorrect = sel === q.correct;
-
-  // highlight correct/wrong options visually
-  const optionRows = Array.from(document.querySelectorAll(".option-row"));
-  optionRows.forEach((el, i) => {
-    el.classList.remove("correct", "wrong");
-    if (i === q.correct) el.classList.add("correct");
-    else if (i === sel && !isCorrect) el.classList.add("wrong");
-  });
-
-  // show feedback with escaped text
-  if (feedbackEl) {
-    feedbackEl.className = `feedback show ${isCorrect ? "correct" : "wrong"}`;
-    const correctText = escapeHtml(q.options[q.correct]);
-    const explanation = q.explanation
-      ? `<div style="margin-top:8px">${escapeHtml(q.explanation)}</div>`
-      : "";
-    feedbackEl.innerHTML = `${
-      isCorrect ? "Correct ✅" : `Wrong ❌ — Correct: ${correctText}`
-    }${explanation}`;
-  }
-
-  // Lock this question so the user cannot change their answer after seeing feedback
+  if (userAnswers[currentIdx] === undefined) return;
   lockedQuestions[currentIdx] = true;
-  // disable option inputs and clicks for current question in the DOM
-  optionRows.forEach((el) => {
-    const input = el.querySelector("input");
-    if (input) input.disabled = true;
-    el.classList.add("locked");
-    el.onclick = null;
-  });
   saveState();
-
-  // If all questions are locked, update finish button text to indicate completion
-  const totalLocked = Object.keys(lockedQuestions).length;
-  if (els.finishBtn) {
-    if (totalLocked === questions.length) {
-      els.finishBtn.textContent = "Finish Exam";
-    } else {
-      els.finishBtn.textContent = "Finish Here";
-    }
-  }
+  renderQuestion();
+  updateNav();
 };
 
 // --- Utilities ---
@@ -362,17 +333,15 @@ function saveState() {
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
-  // Pass function reference, NOT a string (CSP friendly)
-  timerInterval = setInterval(updateTimerUI, 1000);
-}
-
-function updateTimerUI() {
-  timeElapsed++;
-  const m = Math.floor(timeElapsed / 60)
-    .toString()
-    .padStart(2, "0");
-  const s = (timeElapsed % 60).toString().padStart(2, "0");
-  if (els.timer) els.timer.textContent = `⏱ ${m}:${s}`;
+  timerInterval = setInterval(() => {
+    timeElapsed++;
+    const mins = Math.floor(timeElapsed / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = (timeElapsed % 60).toString().padStart(2, "0");
+    if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
+    saveState(); // Save periodically like second version
+  }, 1000);
 }
 
 function stopTimer() {
