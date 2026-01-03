@@ -1,4 +1,3 @@
-// Script/quiz.js
 import { examList } from "./examManifest.js";
 
 // --- State Management ---
@@ -23,6 +22,18 @@ const els = {
   finishBtn: document.getElementById("finishBtn"),
 };
 
+// --- Helper: HTML Escaping ---
+// This prevents tags like <br> from being rendered as HTML elements
+const escapeHtml = (unsafe) => {
+  if (unsafe === null || unsafe === undefined) return "";
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 // --- Initialization ---
 async function init() {
   const params = new URLSearchParams(window.location.search);
@@ -36,26 +47,23 @@ async function init() {
   }
 
   try {
-    // Dynamic Import (CSP Compliant)
     const module = await import(config.path);
     questions = module.questions;
-    // derive title/category from module.meta when provided, otherwise from file path
+
+    // Handle metadata
     if (module.meta && (module.meta.title || module.meta.category)) {
       metaData = module.meta;
     } else {
-      // compute from config.path: parent folder name and file name
       const parts = config.path.replace(/\\/g, "/").split("/");
-      const filename = parts[parts.length - 1] || ""; // html_basics.js
-      const folder = parts[parts.length - 2] || ""; // HTML
+      const filename = parts[parts.length - 1] || "";
       const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
-      // Title-case each word
       const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
-      metaData = { title, category: folder };
+      metaData = { title, category: parts[parts.length - 2] || "" };
     }
 
     if (els.title) els.title.textContent = metaData.title || "Quiz";
 
-    // Restore Session if exists
+    // Restore Session
     const saved = localStorage.getItem(`quiz_state_${examId}`);
     if (saved) {
       const state = JSON.parse(saved);
@@ -71,28 +79,26 @@ async function init() {
 
     renderQuestion();
     startTimer();
-    // make sure nav controls are exposed for inline html handlers
+
+    // Global Handlers
     window.handleSelect = window.handleSelect || ((i) => {});
     window.prevQuestion = window.prevQuestion || (() => window.nav(-1));
     window.nextQuestion = window.nextQuestion || (() => window.nav(1));
     window.finishEarly = window.finishEarly || (() => window.finish());
     window.checkAnswer = window.checkAnswer || (() => {});
 
-    // Keyboard navigation: Enter -> Next
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
         try {
           window.nextQuestion();
-        } catch (err) {
-          console.error("Enter -> Next failed:", err);
-        }
+        } catch (err) {}
       }
     });
   } catch (err) {
     console.error("Initialization Error:", err);
     if (els.questionContainer) {
-      els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data. Please ensure you are using a local server (Live Server).</p>`;
+      els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data.</p>`;
     }
   }
 }
@@ -102,7 +108,10 @@ function renderQuestion() {
   if (!questions.length) return;
   const q = questions[currentIdx];
 
-  // Update Progress Bar (Solved / Total) - Use lockedQuestions for consistency with second version
+  // Determine correct index safely (using ?? handles index 0 correctly)
+  const correctIdx = q.correct ?? q.answer;
+
+  // Update Progress
   const solvedCount = Object.keys(lockedQuestions).length;
   const progressPercent = (solvedCount / questions.length) * 100;
   if (els.progressFill) els.progressFill.style.width = `${progressPercent}%`;
@@ -111,40 +120,35 @@ function renderQuestion() {
       progressPercent
     )}% (${solvedCount}/${questions.length})`;
 
-  const escapeHtml = (str) =>
-    String(str).replace(
-      /[&<>"']/g,
-      (m) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[m])
-    );
-
   const isLocked = !!lockedQuestions[currentIdx];
   const userSelected = userAnswers[currentIdx];
 
-  // Feedback Logic (enhanced with first version's details)
+  // Feedback Logic
   let feedbackClass = "feedback";
   let feedbackText = "";
-  // Support multiple explanation fields for flexibility
+  // Get explanation and ESCAPE it so tags show as text
   const explanationText =
     q.explanation || q.desc || q.info || "No explanation provided.";
 
   if (isLocked) {
-    const isCorrect = userSelected === (q.correct || q.answer); // Support both field names
+    const isCorrect = userSelected === correctIdx;
     feedbackClass += isCorrect ? " correct show" : " wrong show";
+
+    // Escape the "Correct Answer" text specifically
+    const correctLabel = q.options[correctIdx]
+      ? escapeHtml(q.options[correctIdx])
+      : "Unknown";
+
     const statusMsg = isCorrect
       ? "Correct ✅"
-      : `Wrong ❌ — Correct: ${escapeHtml(q.options[q.correct || q.answer])}`;
+      : `Wrong ❌ — Correct: ${correctLabel}`;
+
     feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
       explanationText
     )}</div>`;
   }
 
+  // Render content using escapeHtml on all dynamic strings
   els.questionContainer.innerHTML = `
         <div class="question-card">
             <div class="question-header">
@@ -162,21 +166,22 @@ function renderQuestion() {
                     if (isSelected) optionClass += " selected";
                     if (isLocked) {
                       optionClass += " locked";
-                      if (i === (q.correct || q.answer))
-                        optionClass += " correct";
-                      if (isSelected && i !== (q.correct || q.answer))
+                      if (i === correctIdx) optionClass += " correct";
+                      if (isSelected && i !== correctIdx)
                         optionClass += " wrong";
                     }
 
+                    // Note: We run escapeHtml(opt) here to fix the display bug
                     return `
                     <div class="${optionClass}" ${
                       isLocked ? "" : `onclick="window.handleSelect(${i})"`
                     }>
                         <input type="radio" name="answer" ${
                           isSelected ? "checked" : ""
-                        } ${isLocked ? "disabled" : ""} aria-label="Option ${
-                      i + 1
-                    }">
+                        } 
+                               ${
+                                 isLocked ? "disabled" : ""
+                               } aria-label="Option ${i + 1}">
                         <span class="option-label">${escapeHtml(opt)}</span>
                     </div>`;
                   })
@@ -184,8 +189,7 @@ function renderQuestion() {
             </div>
 
             <button class="check-answer-btn ${isLocked ? "hidden" : ""}"
-                    id="checkBtn"
-                    onclick="window.checkAnswer()"
+                    id="checkBtn" onclick="window.checkAnswer()"
                     ${userSelected === undefined ? "disabled" : ""}>
                 Check Answer
             </button>
@@ -196,25 +200,17 @@ function renderQuestion() {
         </div>
     `;
 
-  // Re-attach any necessary post-render handlers for accessibility (from first version)
+  // Post-render accessibility adjustments
   const optionRows = Array.from(
     els.questionContainer.querySelectorAll(".option-row")
   );
   optionRows.forEach((row, idx) => {
     const input = row.querySelector('input[type="radio"]');
     if (!input) return;
-
-    // Ensure input reflects locked state
     if (isLocked) {
       input.disabled = true;
       input.setAttribute("aria-disabled", "true");
-      input.setAttribute("tabindex", -1);
-    } else {
-      input.disabled = false;
-      input.removeAttribute("aria-disabled");
     }
-
-    // When the native input receives focus, ensure it has tabindex 0 and others -1
     input.addEventListener("focus", () => {
       const radios = Array.from(
         els.questionContainer.querySelectorAll('input[type="radio"]')
@@ -228,33 +224,24 @@ function renderQuestion() {
   updateNav();
 }
 
-// --- Event Handlers (Attached to window for HTML access) ---
-// Exposed handlers for inline HTML (keeps module CSP-safe)
+// --- Event Handlers ---
 window.handleSelect = (index) => {
-  if (lockedQuestions[currentIdx]) return; // don't allow changing locked answers
+  if (lockedQuestions[currentIdx]) return;
   userAnswers[currentIdx] = index;
   saveState();
   renderQuestion();
   maybeAutoSubmit();
 };
 
-// After selecting an answer, if all questions are answered prompt to submit
 const maybeAutoSubmit = () => {
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
     setTimeout(() => {
       try {
-        if (
-          confirm(
-            "You have answered all questions. Do you want to submit your answers now?"
-          )
-        ) {
-          // skipConfirm true prevents double confirmation
+        if (confirm("You have answered all questions. Submit now?")) {
           window.finishEarly(true);
         }
-      } catch (e) {
-        console.error("Auto-submit prompt failed:", e);
-      }
+      } catch (e) {}
     }, 300);
   }
 };
@@ -269,20 +256,16 @@ window.nav = (dir) => {
 
 window.prevQuestion = () => window.nav(-1);
 window.nextQuestion = () => window.nav(1);
-
 window.finish = () => window.finishEarly();
 
 window.finishEarly = (skipConfirm) => {
-  // Confirm before finishing unless caller set skipConfirm=true
-  if (!skipConfirm) {
-    if (!confirm("Are you sure you want to submit your answers?")) return;
-  }
-
+  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
   stopTimer();
 
   let correctCount = 0;
   questions.forEach((q, i) => {
-    if (userAnswers[i] === (q.correct || q.answer)) correctCount++;
+    const correctIdx = q.correct ?? q.answer;
+    if (userAnswers[i] === correctIdx) correctCount++;
   });
 
   const finalResult = {
@@ -294,11 +277,10 @@ window.finishEarly = (skipConfirm) => {
   };
 
   localStorage.setItem("last_quiz_result", JSON.stringify(finalResult));
-  localStorage.removeItem(`quiz_state_${examId}`); // Clear session
+  localStorage.removeItem(`quiz_state_${examId}`);
   window.location.href = "summary.html";
 };
 
-// Check the current question and show feedback (per-question submit)
 window.checkAnswer = () => {
   if (userAnswers[currentIdx] === undefined) return;
   lockedQuestions[currentIdx] = true;
@@ -310,19 +292,14 @@ window.checkAnswer = () => {
 // --- Utilities ---
 function updateNav() {
   if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
-
-  // Keep Next visible for consistent keyboard behavior;
   if (els.nextBtn) els.nextBtn.style.display = "inline-block";
-
-  // Finish button remains visible throughout; change label when all locked
   if (els.finishBtn) {
     els.finishBtn.style.display = "inline-block";
     const totalLocked = Object.keys(lockedQuestions).length;
-    if (totalLocked === questions.length && questions.length > 0) {
-      els.finishBtn.textContent = "Finish Exam";
-    } else {
-      els.finishBtn.textContent = "Finish Here";
-    }
+    els.finishBtn.textContent =
+      totalLocked === questions.length && questions.length > 0
+        ? "Finish Exam"
+        : "Finish Here";
   }
 }
 
@@ -340,7 +317,7 @@ function startTimer() {
       .padStart(2, "0");
     const secs = (timeElapsed % 60).toString().padStart(2, "0");
     if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
-    saveState(); // Save periodically like second version
+    saveState();
   }, 1000);
 }
 
@@ -348,5 +325,4 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-// Start the app
 init();
