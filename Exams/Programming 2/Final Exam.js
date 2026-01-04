@@ -149,7 +149,7 @@ export const questions = [
   },
   {
     q: "Which of the following is the correct way to comment in CSS?",
-    options: ["", "// comment", "/* comment */", "# comment"],
+    options: ["<!-- comment -->", "// comment", "/* comment */", "# comment"],
     correct: 2,
     explanation: "",
   },
