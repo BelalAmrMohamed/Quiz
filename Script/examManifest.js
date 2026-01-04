@@ -27,6 +27,12 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
   },
   {
+    "id": "Final Exam",
+    "category": "Programming 2",
+    "title": "Final Exam",
+    "path": "../Exams/Programming 2/Final Exam.js"
+  },
+  {
     "id": "First Chapter quiz",
     "category": "Programming 2",
     "title": "First Chapter Quiz",
