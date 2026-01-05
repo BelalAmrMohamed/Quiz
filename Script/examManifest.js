@@ -39,12 +39,6 @@ export const examList = [
     "path": "../Exams/Object-Oriented Programming/Final Exam.js"
   },
   {
-    "id": "Final Exam - Copy",
-    "category": "Object-Oriented Programming",
-    "title": "Final Exam   Copy",
-    "path": "../Exams/Object-Oriented Programming/Final Exam - Copy.js"
-  },
-  {
     "id": "1. Introduction",
     "category": "Operatings Systems",
     "title": "1. Introduction",
@@ -85,6 +79,12 @@ export const examList = [
     "category": "Operatings Systems",
     "title": "Introduction And Structure",
     "path": "../Exams/Operatings Systems/Introduction and Structure.js"
+  },
+  {
+    "id": "Midterm Exam",
+    "category": "Operatings Systems",
+    "title": "Midterm Exam",
+    "path": "../Exams/Operatings Systems/Midterm Exam.js"
   },
   {
     "id": "Process Concept and Management",
