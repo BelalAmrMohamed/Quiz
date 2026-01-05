@@ -39,6 +39,12 @@ export const examList = [
     "path": "../Exams/Object-Oriented Programming/Final Exam.js"
   },
   {
+    "id": "Final Exam - Copy",
+    "category": "Object-Oriented Programming",
+    "title": "Final Exam   Copy",
+    "path": "../Exams/Object-Oriented Programming/Final Exam - Copy.js"
+  },
+  {
     "id": "1. Introduction",
     "category": "Operatings Systems",
     "title": "1. Introduction",
