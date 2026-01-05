@@ -3,6 +3,36 @@
 
 export const examList = [
   {
+    "id": "1. Introduction",
+    "category": "Operatings Systems",
+    "title": "1. Introduction",
+    "path": "../Exams/Operatings Systems/1. Introduction.js"
+  },
+  {
+    "id": "2. Operating Systems Structures",
+    "category": "Operatings Systems",
+    "title": "2. Operating Systems Structures",
+    "path": "../Exams/Operatings Systems/2. Operating Systems Structures.js"
+  },
+  {
+    "id": "3. Processes",
+    "category": "Operatings Systems",
+    "title": "3. Processes",
+    "path": "../Exams/Operatings Systems/3. Processes.js"
+  },
+  {
+    "id": "4. Threads",
+    "category": "Operatings Systems",
+    "title": "4. Threads",
+    "path": "../Exams/Operatings Systems/4. Threads.js"
+  },
+  {
+    "id": "6. CPU Scheduling",
+    "category": "Operatings Systems",
+    "title": "6. CPU Scheduling",
+    "path": "../Exams/Operatings Systems/6. CPU Scheduling.js"
+  },
+  {
     "id": "Introduction and Structure",
     "category": "Operatings Systems",
     "title": "Introduction And Structure",
