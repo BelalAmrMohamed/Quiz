@@ -3,6 +3,42 @@
 
 export const examList = [
   {
+    "id": "Lecture 1 MCQ",
+    "category": "Computer Network",
+    "title": "Lecture 1 MCQ",
+    "path": "../Exams/Computer Network/Lecture 1 MCQ.js"
+  },
+  {
+    "id": "Practical Exam - Model A",
+    "category": "Discrete Structure",
+    "title": "Practical Exam   Model A",
+    "path": "../Exams/Discrete Structure/Practical Exam - Model A.js"
+  },
+  {
+    "id": "Quiz 1",
+    "category": "Discrete Structure",
+    "title": "Quiz 1",
+    "path": "../Exams/Discrete Structure/Quiz 1.js"
+  },
+  {
+    "id": "Quiz 2",
+    "category": "Discrete Structure",
+    "title": "Quiz 2",
+    "path": "../Exams/Discrete Structure/Quiz 2.js"
+  },
+  {
+    "id": "General AI quiz",
+    "category": "Foundation of IS",
+    "title": "General AI Quiz",
+    "path": "../Exams/Foundation of IS/General AI quiz.js"
+  },
+  {
+    "id": "Final Exam",
+    "category": "Object-Oriented Programming",
+    "title": "Final Exam",
+    "path": "../Exams/Object-Oriented Programming/Final Exam.js"
+  },
+  {
     "id": "1. Introduction",
     "category": "Operatings Systems",
     "title": "1. Introduction",
@@ -31,6 +67,12 @@ export const examList = [
     "category": "Operatings Systems",
     "title": "6. CPU Scheduling",
     "path": "../Exams/Operatings Systems/6. CPU Scheduling.js"
+  },
+  {
+    "id": "General Exam",
+    "category": "Operatings Systems",
+    "title": "General Exam",
+    "path": "../Exams/Operatings Systems/General Exam.js"
   },
   {
     "id": "Introduction and Structure",
