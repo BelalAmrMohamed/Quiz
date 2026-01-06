@@ -63,8 +63,49 @@ Quiz Website/
 │   ├── summary.js
 │   └── examManifest.js
 │
-└── tools/
-    └── generateExamManifest.js
+├── tools/
+│   └── generateExamManifest.js
+│
+└── Exams/
+    ├── Categorie-1
+    │   ├── quiz-1
+    │   ├── quiz-2
+    │   └── quiz-3
+    │
+    └── Categorie-2
+        ├── quiz-1
+        ├── quiz-2
+        └── quiz-3
+```
+
+## How quizzes are formatted
+
+Each quiz is smartly formatted in their own javascript file
+
+```js
+export const questions = [
+  {
+    // The question can be MCQ
+    q: "Question text here?",
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    correct: 1,
+    explanation: "Write explanation here.",
+  },
+  {
+    // The question can have 2, 3, 4 or more options
+    q: "What is the primary function of a web browser?",
+    options: ["Option A", "Option B", "Option C", "Option D", "Option E"],
+    correct: 1,
+    explanation: "Write explanation here.",
+  },
+  {
+    // The question can be `True & False`
+    q: "Question text here?",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Write explanation here.",
+  },
+];
 ```
 
 ## Changelog
