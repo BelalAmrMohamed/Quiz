@@ -100,7 +100,7 @@ export const questions = [
       "Process management involves the creation and deletion of user and system processes, as well as their scheduling, synchronization, and communication.",
   },
 
-  // Definitions Section
+  // Definitions Section - Testing knowledge of key terms
   {
     q: "Define the term: Shell",
     options: [
