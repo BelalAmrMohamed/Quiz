@@ -44,6 +44,29 @@ Access the hosted version:
 
 ---
 
+## Project structure
+
+```
+Quiz Website/
+├── index.html
+├── quiz.html
+├── summary.html
+│
+├── CSS/
+│   ├── styles.css
+│   ├── quiz.css
+│   └── summary.css
+│
+├── script/
+│   ├── index.js
+│   ├── quiz.js
+│   ├── summary.js
+│   └── examManifest.js
+│
+└── tools/
+    └── generateExamManifest.js
+```
+
 ## Changelog
 
 **v1.0.0 – Initial Release**
