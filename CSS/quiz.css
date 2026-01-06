@@ -390,6 +390,88 @@ body::before {
   letter-spacing: -0.01em;
 }
 
+/* Essay Question Styles */
+.essay-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  order: 0;
+  margin-bottom: 20px;
+}
+
+.essay-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.essay-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 18px;
+  border: 2px solid var(--color-border);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  resize: vertical;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.essay-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), var(--shadow-sm);
+  background: var(--color-primary-light);
+}
+
+.essay-textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.essay-textarea.locked {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border-light);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.essay-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+  padding: 10px 14px;
+  background: var(--color-primary-light);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.formal-answer {
+  margin-top: 20px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  border-radius: 14px;
+  border-left: 5px solid #0ea5e9;
+  order: 3;
+}
+
+.formal-answer strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #0c4a6e;
+  font-size: 0.9375rem;
+}
+
+.formal-answer-text {
+  color: #0c4a6e;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
 /* Enhanced Options */
 .options-grid {
   display: flex;
@@ -623,6 +705,18 @@ body::before {
   content: "✗";
 }
 
+.feedback.essay-feedback {
+  flex-direction: column;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+.feedback.essay-feedback::before {
+  content: "📝";
+}
+
 /* Navigation */
 .navigation {
   display: flex;
@@ -732,6 +826,12 @@ body::before {
     font-size: 1.125rem;
   }
 
+  .essay-textarea {
+    min-height: 150px;
+    padding: 14px;
+    font-size: 0.9375rem;
+  }
+
   .option-row {
     padding: 16px 18px;
   }
@@ -786,6 +886,11 @@ body::before {
 
   .question-text {
     font-size: 1rem;
+  }
+
+  .essay-textarea {
+    min-height: 120px;
+    padding: 12px;
   }
 
   .option-label {

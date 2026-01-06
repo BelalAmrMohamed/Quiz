@@ -33,6 +33,11 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
+// --- Helper: Check if Essay Question ---
+const isEssayQuestion = (q) => {
+  return q.options && q.options.length === 1;
+};
+
 // --- Initialization ---
 async function init() {
   const params = new URLSearchParams(window.location.search);
@@ -81,13 +86,18 @@ async function init() {
 
     // Global Handlers
     window.handleSelect = window.handleSelect || ((i) => {});
+    window.handleEssayInput = window.handleEssayInput || (() => {});
     window.prevQuestion = window.prevQuestion || (() => window.nav(-1));
     window.nextQuestion = window.nextQuestion || (() => window.nav(1));
     window.finishEarly = window.finishEarly || (() => window.finish());
     window.checkAnswer = window.checkAnswer || (() => {});
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && !e.shiftKey) {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement.tagName === "TEXTAREA") {
+          return; // Allow Enter in textarea
+        }
         e.preventDefault();
         try {
           window.nextQuestion();
@@ -106,10 +116,11 @@ async function init() {
 function renderQuestion() {
   if (!questions.length) return;
   const q = questions[currentIdx];
+  const isEssay = isEssayQuestion(q);
 
   const correctIdx = q.correct ?? q.answer;
 
-  // --- FIX START: Update Progress based on userAnswers (selections) instead of lockedQuestions ---
+  // Update Progress based on userAnswers (selections)
   const answeredCount = Object.keys(userAnswers).length;
   const progressPercent = (answeredCount / questions.length) * 100;
 
@@ -118,7 +129,6 @@ function renderQuestion() {
     els.progressText.textContent = `Progress: ${Math.round(
       progressPercent
     )}% (${answeredCount}/${questions.length})`;
-  // --- FIX END ---
 
   const isLocked = !!lockedQuestions[currentIdx];
   const userSelected = userAnswers[currentIdx];
@@ -130,91 +140,159 @@ function renderQuestion() {
     q.explanation || q.desc || q.info || "No explanation provided.";
 
   if (isLocked) {
-    const isCorrect = userSelected === correctIdx;
-    feedbackClass += isCorrect ? " correct show" : " wrong show";
+    let isCorrect = false;
 
-    const correctLabel = q.options[correctIdx]
-      ? escapeHtml(q.options[correctIdx])
-      : "Unknown";
+    if (isEssay) {
+      // For essay questions, compare text (case-insensitive, trimmed)
+      const userAnswer = String(userSelected || "")
+        .trim()
+        .toLowerCase();
+      const correctAnswer = String(q.options[0] || "")
+        .trim()
+        .toLowerCase();
+      isCorrect = userAnswer === correctAnswer;
 
-    const statusMsg = isCorrect ? "Correct ✅" : `Wrong ❌`;
+      feedbackClass += " essay-feedback show";
+      const statusMsg = isCorrect
+        ? "Your answer matches! ✅"
+        : "Your answer differs ⚠️";
 
-    feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
-      explanationText
-    )}</div>`;
+      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate. Your answer might still be correct in a different way.</div><div style="margin-top:8px">${escapeHtml(
+        explanationText
+      )}</div>`;
+    } else {
+      // For MCQ/True-False
+      isCorrect = userSelected === correctIdx;
+      feedbackClass += isCorrect ? " correct show" : " wrong show";
+      const statusMsg = isCorrect ? "Correct ✅" : `Wrong ❌`;
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
+        explanationText
+      )}</div>`;
+    }
   }
 
   // Render content
-  els.questionContainer.innerHTML = `
-        <div class="question-card">
-            <div class="question-header">
-                <div class="question-number">Question ${currentIdx + 1} of ${
-    questions.length
-  }</div>
-                <h2 class="question-text">${escapeHtml(q.q)}</h2>
-            </div>
-
-            <div class="options-grid">
-                ${q.options
-                  .map((opt, i) => {
-                    const isSelected = userSelected === i;
-                    let optionClass = "option-row";
-                    if (isSelected) optionClass += " selected";
-                    if (isLocked) {
-                      optionClass += " locked";
-                      if (i === correctIdx) optionClass += " correct";
-                      if (isSelected && i !== correctIdx)
-                        optionClass += " wrong";
-                    }
-
-                    return `
-                    <div class="${optionClass}" ${
-                      isLocked ? "" : `onclick="window.handleSelect(${i})"`
-                    }>
-                        <input type="radio" name="answer" ${
-                          isSelected ? "checked" : ""
-                        } 
-                               ${
-                                 isLocked ? "disabled" : ""
-                               } aria-label="Option ${i + 1}">
-                        <span class="option-label">${escapeHtml(opt)}</span>
-                    </div>`;
-                  })
-                  .join("")}
-            </div>
-
-            <button class="check-answer-btn ${isLocked ? "hidden" : ""}"
-                    id="checkBtn" onclick="window.checkAnswer()"
-                    ${userSelected === undefined ? "disabled" : ""}>
-                Check Answer
-            </button>
-
-            <div class="${feedbackClass}">
-                ${feedbackText}
-            </div>
+  if (isEssay) {
+    // Render Essay Question
+    els.questionContainer.innerHTML = `
+      <div class="question-card">
+        <div class="question-header">
+          <div class="question-number">Question ${currentIdx + 1} of ${
+      questions.length
+    }</div>
+          <h2 class="question-text">${escapeHtml(q.q)}</h2>
         </div>
+
+        <div class="essay-container">
+          <label for="essayInput" class="essay-label">Your Answer:</label>
+          <textarea 
+            id="essayInput" 
+            class="essay-textarea ${isLocked ? "locked" : ""}" 
+            placeholder="Type your answer here..."
+            ${isLocked ? "disabled" : ""}
+            oninput="window.handleEssayInput()"
+          >${escapeHtml(userSelected || "")}</textarea>
+          <div class="essay-hint">💡 Tip: Your answer will be compared with the formal answer (case-insensitive)</div>
+        </div>
+
+        <button class="check-answer-btn ${isLocked ? "hidden" : ""}"
+                id="checkBtn" onclick="window.checkAnswer()"
+                ${
+                  !userSelected || String(userSelected).trim() === ""
+                    ? "disabled"
+                    : ""
+                }>
+          Check Answer
+        </button>
+
+        <div class="${feedbackClass}">
+          ${feedbackText}
+        </div>
+
+        ${
+          isLocked
+            ? `
+          <div class="formal-answer">
+            <strong>📝 Formal Answer:</strong>
+            <div class="formal-answer-text">${escapeHtml(q.options[0])}</div>
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+  } else {
+    // Render MCQ/True-False Question
+    els.questionContainer.innerHTML = `
+      <div class="question-card">
+        <div class="question-header">
+          <div class="question-number">Question ${currentIdx + 1} of ${
+      questions.length
+    }</div>
+          <h2 class="question-text">${escapeHtml(q.q)}</h2>
+        </div>
+
+        <div class="options-grid">
+          ${q.options
+            .map((opt, i) => {
+              const isSelected = userSelected === i;
+              let optionClass = "option-row";
+              if (isSelected) optionClass += " selected";
+              if (isLocked) {
+                optionClass += " locked";
+                if (i === correctIdx) optionClass += " correct";
+                if (isSelected && i !== correctIdx) optionClass += " wrong";
+              }
+
+              return `
+              <div class="${optionClass}" ${
+                isLocked ? "" : `onclick="window.handleSelect(${i})"`
+              }>
+                <input type="radio" name="answer" ${
+                  isSelected ? "checked" : ""
+                } 
+                       ${isLocked ? "disabled" : ""} aria-label="Option ${
+                i + 1
+              }">
+                <span class="option-label">${escapeHtml(opt)}</span>
+              </div>`;
+            })
+            .join("")}
+        </div>
+
+        <button class="check-answer-btn ${isLocked ? "hidden" : ""}"
+                id="checkBtn" onclick="window.checkAnswer()"
+                ${userSelected === undefined ? "disabled" : ""}>
+          Check Answer
+        </button>
+
+        <div class="${feedbackClass}">
+          ${feedbackText}
+        </div>
+      </div>
     `;
 
-  // Post-render accessibility
-  const optionRows = Array.from(
-    els.questionContainer.querySelectorAll(".option-row")
-  );
-  optionRows.forEach((row, idx) => {
-    const input = row.querySelector('input[type="radio"]');
-    if (!input) return;
-    if (isLocked) {
-      input.disabled = true;
-      input.setAttribute("aria-disabled", "true");
-    }
-    input.addEventListener("focus", () => {
-      const radios = Array.from(
-        els.questionContainer.querySelectorAll('input[type="radio"]')
-      );
-      radios.forEach((r) =>
-        r.setAttribute("tabindex", r === input ? "0" : "-1")
-      );
+    // Post-render accessibility for MCQ
+    const optionRows = Array.from(
+      els.questionContainer.querySelectorAll(".option-row")
+    );
+    optionRows.forEach((row, idx) => {
+      const input = row.querySelector('input[type="radio"]');
+      if (!input) return;
+      if (isLocked) {
+        input.disabled = true;
+        input.setAttribute("aria-disabled", "true");
+      }
+      input.addEventListener("focus", () => {
+        const radios = Array.from(
+          els.questionContainer.querySelectorAll('input[type="radio"]')
+        );
+        radios.forEach((r) =>
+          r.setAttribute("tabindex", r === input ? "0" : "-1")
+        );
+      });
     });
-  });
+  }
 
   updateNav();
 }
@@ -226,6 +304,21 @@ window.handleSelect = (index) => {
   saveState();
   renderQuestion();
   maybeAutoSubmit();
+};
+
+window.handleEssayInput = () => {
+  if (lockedQuestions[currentIdx]) return;
+  const textarea = document.getElementById("essayInput");
+  if (textarea) {
+    userAnswers[currentIdx] = textarea.value;
+    saveState();
+
+    // Update the check button state without re-rendering the entire question
+    const checkBtn = document.getElementById("checkBtn");
+    if (checkBtn) {
+      checkBtn.disabled = !textarea.value.trim();
+    }
+  }
 };
 
 const maybeAutoSubmit = () => {
@@ -258,15 +351,28 @@ window.finishEarly = (skipConfirm) => {
   stopTimer();
 
   let correctCount = 0;
+  let essayQuestions = [];
+
   questions.forEach((q, i) => {
-    const correctIdx = q.correct ?? q.answer;
-    if (userAnswers[i] === correctIdx) correctCount++;
+    if (isEssayQuestion(q)) {
+      // Track essay questions separately - don't count in score
+      essayQuestions.push(i);
+    } else {
+      // Only count MCQ/True-False in score
+      const correctIdx = q.correct ?? q.answer;
+      if (userAnswers[i] === correctIdx) correctCount++;
+    }
   });
+
+  // Calculate total excluding essay questions
+  const scorableQuestions = questions.length - essayQuestions.length;
 
   const finalResult = {
     examId,
     score: correctCount,
-    total: questions.length,
+    total: scorableQuestions, // Only count MCQ/True-False
+    totalQuestions: questions.length, // Keep total for reference
+    essayQuestions: essayQuestions, // Track which questions are essays
     userAnswers,
     timeElapsed,
   };
@@ -277,7 +383,16 @@ window.finishEarly = (skipConfirm) => {
 };
 
 window.checkAnswer = () => {
-  if (userAnswers[currentIdx] === undefined) return;
+  const q = questions[currentIdx];
+  const isEssay = isEssayQuestion(q);
+
+  if (isEssay) {
+    const textarea = document.getElementById("essayInput");
+    if (!textarea || !textarea.value.trim()) return;
+  } else {
+    if (userAnswers[currentIdx] === undefined) return;
+  }
+
   lockedQuestions[currentIdx] = true;
   saveState();
   renderQuestion();

@@ -67,15 +67,17 @@ Quiz Website/
 │   └── generateExamManifest.js
 │
 └── Exams/
-    ├── Categorie-1
-    │   ├── quiz-1
-    │   ├── quiz-2
-    │   └── quiz-3
+    ├── Categorie-1/
+    │   ├── quiz_1.js
+    │   ├── quiz_2.js
+    │   └── quiz_3.js
     │
-    └── Categorie-2
-        ├── quiz-1
-        ├── quiz-2
-        └── quiz-3
+    ├── Categorie-2/
+    │   ├── quiz_1.js
+    │   ├── quiz_2.js
+    │   └── quiz_3.js
+    │
+    └── categorie-3/...
 ```
 
 ## How quizzes are formatted
@@ -86,24 +88,23 @@ Each quiz is smartly formatted in their own javascript file
 export const questions = [
   {
     // The question can be MCQ
-    q: "Question text here?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    correct: 1,
-    explanation: "Write explanation here.",
-  },
-  {
-    // The question can have 2, 3, 4 or more options
-    q: "What is the primary function of a web browser?",
+    q: "MCQ question text here? The question can have 2, 3, 4 or more options.",
     options: ["Option A", "Option B", "Option C", "Option D", "Option E"],
     correct: 1,
-    explanation: "Write explanation here.",
+    explanation: "Explanation goes here.",
   },
   {
     // The question can be `True & False`
-    q: "Question text here?",
+    q: "True and False question text here?",
     options: ["True", "False"],
     correct: 0,
-    explanation: "Write explanation here.",
+    explanation: "Explanation goes here.",
+  },
+  {
+    q: "Essay type question text here?",
+    options: ["The answer to the essay question goes here as a single option."],
+    correct: 0, // Always 0 since there's only one option
+    explanation: "Explanation goes here.",
   },
 ];
 ```

@@ -105,6 +105,12 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
   },
   {
+    "id": "إمتحان الميد بالمقالي",
+    "category": "Operatings Systems",
+    "title": "إمتحان الميد بالمقالي",
+    "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js"
+  },
+  {
     "id": "Final Exam",
     "category": "Programming 2",
     "title": "Final Exam",
