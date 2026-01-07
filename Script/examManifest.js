@@ -3,191 +3,201 @@
 
 export const examList = [
   {
-    id: "Lecture 1 MCQ",
-    category: "Computer Network",
-    title: "Lecture 1 MCQ",
-    path: "../Exams/Computer Network/Lecture 1 MCQ.js",
+    "id": "Lecture 1 MCQ",
+    "category": "Computer Network",
+    "title": "Lecture 1 MCQ",
+    "path": "../Exams/Computer Network/Lecture 1 MCQ.js"
   },
   {
-    id: "Practical Exam - Model A",
-    category: "Discrete Structure",
-    title: "Practical Exam   Model A",
-    path: "../Exams/Discrete Structure/Practical Exam - Model A.js",
+    "id": "Practical Exam - Model A",
+    "category": "Discrete Structure",
+    "title": "Practical Exam   Model A",
+    "path": "../Exams/Discrete Structure/Practical Exam - Model A.js"
   },
   {
-    id: "Quiz 1",
-    category: "Discrete Structure",
-    title: "Quiz 1",
-    path: "../Exams/Discrete Structure/Quiz 1.js",
+    "id": "Quiz 1",
+    "category": "Discrete Structure",
+    "title": "Quiz 1",
+    "path": "../Exams/Discrete Structure/Quiz 1.js"
   },
   {
-    id: "Quiz 2",
-    category: "Discrete Structure",
-    title: "Quiz 2",
-    path: "../Exams/Discrete Structure/Quiz 2.js",
+    "id": "Quiz 2",
+    "category": "Discrete Structure",
+    "title": "Quiz 2",
+    "path": "../Exams/Discrete Structure/Quiz 2.js"
   },
   {
-    id: "General AI quiz",
-    category: "Foundation of IS",
-    title: "General AI Quiz",
-    path: "../Exams/Foundation of IS/General AI quiz.js",
+    "id": "General AI quiz",
+    "category": "Foundation of IS",
+    "title": "General AI Quiz",
+    "path": "../Exams/Foundation of IS/General AI quiz.js"
   },
   {
-    id: "Final Exam",
-    category: "Object-Oriented Programming",
-    title: "Final Exam",
-    path: "../Exams/Object-Oriented Programming/Final Exam.js",
+    "id": "Final Exam",
+    "category": "Object-Oriented Programming",
+    "title": "Final Exam",
+    "path": "../Exams/Object-Oriented Programming/Final Exam.js"
   },
   {
-    id: "1. Introduction",
-    category: "Operatings Systems",
-    title: "1. Introduction",
-    path: "../Exams/Operatings Systems/1. Introduction.js",
+    "id": "1. Introduction",
+    "category": "Operatings Systems",
+    "title": "1. Introduction",
+    "path": "../Exams/Operatings Systems/1. Introduction.js"
   },
   {
-    id: "2. Operating Systems Structures",
-    category: "Operatings Systems",
-    title: "2. Operating Systems Structures",
-    path: "../Exams/Operatings Systems/2. Operating Systems Structures.js",
+    "id": "2. Operating Systems Structures",
+    "category": "Operatings Systems",
+    "title": "2. Operating Systems Structures",
+    "path": "../Exams/Operatings Systems/2. Operating Systems Structures.js"
   },
   {
-    id: "3. Processes",
-    category: "Operatings Systems",
-    title: "3. Processes",
-    path: "../Exams/Operatings Systems/3. Processes.js",
+    "id": "3. Processes",
+    "category": "Operatings Systems",
+    "title": "3. Processes",
+    "path": "../Exams/Operatings Systems/3. Processes.js"
   },
   {
-    id: "4. Threads",
-    category: "Operatings Systems",
-    title: "4. Threads",
-    path: "../Exams/Operatings Systems/4. Threads.js",
+    "id": "4. Threads",
+    "category": "Operatings Systems",
+    "title": "4. Threads",
+    "path": "../Exams/Operatings Systems/4. Threads.js"
   },
   {
-    id: "6. CPU Scheduling",
-    category: "Operatings Systems",
-    title: "6. CPU Scheduling",
-    path: "../Exams/Operatings Systems/6. CPU Scheduling.js",
+    "id": "6. CPU Scheduling",
+    "category": "Operatings Systems",
+    "title": "6. CPU Scheduling",
+    "path": "../Exams/Operatings Systems/6. CPU Scheduling.js"
   },
   {
-    id: "General Exam",
-    category: "Operatings Systems",
-    title: "General Exam",
-    path: "../Exams/Operatings Systems/General Exam.js",
+    "id": "Ch1 Quiz",
+    "category": "Operatings Systems",
+    "title": "Ch1 Quiz",
+    "path": "../Exams/Operatings Systems/Ch1 Quiz.js"
   },
   {
-    id: "Introduction and Structure",
-    category: "Operatings Systems",
-    title: "Introduction And Structure",
-    path: "../Exams/Operatings Systems/Introduction and Structure.js",
+    "id": "General Exam",
+    "category": "Operatings Systems",
+    "title": "General Exam",
+    "path": "../Exams/Operatings Systems/General Exam.js"
   },
   {
-    id: "Midterm Exam",
-    category: "Operatings Systems",
-    title: "Midterm Exam",
-    path: "../Exams/Operatings Systems/Midterm Exam.js",
+    "id": "General Exam 2",
+    "category": "Operatings Systems",
+    "title": "General Exam 2",
+    "path": "../Exams/Operatings Systems/General Exam 2.js"
   },
   {
-    id: "Process Concept and Management",
-    category: "Operatings Systems",
-    title: "Process Concept And Management",
-    path: "../Exams/Operatings Systems/Process Concept and Management.js",
+    "id": "Introduction and Structure",
+    "category": "Operatings Systems",
+    "title": "Introduction And Structure",
+    "path": "../Exams/Operatings Systems/Introduction and Structure.js"
   },
   {
-    id: "Quiz on the First Chapter",
-    category: "Operatings Systems",
-    title: "Quiz On The First Chapter",
-    path: "../Exams/Operatings Systems/Quiz on the First Chapter.js",
+    "id": "Midterm Exam",
+    "category": "Operatings Systems",
+    "title": "Midterm Exam",
+    "path": "../Exams/Operatings Systems/Midterm Exam.js"
   },
   {
-    id: "Threads and CPU Scheduling",
-    category: "Operatings Systems",
-    title: "Threads And CPU Scheduling",
-    path: "../Exams/Operatings Systems/Threads and CPU Scheduling.js",
-  },
-
-  {
-    id: "إمتحان الميد بالمقالي",
-    category: "Operatings Systems",
-    title: "إمتحان الميد بالمقالي",
-    path: "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js",
-  },
-
-  {
-    id: "Final Exam",
-    category: "Programming 2",
-    title: "Final Exam",
-    path: "../Exams/Programming 2/Final Exam.js",
+    "id": "Process Concept and Management",
+    "category": "Operatings Systems",
+    "title": "Process Concept And Management",
+    "path": "../Exams/Operatings Systems/Process Concept and Management.js"
   },
   {
-    id: "First Chapter quiz",
-    category: "Programming 2",
-    title: "First Chapter Quiz",
-    path: "../Exams/Programming 2/First Chapter quiz.js",
+    "id": "Quiz on the First Chapter",
+    "category": "Operatings Systems",
+    "title": "Quiz On The First Chapter",
+    "path": "../Exams/Operatings Systems/Quiz on the First Chapter.js"
   },
   {
-    id: "Forth and 5th Ch Quiz",
-    category: "Programming 2",
-    title: "Forth And 5th Ch Quiz",
-    path: "../Exams/Programming 2/Forth and 5th Ch Quiz.js",
+    "id": "Threads and CPU Scheduling",
+    "category": "Operatings Systems",
+    "title": "Threads And CPU Scheduling",
+    "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
   },
   {
-    id: "General Quiz",
-    category: "Programming 2",
-    title: "General Quiz",
-    path: "../Exams/Programming 2/General Quiz.js",
+    "id": "إمتحان الميد بالمقالي",
+    "category": "Operatings Systems",
+    "title": "إمتحان الميد بالمقالي",
+    "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js"
   },
   {
-    id: "General Quiz (Hard)",
-    category: "Programming 2",
-    title: "General Quiz (Hard)",
-    path: "../Exams/Programming 2/General Quiz (Hard).js",
+    "id": "Final Exam",
+    "category": "Programming 2",
+    "title": "Final Exam",
+    "path": "../Exams/Programming 2/Final Exam.js"
   },
   {
-    id: "Quiz 1",
-    category: "Programming 2",
-    title: "Quiz 1",
-    path: "../Exams/Programming 2/Quiz 1.js",
+    "id": "First Chapter quiz",
+    "category": "Programming 2",
+    "title": "First Chapter Quiz",
+    "path": "../Exams/Programming 2/First Chapter quiz.js"
   },
   {
-    id: "Quiz 2",
-    category: "Programming 2",
-    title: "Quiz 2",
-    path: "../Exams/Programming 2/Quiz 2.js",
+    "id": "Forth and 5th Ch Quiz",
+    "category": "Programming 2",
+    "title": "Forth And 5th Ch Quiz",
+    "path": "../Exams/Programming 2/Forth and 5th Ch Quiz.js"
   },
   {
-    id: "Quiz 3",
-    category: "Programming 2",
-    title: "Quiz 3",
-    path: "../Exams/Programming 2/Quiz 3.js",
+    "id": "General Quiz",
+    "category": "Programming 2",
+    "title": "General Quiz",
+    "path": "../Exams/Programming 2/General Quiz.js"
   },
   {
-    id: "Quiz 4",
-    category: "Programming 2",
-    title: "Quiz 4",
-    path: "../Exams/Programming 2/Quiz 4.js",
+    "id": "General Quiz (Hard)",
+    "category": "Programming 2",
+    "title": "General Quiz (Hard)",
+    "path": "../Exams/Programming 2/General Quiz (Hard).js"
   },
   {
-    id: "Quiz 5",
-    category: "Programming 2",
-    title: "Quiz 5",
-    path: "../Exams/Programming 2/Quiz 5.js",
+    "id": "Quiz 1",
+    "category": "Programming 2",
+    "title": "Quiz 1",
+    "path": "../Exams/Programming 2/Quiz 1.js"
   },
   {
-    id: "Second Chapter Quiz",
-    category: "Programming 2",
-    title: "Second Chapter Quiz",
-    path: "../Exams/Programming 2/Second Chapter Quiz.js",
+    "id": "Quiz 2",
+    "category": "Programming 2",
+    "title": "Quiz 2",
+    "path": "../Exams/Programming 2/Quiz 2.js"
   },
   {
-    id: "Sixth and 7th Ch Quiz",
-    category: "Programming 2",
-    title: "Sixth And 7th Ch Quiz",
-    path: "../Exams/Programming 2/Sixth and 7th Ch Quiz.js",
+    "id": "Quiz 3",
+    "category": "Programming 2",
+    "title": "Quiz 3",
+    "path": "../Exams/Programming 2/Quiz 3.js"
   },
   {
-    id: "Third Chapter Quiz",
-    category: "Programming 2",
-    title: "Third Chapter Quiz",
-    path: "../Exams/Programming 2/Third Chapter Quiz.js",
+    "id": "Quiz 4",
+    "category": "Programming 2",
+    "title": "Quiz 4",
+    "path": "../Exams/Programming 2/Quiz 4.js"
   },
+  {
+    "id": "Quiz 5",
+    "category": "Programming 2",
+    "title": "Quiz 5",
+    "path": "../Exams/Programming 2/Quiz 5.js"
+  },
+  {
+    "id": "Second Chapter Quiz",
+    "category": "Programming 2",
+    "title": "Second Chapter Quiz",
+    "path": "../Exams/Programming 2/Second Chapter Quiz.js"
+  },
+  {
+    "id": "Sixth and 7th Ch Quiz",
+    "category": "Programming 2",
+    "title": "Sixth And 7th Ch Quiz",
+    "path": "../Exams/Programming 2/Sixth and 7th Ch Quiz.js"
+  },
+  {
+    "id": "Third Chapter Quiz",
+    "category": "Programming 2",
+    "title": "Third Chapter Quiz",
+    "path": "../Exams/Programming 2/Third Chapter Quiz.js"
+  }
 ];

@@ -87,24 +87,22 @@ Each quiz is smartly formatted in their own javascript file
 ```js
 export const questions = [
   {
-    // The question can be MCQ
-    q: "MCQ question text here? The question can have 2, 3, 4 or more options.",
+    q: "MCQ question like this. The question can have 2, 3, 4 or more options.",
     options: ["Option A", "Option B", "Option C", "Option D", "Option E"],
     correct: 1,
-    explanation: "Explanation goes here.",
+    explanation: "Explanation goes here. Or it can be empty",
   },
   {
-    // The question can be `True & False`
-    q: "True and False question text here?",
+    q: "The question can be true and false too.",
     options: ["True", "False"],
     correct: 0,
-    explanation: "Explanation goes here.",
+    explanation: "Explanation goes here. Or it can be empty",
   },
   {
     q: "Essay type question text here?",
     options: ["The answer to the essay question goes here as a single option."],
     correct: 0, // Always 0 since there's only one option
-    explanation: "Explanation goes here.",
+    explanation: "Explanation goes here. Or it can be empty",
   },
 ];
 ```
