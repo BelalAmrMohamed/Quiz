@@ -1,123 +1,97 @@
 export const questions = [
   {
-    q: "Given 'n' processes to be scheduled on a single processor, how many different possible schedules can be created?",
-    options: [
-      "n^2 (n squared)",
-      "2^n (2 to the power of n)",
-      "n! (n factorial)",
-      "n * (n - 1) / 2",
-    ],
-    correct: 2,
+    q: "Given n processes to be scheduled on one processor, how many different possible schedules exist?",
+    options: ["n! (n factorial)", "2^n", "n^2", "n"],
+    correct: 0,
     explanation:
-      "According to the sources, for n processes, there are n! (n factorial) different possible schedules that can be determined.",
+      "With n processes, there are n! (n factorial = n × (n-1) × (n-2) × ... × 2 × 1) possible orderings or schedules.",
   },
   {
-    q: "What is the primary difference between **preemptive** and **nonpreemptive** scheduling?",
+    q: "What is the difference between preemptive and nonpreemptive scheduling?",
     options: [
-      "Preemptive scheduling only occurs when a process terminates",
-      "Nonpreemptive scheduling allows a process to be interrupted in the middle of execution",
-      "Preemptive scheduling allows the CPU to be taken away from a process during its execution",
-      "Nonpreemptive scheduling is used only in time-sharing systems",
-    ],
-    correct: 2,
-    explanation:
-      "Preemptive scheduling allows a process to be interrupted during execution to allocate the CPU to another process, while nonpreemptive scheduling ensures a process keeps the CPU until it finishes its current burst or terminates.",
-  },
-  {
-    q: "Which of the following is NOT a goal of scheduling algorithm optimization?",
-    options: [
-      "Maximize CPU utilization",
-      "Maximize Throughput",
-      "Maximize Turnaround time",
-      "Minimize Response time",
-      "Minimize Waiting time",
-    ],
-    correct: 2,
-    explanation:
-      "The optimization criteria aim to **maximize** CPU utilization and throughput, but **minimize** turnaround time, waiting time, and response time.",
-  },
-  {
-    q: "In First-Come, First-Served (FCFS) scheduling, what is the **convoy effect**?",
-    options: [
-      "When many short processes wait for one long CPU-bound process to relinquish the CPU",
-      "When the CPU scheduler is overwhelmed by too many arrival requests",
-      "When a process is repeatedly moved to the back of the queue",
-      "When context switching overhead exceeds actual processing time",
+      "Preemptive allows interrupting a process and allocating CPU to another; nonpreemptive requires the process to relinquish CPU voluntarily",
     ],
     correct: 0,
     explanation:
-      "The convoy effect occurs in FCFS when short processes (often I/O-bound) are stuck waiting behind one long, CPU-bound process, resulting in lower hardware utilization.",
+      "Preemptive scheduling can interrupt a running process and switch to another. Nonpreemptive scheduling waits for the process to finish its CPU burst before switching.",
   },
   {
-    q: "Why is **Shortest-Job-First (SJF)** scheduling considered optimal?",
-    options: [
-      "It is the easiest algorithm to implement in modern kernels",
-      "It provides the minimum average waiting time for a given set of processes",
-      "It eliminates the need for a dispatcher",
-      "It prevents CPU-bound processes from starving",
-    ],
-    correct: 1,
+    q: "For the processes with arrival times P1(0.0, 8), P2(0.4, 4), P3(1.0, 1), what is the average turnaround time using FCFS scheduling?",
+    options: ["10.53", "9.53", "6.86", "11.00"],
+    correct: 0,
     explanation:
-      "SJF is optimal because it results in the minimum average waiting time for a specific set of processes by prioritizing the shortest CPU bursts.",
+      "Using First-Come-First-Served, P1 runs first, then P2, then P3. Remember turnaround time is finishing time minus arrival time. FCFS gives 10.53.",
   },
   {
-    q: "When predicting the length of the next CPU burst using **exponential averaging**, what does a parameter of **α = 0** imply?",
-    options: [
-      "Only the actual last CPU burst counts",
-      "Recent history does not count, and the prediction remains constant",
-      "The next burst will always be zero",
-      "The history and the recent burst are weighted equally",
-    ],
-    correct: 1,
+    q: "Using the same processes from the previous question, what is the average turnaround time with SJF (Shortest Job First) scheduling?",
+    options: ["9.53", "10.53", "6.86", "11.00"],
+    correct: 0,
     explanation:
-      "In the formula τ_{n+1} = αt_n + (1 - α)τ_n, if α = 0, the recent history (t_n) does not count, and the predicted value (τ) does not change.",
+      "SJF schedules P1 first (it's available at time 0), then P3 (shortest remaining), then P2, giving an average turnaround time of 9.53.",
   },
   {
-    q: "What is a major problem with **Priority Scheduling**, and what is its commonly used solution?",
+    q: "What advantage is there in having different time-quantum sizes at different levels of a multilevel queueing system?",
     options: [
-      "Problem: Convoy effect; Solution: Round Robin",
-      "Problem: Starvation (indefinite blocking); Solution: Aging",
-      "Problem: High dispatch latency; Solution: Preemption",
-      "Problem: Excessive memory use; Solution: Swapping",
-    ],
-    correct: 1,
-    explanation:
-      "A major problem is **starvation**, where low-priority processes may never execute. The solution is **aging**, which gradually increases the priority of processes that wait in the system for a long time.",
-  },
-  {
-    q: "How does the size of the **time quantum (q)** affect Round Robin (RR) scheduling?",
-    options: [
-      "If 'q' is extremely large, RR becomes FCFS",
-      "If 'q' is extremely small, it results in very high context-switch overhead",
-      "The time quantum should be large with respect to the context-switch time",
-      "All of the above",
-    ],
-    correct: 3,
-    explanation:
-      "If the quantum is too large, RR behaves like FCFS. If it is too small, the CPU spends too much time on context-switch overhead. Ideally, the quantum should be large compared to the time it takes to switch contexts.",
-  },
-  {
-    q: "What are the specific tasks performed by the **dispatcher**?",
-    options: [
-      "Selecting the next process from the ready queue",
-      "Switching context and switching to user mode",
-      "Jumping to the proper location in the user program to restart it",
-      "Both B and C",
-    ],
-    correct: 3,
-    explanation:
-      "While the scheduler *selects* the process, the dispatcher is the module that actually gives control of the CPU to that process by switching context, switching to user mode, and jumping to the correct instruction.",
-  },
-  {
-    q: "What is an advantage of having different time-quantum sizes at different levels of a **multilevel queueing system**?",
-    options: [
-      "It allows for better process mix by giving interactive processes smaller quantums for frequent servicing",
-      "It eliminates the need for priority numbers",
-      "It ensures that no process ever enters the waiting state",
-      "It reduces the amount of memory needed for the PCB",
+      "Interactive processes can use small quanta for frequent servicing while batch processes use larger quanta for efficiency",
     ],
     correct: 0,
     explanation:
-      "Interactive processes (like editors) can be placed in queues with small quantums for faster response, while processes with no need for frequent servicing can have larger quantums to reduce context-switch overhead.",
+      "Processes needing frequent servicing (like editors) benefit from small time quanta. Processes not requiring frequent servicing can use larger quanta, reducing context switches and improving efficiency.",
+  },
+  {
+    q: "The FCFS algorithm is equivalent to the RR (Round Robin) algorithm with an infinite time quantum.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "With an infinite time quantum, Round Robin never preempts, allowing each process to run to completion in order of arrival, which is exactly First-Come-First-Served behavior.",
+  },
+  {
+    q: "What relationship exists between Priority scheduling and SJF (Shortest Job First)?",
+    options: [
+      "In SJF, the shortest job has the highest priority",
+      "They are completely unrelated",
+      "Priority scheduling is always faster than SJF",
+      "SJF cannot be expressed as priority scheduling",
+    ],
+    correct: 0,
+    explanation:
+      "SJF is a special case of priority scheduling where priority is inversely related to predicted CPU burst time - the shortest job gets the highest priority.",
+  },
+  {
+    q: "Why does a scheduling algorithm that favors processes with least recent processor time favor I/O-bound programs without starving CPU-bound programs?",
+    options: [
+      "I/O-bound programs have short CPU bursts (favored by the algorithm) but relinquish CPU frequently (allowing CPU-bound programs to eventually run)",
+    ],
+    correct: 0,
+    explanation:
+      "I/O-bound programs are favored due to their short CPU burst requests, but they frequently relinquish the CPU to perform I/O operations, giving CPU-bound programs opportunities to run.",
+  },
+  {
+    q: "What is the difference between PCS (Process-Contention Scope) and SCS (System-Contention Scope) scheduling?",
+    options: [
+      "PCS is local thread library scheduling of threads onto LWPs; SCS is OS scheduling of kernel threads",
+      "PCS is faster than SCS",
+      "SCS only works on single-processor systems",
+      "PCS is used only for real-time systems",
+    ],
+    correct: 0,
+    explanation:
+      "PCS scheduling is how the thread library schedules user threads onto available LWPs. SCS is where the OS schedules kernel threads. On one-to-one threading models, PCS and SCS are the same.",
+  },
+  {
+    q: "Is it necessary to bind a real-time thread to an LWP in a many-to-many threading model for scheduling purposes?",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Yes. Without binding, a user thread may have to compete for an available LWP before being scheduled, introducing latency. Binding ensures the real-time thread can be scheduled immediately without waiting for an LWP.",
+  },
+  {
+    q: "In the traditional UNIX scheduler with Priority = (recent CPU usage / 2) + base (base=60), if P1 has recent CPU usage of 40, P2 has 18, and P3 has 10, what are their new priorities? Does this raise or lower the priority of CPU-bound processes?",
+    options: [
+      "P1=80, P2=69, P3=65. The scheduler lowers the relative priority of CPU-bound processes",
+    ],
+    correct: 0,
+    explanation:
+      "With higher numbers meaning lower priority in UNIX, the priorities are 80, 69, and 65 respectively. CPU-bound processes have higher recent usage, resulting in higher priority numbers (lower actual priority).",
   },
 ];

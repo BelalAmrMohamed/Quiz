@@ -1,107 +1,70 @@
 export const questions = [
   {
-    q: "What is the fundamental difference between a program and a process?",
+    q: "When a child process updates a variable in the program from Figure 3.30, what happens to the parent process's copy of that variable?",
     options: [
-      "A program is active while a process is passive",
-      "A program is a passive entity stored on disk, whereas a process is an active entity in execution",
-      "A program uses a PCB, but a process does not",
-      "There is no difference; the terms are used interchangeably",
-    ],
-    correct: 1,
-    explanation:
-      "The sources state that a program is a passive entity (like an executable file on disk), while a process is an active entity that is currently in execution.",
-  },
-  {
-    q: "Which part of a process in memory contains dynamically allocated memory during runtime?",
-    options: ["Stack", "Data section", "Text section", "Heap"],
-    correct: 3,
-    explanation:
-      "The heap is the section of process memory that is dynamically allocated during run time.",
-  },
-  {
-    q: "When a process is waiting to be assigned to a processor, what state is it in?",
-    options: ["New", "Waiting", "Ready", "Running"],
-    correct: 2,
-    explanation:
-      "A process in the 'ready' state is waiting to be assigned to a processor.",
-  },
-  {
-    q: "What information is typically stored in a Process Control Block (PCB)?",
-    options: [
-      "Process state, program counter, and CPU registers",
-      "Memory-management information and I/O status",
-      "CPU-scheduling and accounting information",
-      "All of the above",
-    ],
-    correct: 3,
-    explanation:
-      "The PCB contains a wide range of information, including process state, program counter, registers, scheduling info, memory management, accounting, and I/O status.",
-  },
-  {
-    q: "Which scheduler is responsible for controlling the 'degree of multiprogramming'?",
-    options: [
-      "Short-term scheduler",
-      "Medium-term scheduler",
-      "Long-term scheduler",
-      "CPU scheduler",
-    ],
-    correct: 2,
-    explanation:
-      "The long-term scheduler (or job scheduler) selects which processes should be brought into the ready queue, thereby controlling the degree of multiprogramming.",
-  },
-  {
-    q: "What occurs during a 'context switch'?",
-    options: [
-      "The OS switches from kernel mode to user mode only",
-      "The system saves the state of the current process and loads the saved state of a new process",
-      "The OS deletes a terminated process to free up memory",
-      "A process moves from the ready queue to a device queue",
-    ],
-    correct: 1,
-    explanation:
-      "A context switch involves saving the state of the old process and loading the saved state for the new process via the PCB.",
-  },
-  {
-    q: "In a Unix-based system, which system call is used to create a new process by duplicating the parent?",
-    options: ["exec()", "abort()", "fork()", "wait()"],
-    correct: 2,
-    explanation:
-      "The fork() system call creates a new process by duplicating the currently executing process.",
-  },
-  {
-    q: "What are the two primary models for Interprocess Communication (IPC)?",
-    options: [
-      "Direct and Indirect communication",
-      "Shared memory and Message passing",
-      "Synchronous and Asynchronous communication",
-      "Sockets and Symmetrical communication",
-    ],
-    correct: 1,
-    explanation:
-      "The two fundamental models of IPC described in the sources are shared memory and message passing.",
-  },
-  {
-    q: "What is a 'zombie' process?",
-    options: [
-      "A process that has been terminated but its parent has not yet called wait()",
-      "A process that has been orphaned because its parent terminated",
-      "A process that is stuck in an infinite loop",
-      "A process that has been swapped out to disk",
+      "The parent's value remains unchanged because the child updates its own copy",
+      "The parent's value is also updated",
+      "The program crashes",
+      "The value is shared between both processes",
     ],
     correct: 0,
     explanation:
-      "A process is considered a 'zombie' if it has terminated but the parent process has not yet invoked the wait() system call to collect its status.",
+      "The child process updates its own copy of the variable. When control returns to the parent, its value remains unchanged at 5.",
   },
   {
-    q: "Which mechanism allows a client to call a procedure on a remote host as if it were a local call?",
-    options: [
-      "Sockets",
-      "Pipes",
-      "RPC (Remote Procedure Call)",
-      "Shared Memory",
-    ],
-    correct: 2,
+    q: "Including the initial parent process, how many processes are created by the program shown in Figure 3.31?",
+    options: ["8 processes", "4 processes", "16 processes", "7 processes"],
+    correct: 0,
     explanation:
-      "RPC abstracts procedure calls between processes on networked systems, using stubs to handle communication between the client and server.",
+      "The program creates a total of 8 processes including the initial parent process.",
+  },
+  {
+    q: "In a Sun UltraSPARC processor with multiple register sets, what happens during a context switch when the new context is already loaded into one of the register sets?",
+    options: [
+      "The CPU current-register-set pointer is changed, which takes very little time",
+      "All registers must be saved to memory first",
+      "The processor must restart",
+      "A new register set must be allocated",
+    ],
+    correct: 0,
+    explanation:
+      "When the new context is already in a register set, the CPU simply changes the current-register-set pointer, which is very fast. If the context is in memory and all register sets are in use, one context must be moved to memory and the new context loaded.",
+  },
+  {
+    q: "When a process creates a new process using fork(), which of the following is shared between parent and child?",
+    options: [
+      "Shared memory segments only",
+      "Stack and heap",
+      "Stack only",
+      "All memory is shared",
+    ],
+    correct: 0,
+    explanation:
+      "Only shared memory segments are shared. Copies of the stack and heap are made for the newly created child process.",
+  },
+  {
+    q: "In RPC (Remote Procedure Call) with 'exactly once' semantics, if the ACK message back to the client is lost, does the algorithm still execute correctly?",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Yes, the algorithm handles this case. The client will timeout and resend the RPC with a later timestamp. The server uses timestamps to identify duplicate RPCs and won't execute it twice, but will send a second ACK to inform the client the RPC was performed.",
+  },
+  {
+    q: "How does the 'exactly once' semantic for RPC handle the case where the server receives a duplicate RPC request?",
+    options: [
+      "The server uses timestamps to identify duplicates and doesn't perform the RPC a second time, but sends another ACK",
+    ],
+    correct: 0,
+    explanation:
+      "The server receives RPCs with timestamps. When a duplicate arrives (identified by the timestamp), the server doesn't execute it again but must send another ACK to inform the client that the RPC has been performed.",
+  },
+  {
+    q: "What mechanisms are required to guarantee 'exactly once' semantics for RPC execution in a distributed system susceptible to server failure?",
+    options: [
+      "The server should keep track in stable storage (like a disk log) of what RPC operations were received, whether they were successfully performed, and the results",
+    ],
+    correct: 0,
+    explanation:
+      "Using stable storage allows the server to check after a crash whether an RPC had been previously performed, thus guaranteeing exactly once semantics even with server failures.",
   },
 ];

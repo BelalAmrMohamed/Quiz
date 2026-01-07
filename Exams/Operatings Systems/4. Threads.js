@@ -1,155 +1,63 @@
 export const questions = [
   {
-    q: "What is the fundamental definition of a **thread** in an operating system?",
+    q: "Which of the following is a valid example of where multithreading provides better performance than a single-threaded solution?",
     options: [
-      "A heavy-weight unit of work that requires its own memory map and open files",
-      "A fundamental unit of CPU utilization that forms the basis of multithreaded computer systems",
-      "A passive entity stored on a disk, such as an executable file",
-      "A mechanism used solely for communication between different computer systems",
+      "All of these are valid examples",
+      "A web server that services each request in a separate thread",
+      "A parallelized matrix multiplication application",
+      "An interactive GUI debugger with separate threads for user input, application execution, and performance monitoring",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "A thread is described as the **fundamental unit of CPU utilization**. It is considered **light-weight** compared to process creation, which is heavy-weight.",
+      "All three examples demonstrate effective use of multithreading: web servers handling concurrent requests, parallel computation on data, and interactive programs with multiple simultaneous activities.",
   },
   {
-    q: "Which of the following are listed as **benefits** of multithreaded programming?",
+    q: "What are key differences between user-level threads and kernel-level threads?",
     options: [
-      "Responsiveness",
-      "Resource Sharing",
-      "Economy",
-      "Scalability",
-      "All of the above",
+      "User-level threads are unknown by the kernel while kernel is aware of kernel threads; user threads are scheduled by thread library while kernel schedules kernel threads; kernel threads need not be associated with a process",
     ],
-    correct: 4,
+    correct: 0,
     explanation:
-      "The sources identify four major benefits: **Responsiveness** (allowing continued execution if part of a process is blocked), **Resource Sharing** (threads share memory and resources of the process), **Economy** (thread switching has lower overhead than context switching), and **Scalability** (multiprocessor architectures).",
+      "User-level threads are managed by the thread library and invisible to the kernel. Kernel threads are known to the OS, scheduled by the kernel, and are more expensive to maintain as they require kernel data structures.",
   },
   {
-    q: "What is a major challenge in **multicore programming** according to the sources?",
+    q: "What does context switching between kernel-level threads typically require?",
     options: [
-      "Dividing activities into separate concurrent tasks",
-      "Ensuring balance so tasks perform equal work",
-      "Managing data splitting and data dependency",
-      "Testing and debugging concurrent programs",
-      "All of the above",
+      "Saving CPU registers from the thread being switched out and restoring CPU registers of the new thread being scheduled",
+      "Copying the entire memory space",
+      "Restarting the processor",
+      "Reloading the operating system",
     ],
-    correct: 4,
+    correct: 0,
     explanation:
-      "Challenges for multicore programming include **dividing activities**, **balance**, **data splitting**, **data dependency**, and **testing/debugging**.",
+      "Context switching between kernel threads involves saving and restoring CPU register values to switch execution from one thread to another.",
   },
   {
-    q: "According to **Amdahl's Law**, what happens to the speedup gain as the number of processing cores (N) approaches infinity?",
-    options: [
-      "Speedup approaches infinity",
-      "Speedup approaches the number of threads in the pool",
-      "Speedup approaches 1 / S, where S is the serial portion of the application",
-      "Speedup becomes zero due to synchronization overhead",
-    ],
-    correct: 2,
+    q: "Thread creation uses fewer resources than process creation.",
+    options: ["True", "False"],
+    correct: 0,
     explanation:
-      "Amdahl's Law identifies that as the number of cores (N) approaches infinity, the **speedup approaches 1 / S**, implying the serial portion of an application has a disproportionate effect on performance.",
+      "Creating a process requires allocating a PCB (process control block) with memory map, file lists, and environment variables. Thread creation only requires a small data structure for registers, stack, and priority, making it much more lightweight.",
   },
   {
-    q: "In the **Many-to-One** multithreading model, why might multiple threads fail to run in parallel on a multicore system?",
+    q: "Why is it necessary to bind a real-time thread to an LWP (Lightweight Process) in a many-to-many threading model?",
     options: [
-      "User-level threads are too heavy-weight for multicore systems",
-      "Only one thread can be in the kernel at a time",
-      "The model does not support thread libraries",
-      "Kernel threads are unable to see user-level tasks",
+      "To ensure the thread can run with minimal delay once scheduled, without waiting for an available LWP",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "In the **Many-to-One** model, multiple threads may not run in parallel on multicore systems because **only one thread may be in the kernel at a time**.",
+      "Timing is crucial for real-time applications. Without binding, a real-time thread may have to wait for an LWP to become available before running. Binding ensures the thread can run immediately when scheduled, providing the predictable timing required for real-time systems.",
   },
   {
-    q: "Which multithreading model is used by **Windows** and **Linux**?",
-    options: ["Many-to-One", "One-to-One", "Many-to-Many", "Two-level"],
-    correct: 1,
-    explanation:
-      "The **One-to-One** model, where each user-level thread maps to a kernel thread, is implemented by both **Windows** and **Linux**.",
-  },
-  {
-    q: "What is the primary difference between **Pthreads** and its implementation?",
+    q: "What happens to a real-time thread that is not bound to an LWP when it blocks (e.g., for I/O)?",
     options: [
-      "Pthreads is a library entirely in user space",
-      "Pthreads is a specification for thread behavior, not an implementation",
-      "Pthreads is only available for Windows systems",
-      "There is no difference; Pthreads is a specific piece of software",
+      "When it's ready to run again, it must wait to be attached to an LWP, causing delay",
+      "It immediately resumes execution",
+      "It terminates",
+      "It's automatically promoted to a kernel thread",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "Pthreads refers to a **POSIX standard API** for thread creation and synchronization. It is a **specification**, and the implementation is up to the developers of the library.",
-  },
-  {
-    q: "What is an advantage of using a **Thread Pool**?",
-    options: [
-      "It allows the kernel to manage user threads without a library",
-      "Creating a new thread is always faster than using an existing one",
-      "It allows the number of threads to be bound to the size of the pool",
-      "It eliminates the need for thread-local storage",
-    ],
-    correct: 2,
-    explanation:
-      "Thread pools provide several advantages: it is usually **faster to service a request** with an existing thread and it allows the application to **bind the number of threads** to the pool size.",
-  },
-  {
-    q: "How does **deferred cancellation** differ from **asynchronous cancellation**?",
-    options: [
-      "Asynchronous cancellation terminates the target thread immediately",
-      "Deferred cancellation allows the thread to check if it should be cancelled at a 'cancellation point'",
-      "Asynchronous cancellation is the default type in Pthreads",
-      "Both A and B are correct",
-    ],
-    correct: 3,
-    explanation:
-      "Asynchronous cancellation **terminates the thread immediately**, while **deferred cancellation** allows the thread to periodically check for a cancellation request at specific points.",
-  },
-  {
-    q: "What is the purpose of **Thread-Local Storage (TLS)**?",
-    options: [
-      "To provide a shared memory segment for all threads in a process",
-      "To allow each thread to have its own unique copy of certain data across function invocations",
-      "To act as a temporary stack for function parameters that is deleted upon return",
-      "To store configuration information in a global registry",
-    ],
-    correct: 1,
-    explanation:
-      "TLS allows each thread to have its **own copy of data** that is visible across function invocations, which is different from local variables that only exist during a single function call.",
-  },
-  {
-    q: "In the context of the Many-to-Many and Two-level models, what is a **Lightweight Process (LWP)**?",
-    options: [
-      "A user-level thread that requires no kernel support",
-      "An intermediate data structure that appears as a virtual processor to the thread library",
-      "A special type of signal handler used in Linux",
-      "A kernel thread that has been bound to a user process",
-    ],
-    correct: 1,
-    explanation:
-      "An **LWP** is an intermediate data structure between user and kernel threads. To the user-level thread library, it **appears to be a virtual processor** on which the process can schedule user threads.",
-  },
-  {
-    q: "Which data structure in the **Windows** thread implementation is stored in **user space**?",
-    options: [
-      "ETHREAD (executive thread block)",
-      "KTHREAD (kernel thread block)",
-      "TEB (thread environment block)",
-      "The kernel-mode stack",
-    ],
-    correct: 2,
-    explanation:
-      "The **TEB** (thread environment block) contains the thread ID, user-mode stack, and thread-local storage, and is located in **user space**.",
-  },
-  {
-    q: "How are threads created in the **Linux** operating system?",
-    options: [
-      "Using the fork() system call exclusively",
-      "Through the CreateThread() API",
-      "Via the clone() system call, which allows sharing of address space",
-      "Linux does not support threads at the kernel level",
-    ],
-    correct: 2,
-    explanation:
-      "Linux refers to threads as 'tasks' and uses the **clone() system call**, which allows a child task to **share the address space** of the parent task.",
+      "When an unbound real-time thread blocks, the LWP it was using gets assigned to another thread. When the real-time thread is ready to run again, it must wait for an available LWP, introducing unpredictable delay that's problematic for real-time systems.",
   },
 ];

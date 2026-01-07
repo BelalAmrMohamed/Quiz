@@ -1,122 +1,121 @@
 export const questions = [
   {
-    q: "What is the primary purpose of system calls?",
+    q: "What is the purpose of system calls?",
     options: [
-      "To provide a graphical user interface for the end user",
-      "To allow user-level processes to request services of the operating system",
-      "To manage the physical arrangement of files on a disk",
-      "To act as a high-level programming language for application development",
-    ],
-    correct: 1,
-    explanation:
-      "System calls serve as the programming interface to the services provided by the operating system, allowing user-level processes to request specific tasks from the kernel.",
-  },
-  {
-    q: "Which major activity is part of the operating system's process management responsibilities?",
-    options: [
-      "Free-space management",
-      "Allocating and deallocating memory space as needed",
-      "Providing mechanisms for process synchronization",
-      "Disk scheduling",
-    ],
-    correct: 2,
-    explanation:
-      "The major activities for process management include the creation/deletion of processes, suspension/resumption, and providing mechanisms for process synchronization, communication, and deadlock handling.",
-  },
-  {
-    q: "In a Unix system, which sequence of system calls is typically used to start a new process?",
-    options: [
-      "create() followed by start()",
-      "open() followed by close()",
-      "request() followed by release()",
-      "fork() followed by exec()",
-    ],
-    correct: 3,
-    explanation:
-      "In Unix systems, the fork() system call clones the currently executing process, and the exec() call overlays a new executable over that process.",
-  },
-  {
-    q: "What are the three most common Application Programming Interfaces (APIs) used to access system calls?",
-    options: [
-      "Win32, POSIX, and Java",
-      "HTML, CSS, and JavaScript",
-      "CLI, GUI, and Batch",
-      "SaaS, PaaS, and IaaS",
+      "System calls allow user-level processes to request services of the operating system",
     ],
     correct: 0,
     explanation:
-      "The Win32 API is used for Windows, the POSIX API is for POSIX-based systems like Unix and Linux, and the Java API is for the Java virtual machine.",
+      "System calls provide an interface between user-level processes and the operating system kernel, allowing processes to request OS services.",
   },
   {
-    q: "Which of the following is a general method used to pass parameters to the operating system during a system call?",
+    q: "What are the five major activities of an operating system with regard to process management?",
     options: [
-      "Passing parameters in registers",
-      "Storing parameters in a memory block and passing the address in a register",
-      "Pushing parameters onto a stack to be popped by the operating system",
-      "All of the above",
+      "Creation and deletion of processes, suspension and resumption of processes, provision of mechanisms for process synchronization, provision of mechanisms for process communication, and provision of mechanisms for deadlock handling",
     ],
-    correct: 3,
+    correct: 0,
     explanation:
-      "Operating systems typically use one of three methods: registers for simple parameters, a memory block/table for larger amounts of data, or a stack-based approach.",
+      "These five activities cover the complete lifecycle and interaction management of processes in an operating system.",
   },
   {
-    q: "What is a significant advantage of using a microkernel approach for system structure?",
+    q: "Which of the following is NOT one of the three major activities of an operating system with regard to memory management?",
     options: [
-      "It eliminates the need for message passing",
-      "It is easier to extend the operating system and port it to new architectures",
-      "It provides the fastest possible performance for all system services",
-      "It allows all applications to run in kernel mode for better security",
+      "Encryption of memory contents",
+      "Keeping track of which parts of memory are being used",
+      "Deciding which processes to load into memory",
+      "Allocating and deallocating memory space",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "Microkernels move non-essential components from the kernel to user space, making the OS easier to extend, more reliable, and simpler to port to new hardware architectures.",
+      "The three major memory management activities are: tracking memory usage, deciding which processes to load, and allocating/deallocating memory. Encryption is not a core memory management activity.",
   },
   {
-    q: "Which operating system service provides a mechanism for processes to exchange information?",
+    q: "What are the three major activities of an operating system with regard to secondary-storage management?",
     options: [
-      "Accounting",
-      "Communications",
-      "Program execution",
-      "Error detection",
+      "Free-space management, storage allocation, and disk scheduling",
+      "Backup, encryption, and compression",
+      "Reading, writing, and deleting files",
+      "Partitioning, formatting, and defragmenting",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "The communications service allows processes to exchange information either on the same computer or between different systems over a network via shared memory or message passing.",
+      "Secondary-storage management focuses on managing free space, allocating storage efficiently, and scheduling disk operations.",
   },
   {
-    q: "What is the role of a bootstrap loader during the system boot process?",
+    q: "Why is the command interpreter usually separate from the kernel?",
     options: [
-      "To provide a command-line interface for the user",
-      "To configure hardware for specific computer sites",
-      "To locate the kernel, load it into memory, and start its execution",
-      "To manage the power-saving features of the CPU",
+      "Because the command interpreter is subject to changes",
+      "Because it requires less memory",
+      "Because it runs faster when separate",
+      "Because it needs to be written in a different programming language",
     ],
-    correct: 2,
+    correct: 0,
     explanation:
-      "The bootstrap loader is a small piece of code stored in ROM or EEPROM that initializes the system and initiates the execution of the operating system kernel.",
+      "The command interpreter reads and executes commands, converting them into system calls. It's kept separate from the kernel because it frequently needs to be modified or updated.",
   },
   {
-    q: "In the context of operating system debugging, what is a 'crash dump'?",
+    q: "In Unix systems, what two system calls need to be executed to start a new process?",
     options: [
-      "A file containing error information from a failed user application",
-      "A file containing kernel memory captured after an operating system failure",
-      "A log file that tracks every command entered into the CLI",
-      "A statistical trend analysis of the instruction pointer",
+      "fork() followed by exec()",
+      "create() followed by run()",
+      "spawn() followed by execute()",
+      "clone() followed by start()",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "A crash dump file is generated after an operating system failure to capture kernel memory for later analysis, whereas application failures generate core dumps.",
+      "The fork() call clones the currently executing process, while exec() overlays a new process based on a different executable over the calling process.",
   },
   {
-    q: "What is the primary difference between the many-to-many and two-level multithreading models?",
-    options: [
-      "The many-to-many model does not support kernel threads",
-      "The two-level model allows a user thread to be bound to a specific kernel thread",
-      "The many-to-many model is only used in mobile operating systems",
-      "There is no functional difference between the two models",
-    ],
-    correct: 1,
+    q: "System programs can be thought of as bundles of useful system calls that provide basic functionality to users.",
+    options: ["True", "False"],
+    correct: 0,
     explanation:
-      "While both involve mapping user threads to kernel threads, the two-level model specifically allows a user-level thread to be permanently bound to a kernel thread.",
+      "System programs provide common functionality so users don't need to write their own programs to solve common problems using system calls directly.",
+  },
+  {
+    q: "What is the main advantage of the layered approach to system design?",
+    options: [
+      "The system is easier to debug and modify because changes affect only limited sections",
+      "It makes the system run faster",
+      "It reduces memory usage",
+      "It allows multiple operating systems to run simultaneously",
+    ],
+    correct: 0,
+    explanation:
+      "Modular design means bugs are limited to specific modules/layers, information is kept where needed, and changes don't affect the entire system.",
+  },
+  {
+    q: "Which of the following OS services could NOT be safely provided by user-level programs?",
+    options: [
+      "All of the listed services require OS-level control",
+      "Program execution and CPU time allocation",
+      "I/O operations and device access",
+      "File-system manipulation and protection",
+      "Communications and network access",
+    ],
+    correct: 0,
+    explanation:
+      "User-level programs cannot be trusted to properly allocate CPU time, access devices appropriately, enforce file protections, coordinate network access, or handle system-wide errors. These all require OS-level control.",
+  },
+  {
+    q: "Why do some systems store the operating system in firmware rather than on disk?",
+    options: [
+      "For devices like PDAs and cellular phones that may not have a disk with a file system available",
+      "Because firmware is faster than disk storage",
+      "Because it's cheaper to manufacture",
+      "Because it's easier to update",
+    ],
+    correct: 0,
+    explanation:
+      "Devices without traditional disk storage, such as handheld PDAs and cellular telephones, must store their operating system in firmware.",
+  },
+  {
+    q: "How does a boot manager allow a choice of operating systems from which to boot?",
+    options: [
+      "The boot manager runs during system startup and determines which OS to boot into, typically stored at specific hard disk locations and providing a selection menu",
+    ],
+    correct: 0,
+    explanation:
+      "Rather than booting directly to an OS, the boot manager runs first during startup, presents a menu of available operating systems, and boots into a default OS if no selection is made.",
   },
 ];

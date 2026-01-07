@@ -3,241 +3,120 @@ export const questions = [
   {
     q: "What are the three main purposes of an operating system?",
     options: [
-      "To provide a user environment, allocate resources, and act as a control program",
-      "To increase hardware clock speed, manage word processing, and design graphics",
-      "To eliminate the need for a CPU, provide physical storage, and cool the system",
-      "To browse the web, send emails, and play video games",
+      "To provide an environment for executing programs conveniently and efficiently, to allocate computer resources fairly and efficiently, and to serve as a control program supervising user programs and managing I/O devices",
     ],
     correct: 0,
     explanation:
-      "The three main purposes include providing an **environment for users to execute programs**, **allocating resources** fairly and efficiently, and serving as a **control program** to manage I/O devices and prevent improper use.",
+      "An operating system serves three key purposes: providing a convenient execution environment, managing resource allocation, and acting as a control program for supervision and I/O management.",
   },
   {
-    q: "When is it appropriate for an operating system to 'waste' resources?",
+    q: "When is it appropriate for an operating system to 'waste' resources by not maximizing hardware efficiency?",
     options: [
-      "In a multi-user mainframe system to prioritize the administrator",
-      "In single-user systems to optimize the user’s interaction, such as using a GUI",
-      "When the system is running a real-time process that is ahead of schedule",
-      "Never; an operating system must always maximize hardware efficiency",
+      "In single-user systems where optimizing user interaction (like with a GUI) is more important than CPU efficiency",
+      "Never - the OS should always maximize hardware efficiency",
+      "Only in multi-user systems",
+      "Only when running real-time applications",
     ],
+    correct: 0,
+    explanation:
+      "Single-user systems should maximize use of the system for the user. A GUI might 'waste' CPU cycles, but it optimizes the user's interaction with the system, making it a worthwhile tradeoff.",
+  },
+  {
+    q: "What is the main difficulty that a programmer must overcome in writing an operating system for a real-time environment?",
+    options: [
+      "Keeping the OS within fixed time constraints",
+      "Managing multiple users simultaneously",
+      "Providing a graphical user interface",
+      "Maximizing throughput",
+    ],
+    correct: 0,
+    explanation:
+      "The main difficulty is keeping the operating system within the fixed time constraints of a real-time system. If the system does not complete a task in a certain time frame, it may cause a breakdown of the entire system. Scheduling schemes must not allow response time to exceed the time constraint.",
+  },
+  {
+    q: "Arguments against embedding applications (like web browsers) within the operating system typically include all of the following EXCEPT:",
+    options: [
+      "Applications are not part of an operating system",
+      "Security vulnerabilities offset any performance benefits",
+      "It leads to a bloated operating system",
+      "It makes the applications harder to update",
+    ],
+    correct: 3,
+    explanation:
+      "The document mentions three main arguments against embedding applications: (1) applications are not part of an OS, (2) performance benefits are offset by security vulnerabilities, and (3) it leads to bloat. Update difficulty is not mentioned.",
+  },
+  {
+    q: "How does the distinction between kernel mode and user mode function as a rudimentary form of protection?",
+    options: [
+      "Certain critical instructions and hardware access can only be executed in kernel mode, limiting user mode capabilities and protecting critical resources",
+    ],
+    correct: 0,
+    explanation:
+      "Certain instructions can only be executed in kernel mode. Hardware devices can only be accessed in kernel mode. Control over interrupts is only possible in kernel mode. This gives user mode very limited capability, thereby enforcing protection of critical resources.",
+  },
+  {
+    q: "Which of the following instructions should be privileged and executed only in kernel mode? (Select all that apply by identifying which statement is correct)",
+    options: [
+      "Set timer value, clear memory, turn off interrupts, modify device-status table entries, and access I/O devices",
+      "All instructions including reading the clock and issuing trap instructions",
+      "Only instructions that modify hardware directly",
+      "Reading the clock, issuing trap instructions, and switching to kernel mode",
+    ],
+    correct: 0,
+    explanation:
+      "Privileged instructions include: set value of timer, clear memory, turn off interrupts, modify entries in device-status table, and access I/O device. Operations like reading the clock, issuing trap instructions, and switching to kernel mode can be performed in user mode.",
+  },
+  {
+    q: "Early computers that placed the OS in a memory partition that could not be modified by either user jobs or the OS itself would face difficulties because:",
+    options: [
+      "Data required by the OS (passwords, access controls, etc.) would have to be stored in unprotected memory, making it accessible to unauthorized users",
+    ],
+    correct: 0,
+    explanation:
+      "The main difficulty is that operating system data like passwords, access controls, and accounting information would need to be stored in or passed through unprotected memory, making it accessible to unauthorized users.",
+  },
+  {
+    q: "Some CPUs provide for more than two modes of operation. What are two possible uses of these multiple modes?",
+    options: [
+      "To provide finer-grained security policies (e.g., different user groups) and to allow device drivers to run in quasi-user/kernel mode without full kernel mode switching",
+    ],
+    correct: 0,
+    explanation:
+      "Multiple modes could provide finer-grained security by distinguishing between different types of user modes (e.g., users in the same group executing each other's code). They could also allow different distinctions within kernel code, such as allowing USB device drivers to run in a special mode without full kernel mode switching.",
+  },
+  {
+    q: "How could timers be used to compute the current time?",
+    options: [
+      "Set a timer for the future, sleep until interrupted, update local state tracking interrupt count, and repeat this process continuously",
+    ],
+    correct: 0,
+    explanation:
+      "A program could set a timer for some time in the future and go to sleep. When awakened by the interrupt, it updates its local state tracking the number of interrupts received. By repeating this process of setting timer interrupts and updating state, it can compute the current time.",
+  },
+  {
+    q: "Caches are useful because they solve the transfer problem between components operating at different speeds.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Caches provide a buffer of intermediate speed between components that transfer data at differing speeds. If the fast device finds needed data in the cache, it doesn't need to wait for the slower device.",
+  },
+  {
+    q: "A cache can completely replace a device it's caching for (like a disk) if the cache is made the same size.",
+    options: ["True", "False"],
     correct: 1,
     explanation:
-      "**Single-user systems** may forsake efficiency to maximize the user's experience. For example, a **GUI** might waste CPU cycles but optimizes the user's interaction with the system.",
+      "A component may be eliminated by an equal-sized cache only if: (a) the cache and component have equivalent state-saving capacity (e.g., if the component retains data when power is removed, the cache must too), and (b) the cache is affordable, since faster storage tends to be more expensive.",
   },
   {
-    q: "What is the primary difficulty a programmer face when writing an OS for a real-time environment?",
+    q: "What is a key difference between client-server and peer-to-peer distributed system models?",
     options: [
-      "Ensuring the user interface is colorful and interactive",
-      "Keeping the operating system within fixed time constraints",
-      "Making sure the system can run multiple web browsers simultaneously",
-      "Allowing the user to bypass all security protocols",
+      "Client-server has distinct roles where clients request services from servers, while peer-to-peer nodes can act as both clients and servers",
+      "Client-server is faster than peer-to-peer",
+      "Peer-to-peer requires a central server while client-server does not",
+      "Client-server can only handle one client at a time",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "The main difficulty is keeping the OS within the **fixed time constraints** of a real-time system. If tasks are not completed within a specific time frame, it can cause a **breakdown of the entire system**.",
-  },
-  {
-    q: "Which of the following is an argument AGAINST embedding applications like web browsers in the OS?",
-    options: [
-      "Applications can take better advantage of kernel features",
-      "Applications run faster when integrated into the kernel",
-      "It leads to a bloated operating system and security vulnerabilities",
-      "It makes the operating system easier to install",
-    ],
-    correct: 2,
-    explanation:
-      "Arguments against embedding applications include the fact that they are not part of an OS, integration leads to a **bloated system**, and performance benefits are offset by **security vulnerabilities**.",
-  },
-  {
-    q: "How does the distinction between kernel mode and user mode provide protection?",
-    options: [
-      "By allowing the user to access all hardware instructions at any time",
-      "By ensuring certain instructions can only be executed in kernel mode",
-      "By making the computer run faster when in user mode",
-      "By requiring a password every time a program starts",
-    ],
-    correct: 1,
-    explanation:
-      "Certain instructions and hardware device access are only permitted when the CPU is in **kernel mode**. This enforces protection of **critical resources** because the CPU has very limited capability in user mode.",
-  },
-  {
-    q: "Which of the following instructions is typically 'privileged'?",
-    options: [
-      "Reading the clock",
-      "Issuing a trap instruction",
-      "Turning off interrupts",
-      "Switching from kernel to user mode",
-    ],
-    correct: 2,
-    explanation:
-      "Operations such as **turning off interrupts**, setting the timer value, clearing memory, and accessing I/O devices need to be **privileged**.",
-  },
-  {
-    q: "What was a difficulty of early systems that protected the OS by placing it in a fixed memory partition?",
-    options: [
-      "The OS became too fast for the hardware to keep up",
-      "OS data like passwords would be accessible to unauthorized users in unprotected memory",
-      "It prevented the use of a monitor or keyboard",
-      "The system could only run one program per year",
-    ],
-    correct: 1,
-    explanation:
-      "If the OS is in a protected partition that it cannot modify, critical data like **passwords or access controls** would have to be stored in **unprotected memory**, making them accessible to unauthorized users.",
-  },
-  {
-    q: "What is one possible use for a CPU that supports more than two modes of operation?",
-    options: [
-      "To allow the computer to use more than one type of electricity",
-      "To provide a finer-grained security policy, such as different types of user modes",
-      "To increase the physical number of cores in the processor",
-      "To eliminate the need for an operating system entirely",
-    ],
-    correct: 1,
-    explanation:
-      "Multiple modes can provide **finer-grained security**. For example, a specific mode could allow **USB device drivers** to run without having to switch fully to kernel mode.",
-  },
-  {
-    q: "How can timers be used to compute the current time?",
-    options: [
-      "By asking the user to input the time every hour",
-      "By setting a timer to interrupt, incrementing a counter upon awakening, and repeating",
-      "By measuring the physical temperature of the CPU",
-      "Timers cannot be used to track time; they only stop processes",
-    ],
-    correct: 1,
-    explanation:
-      "A program can set a timer for the future, go to sleep, and increment a **local state counter** representing the number of interrupts received when awakened. This process is repeated continually to track time.",
-  },
-  {
-    q: "What problem do caches solve in a computer system?",
-    options: [
-      "They eliminate the need for main memory",
-      "They provide a buffer between components that perform transfers at differing speeds",
-      "They permanently store data even when the power is turned off",
-      "They prevent the CPU from becoming too hot during calculations",
-    ],
-    correct: 1,
-    explanation:
-      "Caches solve the transfer problem by providing a **buffer of intermediate speed** between two components exchanging data. If the fast device finds data in the cache, it doesn't have to wait for the slower device.",
-  },
-  {
-    q: "What is a significant problem caused by the use of caches?",
-    options: [
-      "They make the system too heavy to carry",
-      "Data in the cache must be kept consistent with data in the components",
-      "Caches are always cheaper than the devices they cache",
-      "Caches increase the amount of physical space needed for a motherboard",
-    ],
-    correct: 1,
-    explanation:
-      "Cache data must be kept **consistent**; if a component's data value changes, the cache must also be updated. This is a particular problem in **multiprocessor systems**.",
-  },
-  {
-    q: "Why can't we simply make a cache as large as a disk and eliminate the disk?",
-    options: [
-      "Because the cache would be too fast for the CPU",
-      "Because of affordability and the need for equivalent state-saving capacity",
-      "Because the government regulates the size of caches",
-      "Because it is physically impossible to make a cache larger than 1GB",
-    ],
-    correct: 1,
-    explanation:
-      "A component can only be eliminated by an equal-sized cache if the cache is **affordable** and has **equivalent state-saving capacity** (retaining data when power is removed).",
-  },
-  {
-    q: "How does the client-server model differ from the peer-to-peer (P2P) model?",
-    options: [
-      "P2P has a central server that manages all clients",
-      "Client-server distinguishes roles, while P2P considers all nodes as peers",
-      "Client-server is only used for local networks, while P2P is for the Internet",
-      "There is no difference between the two models",
-    ],
-    correct: 1,
-    explanation:
-      "The client-server model **firmly distinguishes roles**, where the client requests and the server provides. In **P2P**, all nodes are peers and can act as **both clients and servers**.",
-  },
-  {
-    q: "In a P2P system sharing recipes, how does a node obtain a recipe?",
-    options: [
-      "It must wait for the central recipe server to broadcast it",
-      "It requests the recipe from other peer nodes in the network",
-      "It must generate the recipe itself using its own CPU",
-      "It is impossible to share data in a P2P system",
-    ],
-    correct: 1,
-    explanation:
-      "In a P2P model, a peer node can **ask other peer nodes** for a specified recipe, and any node with that recipe can provide it to the requester.",
-  },
-  {
-    q: "What is the OS's role as a resource allocator?",
-    options: [
-      "To prevent the CPU from running any user programs",
-      "To manage all resources and decide between conflicting requests for fair use",
-      "To provide a physical storage space for the user's files",
-      "To act as a power supply for the hardware",
-    ],
-    correct: 1,
-    explanation:
-      "As a resource allocator, the OS **manages all resources** and decides how to resolve **conflicting requests** for efficient and fair use.",
-  },
-  {
-    q: "Which definition of an operating system is generally referred to as the 'kernel'?",
-    options: [
-      "Everything a vendor ships in the box",
-      "The one program running at all times on the computer",
-      "The set of all application programs like Excel or Word",
-      "The physical metal casing of the computer",
-    ],
-    correct: 1,
-    explanation:
-      "A common approximation is that the **kernel** is the one program running at all times on the computer.",
-  },
-  {
-    q: "What is the primary function of the bootstrap program?",
-    options: [
-      "To manage the user's email and web browsing",
-      "To initialize the system and load the OS kernel",
-      "To shut down the computer safely",
-      "To provide a backup of the user's hard drive",
-    ],
-    correct: 1,
-    explanation:
-      "The bootstrap program **initializes all aspects of the system** (registers, controllers, memory) and **loads the OS kernel** to start execution.",
-  },
-  {
-    q: "How does a device controller notify the CPU that it has finished its operation?",
-    options: [
-      "By sending an email to the administrator",
-      "By causing an interrupt",
-      "By restarting the computer",
-      "By clearing the system's RAM",
-    ],
-    correct: 1,
-    explanation:
-      "A device controller informs the CPU that it has finished its operation by **causing an interrupt**.",
-  },
-  {
-    q: "What is a 'trap' or 'exception' in an operating system?",
-    options: [
-      "A physical hardware failure that cannot be fixed",
-      "A software-generated interrupt caused by an error or user request",
-      "A method for catching computer viruses",
-      "A specialized hardware button for debugging",
-    ],
-    correct: 1,
-    explanation:
-      "A trap or exception is a software-generated interrupt caused either by an error (like division by zero) or a user request.",
-  },
-  {
-    q: "Which of these is the only large storage media the CPU can access directly?",
-    options: [
-      "Hard disk",
-      "Magnetic tape",
-      "Main memory (RAM)",
-      "Solid-state disk",
-    ],
-    correct: 2,
-    explanation:
-      "Main memory is the only large storage media that the CPU can access directly.",
+      "The client-server model firmly distinguishes roles: clients request services provided by servers. The peer-to-peer model has no strict roles - all nodes are peers and may act as either clients or servers (or both), requesting services from or providing services to other peers.",
   },
 ];
