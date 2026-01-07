@@ -75,6 +75,12 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Ch1 Quiz.js"
   },
   {
+    "id": "Ch2 Quiz",
+    "category": "Operatings Systems",
+    "title": "Ch2 Quiz",
+    "path": "../Exams/Operatings Systems/Ch2 Quiz.js"
+  },
+  {
     "id": "General Exam",
     "category": "Operatings Systems",
     "title": "General Exam",
