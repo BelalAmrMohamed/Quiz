@@ -33,6 +33,12 @@ export const examList = [
     "path": "../Exams/Foundation of IS/General AI quiz.js"
   },
   {
+    "id": "Midterm Exam",
+    "category": "Foundation of IS",
+    "title": "Midterm Exam",
+    "path": "../Exams/Foundation of IS/Midterm Exam.js"
+  },
+  {
     "id": "Final Exam",
     "category": "Object-Oriented Programming",
     "title": "Final Exam",
