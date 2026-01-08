@@ -69,6 +69,12 @@ export const examList = [
     "path": "../Exams/Operatings Systems/6. CPU Scheduling.js"
   },
   {
+    "id": "Ch1 and 2 Quiz",
+    "category": "Operatings Systems",
+    "title": "Ch1 And 2 Quiz",
+    "path": "../Exams/Operatings Systems/Ch1 and 2 Quiz.js"
+  },
+  {
     "id": "Ch1 Quiz",
     "category": "Operatings Systems",
     "title": "Ch1 Quiz",
@@ -81,6 +87,12 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Ch2 Quiz.js"
   },
   {
+    "id": "Ch3 Quiz",
+    "category": "Operatings Systems",
+    "title": "Ch3 Quiz",
+    "path": "../Exams/Operatings Systems/Ch3 Quiz.js"
+  },
+  {
     "id": "General Exam",
     "category": "Operatings Systems",
     "title": "General Exam",
@@ -91,6 +103,12 @@ export const examList = [
     "category": "Operatings Systems",
     "title": "General Exam 2",
     "path": "../Exams/Operatings Systems/General Exam 2.js"
+  },
+  {
+    "id": "General Exam 3",
+    "category": "Operatings Systems",
+    "title": "General Exam 3",
+    "path": "../Exams/Operatings Systems/General Exam 3.js"
   },
   {
     "id": "Introduction and Structure",
@@ -121,6 +139,18 @@ export const examList = [
     "category": "Operatings Systems",
     "title": "Threads And CPU Scheduling",
     "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
+  },
+  {
+    "id": "إمتحان أسئلة مقالي",
+    "category": "Operatings Systems",
+    "title": "إمتحان أسئلة مقالي",
+    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js"
+  },
+  {
+    "id": "إمتحان أسئلة مقالي 2",
+    "category": "Operatings Systems",
+    "title": "إمتحان أسئلة مقالي 2",
+    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js"
   },
   {
     "id": "إمتحان الميد بالمقالي",
