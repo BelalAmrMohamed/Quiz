@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/dashboard.css">
+</head>
+
+<body>
+    <div class="container">
+        <div id="breadcrumb" class="show" onclick="window.location.href='index.html'">
+            <span class="breadcrumb-text">Back to Home</span>
+        </div>
+
+        <div class="header">
+            <h1>User Dashboard</h1>
+            <p>Track your progress and achievements</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">💎</div>
+                <div class="info">
+                    <span class="label">Total Points</span>
+                    <span class="value" id="totalPoints">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">📝</div>
+                <div class="info">
+                    <span class="label">Quizzes Taken</span>
+                    <span class="value" id="totalQuizzes">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🏆</div>
+                <div class="info">
+                    <span class="label">Badges</span>
+                    <span class="value" id="totalBadges">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-layout">
+            <div class="main-content">
+                <h2>Recent History</h2>
+                <div id="historyList" class="history-list">
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3>Your Badges</h3>
+                    <div id="badgeContainer" class="badge-display-grid">
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Leaderboard</h3>
+                    <div id="leaderboard" class="leaderboard-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="watermark">Crafted by Belal Amr</div>
+    </div>
+
+    <script type="module" src="Script/dashboard.js"></script>
+</body>
+
+</html>

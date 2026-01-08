@@ -51,22 +51,26 @@ Quiz Website/
 ├── index.html
 ├── quiz.html
 ├── summary.html
+├── dashboard.html
 │
 ├── CSS/
 │   ├── styles.css
 │   ├── quiz.css
-│   └── summary.css
+│   ├── summary.css
+│   └── dashboard.css
 │
 ├── script/
 │   ├── index.js
 │   ├── quiz.js
 │   ├── summary.js
+│   ├── dashboard.js
+│   ├── gameEngine.js
 │   └── examManifest.js
 │
 ├── tools/
-│   └── generateExamManifest.js
+│   └── generateExamManifest.js <- Auto generates "examManifest.js"
 │
-└── Exams/
+└── Exams/ <- Conatains the categories which contain the quizzes
     ├── Categorie-1/
     │   ├── quiz_1.js
     │   ├── quiz_2.js

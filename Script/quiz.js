@@ -1,3 +1,5 @@
+import { gameEngine } from "./gameEngine.js";
+
 import { examList } from "./examManifest.js";
 
 // --- State Management ---
@@ -436,3 +438,48 @@ function stopTimer() {
 }
 
 init();
+
+window.finishEarly = (skipConfirm) => {
+  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
+  stopTimer();
+
+  let correctCount = 0;
+  let essayQuestions = [];
+
+  questions.forEach((q, i) => {
+    if (isEssayQuestion(q)) {
+      essayQuestions.push(i);
+    } else {
+      const correctIdx = q.correct ?? q.answer;
+      if (userAnswers[i] === correctIdx) correctCount++;
+    }
+  });
+
+  const scorableQuestions = questions.length - essayQuestions.length;
+
+  // 1. Create the basic result object
+  const rawResult = {
+    examId,
+    score: correctCount,
+    total: scorableQuestions,
+    totalQuestions: questions.length,
+    essayQuestions: essayQuestions,
+    userAnswers,
+    timeElapsed,
+  };
+
+  // 2. Process via Game Engine (Calculates points, saves history, checks badges)
+  const gamifiedResult = gameEngine.processResult(rawResult);
+
+  // 3. Combine raw result with gamification data for the summary page
+  const finalOutput = {
+    ...rawResult,
+    gamification: gamifiedResult,
+  };
+
+  // 4. Save to temp storage for summary page to read
+  localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
+  localStorage.removeItem(`quiz_state_${examId}`);
+
+  window.location.href = "summary.html";
+};

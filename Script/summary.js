@@ -87,6 +87,60 @@ function renderHeader(
     data.timeElapsed % 60
   }s`;
 
+  // Extract Gamification Data
+  const points = data.gamification ? data.gamification.pointsEarned : 0;
+  const newBadges = data.gamification ? data.gamification.newBadges : [];
+
+  // Generate Badge HTML if any
+  let badgeHTML = "";
+  if (newBadges.length > 0) {
+    badgeHTML = `
+      <div class="new-badges-section">
+        <h3>🎉 Badges Unlocked!</h3>
+        <div class="badge-grid">
+          ${newBadges
+            .map(
+              (b) => `
+            <div class="badge-item">
+              <span class="badge-icon">${b.icon}</span>
+              <span class="badge-name">${b.title}</span>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (scoreHeader)
+    scoreHeader.innerHTML = `
+        <div class="score-circle ${percentage >= 70 ? "pass" : "fail"}">
+            <span>${percentage}%</span>
+        </div>
+        <div class="stats-text">
+            <h2>${percentage >= 70 ? "Great Job!" : "Keep Practicing"}</h2>
+            
+            <div class="points-pill">
+              <span>💎 +${points} Points</span>
+            </div>
+
+            <p>Score: ${data.score} / ${total}</p>
+            <p>Correct: ${correct} • Wrong: ${wrong} • Skipped: ${skipped}</p>
+            ${
+              essayCount > 0
+                ? `<p class="essay-note">📝 ${essayCount} Essay Question${
+                    essayCount > 1 ? "s" : ""
+                  } (Not Counted in Score)</p>`
+                : ""
+            }
+            <p>Time: ${timeStr}</p>
+            ${badgeHTML}
+        </div>
+    `;
+
+  // ... keep existing code for scoreDisplay and statsDisplay ...
+
   if (scoreHeader)
     scoreHeader.innerHTML = `
         <div class="score-circle ${percentage >= 70 ? "pass" : "fail"}">
