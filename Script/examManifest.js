@@ -87,16 +87,34 @@ export const examList = [
     "path": "../Exams/Operatings Systems/Ch1 Quiz.js"
   },
   {
+    "id": "Ch1 Zaqazeeq",
+    "category": "Operatings Systems",
+    "title": "Ch1 Zaqazeeq",
+    "path": "../Exams/Operatings Systems/Ch1 Zaqazeeq.js"
+  },
+  {
     "id": "Ch2 Quiz",
     "category": "Operatings Systems",
     "title": "Ch2 Quiz",
     "path": "../Exams/Operatings Systems/Ch2 Quiz.js"
   },
   {
+    "id": "Ch2 Zaqazeeq",
+    "category": "Operatings Systems",
+    "title": "Ch2 Zaqazeeq",
+    "path": "../Exams/Operatings Systems/Ch2 Zaqazeeq.js"
+  },
+  {
     "id": "Ch3 Quiz",
     "category": "Operatings Systems",
     "title": "Ch3 Quiz",
     "path": "../Exams/Operatings Systems/Ch3 Quiz.js"
+  },
+  {
+    "id": "Ch3 Zaqazeeq",
+    "category": "Operatings Systems",
+    "title": "Ch3 Zaqazeeq",
+    "path": "../Exams/Operatings Systems/Ch3 Zaqazeeq.js"
   },
   {
     "id": "General Exam",
