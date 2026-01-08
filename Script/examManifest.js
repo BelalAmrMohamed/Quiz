@@ -21,10 +21,10 @@ export const examList = [
     "path": "../Exams/Discrete Structure/Quiz 1.js"
   },
   {
-    "id": "Quiz 2",
+    "id": "Revision 2",
     "category": "Discrete Structure",
-    "title": "Quiz 2",
-    "path": "../Exams/Discrete Structure/Quiz 2.js"
+    "title": "Revision 2",
+    "path": "../Exams/Discrete Structure/Revision 2.js"
   },
   {
     "id": "General AI quiz",
