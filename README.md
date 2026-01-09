@@ -114,7 +114,8 @@ Quiz Website/
 │   ├── summary.js
 │   ├── dashboard.js
 │   ├── gameEngine.js
-│   └── examManifest.js
+│   ├── examManifest.js
+│   └── theme.js
 │
 ├── tools/
 │   └── generateExamManifest.js <- Auto generates "examManifest.js"

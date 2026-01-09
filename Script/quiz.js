@@ -1,6 +1,6 @@
-import { gameEngine } from "./gameEngine.js";
-
+// Script/quiz.js
 import { examList } from "./examManifest.js";
+import { gameEngine } from "./gameEngine.js";
 
 // --- State Management ---
 let questions = [];
@@ -11,6 +11,8 @@ let lockedQuestions = {};
 let timeElapsed = 0;
 let timerInterval = null;
 let examId = null;
+let quizMode = "exam"; // 'practice', 'timed', 'exam'
+let timeRemaining = 0; // Only used for 'timed' mode
 
 // --- DOM Elements ---
 const els = {
@@ -44,6 +46,9 @@ const isEssayQuestion = (q) => {
 async function init() {
   const params = new URLSearchParams(window.location.search);
   examId = params.get("id");
+  quizMode = params.get("mode") || "exam";
+  const startAt = params.get("startAt"); // Get the bookmarked index
+
   const config = examList.find((e) => e.id === examId);
 
   if (!config) {
@@ -67,11 +72,22 @@ async function init() {
       metaData = { title, category: parts[parts.length - 2] || "" };
     }
 
-    if (els.title) els.title.textContent = metaData.title || "Quiz";
+    if (els.title) {
+      let modeLabel = "";
+      if (quizMode === "practice") modeLabel = " (Practice)";
+      if (quizMode === "timed") modeLabel = " (Timed)";
+      els.title.textContent = (metaData.title || "Quiz") + modeLabel;
+    }
 
-    // Restore Session
+    // Initialize Timer for Timed Mode
+    if (quizMode === "timed") {
+      // Default: 30 seconds per question
+      timeRemaining = questions.length * 30;
+    }
+
+    // Restore Session (Optional - disabled for Timed/Exam mode to prevent cheating, enabled for Practice)
     const saved = localStorage.getItem(`quiz_state_${examId}`);
-    if (saved) {
+    if (saved && quizMode === "practice") {
       const state = JSON.parse(saved);
       if (confirm("Resume your previous session?")) {
         currentIdx = state.currentIdx || 0;
@@ -80,6 +96,23 @@ async function init() {
         timeElapsed = state.timeElapsed || 0;
       } else {
         localStorage.removeItem(`quiz_state_${examId}`);
+      }
+    } else {
+      // Clear old state if starting fresh
+      localStorage.removeItem(`quiz_state_${examId}`);
+    }
+
+    // This is supposed to be after the questions are loaded
+    if (startAt !== null) {
+      currentIdx = parseInt(startAt);
+    } else {
+      // Restore Session (Optional - your existing logic)
+      const saved = localStorage.getItem(`quiz_state_${examId}`);
+      if (saved && quizMode === "practice") {
+        const state = JSON.parse(saved);
+        currentIdx = state.currentIdx || 0;
+        userAnswers = state.userAnswers || {};
+        lockedQuestions = state.lockedQuestions || {};
       }
     }
 
@@ -93,6 +126,12 @@ async function init() {
     window.nextQuestion = window.nextQuestion || (() => window.nav(1));
     window.finishEarly = window.finishEarly || (() => window.finish());
     window.checkAnswer = window.checkAnswer || (() => {});
+
+    // NEW: Bookmark Handler
+    window.toggleBookmark = () => {
+      const isActive = gameEngine.toggleBookmark(examId, currentIdx);
+      renderQuestion(); // Re-render to update star icon
+    };
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -122,7 +161,7 @@ function renderQuestion() {
 
   const correctIdx = q.correct ?? q.answer;
 
-  // Update Progress based on userAnswers (selections)
+  // Update Progress
   const answeredCount = Object.keys(userAnswers).length;
   const progressPercent = (answeredCount / questions.length) * 100;
 
@@ -134,6 +173,16 @@ function renderQuestion() {
 
   const isLocked = !!lockedQuestions[currentIdx];
   const userSelected = userAnswers[currentIdx];
+  const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
+
+  // Bookmark Button HTML
+  const bookmarkBtn = `
+    <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
+            onclick="window.toggleBookmark()" 
+            title="${isBookmarked ? "Remove Bookmark" : "Bookmark for review"}">
+        ${isBookmarked ? "★" : "☆"}
+    </button>
+  `;
 
   // Feedback Logic
   let feedbackClass = "feedback";
@@ -145,7 +194,6 @@ function renderQuestion() {
     let isCorrect = false;
 
     if (isEssay) {
-      // For essay questions, compare text (case-insensitive, trimmed)
       const userAnswer = String(userSelected || "")
         .trim()
         .toLowerCase();
@@ -163,7 +211,6 @@ function renderQuestion() {
         explanationText
       )}</div>`;
     } else {
-      // For MCQ/True-False
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
       const statusMsg = isCorrect ? "Correct ✅" : `Wrong ❌`;
@@ -173,17 +220,24 @@ function renderQuestion() {
     }
   }
 
+  // Common Header HTML
+  const questionHeaderHTML = `
+    <div class="question-header">
+        <div class="question-number">Question ${currentIdx + 1} of ${
+    questions.length
+  }</div>
+        <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
+                onclick="window.toggleBookmark()">
+            ${isBookmarked ? "★" : "☆"}
+        </button>
+        <h2 class="question-text">${escapeHtml(q.q)}</h2>
+    </div>
+`;
   // Render content
   if (isEssay) {
-    // Render Essay Question
     els.questionContainer.innerHTML = `
       <div class="question-card">
-        <div class="question-header">
-          <div class="question-number">Question ${currentIdx + 1} of ${
-      questions.length
-    }</div>
-          <h2 class="question-text">${escapeHtml(q.q)}</h2>
-        </div>
+        ${questionHeaderHTML}
 
         <div class="essay-container">
           <label for="essayInput" class="essay-label">Your Answer:</label>
@@ -224,15 +278,10 @@ function renderQuestion() {
       </div>
     `;
   } else {
-    // Render MCQ/True-False Question
+    // MCQ Render
     els.questionContainer.innerHTML = `
       <div class="question-card">
-        <div class="question-header">
-          <div class="question-number">Question ${currentIdx + 1} of ${
-      questions.length
-    }</div>
-          <h2 class="question-text">${escapeHtml(q.q)}</h2>
-        </div>
+        ${questionHeaderHTML}
 
         <div class="options-grid">
           ${q.options
@@ -274,11 +323,11 @@ function renderQuestion() {
       </div>
     `;
 
-    // Post-render accessibility for MCQ
+    // Accessibility for Radios
     const optionRows = Array.from(
       els.questionContainer.querySelectorAll(".option-row")
     );
-    optionRows.forEach((row, idx) => {
+    optionRows.forEach((row) => {
       const input = row.querySelector('input[type="radio"]');
       if (!input) return;
       if (isLocked) {
@@ -314,8 +363,6 @@ window.handleEssayInput = () => {
   if (textarea) {
     userAnswers[currentIdx] = textarea.value;
     saveState();
-
-    // Update the check button state without re-rendering the entire question
     const checkBtn = document.getElementById("checkBtn");
     if (checkBtn) {
       checkBtn.disabled = !textarea.value.trim();
@@ -324,6 +371,8 @@ window.handleEssayInput = () => {
 };
 
 const maybeAutoSubmit = () => {
+  // Only auto-submit prompt if we are in exam mode or practice
+  // In timed mode, we usually wait for time or explicit finish
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
     setTimeout(() => {
@@ -348,6 +397,7 @@ window.prevQuestion = () => window.nav(-1);
 window.nextQuestion = () => window.nav(1);
 window.finish = () => window.finishEarly();
 
+// Updated Finish Function with Gamification Integration
 window.finishEarly = (skipConfirm) => {
   if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
   stopTimer();
@@ -357,29 +407,38 @@ window.finishEarly = (skipConfirm) => {
 
   questions.forEach((q, i) => {
     if (isEssayQuestion(q)) {
-      // Track essay questions separately - don't count in score
       essayQuestions.push(i);
     } else {
-      // Only count MCQ/True-False in score
       const correctIdx = q.correct ?? q.answer;
       if (userAnswers[i] === correctIdx) correctCount++;
     }
   });
 
-  // Calculate total excluding essay questions
   const scorableQuestions = questions.length - essayQuestions.length;
 
-  const finalResult = {
+  const rawResult = {
     examId,
     score: correctCount,
-    total: scorableQuestions, // Only count MCQ/True-False
-    totalQuestions: questions.length, // Keep total for reference
-    essayQuestions: essayQuestions, // Track which questions are essays
+    total: scorableQuestions,
+    totalQuestions: questions.length,
+    essayQuestions: essayQuestions,
     userAnswers,
-    timeElapsed,
+    timeElapsed:
+      quizMode === "timed"
+        ? questions.length * 30 - timeRemaining
+        : timeElapsed,
+    mode: quizMode,
   };
 
-  localStorage.setItem("last_quiz_result", JSON.stringify(finalResult));
+  // Process Game Logic (Points, Badges, History)
+  const gamifiedResult = gameEngine.processResult(rawResult);
+
+  const finalOutput = {
+    ...rawResult,
+    gamification: gamifiedResult,
+  };
+
+  localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
   localStorage.removeItem(`quiz_state_${examId}`);
   window.location.href = "summary.html";
 };
@@ -416,20 +475,46 @@ function updateNav() {
 }
 
 function saveState() {
+  // Don't save state in Timed mode to prevent refreshing to reset timer
+  if (quizMode === "timed") return;
+
   const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
   localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
 }
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
+
   timerInterval = setInterval(() => {
-    timeElapsed++;
-    const mins = Math.floor(timeElapsed / 60)
-      .toString()
-      .padStart(2, "0");
-    const secs = (timeElapsed % 60).toString().padStart(2, "0");
-    if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
-    saveState();
+    if (quizMode === "timed") {
+      // Count Down
+      timeRemaining--;
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        alert("Time's up! Submitting quiz...");
+        window.finishEarly(true);
+        return;
+      }
+
+      const mins = Math.floor(timeRemaining / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = (timeRemaining % 60).toString().padStart(2, "0");
+      if (els.timer) {
+        els.timer.textContent = `⏳ ${mins}:${secs}`;
+        // Optional: visual warning when low on time
+        if (timeRemaining < 30) els.timer.style.color = "var(--color-error)";
+      }
+    } else {
+      // Count Up (Practice & Exam)
+      timeElapsed++;
+      const mins = Math.floor(timeElapsed / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = (timeElapsed % 60).toString().padStart(2, "0");
+      if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
+      saveState();
+    }
   }, 1000);
 }
 
@@ -438,48 +523,3 @@ function stopTimer() {
 }
 
 init();
-
-window.finishEarly = (skipConfirm) => {
-  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
-  stopTimer();
-
-  let correctCount = 0;
-  let essayQuestions = [];
-
-  questions.forEach((q, i) => {
-    if (isEssayQuestion(q)) {
-      essayQuestions.push(i);
-    } else {
-      const correctIdx = q.correct ?? q.answer;
-      if (userAnswers[i] === correctIdx) correctCount++;
-    }
-  });
-
-  const scorableQuestions = questions.length - essayQuestions.length;
-
-  // 1. Create the basic result object
-  const rawResult = {
-    examId,
-    score: correctCount,
-    total: scorableQuestions,
-    totalQuestions: questions.length,
-    essayQuestions: essayQuestions,
-    userAnswers,
-    timeElapsed,
-  };
-
-  // 2. Process via Game Engine (Calculates points, saves history, checks badges)
-  const gamifiedResult = gameEngine.processResult(rawResult);
-
-  // 3. Combine raw result with gamification data for the summary page
-  const finalOutput = {
-    ...rawResult,
-    gamification: gamifiedResult,
-  };
-
-  // 4. Save to temp storage for summary page to read
-  localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
-  localStorage.removeItem(`quiz_state_${examId}`);
-
-  window.location.href = "summary.html";
-};

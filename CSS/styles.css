@@ -25,6 +25,11 @@
   --color-warning: #f59e0b;
   --color-error: #ef4444;
 
+  /* Dark variables after the light variables */
+  --color-background: #fafbfc;
+  --color-surface: #ffffff;
+  --color-text-primary: #111827;
+
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-accent: linear-gradient(
@@ -113,6 +118,213 @@ body::before {
   }
 }
 
+/* This block is for Dark Mode */
+[data-theme="dark"] {
+  --color-background: #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #334155;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+
+  --color-primary-light: #312e81; /* Darker indigo for backgrounds */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Mode Fixes for specific elements */
+[data-theme="dark"] body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+[data-theme="dark"] .card,
+[data-theme="dark"] .category-card,
+[data-theme="dark"] .exam-card {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border);
+}
+[data-theme="dark"] #breadcrumb {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+/* --- Hamburger Menu CSS --- */
+.menu-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3000;
+}
+.hamburger {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 1.5rem;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+}
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transition: 0.3s;
+  padding: 20px;
+  z-index: 3001;
+}
+.side-menu.open {
+  right: 0;
+}
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  border-radius: 8px;
+  margin-bottom: 5px;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.menu-item:hover {
+  background: var(--color-primary-light);
+}
+
+.close-menu {
+  background: var(--color-background-secondary);
+  border: none;
+  color: var(--color-text-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.close-menu:hover {
+  background: var(--color-error);
+  color: white;
+}
+.menu-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 15px 0;
+}
+
+/* --- Bookmark UI Fix --- */
+.question-header {
+  position: relative;
+  padding-right: 50px;
+} /* Create space for star */
+.bookmark-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Theme Toggle Button Style */
+.theme-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+.theme-toggle:hover {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-card {
+  background: var(--color-surface);
+  padding: 32px;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border);
+}
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.mode-btn {
+  background: var(--color-background-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+}
+.mode-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-3px);
+}
+.mode-btn .icon {
+  font-size: 2rem;
+}
+.close-modal {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+}
 .container {
   max-width: 1280px;
   margin: 0 auto;

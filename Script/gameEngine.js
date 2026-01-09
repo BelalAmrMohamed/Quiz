@@ -7,6 +7,7 @@ const initialState = {
   totalPoints: 0,
   history: [], // Array of past quiz results
   badges: [], // Array of unlocked badge IDs
+  bookmarks: {}, // format: { "examId_questionIdx": { note: "", timestamp: date } }
   streaks: {
     currentDaily: 0,
     lastLoginDate: null,
@@ -145,5 +146,23 @@ export const gameEngine = {
 
     // Assign ranks
     return all.map((u, i) => ({ ...u, rank: i + 1 }));
+  },
+  toggleBookmark(examId, questionIdx) {
+    const user = this.getUserData();
+    const key = `${examId}_${questionIdx}`;
+
+    if (user.bookmarks && user.bookmarks[key]) {
+      delete user.bookmarks[key];
+    } else {
+      if (!user.bookmarks) user.bookmarks = {};
+      user.bookmarks[key] = { note: "", timestamp: Date.now() };
+    }
+    this.saveUserData(user);
+    return !!user.bookmarks[key]; // returns true if bookmarked
+  },
+
+  isBookmarked(examId, questionIdx) {
+    const user = this.getUserData();
+    return user.bookmarks && !!user.bookmarks[`${examId}_${questionIdx}`];
   },
 };

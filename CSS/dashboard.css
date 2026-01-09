@@ -1,4 +1,37 @@
 /* CSS/dashboard.css */
+[data-theme="dark"] {
+  --color-background: #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #334155;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+  --color-primary-light: rgba(99, 102, 241, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Fix for cards in Dashboard/Index */
+[data-theme="dark"] .card,
+[data-theme="dark"] .category-card,
+[data-theme="dark"] .exam-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .history-item,
+[data-theme="dark"] .sidebar-card,
+[data-theme="dark"] .question-card,
+[data-theme="dark"] .review-card,
+[data-theme="dark"] .nav-btn {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

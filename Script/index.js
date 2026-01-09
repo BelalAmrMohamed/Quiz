@@ -40,6 +40,43 @@ function renderCategories() {
   });
 }
 
+function showModeSelection(examId, examTitle) {
+  // Create Modal HTML
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.innerHTML = `
+        <div class="modal-card">
+            <h2>${examTitle}</h2>
+            <p>Select a study mode:</p>
+            
+            <div class="mode-grid">
+                <button class="mode-btn" onclick="startQuiz('${examId}', 'practice')">
+                    <span class="icon">🛡️</span>
+                    <strong>Practice</strong>
+                    <small>No timer, retry answers</small>
+                </button>
+                <button class="mode-btn" onclick="startQuiz('${examId}', 'timed')">
+                    <span class="icon">⏱️</span>
+                    <strong>Timed</strong>
+                    <small>30s per question</small>
+                </button>
+                <button class="mode-btn" onclick="startQuiz('${examId}', 'exam')">
+                    <span class="icon">📝</span>
+                    <strong>Exam</strong>
+                    <small>Standard conditions</small>
+                </button>
+            </div>
+            <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+        </div>
+    `;
+  document.body.appendChild(modal);
+}
+
+// Global launcher
+window.startQuiz = (id, mode) => {
+  window.location.href = `quiz.html?id=${id}&mode=${mode}`;
+};
+
 function renderExams(category) {
   title.textContent = `${category} Exams`; // 📝
   breadcrumb.textContent = "← Back to Categories";
@@ -68,9 +105,10 @@ function renderExams(category) {
     const btn = document.createElement("button");
     btn.className = "start-btn";
     btn.textContent = "Start";
+
     btn.onclick = (ev) => {
       ev.stopPropagation();
-      window.location.href = `quiz.html?id=${exam.id}`;
+      showModeSelection(exam.id, titleText);
     };
     card.appendChild(h);
     card.appendChild(btn);

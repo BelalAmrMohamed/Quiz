@@ -44,6 +44,130 @@
   --blur-md: 12px;
 }
 
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --color-background: #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #334155;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+
+  --color-primary-light: rgba(99, 102, 241, 0.15);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5),
+    0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
+    0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
+    0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* Apply dark theme to body and cards */
+[data-theme="dark"] body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .header,
+[data-theme="dark"] #scoreHeader,
+[data-theme="dark"] .question-card,
+[data-theme="dark"] .review-card {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .your-ans {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .correct-ans {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--color-success);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .essay-answer-box {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .essay-answer-box.user-essay {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] .essay-answer-box.user-essay .essay-text {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .essay-answer-box.formal-essay {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+}
+
+[data-theme="dark"] .essay-answer-box.formal-essay .essay-text {
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .explanation {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .explanation strong {
+  color: #bfdbfe;
+}
+
+[data-theme="dark"] .new-badges-section {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .badge-item {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .review-card.correct {
+  background: linear-gradient(
+    to right,
+    rgba(16, 185, 129, 0.15) 0%,
+    var(--color-surface) 30%
+  );
+}
+
+[data-theme="dark"] .review-card.wrong {
+  background: linear-gradient(
+    to right,
+    rgba(239, 68, 68, 0.15) 0%,
+    var(--color-surface) 30%
+  );
+}
+
+[data-theme="dark"] .review-card.skipped {
+  background: linear-gradient(
+    to right,
+    rgba(245, 158, 11, 0.15) 0%,
+    var(--color-surface) 30%
+  );
+}
+
+[data-theme="dark"] .review-card.essay-card {
+  background: linear-gradient(
+    to right,
+    rgba(59, 130, 246, 0.15) 0%,
+    var(--color-surface) 30%
+  );
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -69,45 +193,177 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated Background */
+/* Enhanced Particle Background Animation */
 body::before {
   content: "";
   position: fixed;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-      circle at 30% 50%,
-      rgba(99, 102, 241, 0.03) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 70% 50%,
-      rgba(139, 92, 246, 0.03) 0%,
-      transparent 50%
-    );
-  animation: float 20s ease-in-out infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
+  background: radial-gradient(
+      2px 2px at 20% 30%,
+      rgba(99, 102, 241, 0.3),
+      transparent
+    ),
+    radial-gradient(2px 2px at 60% 70%, rgba(139, 92, 246, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(236, 72, 153, 0.3), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(99, 102, 241, 0.3), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(139, 92, 246, 0.2), transparent),
+    radial-gradient(1px 1px at 33% 80%, rgba(236, 72, 153, 0.3), transparent),
+    radial-gradient(1px 1px at 15% 60%, rgba(99, 102, 241, 0.2), transparent);
+  background-size: 200% 200%, 180% 180%, 220% 220%, 190% 190%, 210% 210%,
+    195% 195%, 205% 205%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
+    30% 70%;
+  animation: particleFloat1 20s ease-in-out infinite,
+    particleFloat2 15s ease-in-out infinite,
+    particleFloat3 18s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes particleFloat1 {
   0%,
   100% {
-    transform: translate(0, 0) rotate(0deg);
+    background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
+      30% 70%;
   }
-
   33% {
-    transform: translate(30px, -30px) rotate(5deg);
+    background-position: 30% 40%, 70% 60%, 60% 40%, 90% 30%, 30% 70%, 80% 40%,
+      20% 80%;
   }
-
   66% {
-    transform: translate(-20px, 20px) rotate(-5deg);
+    background-position: 60% 80%, 40% 20%, 70% 60%, 85% 15%, 25% 75%, 75% 35%,
+      35% 65%;
   }
 }
 
-/* Confetti Animation */
+@keyframes particleFloat2 {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+@keyframes particleFloat3 {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Additional floating particles using pseudo-element */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(
+      circle at 10% 20%,
+      rgba(99, 102, 241, 0.08) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(139, 92, 246, 0.08) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 40% 60%,
+      rgba(236, 72, 153, 0.08) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 70% 30%,
+      rgba(99, 102, 241, 0.08) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 25% 75%,
+      rgba(139, 92, 246, 0.08) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 90% 40%,
+      rgba(236, 72, 153, 0.08) 0%,
+      transparent 3%
+    );
+  background-size: 100% 100%;
+  animation: particlePulse 12s ease-in-out infinite;
+}
+
+@keyframes particlePulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
+}
+
+/* Dark theme particles - more visible */
+[data-theme="dark"] body::before {
+  background: radial-gradient(
+      2px 2px at 20% 30%,
+      rgba(99, 102, 241, 0.4),
+      transparent
+    ),
+    radial-gradient(2px 2px at 60% 70%, rgba(139, 92, 246, 0.4), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(236, 72, 153, 0.4), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(99, 102, 241, 0.4), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(139, 92, 246, 0.3), transparent),
+    radial-gradient(1px 1px at 33% 80%, rgba(236, 72, 153, 0.4), transparent),
+    radial-gradient(1px 1px at 15% 60%, rgba(99, 102, 241, 0.3), transparent);
+}
+
+[data-theme="dark"] body::after {
+  background-image: radial-gradient(
+      circle at 10% 20%,
+      rgba(99, 102, 241, 0.15) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(139, 92, 246, 0.15) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 40% 60%,
+      rgba(236, 72, 153, 0.15) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 70% 30%,
+      rgba(99, 102, 241, 0.15) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 25% 75%,
+      rgba(139, 92, 246, 0.15) 0%,
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 90% 40%,
+      rgba(236, 72, 153, 0.15) 0%,
+      transparent 3%
+    );
+}
+
+/* Confetti Animation (for celebration effect) */
 .confetti {
   position: fixed;
   width: 10px;
@@ -161,7 +417,6 @@ body::before {
   100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.8;
   }
@@ -181,11 +436,9 @@ body::before {
     transform: scale(0.8) rotate(-5deg);
     opacity: 0;
   }
-
   50% {
     transform: scale(1.05) rotate(2deg);
   }
-
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -211,7 +464,6 @@ body::before {
     opacity: 0;
     transform: translateY(30px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -247,7 +499,6 @@ body::before {
     transform: scale(0);
     opacity: 0;
   }
-
   to {
     transform: scale(1);
     opacity: 1;
@@ -741,6 +992,75 @@ body::before {
   letter-spacing: 0.05em;
 }
 
+/* Gamification - Points Pill */
+.points-pill {
+  background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+  color: #92400e;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 50px;
+  display: inline-block;
+  margin: 10px 0;
+  box-shadow: 0 4px 6px rgba(253, 185, 49, 0.3);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Gamification - Badges Section */
+.new-badges-section {
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--color-primary-light);
+}
+
+.new-badges-section h3 {
+  font-size: 1rem;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+}
+
+.badge-grid {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  width: 80px;
+}
+
+.badge-icon {
+  font-size: 1.5rem;
+}
+
+.badge-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-top: 5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
 /* Premium Footer */
 .watermark {
   text-align: center;
@@ -892,72 +1212,4 @@ body::before {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-/* Add to CSS/summary.css */
-
-.points-pill {
-  background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
-  color: #92400e;
-  font-weight: 800;
-  padding: 8px 16px;
-  border-radius: 50px;
-  display: inline-block;
-  margin: 10px 0;
-  box-shadow: 0 4px 6px rgba(253, 185, 49, 0.3);
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popIn {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.new-badges-section {
-  margin-top: 15px;
-  background: rgba(255, 255, 255, 0.5);
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid var(--color-primary-light);
-}
-
-.new-badges-section h3 {
-  font-size: 1rem;
-  color: var(--color-primary);
-  margin-bottom: 10px;
-}
-
-.badge-grid {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.badge-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  width: 80px;
-}
-
-.badge-icon {
-  font-size: 1.5rem;
-}
-
-.badge-name {
-  font-size: 0.7rem;
-  font-weight: 700;
-  margin-top: 5px;
-  text-align: center;
-  line-height: 1.2;
 }
