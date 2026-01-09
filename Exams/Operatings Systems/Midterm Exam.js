@@ -1,5 +1,4 @@
 export const questions = [
-  // --- Questions from Image 1 (Multiple Choice) ---
   {
     q: "What is the fundamental role of an operating system?",
     options: [
@@ -10,21 +9,21 @@ export const questions = [
     ],
     correct: 1,
     explanation:
-      "The OS serves as an interface between the user/applications and the underlying hardware, managing resources efficiently.",
+      "As defined in the sources, an operating system is a program that acts as an intermediary between a user of a computer and the computer hardware.",
   },
   {
     q: "Which component is considered the 'core' of the operating system and is always running?",
     options: ["Shell", "BIOS", "Kernel", "Compiler"],
     correct: 2,
     explanation:
-      "The Kernel is the essential center of the OS, loaded into memory at startup and remaining there until the system shuts down.",
+      "The kernel is the one program running at all times on the computer; all other components are either system programs or application programs.",
   },
   {
     q: "A signal from a hardware device, like a keyboard or disk drive, that alerts the CPU is called a(n):",
     options: ["System Call", "Trap", "Interrupt", "Exception"],
     correct: 2,
     explanation:
-      "An interrupt signals the CPU to suspend its current activities and execute an interrupt handler routine to deal with the event.",
+      "Hardware triggers interrupts by sending signals to the CPU, while traps or exceptions are software-generated interrupts.",
   },
   {
     q: "Which OS structure is characterized by a very small kernel and most services running as user-level processes?",
@@ -36,7 +35,7 @@ export const questions = [
     ],
     correct: 2,
     explanation:
-      "Microkernels aim to minimize the kernel size by moving as many services as possible (like file system management) into user space.",
+      "A microkernel structure moves as much as possible from the kernel into user space, resulting in a smaller kernel that handles basic communication between user-level services.",
   },
   {
     q: "What is the primary purpose of the 'dual-mode' operation in a CPU?",
@@ -48,21 +47,21 @@ export const questions = [
     ],
     correct: 2,
     explanation:
-      "Dual-mode distinguishes between 'user mode' and 'kernel mode' to prevent user programs from damaging the OS or other programs.",
+      "Dual-mode operation (user mode and kernel mode) provides the ability to distinguish when the system is running user code or kernel code, ensuring the OS can protect itself and other components from errors.",
   },
   {
     q: "The initial program that runs when a computer is powered on is called the:",
     options: ["Kernel", "Bootloader", "Shell", "Init process"],
     correct: 1,
     explanation:
-      "The bootstrap loader (or bootloader) locates the operating system kernel and loads it into main memory to start the computer.",
+      "The bootstrap loader (or bootloader) is a small piece of code stored in ROM or EEPROM that initializes the system, locates the kernel, and starts its execution.",
   },
   {
-    q: "In a _______ OS structure, the operating system is divided into a number of layers, each built on top of the lower layers.",
-    options: ["Simple structure", "More complex", "Layered", "Microkernel"],
+    q: "In a ________ OS structure, the operating system is divided into a number of layers, each built on top of the lower layers.",
+    options: ["Simple structure.", "More complex.", "Layered.", "Microkernel."],
     correct: 2,
     explanation:
-      "The layered approach modularizes the OS, simplifying debugging and verification.",
+      "In a layered OS structure, the system is divided into layers where the bottom layer is the hardware and the highest is the user interface; each layer uses functions of only lower-level layers.",
   },
   {
     q: "The concept of keeping multiple programs in memory simultaneously to maximize CPU utilization is called:",
@@ -74,7 +73,7 @@ export const questions = [
     ],
     correct: 2,
     explanation:
-      "Multiprogramming ensures the CPU is never idle by keeping several jobs in memory and switching between them when one is waiting for I/O.",
+      "Multiprogramming organizes jobs so that the CPU always has one to execute, thereby increasing efficiency by not letting the CPU sit idle during I/O waits.",
   },
   {
     q: "What is a System Call?",
@@ -86,7 +85,7 @@ export const questions = [
     ],
     correct: 1,
     explanation:
-      "System calls act as the API (Application Programming Interface) between user programs and the operating system.",
+      "System calls provide the programming interface to the services provided by the operating system, allowing user-level processes to request kernel-level tasks.",
   },
   {
     q: "Which of these is a primary function of the OS's Process Management?",
@@ -98,128 +97,98 @@ export const questions = [
     ],
     correct: 2,
     explanation:
-      "Process management specifically deals with process creation, termination, suspension, and scheduling on the CPU.",
+      "Process management involves the creation and deletion of user and system processes, as well as their scheduling, synchronization, and communication.",
   },
 
-  // --- Questions from Image 2 (Definitions converted to MCQ) ---
+  // Definitions Section - Testing knowledge of key terms
   {
-    q: "What is a 'Shell' in the context of an Operating System?",
+    q: "Define the term: Shell",
     options: [
-      "The core component of the kernel.",
-      "A command interpreter that acts as an interface between the user and the OS.",
-      "A hardware component protecting the CPU.",
-      "The first program to run on startup.",
-    ],
-    correct: 1,
-    explanation:
-      "A Shell (like Bash or cmd) interprets user commands and executes them.",
-  },
-  {
-    q: "What is the best definition of a 'Process'?",
-    options: [
-      "A program in execution.",
-      "A static file stored on the hard drive.",
-      "A high-speed cache memory.",
-      "A type of system interrupt.",
+      "A command interpreter that reads commands from the user and executes them.",
     ],
     correct: 0,
     explanation:
-      "A process is an active entity; it is a program that has been loaded into memory and is currently being executed.",
+      "The shell is a user interface that allows direct command entry, primarily by fetching a command from the user and executing it via system calls.",
   },
   {
-    q: "How does a 'Thread' differ from a process?",
+    q: "Define the term: Interrupt",
     options: [
-      "A thread is a larger unit than a process.",
-      "A thread is a basic unit of CPU utilization, often called a lightweight process.",
-      "A thread manages the hard disk, while a process manages memory.",
-      "Threads run in kernel mode only.",
-    ],
-    correct: 1,
-    explanation:
-      "Threads are the smallest sequence of programmed instructions that can be managed independently, existing within a process.",
-  },
-  {
-    q: "What is the function of 'Cache' memory?",
-    options: [
-      "To store data permanently after shutdown.",
-      "To provide high-speed storage for frequently accessed data to reduce CPU wait times.",
-      "To manage network connections.",
-      "To cool down the processor.",
-    ],
-    correct: 1,
-    explanation:
-      "Cache is small, fast memory located close to the CPU that holds copies of frequently used data.",
-  },
-  {
-    q: "What is 'Timesharing' (or Multitasking)?",
-    options: [
-      "Running only one program at a time until it finishes.",
-      "A CPU execution mode where users cannot interact with the system.",
-      "The CPU switching jobs so frequently that users can interact with each program while it is running.",
-      "Using multiple CPUs to run a single task.",
-    ],
-    correct: 2,
-    explanation:
-      "Timesharing is a logical extension of multiprogramming designed to provide interactive use by switching rapidly between tasks.",
-  },
-  {
-    q: "What are 'System Programs'?",
-    options: [
-      "Programs that provide a convenient environment for program development and execution, distinct from the kernel.",
-      "The hardware components of the computer.",
-      "Applications like video games and web browsers.",
-      "The bootloader code.",
+      "A signal sent to the CPU to indicate an event that requires immediate attention.",
     ],
     correct: 0,
     explanation:
-      "System programs (like compilers, editors, and file managers) bundle with the OS but are not part of the kernel code itself.",
+      "An interrupt is a hardware or software signal that stops the CPU's current activity to execute a specific service routine.",
   },
   {
-    q: "What is a 'Bootstrap Loader'?",
+    q: "Define the term: Process",
     options: [
-      "A program that loads the operating system kernel into memory at startup.",
-      "A utility for installing new applications.",
-      "A program that cleans up memory leaks.",
-      "The physical switch that turns on the computer.",
+      "A program in execution; an active entity with a program counter and associated resources.",
     ],
     correct: 0,
     explanation:
-      "The bootstrap loader is stored in ROM/EEPROM and initializes the system before loading the OS.",
+      "Unlike a passive program on a disk, a process is an active entity in execution that requires resources like CPU time and memory to perform its task.",
   },
   {
-    q: "What is 'Virtual Memory'?",
+    q: "Define the term: Thread",
     options: [
-      "A type of virus.",
-      "A technique that allows the execution of processes that are not completely in memory.",
-      "The physical RAM sticks installed in the motherboard.",
-      "Cloud storage utilized by the OS.",
+      "A fundamental unit of CPU utilization that allows a process to perform multiple tasks concurrently.",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "Virtual memory abstracts main memory into a large, uniform array of storage, allowing programs larger than physical RAM to run.",
+      "A thread is a light-weight unit of control within a process that can share resources with other threads while maintaining its own program counter.",
   },
   {
-    q: "Which statement best describes an 'Interrupt'?",
+    q: "Define the term: Cache",
     options: [
-      "A software error that crashes the system.",
-      "A signal to the CPU that an event has occurred which requires immediate attention.",
-      "A command to shut down the computer.",
-      "A method for increasing internet speed.",
+      "A high-speed storage buffer used to improve data transfer between components of varying speeds.",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "Interrupts are the primary way hardware communicates asynchronously with the CPU.",
+      "Caches provide a buffer of intermediate speed between two components to ensure that fast devices do not have to wait for slower ones.",
   },
   {
-    q: "What defines an 'Operating System'?",
+    q: "Define the term: Timesharing or Multitasking",
     options: [
-      "A set of hardware components like CPU and RAM.",
-      "System software that manages computer hardware and software resources and provides common services for computer programs.",
-      "A specific application for word processing.",
-      "The internet browser.",
+      "An extension of multiprogramming where the CPU switches jobs so frequently that users can interact with each program while it runs.",
     ],
-    correct: 1,
+    correct: 0,
     explanation:
-      "This is the broad definition of an OS: the resource manager and coordinator of the computer system.",
+      "Timesharing creates an interactive computing environment where the system provides quick response times to multiple users simultaneously.",
+  },
+  {
+    q: "Define the term: System Program",
+    options: [
+      "Programs that provide a convenient environment for program development and execution, often acting as interfaces to system calls.",
+    ],
+    correct: 0,
+    explanation:
+      "System programs can be thought of as bundles of system calls that provide basic functionality for file manipulation, programming support, and system status.",
+  },
+  {
+    q: "Define the term: Operating System",
+    options: [
+      "A program that acts as an intermediary between a user of a computer and the computer hardware, managing resource allocation and controlling program execution.",
+    ],
+    correct: 0,
+    explanation:
+      "According to the sources, an operating system is an intermediary between the user and hardware [2]. Its purposes include providing a convenient environment for program execution, allocating resources fairly and efficiently, and acting as a control program to prevent improper use of the computer [3].",
+  },
+  {
+    q: "Define the term: Bootstrap Loader",
+    options: [
+      "A small program stored in ROM that initializes the computer system and loads the OS kernel into memory.",
+    ],
+    correct: 0,
+    explanation:
+      "This is the initial program that runs when a computer is powered on or rebooted, responsible for starting the operating system.",
+  },
+  {
+    q: "Define the term: Virtual Memory",
+    options: [
+      "A technique that allows the execution of processes that are not completely in physical memory.",
+    ],
+    correct: 0,
+    explanation:
+      "Virtual memory abstracts physical storage, allowing programs to be larger than physical memory and improving system efficiency.",
   },
 ];

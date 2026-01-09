@@ -165,21 +165,15 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
-    "id": "إمتحان أسئلة مقالي",
-    "title": "إمتحان أسئلة مقالي",
-    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js",
+    "id": "أسئلة مقالي",
+    "title": "أسئلة مقالي",
+    "path": "../Exams/Operatings Systems/أسئلة مقالي.js",
     "category": "Operatings Systems"
   },
   {
-    "id": "إمتحان أسئلة مقالي 2",
-    "title": "إمتحان أسئلة مقالي 2",
-    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js",
-    "category": "Operatings Systems"
-  },
-  {
-    "id": "إمتحان الميد بالمقالي",
-    "title": "إمتحان الميد بالمقالي",
-    "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js",
+    "id": "أسئلة مقالي 2",
+    "title": "أسئلة مقالي 2",
+    "path": "../Exams/Operatings Systems/أسئلة مقالي 2.js",
     "category": "Operatings Systems"
   },
   {
@@ -429,21 +423,15 @@ export const categoryTree = {
         "category": "Operatings Systems"
       },
       {
-        "id": "إمتحان أسئلة مقالي 2",
-        "title": "إمتحان أسئلة مقالي 2",
-        "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js",
+        "id": "أسئلة مقالي 2",
+        "title": "أسئلة مقالي 2",
+        "path": "../Exams/Operatings Systems/أسئلة مقالي 2.js",
         "category": "Operatings Systems"
       },
       {
-        "id": "إمتحان أسئلة مقالي",
-        "title": "إمتحان أسئلة مقالي",
-        "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js",
-        "category": "Operatings Systems"
-      },
-      {
-        "id": "إمتحان الميد بالمقالي",
-        "title": "إمتحان الميد بالمقالي",
-        "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js",
+        "id": "أسئلة مقالي",
+        "title": "أسئلة مقالي",
+        "path": "../Exams/Operatings Systems/أسئلة مقالي.js",
         "category": "Operatings Systems"
       }
     ]
