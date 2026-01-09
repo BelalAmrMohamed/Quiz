@@ -4,260 +4,606 @@
 export const examList = [
   {
     "id": "Lecture 1 MCQ",
-    "category": "Computer Network",
     "title": "Lecture 1 MCQ",
-    "path": "../Exams/Computer Network/Lecture 1 MCQ.js"
+    "path": "../Exams/Computer Network/Lecture 1 MCQ.js",
+    "category": "Computer Network"
   },
   {
     "id": "Practical Exam - Model A",
-    "category": "Discrete Structure",
     "title": "Practical Exam   Model A",
-    "path": "../Exams/Discrete Structure/Practical Exam - Model A.js"
+    "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
+    "category": "Discrete Structure"
   },
   {
     "id": "Quiz 1",
-    "category": "Discrete Structure",
     "title": "Quiz 1",
-    "path": "../Exams/Discrete Structure/Quiz 1.js"
+    "path": "../Exams/Discrete Structure/Quiz 1.js",
+    "category": "Discrete Structure"
   },
   {
     "id": "Revision 2",
-    "category": "Discrete Structure",
     "title": "Revision 2",
-    "path": "../Exams/Discrete Structure/Revision 2.js"
+    "path": "../Exams/Discrete Structure/Revision 2.js",
+    "category": "Discrete Structure"
   },
   {
     "id": "General AI quiz",
-    "category": "Foundation of IS",
     "title": "General AI Quiz",
-    "path": "../Exams/Foundation of IS/General AI quiz.js"
+    "path": "../Exams/Foundation of IS/General AI quiz.js",
+    "category": "Foundation of IS"
   },
   {
     "id": "Midterm Exam",
-    "category": "Foundation of IS",
     "title": "Midterm Exam",
-    "path": "../Exams/Foundation of IS/Midterm Exam.js"
+    "path": "../Exams/Foundation of IS/Midterm Exam.js",
+    "category": "Foundation of IS"
   },
   {
     "id": "Final Exam",
-    "category": "Object-Oriented Programming",
     "title": "Final Exam",
-    "path": "../Exams/Object-Oriented Programming/Final Exam.js"
+    "path": "../Exams/Object-Oriented Programming/Final Exam.js",
+    "category": "Object-Oriented Programming"
   },
   {
     "id": "1. Introduction",
-    "category": "Operatings Systems",
     "title": "1. Introduction",
-    "path": "../Exams/Operatings Systems/1. Introduction.js"
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
+    "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
     "id": "2. Operating Systems Structures",
-    "category": "Operatings Systems",
     "title": "2. Operating Systems Structures",
-    "path": "../Exams/Operatings Systems/2. Operating Systems Structures.js"
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.js",
+    "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
     "id": "3. Processes",
-    "category": "Operatings Systems",
     "title": "3. Processes",
-    "path": "../Exams/Operatings Systems/3. Processes.js"
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.js",
+    "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
     "id": "4. Threads",
-    "category": "Operatings Systems",
     "title": "4. Threads",
-    "path": "../Exams/Operatings Systems/4. Threads.js"
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.js",
+    "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
     "id": "6. CPU Scheduling",
-    "category": "Operatings Systems",
     "title": "6. CPU Scheduling",
-    "path": "../Exams/Operatings Systems/6. CPU Scheduling.js"
-  },
-  {
-    "id": "Ch1 and 2 Quiz",
-    "category": "Operatings Systems",
-    "title": "Ch1 And 2 Quiz",
-    "path": "../Exams/Operatings Systems/Ch1 and 2 Quiz.js"
-  },
-  {
-    "id": "Ch1 Quiz",
-    "category": "Operatings Systems",
-    "title": "Ch1 Quiz",
-    "path": "../Exams/Operatings Systems/Ch1 Quiz.js"
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.js",
+    "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
     "id": "Ch1 Zaqazeeq",
-    "category": "Operatings Systems",
     "title": "Ch1 Zaqazeeq",
-    "path": "../Exams/Operatings Systems/Ch1 Zaqazeeq.js"
-  },
-  {
-    "id": "Ch2 Quiz",
-    "category": "Operatings Systems",
-    "title": "Ch2 Quiz",
-    "path": "../Exams/Operatings Systems/Ch2 Quiz.js"
+    "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch1 Zaqazeeq.js",
+    "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
   },
   {
     "id": "Ch2 Zaqazeeq",
-    "category": "Operatings Systems",
     "title": "Ch2 Zaqazeeq",
-    "path": "../Exams/Operatings Systems/Ch2 Zaqazeeq.js"
-  },
-  {
-    "id": "Ch3 Quiz",
-    "category": "Operatings Systems",
-    "title": "Ch3 Quiz",
-    "path": "../Exams/Operatings Systems/Ch3 Quiz.js"
+    "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch2 Zaqazeeq.js",
+    "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
   },
   {
     "id": "Ch3 Zaqazeeq",
-    "category": "Operatings Systems",
     "title": "Ch3 Zaqazeeq",
-    "path": "../Exams/Operatings Systems/Ch3 Zaqazeeq.js"
+    "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.js",
+    "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
+  },
+  {
+    "id": "Ch1 and 2 Quiz",
+    "title": "Ch1 And 2 Quiz",
+    "path": "../Exams/Operatings Systems/Ch1 and 2 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Ch1 Quiz",
+    "title": "Ch1 Quiz",
+    "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Ch2 Quiz",
+    "title": "Ch2 Quiz",
+    "path": "../Exams/Operatings Systems/Ch2 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Ch3 Quiz",
+    "title": "Ch3 Quiz",
+    "path": "../Exams/Operatings Systems/Ch3 Quiz.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "General Exam",
-    "category": "Operatings Systems",
     "title": "General Exam",
-    "path": "../Exams/Operatings Systems/General Exam.js"
+    "path": "../Exams/Operatings Systems/General Exam.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "General Exam 2",
-    "category": "Operatings Systems",
     "title": "General Exam 2",
-    "path": "../Exams/Operatings Systems/General Exam 2.js"
+    "path": "../Exams/Operatings Systems/General Exam 2.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "General Exam 3",
-    "category": "Operatings Systems",
     "title": "General Exam 3",
-    "path": "../Exams/Operatings Systems/General Exam 3.js"
+    "path": "../Exams/Operatings Systems/General Exam 3.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Introduction and Structure",
-    "category": "Operatings Systems",
     "title": "Introduction And Structure",
-    "path": "../Exams/Operatings Systems/Introduction and Structure.js"
+    "path": "../Exams/Operatings Systems/Introduction and Structure.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Midterm Exam",
-    "category": "Operatings Systems",
     "title": "Midterm Exam",
-    "path": "../Exams/Operatings Systems/Midterm Exam.js"
+    "path": "../Exams/Operatings Systems/Midterm Exam.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Process Concept and Management",
-    "category": "Operatings Systems",
     "title": "Process Concept And Management",
-    "path": "../Exams/Operatings Systems/Process Concept and Management.js"
+    "path": "../Exams/Operatings Systems/Process Concept and Management.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Quiz on the First Chapter",
-    "category": "Operatings Systems",
     "title": "Quiz On The First Chapter",
-    "path": "../Exams/Operatings Systems/Quiz on the First Chapter.js"
+    "path": "../Exams/Operatings Systems/Quiz on the First Chapter.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Threads and CPU Scheduling",
-    "category": "Operatings Systems",
     "title": "Threads And CPU Scheduling",
-    "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js"
+    "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "إمتحان أسئلة مقالي",
-    "category": "Operatings Systems",
     "title": "إمتحان أسئلة مقالي",
-    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js"
+    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "إمتحان أسئلة مقالي 2",
-    "category": "Operatings Systems",
     "title": "إمتحان أسئلة مقالي 2",
-    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js"
+    "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "إمتحان الميد بالمقالي",
-    "category": "Operatings Systems",
     "title": "إمتحان الميد بالمقالي",
-    "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js"
+    "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Final Exam",
-    "category": "Programming 2",
     "title": "Final Exam",
-    "path": "../Exams/Programming 2/Final Exam.js"
+    "path": "../Exams/Programming 2/Final Exam.js",
+    "category": "Programming 2"
   },
   {
     "id": "First Chapter quiz",
-    "category": "Programming 2",
     "title": "First Chapter Quiz",
-    "path": "../Exams/Programming 2/First Chapter quiz.js"
+    "path": "../Exams/Programming 2/First Chapter quiz.js",
+    "category": "Programming 2"
   },
   {
     "id": "Forth and 5th Ch Quiz",
-    "category": "Programming 2",
     "title": "Forth And 5th Ch Quiz",
-    "path": "../Exams/Programming 2/Forth and 5th Ch Quiz.js"
+    "path": "../Exams/Programming 2/Forth and 5th Ch Quiz.js",
+    "category": "Programming 2"
   },
   {
     "id": "General Quiz",
-    "category": "Programming 2",
     "title": "General Quiz",
-    "path": "../Exams/Programming 2/General Quiz.js"
+    "path": "../Exams/Programming 2/General Quiz.js",
+    "category": "Programming 2"
   },
   {
     "id": "General Quiz (Hard)",
-    "category": "Programming 2",
     "title": "General Quiz (Hard)",
-    "path": "../Exams/Programming 2/General Quiz (Hard).js"
+    "path": "../Exams/Programming 2/General Quiz (Hard).js",
+    "category": "Programming 2"
   },
   {
     "id": "Quiz 1",
-    "category": "Programming 2",
     "title": "Quiz 1",
-    "path": "../Exams/Programming 2/Quiz 1.js"
+    "path": "../Exams/Programming 2/Quiz 1.js",
+    "category": "Programming 2"
   },
   {
     "id": "Quiz 2",
-    "category": "Programming 2",
     "title": "Quiz 2",
-    "path": "../Exams/Programming 2/Quiz 2.js"
+    "path": "../Exams/Programming 2/Quiz 2.js",
+    "category": "Programming 2"
   },
   {
     "id": "Quiz 3",
-    "category": "Programming 2",
     "title": "Quiz 3",
-    "path": "../Exams/Programming 2/Quiz 3.js"
+    "path": "../Exams/Programming 2/Quiz 3.js",
+    "category": "Programming 2"
   },
   {
     "id": "Quiz 4",
-    "category": "Programming 2",
     "title": "Quiz 4",
-    "path": "../Exams/Programming 2/Quiz 4.js"
+    "path": "../Exams/Programming 2/Quiz 4.js",
+    "category": "Programming 2"
   },
   {
     "id": "Quiz 5",
-    "category": "Programming 2",
     "title": "Quiz 5",
-    "path": "../Exams/Programming 2/Quiz 5.js"
+    "path": "../Exams/Programming 2/Quiz 5.js",
+    "category": "Programming 2"
   },
   {
     "id": "Second Chapter Quiz",
-    "category": "Programming 2",
     "title": "Second Chapter Quiz",
-    "path": "../Exams/Programming 2/Second Chapter Quiz.js"
+    "path": "../Exams/Programming 2/Second Chapter Quiz.js",
+    "category": "Programming 2"
   },
   {
     "id": "Sixth and 7th Ch Quiz",
-    "category": "Programming 2",
     "title": "Sixth And 7th Ch Quiz",
-    "path": "../Exams/Programming 2/Sixth and 7th Ch Quiz.js"
+    "path": "../Exams/Programming 2/Sixth and 7th Ch Quiz.js",
+    "category": "Programming 2"
   },
   {
     "id": "Third Chapter Quiz",
-    "category": "Programming 2",
     "title": "Third Chapter Quiz",
-    "path": "../Exams/Programming 2/Third Chapter Quiz.js"
+    "path": "../Exams/Programming 2/Third Chapter Quiz.js",
+    "category": "Programming 2"
   }
 ];
+
+export const categoryTree = {
+  "Computer Network": {
+    "name": "Computer Network",
+    "path": [
+      "Computer Network"
+    ],
+    "parent": null,
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Lecture 1 MCQ",
+        "title": "Lecture 1 MCQ",
+        "path": "../Exams/Computer Network/Lecture 1 MCQ.js",
+        "category": "Computer Network"
+      }
+    ]
+  },
+  "Discrete Structure": {
+    "name": "Discrete Structure",
+    "path": [
+      "Discrete Structure"
+    ],
+    "parent": null,
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Practical Exam - Model A",
+        "title": "Practical Exam   Model A",
+        "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Quiz 1",
+        "title": "Quiz 1",
+        "path": "../Exams/Discrete Structure/Quiz 1.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Revision 2",
+        "title": "Revision 2",
+        "path": "../Exams/Discrete Structure/Revision 2.js",
+        "category": "Discrete Structure"
+      }
+    ]
+  },
+  "Foundation of IS": {
+    "name": "Foundation of IS",
+    "path": [
+      "Foundation of IS"
+    ],
+    "parent": null,
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "General AI quiz",
+        "title": "General AI Quiz",
+        "path": "../Exams/Foundation of IS/General AI quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
+        "id": "Midterm Exam",
+        "title": "Midterm Exam",
+        "path": "../Exams/Foundation of IS/Midterm Exam.js",
+        "category": "Foundation of IS"
+      }
+    ]
+  },
+  "Object-Oriented Programming": {
+    "name": "Object-Oriented Programming",
+    "path": [
+      "Object-Oriented Programming"
+    ],
+    "parent": null,
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Final Exam",
+        "title": "Final Exam",
+        "path": "../Exams/Object-Oriented Programming/Final Exam.js",
+        "category": "Object-Oriented Programming"
+      }
+    ]
+  },
+  "Operatings Systems": {
+    "name": "Operatings Systems",
+    "path": [
+      "Operatings Systems"
+    ],
+    "parent": null,
+    "subcategories": [
+      "Operatings Systems/أسئلة الدكتور المحلولة",
+      "Operatings Systems/إمتحانات جامعة الزقازيق"
+    ],
+    "exams": [
+      {
+        "id": "Ch1 and 2 Quiz",
+        "title": "Ch1 And 2 Quiz",
+        "path": "../Exams/Operatings Systems/Ch1 and 2 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Ch1 Quiz",
+        "title": "Ch1 Quiz",
+        "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Ch2 Quiz",
+        "title": "Ch2 Quiz",
+        "path": "../Exams/Operatings Systems/Ch2 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Ch3 Quiz",
+        "title": "Ch3 Quiz",
+        "path": "../Exams/Operatings Systems/Ch3 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "General Exam 2",
+        "title": "General Exam 2",
+        "path": "../Exams/Operatings Systems/General Exam 2.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "General Exam 3",
+        "title": "General Exam 3",
+        "path": "../Exams/Operatings Systems/General Exam 3.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "General Exam",
+        "title": "General Exam",
+        "path": "../Exams/Operatings Systems/General Exam.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Introduction and Structure",
+        "title": "Introduction And Structure",
+        "path": "../Exams/Operatings Systems/Introduction and Structure.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Midterm Exam",
+        "title": "Midterm Exam",
+        "path": "../Exams/Operatings Systems/Midterm Exam.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Process Concept and Management",
+        "title": "Process Concept And Management",
+        "path": "../Exams/Operatings Systems/Process Concept and Management.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Quiz on the First Chapter",
+        "title": "Quiz On The First Chapter",
+        "path": "../Exams/Operatings Systems/Quiz on the First Chapter.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Threads and CPU Scheduling",
+        "title": "Threads And CPU Scheduling",
+        "path": "../Exams/Operatings Systems/Threads and CPU Scheduling.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "إمتحان أسئلة مقالي 2",
+        "title": "إمتحان أسئلة مقالي 2",
+        "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي 2.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "إمتحان أسئلة مقالي",
+        "title": "إمتحان أسئلة مقالي",
+        "path": "../Exams/Operatings Systems/إمتحان أسئلة مقالي.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "إمتحان الميد بالمقالي",
+        "title": "إمتحان الميد بالمقالي",
+        "path": "../Exams/Operatings Systems/إمتحان الميد بالمقالي.js",
+        "category": "Operatings Systems"
+      }
+    ]
+  },
+  "Operatings Systems/أسئلة الدكتور المحلولة": {
+    "name": "أسئلة الدكتور المحلولة",
+    "path": [
+      "Operatings Systems",
+      "أسئلة الدكتور المحلولة"
+    ],
+    "parent": "Operatings Systems",
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "1. Introduction",
+        "title": "1. Introduction",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
+        "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+      },
+      {
+        "id": "2. Operating Systems Structures",
+        "title": "2. Operating Systems Structures",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.js",
+        "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+      },
+      {
+        "id": "3. Processes",
+        "title": "3. Processes",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.js",
+        "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+      },
+      {
+        "id": "4. Threads",
+        "title": "4. Threads",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.js",
+        "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+      },
+      {
+        "id": "6. CPU Scheduling",
+        "title": "6. CPU Scheduling",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.js",
+        "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+      }
+    ]
+  },
+  "Operatings Systems/إمتحانات جامعة الزقازيق": {
+    "name": "إمتحانات جامعة الزقازيق",
+    "path": [
+      "Operatings Systems",
+      "إمتحانات جامعة الزقازيق"
+    ],
+    "parent": "Operatings Systems",
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Ch1 Zaqazeeq",
+        "title": "Ch1 Zaqazeeq",
+        "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch1 Zaqazeeq.js",
+        "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
+      },
+      {
+        "id": "Ch2 Zaqazeeq",
+        "title": "Ch2 Zaqazeeq",
+        "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch2 Zaqazeeq.js",
+        "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
+      },
+      {
+        "id": "Ch3 Zaqazeeq",
+        "title": "Ch3 Zaqazeeq",
+        "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.js",
+        "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
+      }
+    ]
+  },
+  "Programming 2": {
+    "name": "Programming 2",
+    "path": [
+      "Programming 2"
+    ],
+    "parent": null,
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Final Exam",
+        "title": "Final Exam",
+        "path": "../Exams/Programming 2/Final Exam.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "First Chapter quiz",
+        "title": "First Chapter Quiz",
+        "path": "../Exams/Programming 2/First Chapter quiz.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Forth and 5th Ch Quiz",
+        "title": "Forth And 5th Ch Quiz",
+        "path": "../Exams/Programming 2/Forth and 5th Ch Quiz.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "General Quiz (Hard)",
+        "title": "General Quiz (Hard)",
+        "path": "../Exams/Programming 2/General Quiz (Hard).js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "General Quiz",
+        "title": "General Quiz",
+        "path": "../Exams/Programming 2/General Quiz.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Quiz 1",
+        "title": "Quiz 1",
+        "path": "../Exams/Programming 2/Quiz 1.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Quiz 2",
+        "title": "Quiz 2",
+        "path": "../Exams/Programming 2/Quiz 2.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Quiz 3",
+        "title": "Quiz 3",
+        "path": "../Exams/Programming 2/Quiz 3.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Quiz 4",
+        "title": "Quiz 4",
+        "path": "../Exams/Programming 2/Quiz 4.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Quiz 5",
+        "title": "Quiz 5",
+        "path": "../Exams/Programming 2/Quiz 5.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Second Chapter Quiz",
+        "title": "Second Chapter Quiz",
+        "path": "../Exams/Programming 2/Second Chapter Quiz.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Sixth and 7th Ch Quiz",
+        "title": "Sixth And 7th Ch Quiz",
+        "path": "../Exams/Programming 2/Sixth and 7th Ch Quiz.js",
+        "category": "Programming 2"
+      },
+      {
+        "id": "Third Chapter Quiz",
+        "title": "Third Chapter Quiz",
+        "path": "../Exams/Programming 2/Third Chapter Quiz.js",
+        "category": "Programming 2"
+      }
+    ]
+  }
+};
