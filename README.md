@@ -120,18 +120,13 @@ Quiz Website/
 ├── tools/
 │   └── generateExamManifest.js <- Auto generates "examManifest.js"
 │
-└── Exams/ <- Conatains the categories which contain the quizzes
-    ├── Categorie-1/
-    │   ├── quiz_1.js
-    │   ├── quiz_2.js
-    │   └── quiz_3.js
-    │
-    ├── Categorie-2/
-    │   ├── quiz_1.js
-    │   ├── quiz_2.js
-    │   └── quiz_3.js
-    │
-    └── categorie-3/...
+└── Exams/
+    ├── Category-1/           # Shows as folder
+    │   ├── Subcategory-A/    # Shows as folder
+    │   │   └── quiz-1.js       # Shows as exam
+    │   └── quiz-2.js           # Shows as exam
+    └── Category-2/
+        └── quiz-3.js
 ```
 
 ## How quizzes are formatted
