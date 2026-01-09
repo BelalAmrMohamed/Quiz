@@ -75,31 +75,31 @@ export const examList = [
     "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
   },
   {
-    "id": "1. Introduction",
+    "id": "أسئلة الدكتور المحلولة-1. Introduction",
     "title": "1. Introduction",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
-    "id": "2. Operating Systems Structures",
+    "id": "أسئلة الدكتور المحلولة-2. Operating Systems Structures",
     "title": "2. Operating Systems Structures",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
-    "id": "3. Processes",
+    "id": "أسئلة الدكتور المحلولة-3. Processes",
     "title": "3. Processes",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
-    "id": "4. Threads",
+    "id": "أسئلة الدكتور المحلولة-4. Threads",
     "title": "4. Threads",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
   {
-    "id": "6. CPU Scheduling",
+    "id": "أسئلة الدكتور المحلولة-6. CPU Scheduling",
     "title": "6. CPU Scheduling",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
@@ -189,7 +189,7 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
-    "id": "Midterm Exam",
+    "id": "Operatings Systems-Midterm Exam",
     "title": "Midterm Exam",
     "path": "../Exams/Operatings Systems/Midterm Exam.js",
     "category": "Operatings Systems"
@@ -225,12 +225,6 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
-    "id": "Final Exam",
-    "title": "Final Exam",
-    "path": "../Exams/Programming 2/Final Exam.js",
-    "category": "Programming 2"
-  },
-  {
     "id": "First Chapter quiz",
     "title": "First Chapter Quiz",
     "path": "../Exams/Programming 2/First Chapter quiz.js",
@@ -255,7 +249,13 @@ export const examList = [
     "category": "Programming 2"
   },
   {
-    "id": "Quiz 1",
+    "id": "Programming 2-Final Exam",
+    "title": "Final Exam",
+    "path": "../Exams/Programming 2/Final Exam.js",
+    "category": "Programming 2"
+  },
+  {
+    "id": "Programming 2-Quiz 1",
     "title": "Quiz 1",
     "path": "../Exams/Programming 2/Quiz 1.js",
     "category": "Programming 2"
@@ -466,7 +466,7 @@ export const categoryTree = {
         "category": "Operatings Systems"
       },
       {
-        "id": "Midterm Exam",
+        "id": "Operatings Systems-Midterm Exam",
         "title": "Midterm Exam",
         "path": "../Exams/Operatings Systems/Midterm Exam.js",
         "category": "Operatings Systems"
@@ -554,31 +554,31 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
-        "id": "1. Introduction",
+        "id": "أسئلة الدكتور المحلولة-1. Introduction",
         "title": "1. Introduction",
         "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
         "category": "Operatings Systems/أسئلة الدكتور المحلولة"
       },
       {
-        "id": "2. Operating Systems Structures",
+        "id": "أسئلة الدكتور المحلولة-2. Operating Systems Structures",
         "title": "2. Operating Systems Structures",
         "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.js",
         "category": "Operatings Systems/أسئلة الدكتور المحلولة"
       },
       {
-        "id": "3. Processes",
+        "id": "أسئلة الدكتور المحلولة-3. Processes",
         "title": "3. Processes",
         "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.js",
         "category": "Operatings Systems/أسئلة الدكتور المحلولة"
       },
       {
-        "id": "4. Threads",
+        "id": "أسئلة الدكتور المحلولة-4. Threads",
         "title": "4. Threads",
         "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.js",
         "category": "Operatings Systems/أسئلة الدكتور المحلولة"
       },
       {
-        "id": "6. CPU Scheduling",
+        "id": "أسئلة الدكتور المحلولة-6. CPU Scheduling",
         "title": "6. CPU Scheduling",
         "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.js",
         "category": "Operatings Systems/أسئلة الدكتور المحلولة"
@@ -623,7 +623,7 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
-        "id": "Final Exam",
+        "id": "Programming 2-Final Exam",
         "title": "Final Exam",
         "path": "../Exams/Programming 2/Final Exam.js",
         "category": "Programming 2"
@@ -653,7 +653,7 @@ export const categoryTree = {
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 1",
+        "id": "Programming 2-Quiz 1",
         "title": "Quiz 1",
         "path": "../Exams/Programming 2/Quiz 1.js",
         "category": "Programming 2"
