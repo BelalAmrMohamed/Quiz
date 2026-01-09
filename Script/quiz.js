@@ -1,4 +1,4 @@
-// Script/quiz.js
+// Script/quiz.js - Enhanced with Navigation Grid and Flag System
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
 
@@ -11,8 +11,8 @@ let lockedQuestions = {};
 let timeElapsed = 0;
 let timerInterval = null;
 let examId = null;
-let quizMode = "exam"; // 'practice', 'timed', 'exam'
-let timeRemaining = 0; // Only used for 'timed' mode
+let quizMode = "exam";
+let timeRemaining = 0;
 
 // --- DOM Elements ---
 const els = {
@@ -47,7 +47,7 @@ async function init() {
   const params = new URLSearchParams(window.location.search);
   examId = params.get("id");
   quizMode = params.get("mode") || "exam";
-  const startAt = params.get("startAt"); // Get the bookmarked index
+  const startAt = params.get("startAt");
 
   const config = examList.find((e) => e.id === examId);
 
@@ -61,7 +61,6 @@ async function init() {
     const module = await import(config.path);
     questions = module.questions;
 
-    // Handle metadata
     if (module.meta && (module.meta.title || module.meta.category)) {
       metaData = module.meta;
     } else {
@@ -79,66 +78,66 @@ async function init() {
       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
     }
 
-    // Initialize Timer for Timed Mode
     if (quizMode === "timed") {
-      // Default: 30 seconds per question
       timeRemaining = questions.length * 30;
     }
 
-    // Restore Session (Optional - disabled for Timed/Exam mode to prevent cheating, enabled for Practice)
-    const saved = localStorage.getItem(`quiz_state_${examId}`);
-    if (saved && quizMode === "practice") {
-      const state = JSON.parse(saved);
-      if (confirm("Resume your previous session?")) {
-        currentIdx = state.currentIdx || 0;
-        userAnswers = state.userAnswers || {};
-        lockedQuestions = state.lockedQuestions || {};
-        timeElapsed = state.timeElapsed || 0;
-      } else {
-        localStorage.removeItem(`quiz_state_${examId}`);
-      }
-    } else {
-      // Clear old state if starting fresh
-      localStorage.removeItem(`quiz_state_${examId}`);
-    }
-
-    // This is supposed to be after the questions are loaded
     if (startAt !== null) {
       currentIdx = parseInt(startAt);
     } else {
-      // Restore Session (Optional - your existing logic)
       const saved = localStorage.getItem(`quiz_state_${examId}`);
       if (saved && quizMode === "practice") {
         const state = JSON.parse(saved);
-        currentIdx = state.currentIdx || 0;
-        userAnswers = state.userAnswers || {};
-        lockedQuestions = state.lockedQuestions || {};
+        if (confirm("Resume your previous session?")) {
+          currentIdx = state.currentIdx || 0;
+          userAnswers = state.userAnswers || {};
+          lockedQuestions = state.lockedQuestions || {};
+          timeElapsed = state.timeElapsed || 0;
+        } else {
+          localStorage.removeItem(`quiz_state_${examId}`);
+        }
       }
     }
 
+    renderNavigationGrid();
     renderQuestion();
     startTimer();
 
     // Global Handlers
-    window.handleSelect = window.handleSelect || ((i) => {});
-    window.handleEssayInput = window.handleEssayInput || (() => {});
-    window.prevQuestion = window.prevQuestion || (() => window.nav(-1));
-    window.nextQuestion = window.nextQuestion || (() => window.nav(1));
-    window.finishEarly = window.finishEarly || (() => window.finish());
-    window.checkAnswer = window.checkAnswer || (() => {});
-
-    // NEW: Bookmark Handler
+    window.handleSelect = (i) => handleSelect(i);
+    window.handleEssayInput = () => handleEssayInput();
+    window.prevQuestion = () => nav(-1);
+    window.nextQuestion = () => nav(1);
+    window.finishEarly = () => finish();
+    window.checkAnswer = () => checkAnswer();
     window.toggleBookmark = () => {
-      const isActive = gameEngine.toggleBookmark(examId, currentIdx);
-      renderQuestion(); // Re-render to update star icon
+      gameEngine.toggleBookmark(examId, currentIdx);
+      renderQuestion();
+      renderNavigationGrid();
+    };
+    window.toggleFlag = () => {
+      gameEngine.toggleFlag(examId, currentIdx);
+      renderQuestion();
+      renderNavigationGrid();
+      updateFlagCount();
+    };
+    window.jumpToQuestion = (idx) => {
+      currentIdx = idx;
+      saveState();
+      renderQuestion();
+      renderNavigationGrid();
+
+      // Scroll to question
+      const questionCard = document.querySelector(".question-card");
+      if (questionCard) {
+        questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     };
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         const activeElement = document.activeElement;
-        if (activeElement && activeElement.tagName === "TEXTAREA") {
-          return; // Allow Enter in textarea
-        }
+        if (activeElement && activeElement.tagName === "TEXTAREA") return;
         e.preventDefault();
         try {
           window.nextQuestion();
@@ -153,12 +152,112 @@ async function init() {
   }
 }
 
+// --- NEW: Navigation Grid ---
+function renderNavigationGrid() {
+  let navGrid = document.getElementById("navGrid");
+
+  if (!navGrid) {
+    navGrid = document.createElement("div");
+    navGrid.id = "navGrid";
+    navGrid.className = "nav-grid";
+
+    // Insert after header, before question container
+    const header = document.querySelector(".header");
+    if (header) {
+      header.after(navGrid);
+    }
+  }
+
+  const gridHTML = questions
+    .map((q, idx) => {
+      const isAnswered = userAnswers[idx] !== undefined;
+      const isLocked = lockedQuestions[idx];
+      const isBookmarked = gameEngine.isBookmarked(examId, idx);
+      const isFlagged = gameEngine.isFlagged(examId, idx);
+      const isCurrent = idx === currentIdx;
+
+      let statusClass = "unanswered";
+      let statusIcon = "";
+
+      if (isCurrent) {
+        statusClass = "current";
+      } else if (isLocked) {
+        const correctIdx = q.correct ?? q.answer;
+        const isCorrect = userAnswers[idx] === correctIdx;
+        statusClass = isCorrect ? "correct" : "wrong";
+        statusIcon = isCorrect ? "✓" : "✗";
+      } else if (isAnswered) {
+        statusClass = "answered";
+        statusIcon = "●";
+      }
+
+      const badges = [];
+      if (isBookmarked)
+        badges.push('<span class="mini-badge bookmark">★</span>');
+      if (isFlagged) badges.push('<span class="mini-badge flag">🚩</span>');
+
+      return `
+      <button 
+        class="nav-grid-item ${statusClass}" 
+        onclick="window.jumpToQuestion(${idx})"
+        title="Question ${idx + 1}${isBookmarked ? " - Bookmarked" : ""}${
+        isFlagged ? " - Flagged" : ""
+      }"
+      >
+        <span class="nav-number">${idx + 1}</span>
+        ${statusIcon ? `<span class="nav-status">${statusIcon}</span>` : ""}
+        ${
+          badges.length > 0
+            ? `<div class="nav-badges">${badges.join("")}</div>`
+            : ""
+        }
+      </button>
+    `;
+    })
+    .join("");
+
+  const flagCount = gameEngine.getFlaggedCount(examId);
+  const flagInfo =
+    flagCount > 0
+      ? `<span class="flag-count">🚩 ${flagCount} flagged for review</span>`
+      : "";
+
+  navGrid.innerHTML = `
+    <div class="nav-grid-header">
+      <h3>Question Navigator</h3>
+      <div class="nav-grid-legend">
+        <span><span class="legend-dot current"></span> Current</span>
+        <span><span class="legend-dot answered"></span> Answered</span>
+        <span><span class="legend-dot correct"></span> Correct</span>
+        <span><span class="legend-dot wrong"></span> Wrong</span>
+        ${flagInfo}
+      </div>
+    </div>
+    <div class="nav-grid-items">
+      ${gridHTML}
+    </div>
+  `;
+}
+
+// --- NEW: Update Flag Count ---
+function updateFlagCount() {
+  const flagCount = gameEngine.getFlaggedCount(examId);
+  const flagCountEl = document.querySelector(".flag-count");
+  if (flagCountEl) {
+    if (flagCount > 0) {
+      flagCountEl.textContent = `🚩 ${flagCount} flagged for review`;
+      flagCountEl.style.display = "inline";
+    } else {
+      flagCountEl.style.display = "none";
+    }
+  }
+}
+
 // --- Core Logic ---
 function renderQuestion() {
   if (!questions.length) return;
   const q = questions[currentIdx];
   const isEssay = isEssayQuestion(q);
-
   const correctIdx = q.correct ?? q.answer;
 
   // Update Progress
@@ -174,15 +273,7 @@ function renderQuestion() {
   const isLocked = !!lockedQuestions[currentIdx];
   const userSelected = userAnswers[currentIdx];
   const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
-
-  // Bookmark Button HTML
-  const bookmarkBtn = `
-    <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
-            onclick="window.toggleBookmark()" 
-            title="${isBookmarked ? "Remove Bookmark" : "Bookmark for review"}">
-        ${isBookmarked ? "★" : "☆"}
-    </button>
-  `;
+  const isFlagged = gameEngine.isFlagged(examId, currentIdx);
 
   // Feedback Logic
   let feedbackClass = "feedback";
@@ -206,7 +297,6 @@ function renderQuestion() {
       const statusMsg = isCorrect
         ? "Your answer matches! ✅"
         : "Your answer differs ⚠️";
-
       feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate. Your answer might still be correct in a different way.</div><div style="margin-top:8px">${escapeHtml(
         explanationText
       )}</div>`;
@@ -220,19 +310,33 @@ function renderQuestion() {
     }
   }
 
+  // Action buttons
+  const actionButtons = `
+    <div class="question-actions">
+      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
+              onclick="window.toggleBookmark()" 
+              title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
+        ${isBookmarked ? "★" : "☆"}
+      </button>
+      <button class="flag-btn ${isFlagged ? "active" : ""}" 
+              onclick="window.toggleFlag()" 
+              title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
+        🚩
+      </button>
+    </div>
+  `;
+
   // Common Header HTML
   const questionHeaderHTML = `
     <div class="question-header">
-        <div class="question-number">Question ${currentIdx + 1} of ${
+      <div class="question-number">Question ${currentIdx + 1} of ${
     questions.length
   }</div>
-        <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
-                onclick="window.toggleBookmark()">
-            ${isBookmarked ? "★" : "☆"}
-        </button>
-        <h2 class="question-text">${escapeHtml(q.q)}</h2>
+      ${actionButtons}
     </div>
-`;
+    <h2 class="question-text">${escapeHtml(q.q)}</h2>
+  `;
+
   // Render content
   if (isEssay) {
     els.questionContainer.innerHTML = `
@@ -322,42 +426,22 @@ function renderQuestion() {
         </div>
       </div>
     `;
-
-    // Accessibility for Radios
-    const optionRows = Array.from(
-      els.questionContainer.querySelectorAll(".option-row")
-    );
-    optionRows.forEach((row) => {
-      const input = row.querySelector('input[type="radio"]');
-      if (!input) return;
-      if (isLocked) {
-        input.disabled = true;
-        input.setAttribute("aria-disabled", "true");
-      }
-      input.addEventListener("focus", () => {
-        const radios = Array.from(
-          els.questionContainer.querySelectorAll('input[type="radio"]')
-        );
-        radios.forEach((r) =>
-          r.setAttribute("tabindex", r === input ? "0" : "-1")
-        );
-      });
-    });
   }
 
   updateNav();
 }
 
 // --- Event Handlers ---
-window.handleSelect = (index) => {
+function handleSelect(index) {
   if (lockedQuestions[currentIdx]) return;
   userAnswers[currentIdx] = index;
   saveState();
   renderQuestion();
+  renderNavigationGrid();
   maybeAutoSubmit();
-};
+}
 
-window.handleEssayInput = () => {
+function handleEssayInput() {
   if (lockedQuestions[currentIdx]) return;
   const textarea = document.getElementById("essayInput");
   if (textarea) {
@@ -368,37 +452,31 @@ window.handleEssayInput = () => {
       checkBtn.disabled = !textarea.value.trim();
     }
   }
-};
+}
 
 const maybeAutoSubmit = () => {
-  // Only auto-submit prompt if we are in exam mode or practice
-  // In timed mode, we usually wait for time or explicit finish
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
     setTimeout(() => {
       try {
         if (confirm("You have answered all questions. Submit now?")) {
-          window.finishEarly(true);
+          finish(true);
         }
       } catch (e) {}
     }, 300);
   }
 };
 
-window.nav = (dir) => {
+function nav(dir) {
   const newIdx = currentIdx + dir;
   if (newIdx < 0 || newIdx >= questions.length) return;
   currentIdx = newIdx;
   saveState();
   renderQuestion();
-};
+  renderNavigationGrid();
+}
 
-window.prevQuestion = () => window.nav(-1);
-window.nextQuestion = () => window.nav(1);
-window.finish = () => window.finishEarly();
-
-// Updated Finish Function with Gamification Integration
-window.finishEarly = (skipConfirm) => {
+function finish(skipConfirm) {
   if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
   stopTimer();
 
@@ -430,7 +508,6 @@ window.finishEarly = (skipConfirm) => {
     mode: quizMode,
   };
 
-  // Process Game Logic (Points, Badges, History)
   const gamifiedResult = gameEngine.processResult(rawResult);
 
   const finalOutput = {
@@ -440,10 +517,11 @@ window.finishEarly = (skipConfirm) => {
 
   localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
   localStorage.removeItem(`quiz_state_${examId}`);
+  gameEngine.clearFlags(examId);
   window.location.href = "summary.html";
-};
+}
 
-window.checkAnswer = () => {
+function checkAnswer() {
   const q = questions[currentIdx];
   const isEssay = isEssayQuestion(q);
 
@@ -457,8 +535,9 @@ window.checkAnswer = () => {
   lockedQuestions[currentIdx] = true;
   saveState();
   renderQuestion();
+  renderNavigationGrid();
   updateNav();
-};
+}
 
 // --- Utilities ---
 function updateNav() {
@@ -475,9 +554,7 @@ function updateNav() {
 }
 
 function saveState() {
-  // Don't save state in Timed mode to prevent refreshing to reset timer
   if (quizMode === "timed") return;
-
   const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
   localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
 }
@@ -487,12 +564,11 @@ function startTimer() {
 
   timerInterval = setInterval(() => {
     if (quizMode === "timed") {
-      // Count Down
       timeRemaining--;
       if (timeRemaining <= 0) {
         clearInterval(timerInterval);
         alert("Time's up! Submitting quiz...");
-        window.finishEarly(true);
+        finish(true);
         return;
       }
 
@@ -502,11 +578,9 @@ function startTimer() {
       const secs = (timeRemaining % 60).toString().padStart(2, "0");
       if (els.timer) {
         els.timer.textContent = `⏳ ${mins}:${secs}`;
-        // Optional: visual warning when low on time
         if (timeRemaining < 30) els.timer.style.color = "var(--color-error)";
       }
     } else {
-      // Count Up (Practice & Exam)
       timeElapsed++;
       const mins = Math.floor(timeElapsed / 60)
         .toString()
