@@ -1,0 +1,642 @@
+export const questions = [
+  // Section 1: Introduction to OS
+  {
+    q: "What is an operating system?",
+    options: [
+      "A program that acts as an intermediary between a user and computer hardware",
+      "A word-processing software",
+      "A part of the CPU",
+      "An input/output device",
+    ],
+    correct: 0,
+    explanation:
+      "The OS manages hardware resources and provides a platform for applications to run.",
+  },
+  {
+    q: "Goals of an operating system include:",
+    options: [
+      "Executing user programs",
+      "Making the system convenient to use",
+      "Using hardware efficiently",
+      "All of the above",
+    ],
+    correct: 3,
+    explanation:
+      "An OS balances user convenience with the efficient allocation of system resources.",
+  },
+  {
+    q: "Which of the following is NOT a component of a computer system?",
+    options: [
+      "Hardware",
+      "Operating system",
+      "Application programs",
+      "Programming language",
+    ],
+    correct: 3,
+    explanation:
+      "While used to create software, a programming language is a tool rather than a core functional component of the system architecture.",
+  },
+  {
+    q: "Which program loads at system startup?",
+    options: ["Kernel", "Bootstrap program", "Compiler", "Device driver"],
+    correct: 1,
+    explanation:
+      "The bootstrap program is stored in ROM or EEPROM and initializes the system to load the kernel.",
+  },
+  {
+    q: "Interrupts are used to signal:",
+    options: [
+      "Completion of an I/O operation",
+      "An error occurrence",
+      "A user request",
+      "All of the above",
+    ],
+    correct: 3,
+    explanation:
+      "Interrupts are the primary mechanism for hardware or software to gain the CPU's attention for various events.",
+  },
+  {
+    q: "Which storage is the fastest?",
+    options: ["Hard disk", "Main memory", "Cache", "Registers"],
+    correct: 3,
+    explanation:
+      "Registers are located inside the CPU and provide the highest speed access to data.",
+  },
+  {
+    q: "The purpose of caching is to:",
+    options: [
+      "Increase storage capacity",
+      "Speed up data access",
+      "Reduce power consumption",
+      "Improve security",
+    ],
+    correct: 1,
+    explanation:
+      "Caching stores frequently used data in faster memory to reduce the time spent fetching it from slower storage.",
+  },
+  {
+    q: "In a multiprocessor system, which is NOT an advantage?",
+    options: [
+      "Increased throughput",
+      "Economy of scale",
+      "Increased reliability",
+      "Easier programming",
+    ],
+    correct: 3,
+    explanation:
+      "Multiprocessor systems often increase programming complexity due to synchronization and task distribution requirements.",
+  },
+  {
+    q: "What is the difference between concurrency and parallelism?",
+    options: [
+      "Concurrency is multiple tasks at the same time; parallelism is one task at a time",
+      "Concurrency is on a single core; parallelism is on multiple cores",
+      "They are the same thing",
+      "Concurrency is for I/O; parallelism is for CPU",
+    ],
+    correct: 1,
+    explanation:
+      "Concurrency supports more than one task by switching between them, while parallelism performs multiple tasks simultaneously.",
+  },
+  {
+    q: "What does DMA stand for?",
+    options: [
+      "Direct Memory Access",
+      "Dynamic Memory Allocation",
+      "Data Management Application",
+      "Direct Mode Activation",
+    ],
+    correct: 0,
+    explanation:
+      "DMA allows I/O devices to transmit data directly to/from memory without constant CPU intervention.",
+  },
+  {
+    q: "Which is a non-volatile storage device?",
+    options: ["RAM", "Cache", "Hard disk", "Registers"],
+    correct: 2,
+    explanation:
+      "Non-volatile storage like a hard disk retains its data even when the power is turned off.",
+  },
+  {
+    q: "What is the role of the kernel?",
+    options: [
+      "Manage user applications",
+      "Act as the core part of the OS, always running",
+      "Handle printing tasks",
+      "Provide internet connectivity",
+    ],
+    correct: 1,
+    explanation:
+      "The kernel is the one program running at all times on the computer, managing all hardware and software interactions.",
+  },
+  {
+    q: "Which of the following is a real-time operating system use case?",
+    options: [
+      "Word processing",
+      "Web browsing",
+      "Automotive control systems",
+      "Gaming",
+    ],
+    correct: 2,
+    explanation:
+      "Real-time systems must process data and respond within strict time constraints, which is critical for safety systems like cars.",
+  },
+  {
+    q: "In which OS structure are jobs kept in memory to maximize CPU usage?",
+    options: ["Multiprogramming", "Single-tasking", "Real-time", "Distributed"],
+    correct: 0,
+    explanation:
+      "Multiprogramming ensures the CPU always has a job to execute by keeping several jobs in memory simultaneously.",
+  },
+  {
+    q: "What is a trap in OS terminology?",
+    options: [
+      "A hardware failure",
+      "A software-generated interrupt",
+      "A type of virus",
+      "A memory leak",
+    ],
+    correct: 1,
+    explanation:
+      "A trap (or exception) is caused by an error (like division by zero) or a specific request from a user program for OS service.",
+  },
+  {
+    q: "Which of the following is NOT a storage management activity?",
+    options: [
+      "File creation",
+      "Disk scheduling",
+      "Process synchronization",
+      "Free-space management",
+    ],
+    correct: 2,
+    explanation:
+      "Process synchronization is a part of process management, not storage or disk management.",
+  },
+  {
+    q: "What is the purpose of dual-mode operation?",
+    options: [
+      "To run two OSes simultaneously",
+      "To protect the OS from user programs",
+      "To improve graphics performance",
+      "To enable multitasking",
+    ],
+    correct: 1,
+    explanation:
+      "User mode and Kernel mode ensure that user programs cannot directly access hardware or critical OS memory.",
+  },
+  {
+    q: "Which computing environment uses 'thin clients'?",
+    options: ["Traditional", "Mobile", "Distributed", "Cloud"],
+    correct: 2,
+    explanation:
+      "Thin clients rely on a central server for processing, common in distributed and network-based environments.",
+  },
+  {
+    q: "What does open-source mean?",
+    options: [
+      "Source code is freely available",
+      "It is virus-free",
+      "It runs only on Linux",
+      "It is developed by Microsoft",
+    ],
+    correct: 0,
+    explanation:
+      "Open-source software provides its source code to the public for use, modification, and distribution.",
+  },
+  {
+    q: "Which is an example of a cloud service model?",
+    options: ["SaaS", "PaaS", "IaaS", "All of the above"],
+    correct: 3,
+    explanation:
+      "Software as a Service, Platform as a Service, and Infrastructure as a Service are the three main cloud pillars.",
+  },
+
+  // Section 2: Processes
+  {
+    q: "What is a process?",
+    options: [
+      "A program in execution",
+      "A file on disk",
+      "A CPU register",
+      "An input device",
+    ],
+    correct: 0,
+    explanation:
+      "A program is a passive entity (file), while a process is an active entity currently running in memory.",
+  },
+  {
+    q: "Which of the following is NOT part of a process in memory?",
+    options: ["Text section", "Stack", "Hard disk", "Data section"],
+    correct: 2,
+    explanation:
+      "The text, stack, heap, and data sections reside in RAM; the hard disk is external storage.",
+  },
+  {
+    q: "What does PCB stand for?",
+    options: [
+      "Process Control Block",
+      "Program Control Byte",
+      "Peripheral Control Bus",
+      "Process Communication Buffer",
+    ],
+    correct: 0,
+    explanation:
+      "The PCB stores all the information needed by the OS to manage a specific process.",
+  },
+  {
+    q: "Which state indicates a process is waiting for an event?",
+    options: ["Running", "Ready", "Waiting", "New"],
+    correct: 2,
+    explanation:
+      "The 'Waiting' state occurs when a process cannot proceed until an I/O completion or signal occurs.",
+  },
+  {
+    q: "What is the role of the long-term scheduler?",
+    options: [
+      "Selects which process runs next on CPU",
+      "Brings processes into memory",
+      "Handles I/O operations",
+      "Manages file systems",
+    ],
+    correct: 1,
+    explanation:
+      "The long-term scheduler (job scheduler) selects processes from a pool and loads them into memory for execution.",
+  },
+  {
+    q: "What is context switching?",
+    options: [
+      "Changing CPU from one process to another",
+      "Changing memory blocks",
+      "Switching user modes",
+      "Loading a new OS",
+    ],
+    correct: 0,
+    explanation:
+      "Context switching involves saving the state of the current process and loading the saved state of another process.",
+  },
+  {
+    q: "Which system call creates a new process in UNIX?",
+    options: ["exec()", "fork()", "wait()", "exit()"],
+    correct: 1,
+    explanation:
+      "The fork() system call creates a nearly identical copy of the calling process.",
+  },
+  {
+    q: "A process that has finished but still has an entry in the process table is called:",
+    options: ["Orphan", "Zombie", "Child", "Parent"],
+    correct: 1,
+    explanation:
+      "A zombie process has terminated, but its exit status hasn't been read by its parent yet.",
+  },
+  {
+    q: "What is interprocess communication (IPC)?",
+    options: [
+      "Communication between two processes",
+      "Communication between CPU and I/O",
+      "Communication between user and kernel",
+      "Communication between two computers",
+    ],
+    correct: 0,
+    explanation:
+      "IPC provides mechanisms for processes to communicate and synchronize their actions.",
+  },
+  {
+    q: "Which IPC method uses a shared memory region?",
+    options: ["Message passing", "Shared memory", "Pipes", "Sockets"],
+    correct: 1,
+    explanation:
+      "Shared memory allows multiple processes to read and write to the same block of RAM for high-speed communication.",
+  },
+  {
+    q: "In the producer-consumer problem, a bounded buffer:",
+    options: [
+      "Has unlimited size",
+      "Has fixed size",
+      "Is used only by the producer",
+      "Does not require synchronization",
+    ],
+    correct: 1,
+    explanation:
+      "A bounded buffer has a specific capacity; the producer must wait if the buffer is full.",
+  },
+  {
+    q: "Which of the following is a message-passing primitive?",
+    options: [
+      "send() and receive()",
+      "read() and write()",
+      "open() and close()",
+      "create() and delete()",
+    ],
+    correct: 0,
+    explanation:
+      "Message passing relies on explicit send and receive operations to transfer data between processes.",
+  },
+  {
+    q: "What is a socket?",
+    options: [
+      "A hardware port",
+      "An endpoint for network communication",
+      "A type of process",
+      "A memory address",
+    ],
+    correct: 1,
+    explanation:
+      "A socket is defined by an IP address concatenated with a port number.",
+  },
+  {
+    q: "What is RPC?",
+    options: [
+      "Remote Procedure Call",
+      "Real-time Process Control",
+      "Random Process Communication",
+      "Rapid Program Compilation",
+    ],
+    correct: 0,
+    explanation:
+      "RPC allows a program to cause a procedure to execute in another address space (usually on another computer).",
+  },
+  {
+    q: "Which pipe requires a parent-child relationship?",
+    options: ["Named pipe", "Ordinary pipe", "Socket pipe", "Shared pipe"],
+    correct: 1,
+    explanation:
+      "Ordinary pipes are anonymous and can only be used by processes that share a common ancestor.",
+  },
+  {
+    q: "In process termination, what does abort() do?",
+    options: [
+      "Gracefully ends a process",
+      "Terminates a child process forcibly",
+      "Pauses a process",
+      "Resumes a process",
+    ],
+    correct: 1,
+    explanation:
+      "A parent may abort a child if the child has exceeded its allocated resources or is no longer needed.",
+  },
+  {
+    q: "What is a thread within a process?",
+    options: [
+      "A separate process",
+      "A lightweight unit of CPU utilization",
+      "A memory block",
+      "An I/O device",
+    ],
+    correct: 1,
+    explanation:
+      "Threads allow a single process to perform multiple tasks concurrently while sharing the same memory space.",
+  },
+  {
+    q: "Which of the following is NOT a reason for process cooperation?",
+    options: [
+      "Information sharing",
+      "Computation speedup",
+      "Modularity",
+      "Increasing security risks",
+    ],
+    correct: 3,
+    explanation:
+      "Cooperation aims to improve efficiency and modularity; security risks are a potential disadvantage, not a goal.",
+  },
+  {
+    q: "What is a rendezvous in IPC?",
+    options: [
+      "When both send and receive are blocking",
+      "When processes run in parallel",
+      "When a process is in waiting state",
+      "When a process creates a child",
+    ],
+    correct: 0,
+    explanation:
+      "A rendezvous occurs in synchronous message passing when the sender and receiver both wait for each other.",
+  },
+  {
+    q: "Which of the following is an example of indirect communication?",
+    options: ["Mailbox", "Shared variable", "Signal", "Trap"],
+    correct: 0,
+    explanation:
+      "In indirect communication, messages are sent to and received from mailboxes or ports.",
+  },
+
+  // Section 3: Threads
+  {
+    q: "What is a thread?",
+    options: [
+      "A separate process",
+      "A lightweight process within a process",
+      "A hardware component",
+      "A system call",
+    ],
+    correct: 1,
+    explanation:
+      "A thread is the basic unit of CPU utilization, comprising a thread ID, program counter, register set, and stack.",
+  },
+  {
+    q: "Which of the following is a benefit of multithreading?",
+    options: [
+      "Responsiveness",
+      "Resource sharing",
+      "Economy",
+      "All of the above",
+    ],
+    correct: 3,
+    explanation:
+      "Multithreading allows applications to remain responsive, share memory easily, and save time on context switches.",
+  },
+  {
+    q: "What is the difference between parallelism and concurrency?",
+    options: [
+      "Parallelism runs tasks simultaneously; concurrency interleaves tasks",
+      "They are the same",
+      "Concurrency requires multiple CPUs",
+      "Parallelism is only for single-core systems",
+    ],
+    correct: 0,
+    explanation:
+      "Parallelism actually performs tasks at the same time on different cores; concurrency creates the illusion of simultaneity.",
+  },
+  {
+    q: "What does Amdahl's Law predict?",
+    options: [
+      "Speedup from adding cores",
+      "Memory usage growth",
+      "Power consumption",
+      "Network latency",
+    ],
+    correct: 0,
+    explanation:
+      "It calculates the potential speedup of a program when using multiple processors based on its serial and parallel parts.",
+  },
+  {
+    q: "Which threading model maps many user threads to one kernel thread?",
+    options: ["One-to-One", "Many-to-Many", "Many-to-One", "Two-level"],
+    correct: 2,
+    explanation:
+      "The Many-to-One model handles all thread management in user space, but one blocking call blocks the whole process.",
+  },
+  {
+    q: "Which OS uses the One-to-One threading model?",
+    options: [
+      "Windows",
+      "Solaris Green Threads",
+      "GNU Portable Threads",
+      "None",
+    ],
+    correct: 0,
+    explanation:
+      "Most modern operating systems, including Windows and Linux, use the One-to-One model.",
+  },
+  {
+    q: "What is Pthreads?",
+    options: [
+      "A Windows thread API",
+      "A Java thread library",
+      "A POSIX thread standard",
+      "A hardware thread",
+    ],
+    correct: 2,
+    explanation:
+      "Pthreads is a POSIX standard (IEEE 1003.1c) defining an API for thread creation and synchronization.",
+  },
+  {
+    q: "Which function creates a thread in Pthreads?",
+    options: [
+      "pthread_create()",
+      "pthread_join()",
+      "pthread_exit()",
+      "pthread_cancel()",
+    ],
+    correct: 0,
+    explanation:
+      "The pthread_create function is used to start a new thread of execution within a process.",
+  },
+  {
+    q: "What is thread cancellation?",
+    options: [
+      "Creating a new thread",
+      "Terminating a thread before completion",
+      "Pausing a thread",
+      "Resuming a thread",
+    ],
+    correct: 1,
+    explanation:
+      "Cancellation is the task of terminating a thread before it has completed its work.",
+  },
+  {
+    q: "What does TLS stand for?",
+    options: [
+      "Thread-Local Storage",
+      "Thread-Locked Section",
+      "Temporary Local Storage",
+      "Thread-Linked Segment",
+    ],
+    correct: 0,
+    explanation:
+      "TLS allows each thread to have its own private copy of certain data.",
+  },
+  {
+    q: "Which of the following is an implicit threading method?",
+    options: [
+      "Thread pools",
+      "OpenMP",
+      "Grand Central Dispatch",
+      "All of the above",
+    ],
+    correct: 3,
+    explanation:
+      "Implicit threading transfers the burden of thread management from the programmer to the compiler or runtime library.",
+  },
+  {
+    q: "What is a thread pool?",
+    options: [
+      "A group of pre-created threads waiting for work",
+      "A memory area for threads",
+      "A type of CPU core",
+      "A scheduling algorithm",
+    ],
+    correct: 0,
+    explanation:
+      "Thread pools prevent the overhead of frequent thread creation and destruction by reusing existing threads.",
+  },
+  {
+    q: "OpenMP is used for:",
+    options: [
+      "Distributed systems",
+      "Shared-memory parallel programming",
+      "Real-time systems",
+      "Mobile systems",
+    ],
+    correct: 1,
+    explanation:
+      "OpenMP uses compiler directives to identify parallel regions in C, C++, or Fortran code.",
+  },
+  {
+    q: "Grand Central Dispatch is associated with:",
+    options: ["Windows", "Linux", "Apple systems", "Android"],
+    correct: 2,
+    explanation:
+      "GCD is a technology developed by Apple for macOS and iOS to manage parallel tasks.",
+  },
+  {
+    q: "Which of the following is a threading issue?",
+    options: [
+      "Signal handling",
+      "Thread cancellation",
+      "Thread-local storage",
+      "All of the above",
+    ],
+    explanation:
+      "Designers must consider how signals are delivered to multithreaded processes and how shared data is managed.",
+    correct: 3,
+  },
+  {
+    q: "In multithreading, what does fork() do?",
+    options: [
+      "Duplicates only the calling thread",
+      "Duplicates all threads",
+      "Depends on the OS",
+      "Both a and c",
+    ],
+    correct: 3,
+    explanation:
+      "Some UNIX systems have two versions of fork: one that duplicates all threads and one that only duplicates the calling thread.",
+  },
+  {
+    q: "What is an LWP?",
+    options: [
+      "Lightweight Process",
+      "Long Waiting Period",
+      "Local Window Protocol",
+      "Linked Worker Process",
+    ],
+    correct: 0,
+    explanation:
+      "An LWP is a data structure between user and kernel threads that appears as a virtual processor.",
+  },
+  {
+    q: "Which Windows data structure stores thread ID and user stack?",
+    options: ["ETHREAD", "KTHREAD", "TEB", "PCB"],
+    correct: 2,
+    explanation:
+      "The Thread Environment Block (TEB) is a user-space structure containing thread-specific information.",
+  },
+  {
+    q: "In Linux, which system call creates threads?",
+    options: ["fork()", "clone()", "exec()", "thread()"],
+    correct: 1,
+    explanation:
+      "The clone() system call allows the child to share the address space of the parent, effectively creating a thread.",
+  },
+  {
+    q: "What is the main advantage of multithreaded server architecture?",
+    options: [
+      "Increased complexity",
+      "Better responsiveness to multiple clients",
+      "Higher security",
+      "Reduced memory usage",
+    ],
+    correct: 1,
+    explanation:
+      "A multithreaded server can handle a new request in a separate thread without making other clients wait.",
+  },
+];

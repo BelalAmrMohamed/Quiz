@@ -47,6 +47,36 @@ export const examList = [
   {
     "id": "1. Introduction",
     "title": "1. Introduction",
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/1. Introduction.js",
+    "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+  },
+  {
+    "id": "2. Operating Systems Structures",
+    "title": "2. Operating Systems Structures",
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/2. Operating Systems Structures.js",
+    "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+  },
+  {
+    "id": "3. Processes",
+    "title": "3. Processes",
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.js",
+    "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+  },
+  {
+    "id": "4. Threads",
+    "title": "4. Threads",
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/4. Threads.js",
+    "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+  },
+  {
+    "id": "6. CPU Scheduling",
+    "title": "6. CPU Scheduling",
+    "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.js",
+    "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+  },
+  {
+    "id": "1. Introduction",
+    "title": "1. Introduction",
     "path": "../Exams/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
     "category": "Operatings Systems/أسئلة الدكتور المحلولة"
   },
@@ -91,6 +121,24 @@ export const examList = [
     "title": "Ch3 Zaqazeeq",
     "path": "../Exams/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.js",
     "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
+  },
+  {
+    "id": "Ch 1, 2, 3, and 4 Quiz",
+    "title": "Ch 1, 2, 3, And 4 Quiz",
+    "path": "../Exams/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Ch 4 Quiz",
+    "title": "Ch 4 Quiz",
+    "path": "../Exams/Operatings Systems/Ch 4 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Ch 6 Quiz",
+    "title": "Ch 6 Quiz",
+    "path": "../Exams/Operatings Systems/Ch 6 Quiz.js",
+    "category": "Operatings Systems"
   },
   {
     "id": "Ch1 and 2 Quiz",
@@ -346,10 +394,29 @@ export const categoryTree = {
     ],
     "parent": null,
     "subcategories": [
+      "Operatings Systems/أسئلة الدكتور اللي مش محلولة",
       "Operatings Systems/أسئلة الدكتور المحلولة",
       "Operatings Systems/إمتحانات جامعة الزقازيق"
     ],
     "exams": [
+      {
+        "id": "Ch 1, 2, 3, and 4 Quiz",
+        "title": "Ch 1, 2, 3, And 4 Quiz",
+        "path": "../Exams/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Ch 4 Quiz",
+        "title": "Ch 4 Quiz",
+        "path": "../Exams/Operatings Systems/Ch 4 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Ch 6 Quiz",
+        "title": "Ch 6 Quiz",
+        "path": "../Exams/Operatings Systems/Ch 6 Quiz.js",
+        "category": "Operatings Systems"
+      },
       {
         "id": "Ch1 and 2 Quiz",
         "title": "Ch1 And 2 Quiz",
@@ -433,6 +500,47 @@ export const categoryTree = {
         "title": "أسئلة مقالي",
         "path": "../Exams/Operatings Systems/أسئلة مقالي.js",
         "category": "Operatings Systems"
+      }
+    ]
+  },
+  "Operatings Systems/أسئلة الدكتور اللي مش محلولة": {
+    "name": "أسئلة الدكتور اللي مش محلولة",
+    "path": [
+      "Operatings Systems",
+      "أسئلة الدكتور اللي مش محلولة"
+    ],
+    "parent": "Operatings Systems",
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "1. Introduction",
+        "title": "1. Introduction",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/1. Introduction.js",
+        "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+      },
+      {
+        "id": "2. Operating Systems Structures",
+        "title": "2. Operating Systems Structures",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/2. Operating Systems Structures.js",
+        "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+      },
+      {
+        "id": "3. Processes",
+        "title": "3. Processes",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.js",
+        "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+      },
+      {
+        "id": "4. Threads",
+        "title": "4. Threads",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/4. Threads.js",
+        "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+      },
+      {
+        "id": "6. CPU Scheduling",
+        "title": "6. CPU Scheduling",
+        "path": "../Exams/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.js",
+        "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
       }
     ]
   },
