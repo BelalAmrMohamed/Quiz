@@ -1,4 +1,4 @@
-export const chapter3 = [
+export const questions = [
   {
     q: "What are the four components of a process?",
     options: ["Text section, data section, heap, and stack"],

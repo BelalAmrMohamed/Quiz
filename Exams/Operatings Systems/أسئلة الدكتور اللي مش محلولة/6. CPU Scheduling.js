@@ -1,4 +1,4 @@
-export const chapter6 = [
+export const questions = [
   {
     q: "What are the two bursts that CPU schedulers are designed around?",
     options: ["CPU burst and I/O burst"],

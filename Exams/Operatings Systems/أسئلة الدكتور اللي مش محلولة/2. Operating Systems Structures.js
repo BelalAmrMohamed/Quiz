@@ -1,4 +1,4 @@
-export const chapter2 = [
+export const questions = [
   {
     q: "List at least three operating system services that are useful to users.",
     options: ["User interface, program execution, and I/O operations"],

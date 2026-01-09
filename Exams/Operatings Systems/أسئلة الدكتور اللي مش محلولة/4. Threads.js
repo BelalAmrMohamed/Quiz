@@ -1,4 +1,4 @@
-export const chapter4 = [
+export const questions = [
   {
     q: "How many threads does a traditional, heavyweight process have?",
     options: ["One single thread of control"],

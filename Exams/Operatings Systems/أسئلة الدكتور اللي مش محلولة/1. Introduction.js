@@ -1,4 +1,4 @@
-export const chapter1 = [
+export const questions = [
   {
     q: "What are the four components of a computer system?",
     options: ["Hardware, operating system, application programs, and users"],
