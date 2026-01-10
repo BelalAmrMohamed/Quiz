@@ -130,8 +130,7 @@ async function init() {
       renderMenuNavigationGrid();
       updateMenuActionButtons();
 
-      // Close menu and scroll to question
-      document.getElementById("sideMenu").classList.remove("open");
+      // Scroll to question
       const questionCard = document.querySelector(".question-card");
       if (questionCard) {
         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
