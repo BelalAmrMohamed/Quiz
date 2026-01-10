@@ -99,7 +99,7 @@ async function init() {
       }
     }
 
-    renderMenuNavigationGrid();
+    renderMenuNavigationList();
     updateMenuActionButtons();
     renderQuestion();
     startTimer();
@@ -114,21 +114,32 @@ async function init() {
     window.toggleBookmark = () => {
       gameEngine.toggleBookmark(examId, currentIdx);
       renderQuestion();
-      renderMenuNavigationGrid();
-      updateMenuActionButtons();
+      renderMenuNavigationList();
     };
     window.toggleFlag = () => {
       gameEngine.toggleFlag(examId, currentIdx);
       renderQuestion();
-      renderMenuNavigationGrid();
-      updateMenuActionButtons();
+      renderMenuNavigationList();
+    };
+    window.toggleQuestionBookmark = (idx) => {
+      gameEngine.toggleBookmark(examId, idx);
+      renderMenuNavigationList();
+      if (idx === currentIdx) {
+        renderQuestion();
+      }
+    };
+    window.toggleQuestionFlag = (idx) => {
+      gameEngine.toggleFlag(examId, idx);
+      renderMenuNavigationList();
+      if (idx === currentIdx) {
+        renderQuestion();
+      }
     };
     window.jumpToQuestion = (idx) => {
       currentIdx = idx;
       saveState();
       renderQuestion();
-      renderMenuNavigationGrid();
-      updateMenuActionButtons();
+      renderMenuNavigationList();
 
       // Close menu and scroll to question
       document.getElementById("sideMenu").classList.remove("open");
@@ -156,12 +167,12 @@ async function init() {
   }
 }
 
-// --- NEW: Menu Navigation Grid ---
-function renderMenuNavigationGrid() {
-  let navGrid = document.getElementById("menuNavGrid");
-  if (!navGrid) return;
+// --- NEW: Menu Navigation List ---
+function renderMenuNavigationList() {
+  let navList = document.getElementById("menuNavList");
+  if (!navList) return;
 
-  const gridHTML = questions
+  const listHTML = questions
     .map((q, idx) => {
       const isAnswered = userAnswers[idx] !== undefined;
       const isLocked = lockedQuestions[idx];
@@ -184,29 +195,33 @@ function renderMenuNavigationGrid() {
         statusIcon = "●";
       }
 
-      const badges = [];
-      if (isBookmarked)
-        badges.push('<span class="mini-badge bookmark">★</span>');
-      if (isFlagged) badges.push('<span class="mini-badge flag">🚩</span>');
+      const bookmarkClass = isBookmarked ? "active" : "";
+      const flagClass = isFlagged ? "active" : "";
+      const bookmarkIcon = isBookmarked ? "★" : "☆";
 
       return `
-      <button 
-        class="menu-nav-item ${statusClass}" 
-        onclick="window.jumpToQuestion(${idx})"
-        title="Question ${idx + 1}${isBookmarked ? " - Bookmarked" : ""}${
-        isFlagged ? " - Flagged" : ""
-      }"
-      >
-        <span>${idx + 1}</span>
-        ${
-          statusIcon ? `<span class="menu-nav-status">${statusIcon}</span>` : ""
-        }
-        ${
-          badges.length > 0
-            ? `<div class="menu-nav-badges">${badges.join("")}</div>`
-            : ""
-        }
-      </button>
+      <div class="menu-nav-item ${statusClass}">
+        <div class="menu-nav-item-left" onclick="window.jumpToQuestion(${idx})">
+          <span class="menu-nav-number">Q${idx + 1}</span>
+          ${
+            statusIcon
+              ? `<span class="menu-nav-status">${statusIcon}</span>`
+              : ""
+          }
+        </div>
+        <div class="menu-nav-item-right">
+          <span class="menu-nav-icon bookmark-icon ${bookmarkClass}" 
+                onclick="event.stopPropagation(); window.toggleQuestionBookmark(${idx})"
+                title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
+            ${bookmarkIcon}
+          </span>
+          <span class="menu-nav-icon flag-icon ${flagClass}" 
+                onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
+                title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
+            🚩
+          </span>
+        </div>
+      </div>
     `;
     })
     .join("");
@@ -217,7 +232,7 @@ function renderMenuNavigationGrid() {
       ? `<div class="menu-flag-count">🚩 ${flagCount} flagged for review</div>`
       : "";
 
-  navGrid.innerHTML = `
+  navList.innerHTML = `
     <div class="menu-nav-header">Question Navigator</div>
     <div class="menu-nav-legend">
       <span><span class="legend-dot current"></span> Current</span>
@@ -227,41 +242,15 @@ function renderMenuNavigationGrid() {
     </div>
     ${flagInfo}
     <div class="menu-nav-items">
-      ${gridHTML}
+      ${listHTML}
     </div>
   `;
 }
 
-// --- NEW: Update Menu Action Buttons ---
+// --- Update Menu Action Buttons (Deprecated but kept for compatibility) ---
 function updateMenuActionButtons() {
-  const bookmarkBtn = document.getElementById("menuBookmarkBtn");
-  const flagBtn = document.getElementById("menuFlagBtn");
-  const bookmarkIcon = document.getElementById("menuBookmarkIcon");
-  const bookmarkText = document.getElementById("menuBookmarkText");
-  const flagText = document.getElementById("menuFlagText");
-
-  if (bookmarkBtn && bookmarkIcon && bookmarkText) {
-    const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
-    bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
-    bookmarkText.textContent = isBookmarked
-      ? "Remove Bookmark"
-      : "Bookmark Question";
-    if (isBookmarked) {
-      bookmarkBtn.classList.add("bookmarked");
-    } else {
-      bookmarkBtn.classList.remove("bookmarked");
-    }
-  }
-
-  if (flagBtn && flagText) {
-    const isFlagged = gameEngine.isFlagged(examId, currentIdx);
-    flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
-    if (isFlagged) {
-      flagBtn.classList.add("flagged");
-    } else {
-      flagBtn.classList.remove("flagged");
-    }
-  }
+  // This function is no longer needed since icons are inline
+  // Kept empty to avoid breaking existing code
 }
 
 // --- Core Logic ---
@@ -448,7 +437,7 @@ function handleSelect(index) {
   userAnswers[currentIdx] = index;
   saveState();
   renderQuestion();
-  renderMenuNavigationGrid();
+  renderMenuNavigationList();
   maybeAutoSubmit();
 }
 
@@ -484,8 +473,7 @@ function nav(dir) {
   currentIdx = newIdx;
   saveState();
   renderQuestion();
-  renderMenuNavigationGrid();
-  updateMenuActionButtons();
+  renderMenuNavigationList();
 }
 
 function finish(skipConfirm) {
@@ -547,7 +535,7 @@ function checkAnswer() {
   lockedQuestions[currentIdx] = true;
   saveState();
   renderQuestion();
-  renderMenuNavigationGrid();
+  renderMenuNavigationList();
   updateNav();
 }
 
