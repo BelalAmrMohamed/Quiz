@@ -165,6 +165,12 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
+    "id": "Final السنة اللي فاتت",
+    "title": "Final السنة اللي فاتت",
+    "path": "../Exams/Operatings Systems/Final السنة اللي فاتت.js",
+    "category": "Operatings Systems"
+  },
+  {
     "id": "General Exam",
     "title": "General Exam",
     "path": "../Exams/Operatings Systems/General Exam.js",
@@ -439,6 +445,12 @@ export const categoryTree = {
         "id": "Ch3 Quiz",
         "title": "Ch3 Quiz",
         "path": "../Exams/Operatings Systems/Ch3 Quiz.js",
+        "category": "Operatings Systems"
+      },
+      {
+        "id": "Final السنة اللي فاتت",
+        "title": "Final السنة اللي فاتت",
+        "path": "../Exams/Operatings Systems/Final السنة اللي فاتت.js",
         "category": "Operatings Systems"
       },
       {
