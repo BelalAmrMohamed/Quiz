@@ -13,6 +13,46 @@
 </head>
 
 <body>
+    <div class="menu-container">
+        <button class="hamburger" id="menuBtn"
+            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-header">
+                <h3>Quick Access</h3>
+                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <nav>
+
+                <button id="themeToggle" class="menu-item theme-btn">
+                    <span class="theme-icon-display">☀️</span> Change Appearance
+                </button>
+
+                <div class="menu-divider"></div>
+
+                <div id="menuNavGrid" class="menu-nav-grid">
+                    <!-- Question navigator will be rendered here -->
+                </div>
+
+                <div class="menu-divider"></div>
+
+                <button id="menuBookmarkBtn" class="menu-item action-btn"
+                    onclick="window.toggleBookmark(); document.getElementById('sideMenu').classList.remove('open')">
+                    <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">Bookmark Question</span>
+                </button>
+
+                <button id="menuFlagBtn" class="menu-item action-btn"
+                    onclick="window.toggleFlag(); document.getElementById('sideMenu').classList.remove('open')">
+                    <span>🚩</span> <span id="menuFlagText">Flag for Review</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Premium Header -->
         <div class="header">

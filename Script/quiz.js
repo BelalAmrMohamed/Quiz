@@ -99,7 +99,8 @@ async function init() {
       }
     }
 
-    renderNavigationGrid();
+    renderMenuNavigationGrid();
+    updateMenuActionButtons();
     renderQuestion();
     startTimer();
 
@@ -113,21 +114,24 @@ async function init() {
     window.toggleBookmark = () => {
       gameEngine.toggleBookmark(examId, currentIdx);
       renderQuestion();
-      renderNavigationGrid();
+      renderMenuNavigationGrid();
+      updateMenuActionButtons();
     };
     window.toggleFlag = () => {
       gameEngine.toggleFlag(examId, currentIdx);
       renderQuestion();
-      renderNavigationGrid();
-      updateFlagCount();
+      renderMenuNavigationGrid();
+      updateMenuActionButtons();
     };
     window.jumpToQuestion = (idx) => {
       currentIdx = idx;
       saveState();
       renderQuestion();
-      renderNavigationGrid();
+      renderMenuNavigationGrid();
+      updateMenuActionButtons();
 
-      // Scroll to question
+      // Close menu and scroll to question
+      document.getElementById("sideMenu").classList.remove("open");
       const questionCard = document.querySelector(".question-card");
       if (questionCard) {
         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -152,21 +156,10 @@ async function init() {
   }
 }
 
-// --- NEW: Navigation Grid ---
-function renderNavigationGrid() {
-  let navGrid = document.getElementById("navGrid");
-
-  if (!navGrid) {
-    navGrid = document.createElement("div");
-    navGrid.id = "navGrid";
-    navGrid.className = "nav-grid";
-
-    // Insert after header, before question container
-    const header = document.querySelector(".header");
-    if (header) {
-      header.after(navGrid);
-    }
-  }
+// --- NEW: Menu Navigation Grid ---
+function renderMenuNavigationGrid() {
+  let navGrid = document.getElementById("menuNavGrid");
+  if (!navGrid) return;
 
   const gridHTML = questions
     .map((q, idx) => {
@@ -198,17 +191,19 @@ function renderNavigationGrid() {
 
       return `
       <button 
-        class="nav-grid-item ${statusClass}" 
+        class="menu-nav-item ${statusClass}" 
         onclick="window.jumpToQuestion(${idx})"
         title="Question ${idx + 1}${isBookmarked ? " - Bookmarked" : ""}${
         isFlagged ? " - Flagged" : ""
       }"
       >
-        <span class="nav-number">${idx + 1}</span>
-        ${statusIcon ? `<span class="nav-status">${statusIcon}</span>` : ""}
+        <span>${idx + 1}</span>
+        ${
+          statusIcon ? `<span class="menu-nav-status">${statusIcon}</span>` : ""
+        }
         ${
           badges.length > 0
-            ? `<div class="nav-badges">${badges.join("")}</div>`
+            ? `<div class="menu-nav-badges">${badges.join("")}</div>`
             : ""
         }
       </button>
@@ -219,36 +214,52 @@ function renderNavigationGrid() {
   const flagCount = gameEngine.getFlaggedCount(examId);
   const flagInfo =
     flagCount > 0
-      ? `<span class="flag-count">🚩 ${flagCount} flagged for review</span>`
+      ? `<div class="menu-flag-count">🚩 ${flagCount} flagged for review</div>`
       : "";
 
   navGrid.innerHTML = `
-    <div class="nav-grid-header">
-      <h3>Question Navigator</h3>
-      <div class="nav-grid-legend">
-        <span><span class="legend-dot current"></span> Current</span>
-        <span><span class="legend-dot answered"></span> Answered</span>
-        <span><span class="legend-dot correct"></span> Correct</span>
-        <span><span class="legend-dot wrong"></span> Wrong</span>
-        ${flagInfo}
-      </div>
+    <div class="menu-nav-header">Question Navigator</div>
+    <div class="menu-nav-legend">
+      <span><span class="legend-dot current"></span> Current</span>
+      <span><span class="legend-dot answered"></span> Answered</span>
+      <span><span class="legend-dot correct"></span> Correct</span>
+      <span><span class="legend-dot wrong"></span> Wrong</span>
     </div>
-    <div class="nav-grid-items">
+    ${flagInfo}
+    <div class="menu-nav-items">
       ${gridHTML}
     </div>
   `;
 }
 
-// --- NEW: Update Flag Count ---
-function updateFlagCount() {
-  const flagCount = gameEngine.getFlaggedCount(examId);
-  const flagCountEl = document.querySelector(".flag-count");
-  if (flagCountEl) {
-    if (flagCount > 0) {
-      flagCountEl.textContent = `🚩 ${flagCount} flagged for review`;
-      flagCountEl.style.display = "inline";
+// --- NEW: Update Menu Action Buttons ---
+function updateMenuActionButtons() {
+  const bookmarkBtn = document.getElementById("menuBookmarkBtn");
+  const flagBtn = document.getElementById("menuFlagBtn");
+  const bookmarkIcon = document.getElementById("menuBookmarkIcon");
+  const bookmarkText = document.getElementById("menuBookmarkText");
+  const flagText = document.getElementById("menuFlagText");
+
+  if (bookmarkBtn && bookmarkIcon && bookmarkText) {
+    const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
+    bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
+    bookmarkText.textContent = isBookmarked
+      ? "Remove Bookmark"
+      : "Bookmark Question";
+    if (isBookmarked) {
+      bookmarkBtn.classList.add("bookmarked");
     } else {
-      flagCountEl.style.display = "none";
+      bookmarkBtn.classList.remove("bookmarked");
+    }
+  }
+
+  if (flagBtn && flagText) {
+    const isFlagged = gameEngine.isFlagged(examId, currentIdx);
+    flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
+    if (isFlagged) {
+      flagBtn.classList.add("flagged");
+    } else {
+      flagBtn.classList.remove("flagged");
     }
   }
 }
@@ -437,7 +448,7 @@ function handleSelect(index) {
   userAnswers[currentIdx] = index;
   saveState();
   renderQuestion();
-  renderNavigationGrid();
+  renderMenuNavigationGrid();
   maybeAutoSubmit();
 }
 
@@ -473,7 +484,8 @@ function nav(dir) {
   currentIdx = newIdx;
   saveState();
   renderQuestion();
-  renderNavigationGrid();
+  renderMenuNavigationGrid();
+  updateMenuActionButtons();
 }
 
 function finish(skipConfirm) {
@@ -535,7 +547,7 @@ function checkAnswer() {
   lockedQuestions[currentIdx] = true;
   saveState();
   renderQuestion();
-  renderNavigationGrid();
+  renderMenuNavigationGrid();
   updateNav();
 }
 
