@@ -13,7 +13,7 @@ let timerInterval = null;
 let examId = null;
 let quizMode = "exam";
 let timeRemaining = 0;
-let viewMode = "grid"; // "grid" or "list"
+let viewMode = "grid";
 let autoSubmitTimeout = null;
 
 // --- DOM Elements ---
@@ -35,6 +35,15 @@ const els = {
   viewIcon: document.getElementById("viewIcon"),
   viewText: document.getElementById("viewText"),
 };
+
+// === CRITICAL: Define global handlers IMMEDIATELY ===
+window.finishEarly = () => {
+  console.log("Finish button clicked"); // Debug log
+  finish();
+};
+
+window.prevQuestion = () => nav(-1);
+window.nextQuestion = () => nav(1);
 
 // --- Helper: HTML Escaping ---
 const escapeHtml = (unsafe) => {
@@ -85,7 +94,7 @@ function toggleView() {
   }
 
   renderMenuNavigation();
-  updateMenuActionButtons(); // Applied fix: Ensure buttons update immediately
+  updateMenuActionButtons();
 }
 
 // --- Initialization ---
@@ -175,12 +184,9 @@ async function init() {
     renderQuestion();
     startTimer();
 
-    // Global Handlers
+    // Additional Global Handlers
     window.handleSelect = (i) => handleSelect(i);
     window.handleEssayInput = () => handleEssayInput();
-    window.prevQuestion = () => nav(-1);
-    window.nextQuestion = () => nav(1);
-    window.finishEarly = () => finish();
     window.checkAnswer = () => checkAnswer();
     window.toggleView = () => toggleView();
 
@@ -421,7 +427,6 @@ function updateMenuActionButtons() {
   const bookmarkText = document.getElementById("menuBookmarkText");
   const flagText = document.getElementById("menuFlagText");
 
-  // Disable buttons in list view mode
   const isListView = viewMode === "list";
 
   if (bookmarkBtn) {
@@ -433,10 +438,12 @@ function updateMenuActionButtons() {
       bookmarkBtn.disabled = false;
 
       const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
-      bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
-      bookmarkText.textContent = isBookmarked
-        ? "Remove Bookmark"
-        : "Bookmark Question";
+      if (bookmarkIcon) bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
+      if (bookmarkText)
+        bookmarkText.textContent = isBookmarked
+          ? "Remove Bookmark"
+          : "Bookmark Question";
+
       if (isBookmarked) {
         bookmarkBtn.classList.add("bookmarked");
       } else {
@@ -454,7 +461,9 @@ function updateMenuActionButtons() {
       flagBtn.disabled = false;
 
       const isFlagged = gameEngine.isFlagged(examId, currentIdx);
-      flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
+      if (flagText)
+        flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
+
       if (isFlagged) {
         flagBtn.classList.add("flagged");
       } else {
@@ -655,11 +664,7 @@ function handleSelect(index) {
   userAnswers[currentIdx] = index;
   saveState();
 
-  // Auto-lock in exam mode
-  if (quizMode === "exam") {
-    lockedQuestions[currentIdx] = true;
-    saveState();
-  }
+  // REMOVED: Auto-lock in exam mode (as requested)
 
   renderQuestion();
   renderMenuNavigation();
@@ -694,9 +699,11 @@ const maybeAutoSubmit = () => {
         if (confirm("You have answered all questions. Submit now?")) {
           finish(true);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Auto-submit error:", e);
+      }
       autoSubmitTimeout = null;
-    }, 5000); // 5 seconds delay
+    }, 5000);
   }
 };
 
@@ -711,13 +718,19 @@ function nav(dir) {
 }
 
 function finish(skipConfirm) {
-  // Applied fix: Prevent double submission from auto-timer
+  console.log("Finish function called, skipConfirm:", skipConfirm); // Debug log
+
+  // Clear auto-submit timeout
   if (autoSubmitTimeout) {
     clearTimeout(autoSubmitTimeout);
     autoSubmitTimeout = null;
   }
 
-  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
+  if (!skipConfirm && !confirm("Are you sure you want to submit?")) {
+    console.log("User cancelled submission");
+    return;
+  }
+
   stopTimer();
 
   let correctCount = 0;
@@ -748,6 +761,8 @@ function finish(skipConfirm) {
     mode: quizMode,
   };
 
+  console.log("Processing result:", rawResult); // Debug log
+
   const gamifiedResult = gameEngine.processResult(rawResult);
 
   const finalOutput = {
@@ -755,9 +770,12 @@ function finish(skipConfirm) {
     gamification: gamifiedResult,
   };
 
+  console.log("Saving result and redirecting..."); // Debug log
   localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
   localStorage.removeItem(`quiz_state_${examId}`);
   gameEngine.clearFlags(examId);
+
+  // Force navigation
   window.location.href = "summary.html";
 }
 
@@ -783,23 +801,14 @@ function checkAnswer() {
 function updateNav() {
   if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
 
-  // Applied fix: Hide "Next" button if on last question
   if (els.nextBtn) {
     els.nextBtn.style.display =
       currentIdx === questions.length - 1 ? "none" : "inline-block";
   }
 
   if (els.finishBtn) {
-    // Applied fix: Use 'flex' for the menu button, ensure it's displayed
     els.finishBtn.style.display = "flex";
-
-    // Update text based on progress
     const totalLocked = Object.keys(lockedQuestions).length;
-    // We access the span inside if possible, otherwise rewrite innerHTML carefully to keep icon
-    // Since innerHTML rewrite might lose the icon if we aren't careful, we can check children
-    const textSpan = els.finishBtn.querySelector("span:not(.icon)");
-    // The simplified HTML uses <span>🏁</span> text.
-    // Let's just update the whole HTML for simplicity to match the original logic but keep the icon
     els.finishBtn.innerHTML =
       totalLocked === questions.length && questions.length > 0
         ? `<span>🏁</span> Finish Exam`
@@ -814,7 +823,6 @@ function saveState() {
 }
 
 function startTimer() {
-  // Applied fix: Don't run timer loop in practice mode
   if (quizMode === "practice") return;
 
   if (timerInterval) clearInterval(timerInterval);

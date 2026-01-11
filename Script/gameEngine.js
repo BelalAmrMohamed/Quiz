@@ -309,9 +309,16 @@ export const gameEngine = {
   },
 
   // 5. Process Quiz Result
+  // Inside gameEngine.js
+
   processResult(result) {
     const user = this.getUserData();
     const { score, total, timeElapsed, examId, mode } = result;
+
+    // --- FIX: Define these variables AT THE START so they are available for badge logic ---
+    const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+    const bookmarkCount = Object.keys(user.bookmarks || {}).length;
+    // -----------------------------------------------------------------------------------
 
     const oldLevel = this.calculateLevel(user.totalPoints).level;
 
@@ -325,7 +332,7 @@ export const gameEngine = {
 
     // --- Calculate Points ---
     let pointsEarned = 0;
-    const basePoints = score * 10; // 10 pts per correct answer
+    const basePoints = score * 10;
     pointsEarned += basePoints;
 
     // Multipliers
@@ -372,54 +379,32 @@ export const gameEngine = {
     // --- Badge Logic ---
     const newBadges = [...newBadgesFromStreak];
 
-    // Beginner
-    if (user.history.length + 1 >= 3 && !user.badges.includes("beginner")) {
+    // Badge Checks (Now safe because variables are defined)
+    if (user.history.length + 1 >= 3 && !user.badges.includes("beginner"))
       newBadges.push("beginner");
-    }
-
-    // Dedicated
-    if (user.history.length + 1 >= 10 && !user.badges.includes("dedicated")) {
+    if (user.history.length + 1 >= 10 && !user.badges.includes("dedicated"))
       newBadges.push("dedicated");
-    }
-
-    // Professor
-    if (user.history.length + 1 >= 100 && !user.badges.includes("professor")) {
+    if (user.history.length + 1 >= 100 && !user.badges.includes("professor"))
       newBadges.push("professor");
-    }
-
-    // Point Collector
     if (
       user.totalPoints + finalPoints >= 1000 &&
       !user.badges.includes("point-collector")
-    ) {
+    )
       newBadges.push("point-collector");
-    }
-
-    // Point Hoarder
     if (
       user.totalPoints + finalPoints >= 5000 &&
       !user.badges.includes("point-hoarder")
-    ) {
+    )
       newBadges.push("point-hoarder");
-    }
-
-    // Point Master
     if (
       user.totalPoints + finalPoints >= 10000 &&
       !user.badges.includes("point-master")
-    ) {
+    )
       newBadges.push("point-master");
-    }
-
-    // Consistent (14-day streak)
-    if (
-      user.streaks.currentDaily >= 14 &&
-      !user.badges.includes("consistent")
-    ) {
+    if (user.streaks.currentDaily >= 14 && !user.badges.includes("consistent"))
       newBadges.push("consistent");
-    }
 
-    // Ace Student (95%+ on 10 quizzes)
+    // Ace Student
     const aceScoreCount = user.history.filter(
       (h) => h.score / h.total >= 0.95
     ).length;
@@ -430,7 +415,7 @@ export const gameEngine = {
       newBadges.push("ace");
     }
 
-    // Unstoppable (5 perfect in a row)
+    // Unstoppable
     if (
       user.streaks.consecutivePerfect >= 5 &&
       !user.badges.includes("unstoppable")
@@ -438,7 +423,7 @@ export const gameEngine = {
       newBadges.push("unstoppable");
     }
 
-    // Perfectionist Plus (10 perfect scores total)
+    // Perfectionist Plus (Now safe: percentage is defined)
     const perfectCount = user.history.filter(
       (h) => h.percentage === 100
     ).length;
@@ -460,85 +445,44 @@ export const gameEngine = {
       newBadges.push("practice-master");
     }
 
-    // Organizer (10 bookmarks)
+    // Organizer (Now safe: bookmarkCount is defined)
     if (bookmarkCount >= 10 && !user.badges.includes("organizer")) {
       newBadges.push("organizer");
     }
 
     // Time-based badges
     const currentHour = new Date().getHours();
-    if (currentHour < 8 && !user.badges.includes("early-bird")) {
+    if (currentHour < 8 && !user.badges.includes("early-bird"))
       newBadges.push("early-bird");
-    }
-    if (currentHour >= 22 && !user.badges.includes("night-owl")) {
+    if (currentHour >= 22 && !user.badges.includes("night-owl"))
       newBadges.push("night-owl");
-    }
-    // Novice
-    if (!user.badges.includes("novice")) {
-      newBadges.push("novice");
-    }
 
-    // Perfect Score
-    if (
-      score === total &&
-      total > 0 &&
-      !user.badges.includes("perfect-score")
-    ) {
+    // Remaining standard badges
+    if (!user.badges.includes("novice")) newBadges.push("novice");
+    if (score === total && total > 0 && !user.badges.includes("perfect-score"))
       newBadges.push("perfect-score");
-    }
-
-    // On Fire (3 perfect scores in a row)
     if (
       user.streaks.consecutivePerfect >= 3 &&
       !user.badges.includes("on-fire")
-    ) {
+    )
       newBadges.push("on-fire");
-    }
-
-    // Speed Demon
-    if (
-      timeElapsed < 120 &&
-      score > 0 &&
-      !user.badges.includes("speed-demon")
-    ) {
+    if (timeElapsed < 120 && score > 0 && !user.badges.includes("speed-demon"))
       newBadges.push("speed-demon");
-    }
-
-    // Quick Learner
-    if (
-      user.history.length + 1 >= 5 &&
-      !user.badges.includes("quick-learner")
-    ) {
+    if (user.history.length + 1 >= 5 && !user.badges.includes("quick-learner"))
       newBadges.push("quick-learner");
-    }
-
-    // Scholar
-    if (user.history.length + 1 >= 25 && !user.badges.includes("scholar")) {
+    if (user.history.length + 1 >= 25 && !user.badges.includes("scholar"))
       newBadges.push("scholar");
-    }
-
-    // Academic
-    if (user.history.length + 1 >= 50 && !user.badges.includes("academic")) {
+    if (user.history.length + 1 >= 50 && !user.badges.includes("academic"))
       newBadges.push("academic");
-    }
-
-    // Week Warrior
-    if (
-      user.streaks.currentDaily >= 7 &&
-      !user.badges.includes("week-warrior")
-    ) {
+    if (user.streaks.currentDaily >= 7 && !user.badges.includes("week-warrior"))
       newBadges.push("week-warrior");
-    }
-
-    // Month Master
     if (
       user.streaks.currentDaily >= 30 &&
       !user.badges.includes("month-master")
-    ) {
+    )
       newBadges.push("month-master");
-    }
 
-    // Sharpshooter (90%+ on 5 quizzes)
+    // Sharpshooter
     const highScoreCount = user.history.filter(
       (h) => h.score / h.total >= 0.9
     ).length;
@@ -550,26 +494,22 @@ export const gameEngine = {
     }
 
     // Bookworm & Completionist
-    const bookmarkCount = Object.keys(user.bookmarks || {}).length;
-    if (bookmarkCount >= 25 && !user.badges.includes("bookworm")) {
+    if (bookmarkCount >= 25 && !user.badges.includes("bookworm"))
       newBadges.push("bookworm");
-    }
-    if (bookmarkCount >= 50 && !user.badges.includes("completionist")) {
+    if (bookmarkCount >= 50 && !user.badges.includes("completionist"))
       newBadges.push("completionist");
-    }
 
     // --- Update User Profile ---
     user.totalPoints += finalPoints;
     user.badges = [...user.badges, ...newBadges];
 
     // Add to history
-    const percentage = Math.round((score / total) * 100);
     const historyEntry = {
       examId,
       date: new Date().toISOString(),
       score,
       total,
-      percentage,
+      percentage, // Already calculated at top
       pointsEarned: finalPoints,
       timeElapsed,
       mode: mode || "exam",
