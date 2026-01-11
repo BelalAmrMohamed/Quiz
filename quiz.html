@@ -13,42 +13,63 @@
 </head>
 
 <body>
-    <div class="menu-container">
-        <button class="hamburger" id="menuBtn"
+    <!-- Gamification Stats Bar with Hamburger Menu -->
+    <div class="stats-bar" id="statsBar">
+        <div class="stats-content">
+            <div class="stat-item">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-value" id="statLevel">Lv 1</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">🏆</span>
+                <span class="stat-value" id="statPoints">0 pts</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">🔥</span>
+                <span class="stat-value" id="statStreak">0 day</span>
+            </div>
+        </div>
+
+        <button class="hamburger-stats" id="menuBtn"
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
-        <div class="side-menu" id="sideMenu">
-            <div class="menu-header">
-                <h3>Quick Access</h3>
-                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                </button>
+    </div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h3>Quick Access</h3>
+            <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <nav>
+            <button id="viewToggle" class="menu-item view-toggle-btn">
+                <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
+            </button>
+
+            <button id="themeToggle" class="menu-item theme-btn">
+                <span class="theme-icon-display">☀️</span> Change Appearance
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <div id="menuNavContainer">
+                <!-- Navigation will be rendered here (grid or list) -->
             </div>
 
-            <nav>
+            <div class="menu-divider"></div>
 
-                <button id="themeToggle" class="menu-item theme-btn">
-                    <span class="theme-icon-display">☀️</span> Change Appearance
-                </button>
+            <button id="menuBookmarkBtn" class="menu-item action-btn" onclick="window.toggleBookmark()">
+                <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">Bookmark Question</span>
+            </button>
 
-                <div class="menu-divider"></div>
-
-                <div id="menuNavGrid" class="menu-nav-grid">
-                    <!-- Question navigator will be rendered here -->
-                </div>
-
-                <div class="menu-divider"></div>
-
-                <button id="menuBookmarkBtn" class="menu-item action-btn" onclick="window.toggleBookmark()">
-                    <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">Bookmark Question</span>
-                </button>
-
-                <button id="menuFlagBtn" class="menu-item action-btn" onclick="window.toggleFlag()">
-                    <span>🚩</span> <span id="menuFlagText">Flag for Review</span>
-                </button>
-            </nav>
-        </div>
+            <button id="menuFlagBtn" class="menu-item action-btn" onclick="window.toggleFlag()">
+                <span>🚩</span> <span id="menuFlagText">Flag for Review</span>
+            </button>
+        </nav>
     </div>
 
     <div class="container">
@@ -58,7 +79,7 @@
                 <div class="header-title-section">
                     <h1 id="quizTitle">Loading Quiz...</h1>
                     <div class="header-subtitle">
-                        <div class="timer-badge">
+                        <div class="timer-badge" id="timerBadge">
                             <svg class="timer-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

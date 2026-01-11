@@ -11,9 +11,31 @@
 </head>
 
 <body>
+    <div class="menu-container">
+        <button class="hamburger" id="menuBtn"
+            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-header">
+                <h3>Quick Access</h3>
+                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav>
+                <a href="index.html" class="menu-item">🏠 Home Page</a>
+                <div class="menu-divider"></div>
+                <button id="themeToggle" class="menu-item theme-btn">
+                    <span class="theme-icon-display">☀️</span> Change Appearance
+                </button>
+            </nav>
+        </div>
+    </div>
+
     <div class="container">
         <div id="breadcrumb" class="show" onclick="window.location.href='index.html'">
-            <span class="breadcrumb-text">Back to Home</span>
+            <span class="breadcrumb-text">← Back to Home</span>
         </div>
 
         <div class="header">
@@ -21,6 +43,7 @@
             <p>Track your progress and achievements</p>
         </div>
 
+        <!-- Enhanced Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="icon">💎</div>
@@ -30,7 +53,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="icon">📝</div>
+                <div class="icon">📚</div>
                 <div class="info">
                     <span class="label">Quizzes Taken</span>
                     <span class="value" id="totalQuizzes">0</span>
@@ -39,29 +62,78 @@
             <div class="stat-card">
                 <div class="icon">🏆</div>
                 <div class="info">
-                    <span class="label">Badges</span>
+                    <span class="label">Badges Earned</span>
                     <span class="value" id="totalBadges">0</span>
                 </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">⭐</div>
+                <div class="info">
+                    <span class="label">Current Level</span>
+                    <span class="value" id="currentLevel">1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Progress Bar -->
+        <div class="level-progress-card">
+            <div class="level-header">
+                <div class="level-info">
+                    <h3 id="levelTitle">Beginner</h3>
+                    <p id="levelSubtitle">Level 1 - Keep learning!</p>
+                </div>
+                <div class="level-badge" id="levelBadge">
+                    <span class="level-number">1</span>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="levelProgressBar"></div>
+            </div>
+            <div class="progress-stats">
+                <span id="currentXP">0 XP</span>
+                <span id="nextLevelXP">100 XP to next level</span>
             </div>
         </div>
 
         <div class="dashboard-layout">
             <div class="main-content">
-                <h2>Recent History</h2>
+                <h2>📜 Recent History</h2>
                 <div id="historyList" class="history-list">
                 </div>
             </div>
 
             <div class="sidebar">
                 <div class="sidebar-card">
-                    <h3>Your Badges</h3>
+                    <h3>🏅 Your Badges</h3>
                     <div id="badgeContainer" class="badge-display-grid">
                     </div>
                 </div>
 
                 <div class="sidebar-card">
-                    <h3>Leaderboard</h3>
+                    <h3>🎯 Leaderboard</h3>
                     <div id="leaderboard" class="leaderboard-list">
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>📊 Statistics</h3>
+                    <div id="statsContainer" class="stats-container">
+                        <div class="stat-row">
+                            <span>Accuracy Rate</span>
+                            <strong id="accuracyRate">0%</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Perfect Scores</span>
+                            <strong id="perfectScores">0</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Current Streak</span>
+                            <strong id="currentStreak">0 days</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Best Streak</span>
+                            <strong id="bestStreak">0 days</strong>
+                        </div>
                     </div>
                 </div>
             </div>

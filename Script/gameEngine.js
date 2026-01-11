@@ -27,6 +27,7 @@ export const BADGES = [
     title: "First Step",
     desc: "Complete your first quiz",
   },
+  { id: "beginner", icon: "🎯", title: "Beginner", desc: "Complete 3 quizzes" },
 
   // Completion Badges
   {
@@ -35,12 +36,24 @@ export const BADGES = [
     title: "Quick Learner",
     desc: "Complete 5 quizzes",
   },
+  {
+    id: "dedicated",
+    icon: "📖",
+    title: "Dedicated",
+    desc: "Complete 10 quizzes",
+  },
   { id: "scholar", icon: "📚", title: "Scholar", desc: "Complete 25 quizzes" },
   {
     id: "academic",
     icon: "🎓",
     title: "Academic",
     desc: "Complete 50 quizzes",
+  },
+  {
+    id: "professor",
+    icon: "👨‍🏫",
+    title: "Professor",
+    desc: "Complete 100 quizzes",
   },
 
   // Performance Badges
@@ -57,10 +70,22 @@ export const BADGES = [
     desc: "Score 90%+ on 5 quizzes",
   },
   {
+    id: "ace",
+    icon: "⭐",
+    title: "Ace Student",
+    desc: "Score 95%+ on 10 quizzes",
+  },
+  {
     id: "on-fire",
     icon: "🔥",
     title: "On Fire",
     desc: "Get 3 perfect scores in a row",
+  },
+  {
+    id: "unstoppable",
+    icon: "💪",
+    title: "Unstoppable",
+    desc: "Get 5 perfect scores in a row",
   },
 
   // Speed Badges
@@ -76,6 +101,12 @@ export const BADGES = [
     title: "Lightning Round",
     desc: "Answer 10 questions in under 1 minute",
   },
+  {
+    id: "flash",
+    icon: "💨",
+    title: "Flash",
+    desc: "Complete 5 quizzes in under 2 minutes each",
+  },
 
   // Streak Badges
   {
@@ -89,6 +120,32 @@ export const BADGES = [
     icon: "📅",
     title: "Month Master",
     desc: "Maintain a 30-day streak",
+  },
+  {
+    id: "consistent",
+    icon: "💎",
+    title: "Consistent",
+    desc: "Maintain a 14-day streak",
+  },
+
+  // Points Badges
+  {
+    id: "point-collector",
+    icon: "💰",
+    title: "Point Collector",
+    desc: "Earn 1,000 total points",
+  },
+  {
+    id: "point-hoarder",
+    icon: "💎",
+    title: "Point Hoarder",
+    desc: "Earn 5,000 total points",
+  },
+  {
+    id: "point-master",
+    icon: "👑",
+    title: "Point Master",
+    desc: "Earn 10,000 total points",
   },
 
   // Bookmark Badges
@@ -104,13 +161,57 @@ export const BADGES = [
     title: "Completionist",
     desc: "Bookmark 50+ questions",
   },
+  {
+    id: "organizer",
+    icon: "📌",
+    title: "Organizer",
+    desc: "Bookmark 10 questions",
+  },
 
-  // Special Achievement
+  // Category Badges
+  {
+    id: "category-explorer",
+    icon: "🗺️",
+    title: "Explorer",
+    desc: "Try quizzes from 5 different categories",
+  },
+  {
+    id: "jack-of-all-trades",
+    icon: "🎭",
+    title: "Jack of All Trades",
+    desc: "Complete quizzes in 10 categories",
+  },
+
+  // Special Achievements
   {
     id: "comeback-kid",
     icon: "💪",
     title: "Comeback Kid",
     desc: "Return after 30 days away",
+  },
+  {
+    id: "early-bird",
+    icon: "🌅",
+    title: "Early Bird",
+    desc: "Complete a quiz before 8 AM",
+  },
+  {
+    id: "night-owl",
+    icon: "🦉",
+    title: "Night Owl",
+    desc: "Complete a quiz after 10 PM",
+  },
+  {
+    id: "perfectionist-plus",
+    icon: "🌟",
+    title: "Perfectionist+",
+    desc: "Get 10 perfect scores",
+  },
+  {
+    id: "practice-master",
+    icon: "🎯",
+    title: "Practice Master",
+    desc: "Complete 20 practice mode quizzes",
   },
 ];
 
@@ -271,6 +372,107 @@ export const gameEngine = {
     // --- Badge Logic ---
     const newBadges = [...newBadgesFromStreak];
 
+    // Beginner
+    if (user.history.length + 1 >= 3 && !user.badges.includes("beginner")) {
+      newBadges.push("beginner");
+    }
+
+    // Dedicated
+    if (user.history.length + 1 >= 10 && !user.badges.includes("dedicated")) {
+      newBadges.push("dedicated");
+    }
+
+    // Professor
+    if (user.history.length + 1 >= 100 && !user.badges.includes("professor")) {
+      newBadges.push("professor");
+    }
+
+    // Point Collector
+    if (
+      user.totalPoints + finalPoints >= 1000 &&
+      !user.badges.includes("point-collector")
+    ) {
+      newBadges.push("point-collector");
+    }
+
+    // Point Hoarder
+    if (
+      user.totalPoints + finalPoints >= 5000 &&
+      !user.badges.includes("point-hoarder")
+    ) {
+      newBadges.push("point-hoarder");
+    }
+
+    // Point Master
+    if (
+      user.totalPoints + finalPoints >= 10000 &&
+      !user.badges.includes("point-master")
+    ) {
+      newBadges.push("point-master");
+    }
+
+    // Consistent (14-day streak)
+    if (
+      user.streaks.currentDaily >= 14 &&
+      !user.badges.includes("consistent")
+    ) {
+      newBadges.push("consistent");
+    }
+
+    // Ace Student (95%+ on 10 quizzes)
+    const aceScoreCount = user.history.filter(
+      (h) => h.score / h.total >= 0.95
+    ).length;
+    if (
+      aceScoreCount + (score / total >= 0.95 ? 1 : 0) >= 10 &&
+      !user.badges.includes("ace")
+    ) {
+      newBadges.push("ace");
+    }
+
+    // Unstoppable (5 perfect in a row)
+    if (
+      user.streaks.consecutivePerfect >= 5 &&
+      !user.badges.includes("unstoppable")
+    ) {
+      newBadges.push("unstoppable");
+    }
+
+    // Perfectionist Plus (10 perfect scores total)
+    const perfectCount = user.history.filter(
+      (h) => h.percentage === 100
+    ).length;
+    if (
+      perfectCount + (percentage === 100 ? 1 : 0) >= 10 &&
+      !user.badges.includes("perfectionist-plus")
+    ) {
+      newBadges.push("perfectionist-plus");
+    }
+
+    // Practice Master
+    const practiceCount = user.history.filter(
+      (h) => h.mode === "practice"
+    ).length;
+    if (
+      practiceCount + (mode === "practice" ? 1 : 0) >= 20 &&
+      !user.badges.includes("practice-master")
+    ) {
+      newBadges.push("practice-master");
+    }
+
+    // Organizer (10 bookmarks)
+    if (bookmarkCount >= 10 && !user.badges.includes("organizer")) {
+      newBadges.push("organizer");
+    }
+
+    // Time-based badges
+    const currentHour = new Date().getHours();
+    if (currentHour < 8 && !user.badges.includes("early-bird")) {
+      newBadges.push("early-bird");
+    }
+    if (currentHour >= 22 && !user.badges.includes("night-owl")) {
+      newBadges.push("night-owl");
+    }
     // Novice
     if (!user.badges.includes("novice")) {
       newBadges.push("novice");
