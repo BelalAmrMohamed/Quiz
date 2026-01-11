@@ -308,7 +308,11 @@ body::before {
   transition: 0.3s;
   padding: 20px;
   z-index: 3001;
-  overflow-y: auto;
+
+  /* This removes the inner scrollbar from the menu */
+  overflow-y: hidden !important;
+
+  /* overflow-y: auto; */
 }
 
 .menu-item.action-btn.list-view-disabled {
