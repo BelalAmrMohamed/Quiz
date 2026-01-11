@@ -334,7 +334,7 @@ body::before {
 }
 
 .menu-item {
-  display: block;
+  /* display: block; */
   width: 100%;
   padding: 12px;
   text-decoration: none;
@@ -346,10 +346,20 @@ body::before {
   border: none;
   font-size: 1rem;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  /* background: var(--color-primary-light); */
+  /* color: var(--color-primary); */
 }
 
 .menu-item:hover {
-  background: var(--color-primary-light);
+  /* background: var(--color-primary-light); */
+
+  background: var(--color-primary);
+  color: white;
 }
 
 .close-menu {
@@ -378,14 +388,14 @@ body::before {
 }
 
 /* View Toggle Button */
-.view-toggle-btn {
+/* .view-toggle-btn {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 600;
   background: var(--color-primary-light);
   color: var(--color-primary);
-}
+} */
 
 .view-toggle-btn:hover {
   background: var(--color-primary);

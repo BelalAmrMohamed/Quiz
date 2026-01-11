@@ -88,7 +88,7 @@ function toggleView() {
       els.viewIcon.textContent = "📋";
       els.viewText.textContent = "Switch to List View";
     } else {
-      els.viewIcon.textContent = "▦";
+      els.viewIcon.textContent = "🪟";
       els.viewText.textContent = "Switch to Grid View";
     }
   }
@@ -116,7 +116,7 @@ async function init() {
       els.viewIcon.textContent = "📋";
       els.viewText.textContent = "Switch to List View";
     } else {
-      els.viewIcon.textContent = "▦";
+      els.viewIcon.textContent = "🪟";
       els.viewText.textContent = "Switch to Grid View";
     }
   }
@@ -811,8 +811,8 @@ function updateNav() {
     const totalLocked = Object.keys(lockedQuestions).length;
     els.finishBtn.innerHTML =
       totalLocked === questions.length && questions.length > 0
-        ? `<span>🏁</span> Finish Exam`
-        : `<span>🏁</span> Complete Quiz`;
+        ? `<span>✅</span> Finish Exam`
+        : `<span>✅</span> Complete Quiz`;
   }
 }
 
