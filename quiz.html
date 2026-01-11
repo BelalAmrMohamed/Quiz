@@ -13,7 +13,6 @@
 </head>
 
 <body>
-    <!-- Gamification Stats Bar with Hamburger Menu -->
     <div class="stats-bar" id="statsBar">
         <div class="stats-content">
             <div class="stat-item">
@@ -34,7 +33,6 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
     </div>
 
-    <!-- Side Menu -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <h3>Quick Access</h3>
@@ -46,6 +44,11 @@
         </div>
 
         <nav>
+            <button id="finishBtn" class="menu-item action-btn" style="background: var(--color-primary); color: white;"
+                onclick="finishEarly()">
+                <span>🏁</span> Complete Quiz
+            </button>
+
             <button id="viewToggle" class="menu-item view-toggle-btn">
                 <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
             </button>
@@ -57,7 +60,6 @@
             <div class="menu-divider"></div>
 
             <div id="menuNavContainer">
-                <!-- Navigation will be rendered here (grid or list) -->
             </div>
 
             <div class="menu-divider"></div>
@@ -73,7 +75,6 @@
     </div>
 
     <div class="container">
-        <!-- Premium Header -->
         <div class="header">
             <div class="header-top">
                 <div class="header-title-section">
@@ -88,9 +89,6 @@
                         </div>
                     </div>
                 </div>
-                <button id="finishBtn" class="finish-btn" onclick="finishEarly()">
-                    Complete Quiz
-                </button>
             </div>
 
             <div class="progress-section">
@@ -104,12 +102,10 @@
             </div>
         </div>
 
-        <!-- Question Container -->
         <div id="questionContainer" class="loading">
             <p>Preparing your quiz experience</p>
         </div>
 
-        <!-- Navigation -->
         <div class="navigation">
             <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>
                 ← Previous
