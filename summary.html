@@ -9,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/summary.css">
+
+    <!-- html2pdf.js library for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script type="module" src="Script/theme.js"></script>
 </head>
 
@@ -33,7 +37,13 @@
                 <div class="menu-divider"></div>
                 <div class="menu-section-title">Extract Exam</div>
                 <button id="exportMdBtn" class="menu-item">📝 Markdown (.md)</button>
+                <!--
+                <button id="exportPdfBtn" class="menu-item" disabled>📄 PDF (.pdf) - coming soon</button>
+                <button id="exportHtmlBtn" class="menu-item" disabled>🌐 HTML (.html)</button>
+                -->
                 <a href="#" class="menu-item disabled" style="opacity: 0.5; pointer-events: none;">📄 PDF (.pdf) -
+                    Coming Soon</a>
+                <a href="#" class="menu-item disabled" style="opacity: 0.5; pointer-events: none;">🌐 HTML (.html) -
                     Coming Soon</a>
 
                 <div class="menu-divider"></div>
@@ -79,6 +89,7 @@
         <!-- Premium Footer -->
         <div class="watermark">Crafted by Belal Amr</div>
     </div>
+
     <script type="module" src="Script/theme.js"></script>
     <script type="module" src="Script/summary.js"></script>
 </body>
