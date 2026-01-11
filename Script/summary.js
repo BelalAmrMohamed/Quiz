@@ -15,8 +15,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statsDisplay = document.getElementById("statsDisplay");
   const container = document.getElementById("reviewContainer");
   const backBtn = document.getElementById("backHomeBtn");
+  const exportMdBtn = document.getElementById("exportMdBtn");
 
   backBtn && (backBtn.onclick = goHome);
+  exportMdBtn &&
+    (exportMdBtn.onclick = () => exportToMarkdown(config, questions));
 
   // 1. Re-load the exam data using the ID from results
   const config = examList.find((e) => e.id === result.examId);
@@ -136,28 +139,6 @@ function renderHeader(
             }
             <p>Time: ${timeStr}</p>
             ${badgeHTML}
-        </div>
-    `;
-
-  // ... keep existing code for scoreDisplay and statsDisplay ...
-
-  if (scoreHeader)
-    scoreHeader.innerHTML = `
-        <div class="score-circle ${percentage >= 70 ? "pass" : "fail"}">
-            <span>${percentage}%</span>
-        </div>
-        <div class="stats-text">
-            <h2>${percentage >= 70 ? "Great Job!" : "Keep Practicing"}</h2>
-            <p>Score: ${data.score} / ${total}</p>
-            <p>Correct: ${correct} • Wrong: ${wrong} • Skipped: ${skipped}</p>
-            ${
-              essayCount > 0
-                ? `<p class="essay-note">📝 ${essayCount} Essay Question${
-                    essayCount > 1 ? "s" : ""
-                  } (Not Counted in Score)</p>`
-                : ""
-            }
-            <p>Time: ${timeStr}</p>
         </div>
     `;
 
@@ -288,4 +269,82 @@ function renderReview(container, questions, userAnswers) {
   });
 
   container.innerHTML = html;
+}
+
+// Export to Markdown function
+function exportToMarkdown(config, questions) {
+  // Determine question types
+  let hasMCQ = false;
+  let hasTrueFalse = false;
+  let hasEssay = false;
+
+  questions.forEach((q) => {
+    if (isEssayQuestion(q)) {
+      hasEssay = true;
+    } else if (q.options.length === 2) {
+      hasTrueFalse = true;
+    } else {
+      hasMCQ = true;
+    }
+  });
+
+  // Build question type string
+  let questionType = "";
+  if (hasEssay && !hasMCQ && !hasTrueFalse) {
+    questionType = "Essay/Definitions";
+  } else if (hasEssay) {
+    questionType = "Mixed (MCQ, True/False, Essay)";
+  } else if (hasMCQ && hasTrueFalse) {
+    questionType = "MCQ and True/False";
+  } else if (hasTrueFalse) {
+    questionType = "True/False only";
+  } else {
+    questionType = "MCQ only";
+  }
+
+  // Build markdown content
+  let markdown = `# ${config.title || "Quiz"}\n`;
+  markdown += `**Number of questions:** ${questions.length}\n`;
+  markdown += `**Questions' type:** ${questionType}\n\n`;
+  markdown += `---\n\n`;
+
+  questions.forEach((q, index) => {
+    markdown += `### ${index + 1}. ${q.q}\n\n`;
+
+    if (isEssayQuestion(q)) {
+      // Essay question - show the answer directly
+      markdown += `**Answer:**\n${q.options[0]}\n\n`;
+    } else {
+      // MCQ or True/False - show options
+      q.options.forEach((opt, i) => {
+        const letter = String.fromCharCode(65 + i); // A, B, C, D...
+        markdown += `- ${letter}. ${opt}\n`;
+      });
+      markdown += `\n`;
+
+      // Show correct answer
+      const correctLetter = String.fromCharCode(65 + q.correct);
+      markdown += `#### **Correct answer:** ${correctLetter}. ${
+        q.options[q.correct]
+      }\n\n`;
+    }
+
+    // Add explanation if exists
+    if (q.explanation) {
+      markdown += `> **Explanation:** ${q.explanation}\n\n`;
+    }
+
+    markdown += `---\n\n`;
+  });
+
+  // Create and download file
+  const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${config.title || "quiz"}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
