@@ -315,6 +315,12 @@ body::before {
   /* overflow-y: auto; */
 }
 
+.side-menu nav {
+  flex: 1;
+  overflow-y: auto; /* Small scrollbar appears only here if needed */
+  padding: 20px;
+}
+
 .menu-item.action-btn.list-view-disabled {
   opacity: 0.5;
   cursor: not-allowed;

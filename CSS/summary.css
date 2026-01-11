@@ -223,6 +223,95 @@ body::before {
     particleFloat3 18s ease-in-out infinite;
 }
 
+/* Hamburger Menu */
+.menu-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3000;
+}
+
+.hamburger {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 1.5rem;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transition: 0.3s;
+  padding: 20px;
+  z-index: 3001;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  border-radius: 8px;
+  margin-bottom: 5px;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--color-primary-light);
+}
+
+.close-menu {
+  background: var(--color-background-secondary);
+  border: none;
+  color: var(--color-text-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-menu:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 15px 0;
+}
+
+/* End of the styles of the menu */
+
 @keyframes particleFloat1 {
   0%,
   100% {

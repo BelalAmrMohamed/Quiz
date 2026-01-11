@@ -13,6 +13,30 @@
 </head>
 
 <body>
+    <div class="menu-container">
+        <button class="hamburger" id="menuBtn"
+            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-header">
+                <h3>Quick Access</h3>
+                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav>
+                <a href="index.html" class="menu-item">🏠 Home Page</a>
+                <a href="dashboard.html" class="menu-item">📊 Performance Dashboard</a>
+                <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
+                <div class="menu-divider"></div>
+                <button id="themeToggle" class="menu-item theme-btn">
+                    <span class="theme-icon-display">☀️</span> Change Appearance
+                </button>
+            </nav>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Premium Header -->
         <div class="header">
