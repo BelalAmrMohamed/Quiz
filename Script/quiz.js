@@ -85,6 +85,7 @@ function toggleView() {
   }
 
   renderMenuNavigation();
+  updateMenuActionButtons(); // Applied fix: Ensure buttons update immediately
 }
 
 // --- Initialization ---
@@ -710,6 +711,12 @@ function nav(dir) {
 }
 
 function finish(skipConfirm) {
+  // Applied fix: Prevent double submission from auto-timer
+  if (autoSubmitTimeout) {
+    clearTimeout(autoSubmitTimeout);
+    autoSubmitTimeout = null;
+  }
+
   if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
   stopTimer();
 
@@ -775,14 +782,28 @@ function checkAnswer() {
 // --- Utilities ---
 function updateNav() {
   if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
-  if (els.nextBtn) els.nextBtn.style.display = "inline-block";
+
+  // Applied fix: Hide "Next" button if on last question
+  if (els.nextBtn) {
+    els.nextBtn.style.display =
+      currentIdx === questions.length - 1 ? "none" : "inline-block";
+  }
+
   if (els.finishBtn) {
-    els.finishBtn.style.display = "inline-block";
+    // Applied fix: Use 'flex' for the menu button, ensure it's displayed
+    els.finishBtn.style.display = "flex";
+
+    // Update text based on progress
     const totalLocked = Object.keys(lockedQuestions).length;
-    els.finishBtn.textContent =
+    // We access the span inside if possible, otherwise rewrite innerHTML carefully to keep icon
+    // Since innerHTML rewrite might lose the icon if we aren't careful, we can check children
+    const textSpan = els.finishBtn.querySelector("span:not(.icon)");
+    // The simplified HTML uses <span>🏁</span> text.
+    // Let's just update the whole HTML for simplicity to match the original logic but keep the icon
+    els.finishBtn.innerHTML =
       totalLocked === questions.length && questions.length > 0
-        ? "Finish Exam"
-        : "Complete Quiz";
+        ? `<span>🏁</span> Finish Exam`
+        : `<span>🏁</span> Complete Quiz`;
   }
 }
 
@@ -793,6 +814,9 @@ function saveState() {
 }
 
 function startTimer() {
+  // Applied fix: Don't run timer loop in practice mode
+  if (quizMode === "practice") return;
+
   if (timerInterval) clearInterval(timerInterval);
 
   timerInterval = setInterval(() => {
@@ -822,7 +846,6 @@ function startTimer() {
       if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
       saveState();
     }
-    // No timer in practice mode
   }, 1000);
 }
 
