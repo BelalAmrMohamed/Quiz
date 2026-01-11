@@ -188,7 +188,7 @@ function showModeSelection(examId, examTitle) {
         <button class="mode-btn" onclick="startQuiz('${examId}', 'exam')">
           <span class="icon">📝</span>
           <strong>Exam</strong>
-          <small>Standard conditions</small>
+          <small>No checking answers!</small>
         </button>
       </div>
       <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
