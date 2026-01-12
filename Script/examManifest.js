@@ -27,6 +27,12 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
+    "id": "Ch 8 Quiz",
+    "title": "Ch 8 Quiz",
+    "path": "../Exams/Foundation of IS/Ch 8 Quiz.js",
+    "category": "Foundation of IS"
+  },
+  {
     "id": "Ch1 Quiz",
     "title": "Ch1 Quiz",
     "path": "../Exams/Foundation of IS/Ch1 Quiz.js",
@@ -48,6 +54,12 @@ export const examList = [
     "id": "General AI quiz",
     "title": "General AI Quiz",
     "path": "../Exams/Foundation of IS/General AI quiz.js",
+    "category": "Foundation of IS"
+  },
+  {
+    "id": "General Exam",
+    "title": "General Exam",
+    "path": "../Exams/Foundation of IS/General Exam.js",
     "category": "Foundation of IS"
   },
   {
@@ -183,12 +195,6 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
-    "id": "General Exam",
-    "title": "General Exam",
-    "path": "../Exams/Operatings Systems/General Exam.js",
-    "category": "Operatings Systems"
-  },
-  {
     "id": "General Exam 2",
     "title": "General Exam 2",
     "path": "../Exams/Operatings Systems/General Exam 2.js",
@@ -210,6 +216,12 @@ export const examList = [
     "id": "Operatings Systems-Ch1 Quiz",
     "title": "Ch1 Quiz",
     "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Operatings Systems-General Exam",
+    "title": "General Exam",
+    "path": "../Exams/Operatings Systems/General Exam.js",
     "category": "Operatings Systems"
   },
   {
@@ -382,6 +394,12 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
+        "id": "Ch 8 Quiz",
+        "title": "Ch 8 Quiz",
+        "path": "../Exams/Foundation of IS/Ch 8 Quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
         "id": "Ch1 Quiz",
         "title": "Ch1 Quiz",
         "path": "../Exams/Foundation of IS/Ch1 Quiz.js",
@@ -403,6 +421,12 @@ export const categoryTree = {
         "id": "General AI quiz",
         "title": "General AI Quiz",
         "path": "../Exams/Foundation of IS/General AI quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
+        "id": "General Exam",
+        "title": "General Exam",
+        "path": "../Exams/Foundation of IS/General Exam.js",
         "category": "Foundation of IS"
       },
       {
@@ -502,7 +526,7 @@ export const categoryTree = {
         "category": "Operatings Systems"
       },
       {
-        "id": "General Exam",
+        "id": "Operatings Systems-General Exam",
         "title": "General Exam",
         "path": "../Exams/Operatings Systems/General Exam.js",
         "category": "Operatings Systems"
