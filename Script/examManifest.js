@@ -39,6 +39,12 @@ export const examList = [
     "category": "Foundation of IS"
   },
   {
+    "id": "Ch6 Quiz",
+    "title": "Ch6 Quiz",
+    "path": "../Exams/Foundation of IS/Ch6 Quiz.js",
+    "category": "Foundation of IS"
+  },
+  {
     "id": "General AI quiz",
     "title": "General AI Quiz",
     "path": "../Exams/Foundation of IS/General AI quiz.js",
@@ -385,6 +391,12 @@ export const categoryTree = {
         "id": "Ch1, 2, and 3 Quiz",
         "title": "Ch1, 2, And 3 Quiz",
         "path": "../Exams/Foundation of IS/Ch1, 2, and 3 Quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
+        "id": "Ch6 Quiz",
+        "title": "Ch6 Quiz",
+        "path": "../Exams/Foundation of IS/Ch6 Quiz.js",
         "category": "Foundation of IS"
       },
       {
