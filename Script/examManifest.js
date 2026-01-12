@@ -27,6 +27,18 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
+    "id": "Ch1 Quiz",
+    "title": "Ch1 Quiz",
+    "path": "../Exams/Foundation of IS/Ch1 Quiz.js",
+    "category": "Foundation of IS"
+  },
+  {
+    "id": "Ch1, 2, and 3 Quiz",
+    "title": "Ch1, 2, And 3 Quiz",
+    "path": "../Exams/Foundation of IS/Ch1, 2, and 3 Quiz.js",
+    "category": "Foundation of IS"
+  },
+  {
     "id": "General AI quiz",
     "title": "General AI Quiz",
     "path": "../Exams/Foundation of IS/General AI quiz.js",
@@ -147,12 +159,6 @@ export const examList = [
     "category": "Operatings Systems"
   },
   {
-    "id": "Ch1 Quiz",
-    "title": "Ch1 Quiz",
-    "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
-    "category": "Operatings Systems"
-  },
-  {
     "id": "Ch2 Quiz",
     "title": "Ch2 Quiz",
     "path": "../Exams/Operatings Systems/Ch2 Quiz.js",
@@ -192,6 +198,12 @@ export const examList = [
     "id": "Introduction and Structure",
     "title": "Introduction And Structure",
     "path": "../Exams/Operatings Systems/Introduction and Structure.js",
+    "category": "Operatings Systems"
+  },
+  {
+    "id": "Operatings Systems-Ch1 Quiz",
+    "title": "Ch1 Quiz",
+    "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
     "category": "Operatings Systems"
   },
   {
@@ -364,6 +376,18 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
+        "id": "Ch1 Quiz",
+        "title": "Ch1 Quiz",
+        "path": "../Exams/Foundation of IS/Ch1 Quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
+        "id": "Ch1, 2, and 3 Quiz",
+        "title": "Ch1, 2, And 3 Quiz",
+        "path": "../Exams/Foundation of IS/Ch1, 2, and 3 Quiz.js",
+        "category": "Foundation of IS"
+      },
+      {
         "id": "General AI quiz",
         "title": "General AI Quiz",
         "path": "../Exams/Foundation of IS/General AI quiz.js",
@@ -430,7 +454,7 @@ export const categoryTree = {
         "category": "Operatings Systems"
       },
       {
-        "id": "Ch1 Quiz",
+        "id": "Operatings Systems-Ch1 Quiz",
         "title": "Ch1 Quiz",
         "path": "../Exams/Operatings Systems/Ch1 Quiz.js",
         "category": "Operatings Systems"
