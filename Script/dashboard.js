@@ -37,6 +37,32 @@ window.removeBookmark = function (key) {
   refreshUI();
 };
 
+// Change username
+window.changeUsername = function () {
+  const user = gameEngine.getUserData();
+  const currentName = user.displayName || "User";
+  const newName = prompt("Enter your new display name:", currentName);
+
+  if (newName && newName.trim() !== "") {
+    user.displayName = newName.trim();
+    gameEngine.saveUserData(user);
+    refreshUI();
+  }
+};
+
+// Change username
+window.changeUsername = function () {
+  const user = gameEngine.getUserData();
+  const currentName = user.displayName || "User";
+  const newName = prompt("Enter your new display name:", currentName);
+
+  if (newName && newName.trim() !== "") {
+    user.displayName = newName.trim();
+    gameEngine.saveUserData(user);
+    refreshUI();
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   refreshUI();
 });
@@ -194,31 +220,25 @@ function renderLeaderboard(user) {
   if (!leaderboardEl) return;
 
   const mockUsers = [
-    { name: "QuizMaster Pro", points: 12500 },
-    { name: "Sarah Johnson", points: 10200 },
-    { name: "Alex Chen", points: 9800 },
-    { name: "Emma Williams", points: 8500 },
-    { name: "Michael Brown", points: 7800 },
-    { name: "Jessica Davis", points: 7200 },
+    { name: "QuizMaster Pro", points: 3000 },
+    { name: "Sarah Johnson", points: 2000 },
+    { name: "Alex Chen", points: 1500 },
+    { name: "Emma Williams", points: 1000 },
+    { name: "Michael Brown", points: 500 },
+    { name: "Jessica Davis", points: 100 },
   ];
 
+  const displayName = user.displayName || "User";
   const currentUser = {
-    name: "You (User)",
+    name: `${displayName} (You)`,
     points: user.totalPoints,
     isUser: true,
   };
+
   const all = [...mockUsers, currentUser].sort((a, b) => b.points - a.points);
-
   const rankedList = all.map((u, i) => ({ ...u, rank: i + 1 }));
-  const userRankIdx = rankedList.findIndex((u) => u.isUser);
 
-  // FIX: Show Top 5 PLUS the user if they are further down the list
-  let displayList = rankedList.slice(0, 5);
-  if (userRankIdx >= 5) {
-    displayList.push(rankedList[userRankIdx]);
-  }
-
-  leaderboardEl.innerHTML = displayList
+  leaderboardEl.innerHTML = rankedList
     .map(
       (entry) => `
     <div class="lb-row ${entry.isUser ? "highlight" : ""}">

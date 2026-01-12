@@ -16,10 +16,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("reviewContainer");
   const backBtn = document.getElementById("backHomeBtn");
   const exportMdBtn = document.getElementById("exportMdBtn");
+  const exportPdfBtn = document.getElementById("exportPdfBtn");
+  const exportHtmlBtn = document.getElementById("exportHtmlBtn");
 
   backBtn && (backBtn.onclick = goHome);
   exportMdBtn &&
     (exportMdBtn.onclick = () => exportToMarkdown(config, questions));
+  exportPdfBtn && (exportPdfBtn.onclick = () => exportToPdf(config, questions));
+  exportHtmlBtn &&
+    (exportHtmlBtn.onclick = () => exportToHtml(config, questions));
 
   // 1. Re-load the exam data using the ID from results
   const config = examList.find((e) => e.id === result.examId);
@@ -39,11 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (isEssayQuestion(q)) {
       essayCount++;
-      // Don't count essays in correct/wrong/skipped
       continue;
     }
 
-    // Only process MCQ/True-False
     if (ua === undefined || ua === null) {
       skipped++;
     } else if (ua === q.correct) {
@@ -90,11 +93,9 @@ function renderHeader(
     data.timeElapsed % 60
   }s`;
 
-  // Extract Gamification Data
   const points = data.gamification ? data.gamification.pointsEarned : 0;
   const newBadges = data.gamification ? data.gamification.newBadges : [];
 
-  // Generate Badge HTML if any
   let badgeHTML = "";
   if (newBadges.length > 0) {
     badgeHTML = `
@@ -151,7 +152,6 @@ function renderHeader(
   }
 }
 
-// Escape HTML so any tags in question text/options render as text
 function escapeHTML(input) {
   if (input === undefined || input === null) return "";
   return String(input)
@@ -171,12 +171,10 @@ function renderReview(container, questions, userAnswers) {
     const userAns = userAnswers[index];
 
     if (isEssay) {
-      // Render Essay Question Review
       const userText = userAns ? escapeHTML(userAns) : "Not answered";
       const formalAnswer = escapeHTML(q.options[0]);
       const explanationText = q.explanation ? escapeHTML(q.explanation) : "";
 
-      // Check if answers match (case-insensitive, trimmed)
       const userAnswerLower = String(userAns || "")
         .trim()
         .toLowerCase();
@@ -206,16 +204,8 @@ function renderReview(container, questions, userAnswers) {
           
           ${
             matches
-              ? `
-            <div class="essay-match-notice">
-              ✅ Your answer matches the formal answer!
-            </div>
-          `
-              : `
-            <div class="essay-mismatch-notice">
-              ⚠️ Your answer differs from the formal answer. However, it might still be correct in a different way.
-            </div>
-          `
+              ? `<div class="essay-match-notice">✅ Your answer matches the formal answer!</div>`
+              : `<div class="essay-mismatch-notice">⚠️ Your answer differs from the formal answer. However, it might still be correct in a different way.</div>`
           }
           
           ${
@@ -226,7 +216,6 @@ function renderReview(container, questions, userAnswers) {
         </div>
       `;
     } else {
-      // Render MCQ/True-False Review (existing logic)
       const isSkipped = userAns === undefined || userAns === null;
       const isCorrect = !isSkipped && userAns === q.correct;
       const statusClass = isCorrect
@@ -273,6 +262,90 @@ function renderReview(container, questions, userAnswers) {
 
 // Export to Markdown function
 function exportToMarkdown(config, questions) {
+  let hasMCQ = false;
+  let hasTrueFalse = false;
+  let hasEssay = false;
+
+  questions.forEach((q) => {
+    if (isEssayQuestion(q)) {
+      hasEssay = true;
+    } else if (q.options.length === 2) {
+      hasTrueFalse = true;
+    } else {
+      hasMCQ = true;
+    }
+  });
+
+  let questionType = "";
+  if (hasEssay && !hasMCQ && !hasTrueFalse) {
+    questionType = "Essay/Definitions";
+  } else if (hasEssay) {
+    questionType = "Mixed (MCQ, True/False, Essay)";
+  } else if (hasMCQ && hasTrueFalse) {
+    questionType = "MCQ and True/False";
+  } else if (hasTrueFalse) {
+    questionType = "True/False only";
+  } else {
+    questionType = "MCQ only";
+  }
+
+  let markdown = `# ${config.title || "Quiz"}\n`;
+  markdown += `**Number of questions:** ${questions.length}\n`;
+  markdown += `**Questions' type:** ${questionType}\n\n`;
+  markdown += `---\n\n`;
+
+  questions.forEach((q, index) => {
+    markdown += `### ${index + 1}. ${q.q}\n\n`;
+
+    if (isEssayQuestion(q)) {
+      markdown += `**Answer:**\n${q.options[0]}\n\n`;
+    } else {
+      q.options.forEach((opt, i) => {
+        const letter = String.fromCharCode(65 + i);
+        markdown += `- ${letter}. ${opt}\n`;
+      });
+      markdown += `\n`;
+
+      const correctLetter = String.fromCharCode(65 + q.correct);
+      markdown += `#### **Correct answer:** ${correctLetter}. ${
+        q.options[q.correct]
+      }\n\n`;
+    }
+
+    if (q.explanation) {
+      markdown += `> **Explanation:** ${q.explanation}\n\n`;
+    }
+
+    markdown += `---\n\n`;
+  });
+
+  const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${config.title || "quiz"}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Export to PDF function
+function exportToPdf(config, questions) {
+  // Check if html2pdf is loaded
+  if (typeof html2pdf === "undefined") {
+    alert("PDF library is not loaded. Please refresh the page and try again.");
+    return;
+  }
+
+  // Show loading message
+  const originalText = document.getElementById("exportPdfBtn")?.textContent;
+  if (document.getElementById("exportPdfBtn")) {
+    document.getElementById("exportPdfBtn").textContent =
+      "⏳ Generating PDF...";
+    document.getElementById("exportPdfBtn").disabled = true;
+  }
+
   // Determine question types
   let hasMCQ = false;
   let hasTrueFalse = false;
@@ -288,7 +361,6 @@ function exportToMarkdown(config, questions) {
     }
   });
 
-  // Build question type string
   let questionType = "";
   if (hasEssay && !hasMCQ && !hasTrueFalse) {
     questionType = "Essay/Definitions";
@@ -302,49 +374,124 @@ function exportToMarkdown(config, questions) {
     questionType = "MCQ only";
   }
 
-  // Build markdown content
-  let markdown = `# ${config.title || "Quiz"}\n`;
-  markdown += `**Number of questions:** ${questions.length}\n`;
-  markdown += `**Questions' type:** ${questionType}\n\n`;
-  markdown += `---\n\n`;
+  // Create visible but off-screen container
+  const pdfContainer = document.createElement("div");
+  pdfContainer.id = "pdf-export-container";
+  document.body.appendChild(pdfContainer);
 
+  // Build content HTML
+  let contentHTML = `
+    <div style="font-family: 'Times New Roman', serif; padding: 20px; background: white; max-width: 800px;">
+      <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 30px;">
+        <h1 style="font-size: 24px; font-weight: bold; margin: 0 0 10px 0; text-transform: uppercase;">${
+          config.title || "Quiz Examination"
+        }</h1>
+        <p style="font-size: 14px; margin: 5px 0;">
+          <strong>Total Questions:</strong> ${
+            questions.length
+          } &nbsp;&nbsp;&nbsp;
+          <strong>Type:</strong> ${questionType}
+        </p>
+      </div>
+  `;
+
+  // Add each question
   questions.forEach((q, index) => {
-    markdown += `### ${index + 1}. ${q.q}\n\n`;
+    contentHTML += `
+      <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; background: #fafafa; page-break-inside: avoid;">
+        <div style="font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #2c3e50;">
+          Question ${index + 1}
+        </div>
+        <div style="font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
+          ${q.q}
+        </div>
+    `;
 
     if (isEssayQuestion(q)) {
-      // Essay question - show the answer directly
-      markdown += `**Answer:**\n${q.options[0]}\n\n`;
+      // Essay question
+      contentHTML += `
+        <div style="margin-top: 15px; padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800;">
+          <strong>Answer:</strong><br>
+          <div style="margin-top: 8px;">${q.options[0]}</div>
+        </div>
+      `;
     } else {
       // MCQ or True/False - show options
+      contentHTML += `<div style="margin-left: 20px; margin-top: 10px;">`;
       q.options.forEach((opt, i) => {
-        const letter = String.fromCharCode(65 + i); // A, B, C, D...
-        markdown += `- ${letter}. ${opt}\n`;
+        const letter = String.fromCharCode(65 + i);
+        contentHTML += `
+          <div style="margin-bottom: 8px; line-height: 1.6;">
+            <strong>${letter}.</strong> ${opt}
+          </div>
+        `;
       });
-      markdown += `\n`;
+      contentHTML += `</div>`;
 
-      // Show correct answer
+      // Correct answer
       const correctLetter = String.fromCharCode(65 + q.correct);
-      markdown += `#### **Correct answer:** ${correctLetter}. ${
-        q.options[q.correct]
-      }\n\n`;
+      contentHTML += `
+        <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-left: 4px solid #4caf50; font-weight: bold;">
+          Correct Answer: ${correctLetter}. ${q.options[q.correct]}
+        </div>
+      `;
     }
 
-    // Add explanation if exists
+    // Explanation
     if (q.explanation) {
-      markdown += `> **Explanation:** ${q.explanation}\n\n`;
+      contentHTML += `
+        <div style="margin-top: 12px; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; font-style: italic;">
+          <strong>Explanation:</strong> ${q.explanation}
+        </div>
+      `;
     }
 
-    markdown += `---\n\n`;
+    contentHTML += `</div>`;
   });
 
-  // Create and download file
-  const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${config.title || "quiz"}.md`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Footer
+  contentHTML += `
+      <div style="margin-top: 40px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ddd; padding-top: 15px;">
+        Generated on ${new Date().toLocaleDateString()} • Crafted by Belal Amr
+      </div>
+    </div>
+  `;
+
+  pdfContainer.innerHTML = contentHTML;
+
+  // Configure html2pdf options
+  const options = {
+    margin: [15, 15, 15, 15],
+    filename: `${config.title || "quiz"}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      letterRendering: true,
+      logging: false,
+    },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+  };
+
+  // Wait for content to render, then generate PDF
+  setTimeout(() => {
+    html2pdf()
+      .set(options)
+      .from(pdfContainer)
+      .save()
+      .then(() => {
+        // Clean up
+        if (pdfContainer.parentNode) {
+          document.body.removeChild(pdfContainer);
+        }
+      })
+      .catch((error) => {
+        console.error("PDF generation error:", error);
+        if (pdfContainer.parentNode) {
+          document.body.removeChild(pdfContainer);
+        }
+        alert("Failed to generate PDF. Please try again.");
+      });
+  }, 100);
 }
