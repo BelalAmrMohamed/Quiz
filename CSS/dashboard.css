@@ -500,9 +500,6 @@ body {
   transition: background 0.2s ease;
 }
 
-.lb-row:hover {
-}
-
 .lb-row.highlight {
   font-weight: 700;
   border-left: 4px solid var(--color-primary);

@@ -516,6 +516,210 @@ function exportToHtml(config, questions) {
 // ==========================================
 // 3. Export to PDF (Light Mode Forced)
 // ==========================================
+// function exportToPdf(config, questions) {
+//   // Check if html2pdf is loaded
+//   if (typeof html2pdf === "undefined") {
+//     alert("PDF library is not loaded. Please refresh the page and try again.");
+//     return;
+//   }
+
+//   // Show loading state
+//   const btn = document.getElementById("exportPdfBtn");
+//   const originalText = btn ? btn.textContent : "Export PDF";
+//   if (btn) {
+//     btn.textContent = "⏳ Generating PDF...";
+//     btn.disabled = true;
+//   }
+
+//   // Determine question types
+//   let hasMCQ = false;
+//   let hasTrueFalse = false;
+//   let hasEssay = false;
+
+//   questions.forEach((q) => {
+//     if (isEssayQuestion(q)) {
+//       hasEssay = true;
+//     } else if (q.options.length === 2) {
+//       hasTrueFalse = true;
+//     } else {
+//       hasMCQ = true;
+//     }
+//   });
+
+//   let questionType = "Multiple Choice";
+//   if (hasEssay && !hasMCQ && !hasTrueFalse) questionType = "Essay/Definitions";
+//   else if (hasEssay) questionType = "Mixed (MCQ, True/False, Essay)";
+
+//   // Create visible but off-screen container
+//   const pdfContainer = document.createElement("div");
+//   pdfContainer.id = "pdf-export-container";
+//   // Ensure the container itself is white so html2pdf sees white
+//   pdfContainer.style.background = "#ffffff";
+//   document.body.appendChild(pdfContainer);
+
+//   // Build content HTML with FORCED LIGHT MODE CSS
+//   // We inject a <style> block that forces all text to black to override global dark mode
+//   let contentHTML = `
+//     <style>
+//         #pdf-export-wrapper {
+//             font-family: 'Times New Roman', serif;
+//             color: #000000 !important; /* Force black text */
+//             background: #ffffff !important;
+//             line-height: 1.5;
+//         }
+//         #pdf-export-wrapper h1,
+//         #pdf-export-wrapper h2,
+//         #pdf-export-wrapper p,
+//         #pdf-export-wrapper div,
+//         #pdf-export-wrapper span {
+//             color: #000000 !important;
+//         }
+//         .pdf-card {
+//             border: 1px solid #ddd;
+//             background-color: #fafafa !important;
+//             padding: 15px;
+//             margin-bottom: 20px;
+//             page-break-inside: avoid;
+//         }
+//         .pdf-correct {
+//             background-color: #e8f5e9 !important;
+//             border-left: 4px solid #4caf50;
+//             padding: 10px;
+//             margin-top: 10px;
+//             color: #000 !important;
+//         }
+//         .pdf-essay {
+//             background-color: #fff3e0 !important;
+//             border-left: 4px solid #ff9800;
+//             padding: 10px;
+//             margin-top: 10px;
+//             color: #000 !important;
+//         }
+//         .pdf-explain {
+//             background-color: #e3f2fd !important;
+//             border-left: 4px solid #2196f3;
+//             padding: 10px;
+//             margin-top: 10px;
+//             font-style: italic;
+//             color: #000 !important;
+//         }
+//     </style>
+
+//     <div id="pdf-export-wrapper" style="padding: 20px;">
+//       <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 30px;">
+//         <h1 style="font-size: 24px; margin: 0; text-transform: uppercase;">${
+//           config.title || "Quiz Examination"
+//         }</h1>
+//         <p style="font-size: 14px; margin: 5px 0;">
+//           <strong>Total Questions:</strong> ${questions.length} &nbsp;|&nbsp;
+//           <strong>Type:</strong> ${questionType}
+//         </p>
+//       </div>
+//   `;
+
+//   // Add each question
+//   questions.forEach((q, index) => {
+//     contentHTML += `
+//       <div class="pdf-card">
+//         <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">
+//           Question ${index + 1}
+//         </div>
+//         <div style="font-size: 13px; margin-bottom: 12px;">
+//           ${q.q}
+//         </div>
+//     `;
+
+//     if (isEssayQuestion(q)) {
+//       contentHTML += `
+//         <div class="pdf-essay">
+//           <strong>Answer:</strong><br>
+//           ${q.options[0]}
+//         </div>
+//       `;
+//     } else {
+//       // Options
+//       contentHTML += `<div style="margin-left: 15px;">`;
+//       q.options.forEach((opt, i) => {
+//         const letter = String.fromCharCode(65 + i);
+//         contentHTML += `
+//           <div style="margin-bottom: 5px; font-size: 12px;">
+//             <strong>${letter}.</strong> ${opt}
+//           </div>
+//         `;
+//       });
+//       contentHTML += `</div>`;
+
+//       // Correct Answer
+//       const correctLetter = String.fromCharCode(65 + q.correct);
+//       contentHTML += `
+//         <div class="pdf-correct">
+//           <strong>Correct Answer:</strong> ${correctLetter}. ${
+//         q.options[q.correct]
+//       }
+//         </div>
+//       `;
+//     }
+
+//     if (q.explanation) {
+//       contentHTML += `
+//         <div class="pdf-explain">
+//           <strong>Explanation:</strong> ${q.explanation}
+//         </div>
+//       `;
+//     }
+
+//     contentHTML += `</div>`; // End card
+//   });
+
+//   contentHTML += `
+//       <div style="margin-top: 30px; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 10px;">
+//         Generated on ${new Date().toLocaleDateString()}
+//       </div>
+//     </div>
+//   `;
+
+//   pdfContainer.innerHTML = contentHTML;
+
+//   const options = {
+//     margin: [10, 10, 10, 10], // mm
+//     filename: `${config.title || "quiz"}.pdf`,
+//     image: { type: "jpeg", quality: 0.98 },
+//     html2canvas: {
+//       scale: 2,
+//       useCORS: true,
+//       logging: false,
+//       backgroundColor: "#ffffff", // Force canvas background to white
+//     },
+//     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+//   };
+
+//   setTimeout(() => {
+//     html2pdf()
+//       .set(options)
+//       .from(pdfContainer)
+//       .save()
+//       .then(() => {
+//         if (pdfContainer.parentNode) document.body.removeChild(pdfContainer);
+//         if (btn) {
+//           btn.textContent = originalText;
+//           btn.disabled = false;
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("PDF generation error:", error);
+//         if (pdfContainer.parentNode) document.body.removeChild(pdfContainer);
+//         if (btn) {
+//           btn.textContent = "Error";
+//           btn.disabled = false;
+//         }
+//         alert("Failed to generate PDF.");
+//       });
+//   }, 100);
+// }
+
+// ==========================================
+// 3. Export to PDF (Fixed Scroll Issue)
+// ==========================================
 function exportToPdf(config, questions) {
   // Check if html2pdf is loaded
   if (typeof html2pdf === "undefined") {
@@ -558,12 +762,11 @@ function exportToPdf(config, questions) {
   document.body.appendChild(pdfContainer);
 
   // Build content HTML with FORCED LIGHT MODE CSS
-  // We inject a <style> block that forces all text to black to override global dark mode
   let contentHTML = `
     <style>
         #pdf-export-wrapper {
             font-family: 'Times New Roman', serif;
-            color: #000000 !important; /* Force black text */
+            color: #000000 !important; 
             background: #ffffff !important;
             line-height: 1.5;
         }
@@ -681,14 +884,17 @@ function exportToPdf(config, questions) {
   pdfContainer.innerHTML = contentHTML;
 
   const options = {
-    margin: [10, 10, 10, 10], // mm
+    margin: [10, 10, 10, 10],
     filename: `${config.title || "quiz"}.pdf`,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: "#ffffff", // Force canvas background to white
+      backgroundColor: "#ffffff",
+      // THESE TWO LINES BELOW FIX THE SCROLL BUG
+      scrollY: 0,
+      windowHeight: pdfContainer.scrollHeight,
     },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
   };
@@ -716,169 +922,3 @@ function exportToPdf(config, questions) {
       });
   }, 100);
 }
-
-// Export to PDF function
-// function exportToPdf(config, questions) {
-//   // Check if html2pdf is loaded
-//   if (typeof html2pdf === "undefined") {
-//     alert("PDF library is not loaded. Please refresh the page and try again.");
-//     return;
-//   }
-
-//   // Show loading message
-//   const originalText = document.getElementById("exportPdfBtn")?.textContent;
-//   if (document.getElementById("exportPdfBtn")) {
-//     document.getElementById("exportPdfBtn").textContent =
-//       "⏳ Generating PDF...";
-//     document.getElementById("exportPdfBtn").disabled = true;
-//   }
-
-//   // Determine question types
-//   let hasMCQ = false;
-//   let hasTrueFalse = false;
-//   let hasEssay = false;
-
-//   questions.forEach((q) => {
-//     if (isEssayQuestion(q)) {
-//       hasEssay = true;
-//     } else if (q.options.length === 2) {
-//       hasTrueFalse = true;
-//     } else {
-//       hasMCQ = true;
-//     }
-//   });
-
-//   let questionType = "";
-//   if (hasEssay && !hasMCQ && !hasTrueFalse) {
-//     questionType = "Essay/Definitions";
-//   } else if (hasEssay) {
-//     questionType = "Mixed (MCQ, True/False, Essay)";
-//   } else if (hasMCQ && hasTrueFalse) {
-//     questionType = "MCQ and True/False";
-//   } else if (hasTrueFalse) {
-//     questionType = "True/False only";
-//   } else {
-//     questionType = "MCQ only";
-//   }
-
-//   // Create visible but off-screen container
-//   const pdfContainer = document.createElement("div");
-//   pdfContainer.id = "pdf-export-container";
-//   document.body.appendChild(pdfContainer);
-
-//   // Build content HTML
-//   let contentHTML = `
-//     <div style="font-family: 'Times New Roman', serif; padding: 20px; background: white; max-width: 800px;">
-//       <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 30px;">
-//         <h1 style="font-size: 24px; font-weight: bold; margin: 0 0 10px 0; text-transform: uppercase;">${
-//           config.title || "Quiz Examination"
-//         }</h1>
-//         <p style="font-size: 14px; margin: 5px 0;">
-//           <strong>Total Questions:</strong> ${
-//             questions.length
-//           } &nbsp;&nbsp;&nbsp;
-//           <strong>Type:</strong> ${questionType}
-//         </p>
-//       </div>
-//   `;
-
-//   // Add each question
-//   questions.forEach((q, index) => {
-//     contentHTML += `
-//       <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; background: #fafafa; page-break-inside: avoid;">
-//         <div style="font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #2c3e50;">
-//           Question ${index + 1}
-//         </div>
-//         <div style="font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
-//           ${q.q}
-//         </div>
-//     `;
-
-//     if (isEssayQuestion(q)) {
-//       // Essay question
-//       contentHTML += `
-//         <div style="margin-top: 15px; padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800;">
-//           <strong>Answer:</strong><br>
-//           <div style="margin-top: 8px;">${q.options[0]}</div>
-//         </div>
-//       `;
-//     } else {
-//       // MCQ or True/False - show options
-//       contentHTML += `<div style="margin-left: 20px; margin-top: 10px;">`;
-//       q.options.forEach((opt, i) => {
-//         const letter = String.fromCharCode(65 + i);
-//         contentHTML += `
-//           <div style="margin-bottom: 8px; line-height: 1.6;">
-//             <strong>${letter}.</strong> ${opt}
-//           </div>
-//         `;
-//       });
-//       contentHTML += `</div>`;
-
-//       // Correct answer
-//       const correctLetter = String.fromCharCode(65 + q.correct);
-//       contentHTML += `
-//         <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-left: 4px solid #4caf50; font-weight: bold;">
-//           Correct Answer: ${correctLetter}. ${q.options[q.correct]}
-//         </div>
-//       `;
-//     }
-
-//     // Explanation
-//     if (q.explanation) {
-//       contentHTML += `
-//         <div style="margin-top: 12px; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; font-style: italic;">
-//           <strong>Explanation:</strong> ${q.explanation}
-//         </div>
-//       `;
-//     }
-
-//     contentHTML += `</div>`;
-//   });
-
-//   // Footer
-//   contentHTML += `
-//       <div style="margin-top: 40px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ddd; padding-top: 15px;">
-//         Generated on ${new Date().toLocaleDateString()} • Crafted by Belal Amr
-//       </div>
-//     </div>
-//   `;
-
-//   pdfContainer.innerHTML = contentHTML;
-
-//   // Configure html2pdf options
-//   const options = {
-//     margin: [15, 15, 15, 15],
-//     filename: `${config.title || "quiz"}.pdf`,
-//     image: { type: "jpeg", quality: 0.98 },
-//     html2canvas: {
-//       scale: 2,
-//       useCORS: true,
-//       letterRendering: true,
-//       logging: false,
-//     },
-//     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-//     pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-//   };
-
-//   // Wait for content to render, then generate PDF
-//   setTimeout(() => {
-//     html2pdf()
-//       .set(options)
-//       .from(pdfContainer)
-//       .save()
-//       .then(() => {
-//         // Clean up
-//         if (pdfContainer.parentNode) {
-//           document.body.removeChild(pdfContainer);
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("PDF generation error:", error);
-//         if (pdfContainer.parentNode) {
-//           document.body.removeChild(pdfContainer);
-//         }
-//         alert("Failed to generate PDF. Please try again.");
-//       });
-//   }, 100);
-// }
