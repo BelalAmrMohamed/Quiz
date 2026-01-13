@@ -5,11 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Platform - Master Your Knowledge</title>
+
+    <!-- 🔥 CRITICAL: Add this FIRST - Anti-flash script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
+            const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            document.documentElement.setAttribute("data-animations", savedAnimations ? "enabled" : "disabled");
+        })();
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Files in correct order -->
+    <link rel="stylesheet" href="CSS/themes.css">
+    <link rel="stylesheet" href="CSS/animations.css">
     <link rel="stylesheet" href="CSS/styles.css">
-    <script type="module" src="Script/theme.js"></script>
+
+    <script type="module" src="Script/theme-controller.js"></script>
 </head>
 
 <body>
@@ -29,9 +46,40 @@
                 <a href="dashboard.html" class="menu-item">📊 Performance Dashboard</a>
                 <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
                 <div class="menu-divider"></div>
-                <button id="themeToggle" class="menu-item theme-btn">
-                    <span class="theme-icon-display">☀️</span> Change Appearance
-                </button>
+
+                <!-- NEW THEME CONTROLS -->
+                <div class="theme-controls-section">
+                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-selector-grid">
+                        <button class="theme-selector-btn" data-theme="light">
+                            <span class="theme-btn-icon">☀️</span>
+                            <span class="theme-btn-label">Light</span>
+                        </button>
+                        <button class="theme-selector-btn" data-theme="dark-slate">
+                            <span class="theme-btn-icon">🌙</span>
+                            <span class="theme-btn-label">Slate</span>
+                        </button>
+                        <button class="theme-selector-btn" data-theme="dark">
+                            <span class="theme-btn-icon">🌑</span>
+                            <span class="theme-btn-label">Dark</span>
+                        </button>
+                    </div>
+
+                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
+                        <div class="animation-toggle-label">
+                            <span class="animation-toggle-icon">✨</span>
+                            <span>Background Effects</span>
+                        </div>
+                        <div class="toggle-switch active animation-toggle-switch"></div>
+                    </div>
+
+                    <p class="theme-info-text">
+                        💡 Disable animations to improve performance
+                    </p>
+                </div>
+                <!-- End of the new theme cotrolls -->
+
             </nav>
         </div>
     </div>
@@ -60,7 +108,6 @@
         <div class="watermark">Crafted by Belal Amr</div>
     </div>
 
-    <script type="module" src="Script/theme.js"></script>
     <script type="module" src="Script/index.js"></script>
 </body>
 

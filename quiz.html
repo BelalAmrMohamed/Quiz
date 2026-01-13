@@ -5,11 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz In Progress - Master Your Knowledge</title>
+
+    <!-- CRITICAL: Anti-flash script FIRST (inline for instant execution) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
+            const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            document.documentElement.setAttribute("data-animations", savedAnimations ? "enabled" : "disabled");
+        })();
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Files - CRITICAL ORDER -->
+    <!-- REMOVED: theme-switcher.css (likely causing conflicts) -->
+    <link rel="stylesheet" href="CSS/themes.css">
+    <link rel="stylesheet" href="CSS/animations.css">
     <link rel="stylesheet" href="CSS/quiz.css">
-    <script type="module" src="Script/theme.js"></script>
+
+    <!-- Theme Controller - Load once as module -->
+    <script type="module" src="Script/theme-controller.js"></script>
 </head>
 
 <body>
@@ -52,9 +71,42 @@
                 <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
             </button>
 
-            <button id="themeToggle" class="menu-item theme-btn">
+            <!-- <button id="themeToggle" class="menu-item theme-btn">
                 <span class="theme-icon-display">☀️</span> Change Appearance
-            </button>
+            </button> -->
+
+            <!-- NEW THEME CONTROLS -->
+            <div class="theme-controls-section">
+                <div class="theme-section-header">Appearance</div>
+                <div class="theme-selector-grid">
+                    <button class="theme-selector-btn" data-theme="light">
+                        <span class="theme-btn-icon">☀️</span>
+                        <span class="theme-btn-label">Light</span>
+                    </button>
+                    <button class="theme-selector-btn" data-theme="dark-slate">
+                        <span class="theme-btn-icon">🌙</span>
+                        <span class="theme-btn-label">Slate</span>
+                    </button>
+                    <button class="theme-selector-btn" data-theme="dark">
+                        <span class="theme-btn-icon">🌑</span>
+                        <span class="theme-btn-label">Dark</span>
+                    </button>
+                </div>
+
+                <div class="animation-section-header">Animations</div>
+                <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
+                    <div class="animation-toggle-label">
+                        <span class="animation-toggle-icon">✨</span>
+                        <span>Background Effects</span>
+                    </div>
+                    <div class="toggle-switch active animation-toggle-switch"></div>
+                </div>
+
+                <p class="theme-info-text">
+                    💡 Disable animations to improve performance
+                </p>
+            </div>
+            <!-- End of the new theme cotrolls -->
 
             <div class="menu-divider"></div>
 
@@ -114,7 +166,6 @@
             </button>
         </div>
     </div>
-    <script type="module" src="Script/theme.js"></script>
     <script type="module" src="Script/quiz.js"></script>
 </body>
 

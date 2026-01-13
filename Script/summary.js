@@ -260,7 +260,7 @@ function renderReview(container, questions, userAnswers) {
   container.innerHTML = html;
 }
 // ==========================================
-// 2. Export to Markdown
+// 1. Export to Markdown
 // ==========================================
 function exportToMarkdown(config, questions) {
   let hasMCQ = false;

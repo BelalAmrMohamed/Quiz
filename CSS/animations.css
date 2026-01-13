@@ -1,0 +1,345 @@
+/* animations.css - Reusable Background Animations for All Pages */
+
+/* ==================== ANIMATED BACKGROUND SYSTEM ==================== */
+
+/* Main particle animation layer */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+      2px 2px at 20% 30%,
+      var(--anim-particle-1),
+      transparent
+    ),
+    radial-gradient(2px 2px at 60% 70%, var(--anim-particle-2), transparent),
+    radial-gradient(1px 1px at 50% 50%, var(--anim-particle-3), transparent),
+    radial-gradient(1px 1px at 80% 10%, var(--anim-particle-1), transparent),
+    radial-gradient(2px 2px at 90% 60%, var(--anim-particle-2), transparent),
+    radial-gradient(1px 1px at 33% 80%, var(--anim-particle-3), transparent),
+    radial-gradient(1px 1px at 15% 60%, var(--anim-particle-1), transparent);
+  background-size: 200% 200%, 180% 180%, 220% 220%, 190% 190%, 210% 210%,
+    195% 195%, 205% 205%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
+    30% 70%;
+  animation: particleFloat1 20s ease-in-out infinite,
+    particleFloat2 15s ease-in-out infinite,
+    particleFloat3 18s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Secondary floating orb layer */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(
+      circle at 10% 20%,
+      var(--anim-orb) 0%,
+      transparent 3%
+    ),
+    radial-gradient(circle at 80% 80%, var(--anim-orb) 0%, transparent 3%),
+    radial-gradient(circle at 40% 60%, var(--anim-orb) 0%, transparent 3%),
+    radial-gradient(circle at 70% 30%, var(--anim-orb) 0%, transparent 3%),
+    radial-gradient(circle at 25% 75%, var(--anim-orb) 0%, transparent 3%),
+    radial-gradient(circle at 90% 40%, var(--anim-orb) 0%, transparent 3%);
+  background-size: 100% 100%;
+  animation: particlePulse 12s ease-in-out infinite,
+    orbFloat 30s linear infinite;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* ==================== ANIMATION KEYFRAMES ==================== */
+
+@keyframes particleFloat1 {
+  0%,
+  100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
+      30% 70%;
+  }
+  33% {
+    background-position: 30% 40%, 70% 60%, 60% 40%, 90% 30%, 30% 70%, 80% 40%,
+      20% 80%;
+  }
+  66% {
+    background-position: 60% 80%, 40% 20%, 70% 60%, 85% 15%, 25% 75%, 75% 35%,
+      35% 65%;
+  }
+}
+
+@keyframes particleFloat2 {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+@keyframes particleFloat3 {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes particlePulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes orbFloat {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Additional animation for header/card accents */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ==================== ANIMATION DISABLED STATE ==================== */
+
+/* When animations are disabled via data attribute */
+[data-animations="disabled"] body::before,
+[data-animations="disabled"] body::after {
+  animation: none !important;
+  opacity: 0.15 !important;
+}
+
+[data-animations="disabled"] .header::before {
+  animation: none !important;
+}
+
+/* Disable floating animations but keep essential UI transitions */
+[data-animations="disabled"] .card::before,
+[data-animations="disabled"] .category-card::before,
+[data-animations="disabled"] .exam-card::before {
+  animation: none !important;
+}
+
+[data-animations="disabled"] .score-circle,
+[data-animations="disabled"] .question-card,
+[data-animations="disabled"] #scoreHeader,
+[data-animations="disabled"] .review-card,
+[data-animations="disabled"] .header h1 {
+  animation: none !important;
+}
+
+/* Keep UI interactions smooth */
+[data-animations="disabled"] body,
+[data-animations="disabled"] .card,
+[data-animations="disabled"] .menu-item,
+[data-animations="disabled"] .nav-btn,
+[data-animations="disabled"] .theme-selector-btn,
+[data-animations="disabled"] .option-row,
+[data-animations="disabled"] button,
+[data-animations="disabled"] a {
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* ==================== REDUCED MOTION SUPPORT ==================== */
+
+/* Respect user's system preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  body::before,
+  body::after {
+    animation: none !important;
+    opacity: 0.3;
+  }
+}
+
+/* Modal overlay and content */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Disable backdrop blur when animations are off (performance fix) */
+[data-animations="disabled"] .modal-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+
+.modal-card {
+  animation: scaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+[data-animations="disabled"] .modal-card {
+  animation: none !important;
+}
+
+/* Confetti Animation (Summary Page) */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--color-primary);
+  position: absolute;
+  animation: confetti-fall 3s ease-out forwards;
+  z-index: 1000;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Disable confetti when animations are off */
+[data-animations="disabled"] .confetti {
+  display: none;
+}
+
+/* ==================== UTILITY ANIMATIONS ==================== */
+
+/* Fade in up animation for cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale in animation */
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Celebration bounce animation */
+@keyframes celebration {
+  0% {
+    transform: scale(0.8) rotate(-5deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Pop in animation for badges */
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Loading dots animation */
+@keyframes dots {
+  0%,
+  20% {
+    content: ".";
+  }
+  40% {
+    content: "..";
+  }
+  60%,
+  100% {
+    content: "...";
+  }
+}
+
+/* Timer tick animation */
+@keyframes tick {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
