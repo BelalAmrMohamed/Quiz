@@ -9,6 +9,12 @@ export const examList = [
     "category": "Computer Network"
   },
   {
+    "id": "MCQs on Chapter 2",
+    "title": "MCQs On Chapter 2",
+    "path": "../Exams/Discrete Structure/MCQs on Chapter 2.js",
+    "category": "Discrete Structure"
+  },
+  {
     "id": "Practical Exam - Model A",
     "title": "Practical Exam   Model A",
     "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
@@ -365,6 +371,12 @@ export const categoryTree = {
     "parent": null,
     "subcategories": [],
     "exams": [
+      {
+        "id": "MCQs on Chapter 2",
+        "title": "MCQs On Chapter 2",
+        "path": "../Exams/Discrete Structure/MCQs on Chapter 2.js",
+        "category": "Discrete Structure"
+      },
       {
         "id": "Practical Exam - Model A",
         "title": "Practical Exam   Model A",
