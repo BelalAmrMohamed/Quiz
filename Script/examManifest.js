@@ -15,15 +15,39 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
+    "id": "Midterm 2023",
+    "title": "Midterm 2023",
+    "path": "../Exams/Discrete Structure/Midterm 2023.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Midterm 2025",
+    "title": "Midterm 2025",
+    "path": "../Exams/Discrete Structure/Midterm 2025.js",
+    "category": "Discrete Structure"
+  },
+  {
     "id": "Practical Exam - Model A",
     "title": "Practical Exam   Model A",
     "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
     "category": "Discrete Structure"
   },
   {
-    "id": "Quiz 1",
-    "title": "Quiz 1",
-    "path": "../Exams/Discrete Structure/Quiz 1.js",
+    "id": "Quiz",
+    "title": "Quiz",
+    "path": "../Exams/Discrete Structure/Quiz.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Quiz 2",
+    "title": "Quiz 2",
+    "path": "../Exams/Discrete Structure/Quiz 2.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Revision",
+    "title": "Revision",
+    "path": "../Exams/Discrete Structure/Revision.js",
     "category": "Discrete Structure"
   },
   {
@@ -297,15 +321,15 @@ export const examList = [
     "category": "Programming 2"
   },
   {
-    "id": "Programming 2-Quiz 1",
-    "title": "Quiz 1",
-    "path": "../Exams/Programming 2/Quiz 1.js",
+    "id": "Programming 2-Quiz 2",
+    "title": "Quiz 2",
+    "path": "../Exams/Programming 2/Quiz 2.js",
     "category": "Programming 2"
   },
   {
-    "id": "Quiz 2",
-    "title": "Quiz 2",
-    "path": "../Exams/Programming 2/Quiz 2.js",
+    "id": "Quiz 1",
+    "title": "Quiz 1",
+    "path": "../Exams/Programming 2/Quiz 1.js",
     "category": "Programming 2"
   },
   {
@@ -378,21 +402,45 @@ export const categoryTree = {
         "category": "Discrete Structure"
       },
       {
+        "id": "Midterm 2023",
+        "title": "Midterm 2023",
+        "path": "../Exams/Discrete Structure/Midterm 2023.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Midterm 2025",
+        "title": "Midterm 2025",
+        "path": "../Exams/Discrete Structure/Midterm 2025.js",
+        "category": "Discrete Structure"
+      },
+      {
         "id": "Practical Exam - Model A",
         "title": "Practical Exam   Model A",
         "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
         "category": "Discrete Structure"
       },
       {
-        "id": "Quiz 1",
-        "title": "Quiz 1",
-        "path": "../Exams/Discrete Structure/Quiz 1.js",
+        "id": "Quiz 2",
+        "title": "Quiz 2",
+        "path": "../Exams/Discrete Structure/Quiz 2.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Quiz",
+        "title": "Quiz",
+        "path": "../Exams/Discrete Structure/Quiz.js",
         "category": "Discrete Structure"
       },
       {
         "id": "Revision 2",
         "title": "Revision 2",
         "path": "../Exams/Discrete Structure/Revision 2.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Revision",
+        "title": "Revision",
+        "path": "../Exams/Discrete Structure/Revision.js",
         "category": "Discrete Structure"
       }
     ]
@@ -737,13 +785,13 @@ export const categoryTree = {
         "category": "Programming 2"
       },
       {
-        "id": "Programming 2-Quiz 1",
+        "id": "Quiz 1",
         "title": "Quiz 1",
         "path": "../Exams/Programming 2/Quiz 1.js",
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 2",
+        "id": "Programming 2-Quiz 2",
         "title": "Quiz 2",
         "path": "../Exams/Programming 2/Quiz 2.js",
         "category": "Programming 2"
