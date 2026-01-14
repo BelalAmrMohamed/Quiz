@@ -45,6 +45,12 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
+    "id": "Oral 2026 FCI",
+    "title": "Oral 2026 FCI",
+    "path": "../Exams/Discrete Structure/Oral 2026 FCI.js",
+    "category": "Discrete Structure"
+  },
+  {
     "id": "Practical Exam - Model A",
     "title": "Practical Exam   Model A",
     "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
@@ -465,6 +471,12 @@ export const categoryTree = {
         "id": "Midterm 2026",
         "title": "Midterm 2026",
         "path": "../Exams/Discrete Structure/Midterm 2026.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Oral 2026 FCI",
+        "title": "Oral 2026 FCI",
+        "path": "../Exams/Discrete Structure/Oral 2026 FCI.js",
         "category": "Discrete Structure"
       },
       {
