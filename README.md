@@ -101,21 +101,34 @@ Quiz Website/
 ├── quiz.html
 ├── summary.html
 ├── dashboard.html
+├── .gitignore
+├── README.md
+├── LICENSE
+├── robots.txt
+├── sitemap.xml
 │
 ├── CSS/
 │   ├── styles.css
 │   ├── quiz.css
 │   ├── summary.css
+│   ├── animations.css
+│   ├── themes.css
 │   └── dashboard.css
 │
-├── script/
+├── images/
+│   ├── icon.png
+│   └── thumbnail.png
+│
+├── Script/
 │   ├── index.js
 │   ├── quiz.js
 │   ├── summary.js
 │   ├── dashboard.js
 │   ├── gameEngine.js
 │   ├── examManifest.js
-│   └── theme.js
+│   ├── anti-flash.js
+│   ├── meta-data.json
+│   └── theme-controller.js
 │
 ├── tools/
 │   └── generateExamManifest.js <- Auto generates "examManifest.js"
