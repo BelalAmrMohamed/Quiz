@@ -39,14 +39,44 @@ export const themeManager = {
     this.updateThemeUI(theme);
   },
 
+  // applyAnimations(enabled) {
+  //   document.documentElement.setAttribute(
+  //     "data-animations",
+  //     enabled ? "enabled" : "disabled"
+  //   );
+  //   localStorage.setItem(ANIMATIONS_KEY, enabled ? "enabled" : "disabled");
+
+  //   // Update UI if elements exist
+  //   this.updateAnimationsUI(enabled);
+  // },
+
   applyAnimations(enabled) {
+    // 1. Manage the physical CSS file in the <head>
+    const ANIM_ID = "dynamic-animations-stylesheet";
+    let link = document.getElementById(ANIM_ID);
+
+    if (enabled) {
+      if (!link) {
+        link = document.createElement("link");
+        link.id = ANIM_ID;
+        link.rel = "stylesheet";
+        link.href = "CSS/animations.css"; // Ensure this path matches your folder structure
+        document.head.appendChild(link);
+      }
+    } else {
+      if (link) {
+        link.remove(); // This completely unloads the file and its rules
+      }
+    }
+
+    // 2. Existing logic for attributes and storage
     document.documentElement.setAttribute(
       "data-animations",
       enabled ? "enabled" : "disabled"
     );
     localStorage.setItem(ANIMATIONS_KEY, enabled ? "enabled" : "disabled");
 
-    // Update UI if elements exist
+    // 3. Update UI
     this.updateAnimationsUI(enabled);
   },
 
