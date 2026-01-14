@@ -127,7 +127,6 @@ Quiz Website/
 │   ├── gameEngine.js
 │   ├── examManifest.js
 │   ├── anti-flash.js
-│   ├── meta-data.json
 │   └── theme-controller.js
 │
 ├── tools/
