@@ -1,0 +1,587 @@
+export const questions = [
+  {
+    q: "What is the associative law for disjunction?",
+    options: [
+      "p ∨ q ≡ q ∨ p",
+      "p ∨ (q ∨ r) ≡ (p ∨ q) ∨ r",
+      "p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r)",
+      "p ∨ q ≡ ¬p → q",
+    ],
+    correct: 1,
+    explanation: "Grouping does not matter in a series of disjunctions.",
+  },
+  {
+    q: "What is the distributive law of ∧ over ∨?",
+    options: [
+      "p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r)",
+      "p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r)",
+      "p ∧ q ≡ p ∨ q",
+      "p ∧ (q ∧ r) ≡ (p ∧ q) ∧ r",
+    ],
+    correct: 0,
+    explanation:
+      "Conjunction distributes over disjunction similar to multiplication over addition in algebra.",
+  },
+  {
+    q: "What does it mean for a compound proposition to be satisfiable?",
+    options: [
+      "It is always true",
+      "There exists an assignment of truth values that makes it true",
+      "It is always false",
+      "It contains no variables",
+    ],
+    correct: 1,
+    explanation:
+      "Satisfiability requires at least one combination of inputs to result in True.",
+  },
+  {
+    q: "What is an unsatisfiable compound proposition?",
+    options: [
+      "A tautology",
+      "A contradiction",
+      "A contingency",
+      "A proposition with variables",
+    ],
+    correct: 1,
+    explanation: "If no assignment makes it true, it is a contradiction.",
+  },
+  {
+    q: "In the rule of Modus Ponens, given p and p → q, what can we conclude?",
+    options: ["q", "¬q", "¬p", "p ∧ q"],
+    correct: 0,
+    explanation: "If p is true, and p implies q, then q must be true.",
+  },
+  {
+    q: "In the rule of Modus Tollens, given ¬q and p → q, what can we conclude?",
+    options: ["p", "¬p", "q", "p ∧ q"],
+    correct: 1,
+    explanation: "If p implies q, and q is false, then p must be false.",
+  },
+  {
+    q: "What is the Hypothetical Syllogism rule?",
+    options: [
+      "From p and p → q, conclude q",
+      "From p → q and q → r, conclude p → r",
+      "From ¬q and p → q, conclude ¬p",
+      "From p ∨ q and ¬p, conclude q",
+    ],
+    correct: 1,
+    explanation:
+      "This allows chaining implications: if p leads to q, and q leads to r, then p leads to r.",
+  },
+  {
+    q: "What is the Disjunctive Syllogism rule?",
+    options: [
+      "From p ∨ q and ¬p, conclude q",
+      "From p ∧ q, conclude p",
+      "From p → q and q → r, conclude p → r",
+      "From p, conclude p ∨ q",
+    ],
+    correct: 0,
+    explanation:
+      "If one of two options must be true, and one is proven false, the other must be true.",
+  },
+  {
+    q: "What is the Addition rule?",
+    options: [
+      "From p, conclude p ∨ q",
+      "From p ∧ q, conclude p",
+      "From p and q, conclude p ∧ q",
+      "From p → q and p, conclude q",
+    ],
+    correct: 0,
+    explanation: "If p is true, then 'p OR anything' is also true.",
+  },
+  {
+    q: "What is the Simplification rule?",
+    options: [
+      "From p ∧ q, conclude p",
+      "From p, conclude p ∨ q",
+      "From p and q, conclude p ∧ q",
+      "From p → q and p, conclude q",
+    ],
+    correct: 0,
+    explanation: "If 'p AND q' is true, then p must be true individually.",
+  },
+  {
+    q: "What is the Conjunction rule?",
+    options: [
+      "From p and q, conclude p ∧ q",
+      "From p ∧ q, conclude p",
+      "From p, conclude p ∨ q",
+      "From p → q and p, conclude q",
+    ],
+    correct: 0,
+    explanation: "If p is true and q is true, their conjunction is true.",
+  },
+  {
+    q: "What is the Resolution rule?",
+    options: [
+      "From p ∨ q and ¬p ∨ r, conclude q ∨ r",
+      "From p and p → q, conclude q",
+      "From p ∧ q, conclude p",
+      "From p, conclude p ∨ q",
+    ],
+    correct: 0,
+    explanation:
+      "Resolution eliminates complementary literals (p and ¬p) to combine clauses.",
+  },
+  {
+    q: "What is the uniqueness quantifier symbol?",
+    options: ["∀", "∃!", "∃", "¬∃"],
+    correct: 1,
+    explanation: "∃! denotes 'there exists exactly one'.",
+  },
+  {
+    q: "What does ∃!x P(x) mean?",
+    options: [
+      "For all x, P(x) is true",
+      "There exists exactly one x such that P(x) is true",
+      "There exists at least one x such that P(x) is true",
+      "No x makes P(x) true",
+    ],
+    correct: 1,
+    explanation:
+      "It indicates existence (at least one) and uniqueness (at most one).",
+  },
+  {
+    q: "In nested quantifiers ∀x ∃y P(x,y), what does this mean?",
+    options: [
+      "For every x, there exists a y such that P(x,y)",
+      "There exists a y such that for all x, P(x,y)",
+      "For all x and y, P(x,y)",
+      "There exist x and y such that P(x,y)",
+    ],
+    correct: 0,
+    explanation: "The choice of y can depend on the specific x selected.",
+  },
+  {
+    q: "Is ∀x ∃y P(x,y) equivalent to ∃y ∀x P(x,y)?",
+    options: [
+      "Yes, always",
+      "No, they can have different truth values",
+      "Only when P is symmetric",
+      "Only in finite domains",
+    ],
+    correct: 1,
+    explanation:
+      "Order matters. 'Everyone loves someone' is not the same as 'Someone is loved by everyone'.",
+  },
+  {
+    q: "Is ∀x ∀y P(x,y) equivalent to ∀y ∀x P(x,y)?",
+    options: ["Yes", "No", "Only sometimes", "Only in infinite domains"],
+    correct: 0,
+    explanation:
+      "If P holds for all pairs (x,y), the order of selection does not matter.",
+  },
+  {
+    q: "Is ∃x ∃y P(x,y) equivalent to ∃y ∃x P(x,y)?",
+    options: ["Yes", "No", "Only sometimes", "Only in finite domains"],
+    correct: 0,
+    explanation:
+      "If there exists a pair (x,y) satisfying P, the order of existence doesn't matter.",
+  },
+  {
+    q: "What is the negation of ∀x ∃y P(x,y)?",
+    options: [
+      "∃x ∀y ¬P(x,y)",
+      "∀x ∃y ¬P(x,y)",
+      "∃x ∃y ¬P(x,y)",
+      "∀x ∀y ¬P(x,y)",
+    ],
+    correct: 0,
+    explanation:
+      "Negation flips quantifiers (∀ becomes ∃, ∃ becomes ∀) and negates the predicate.",
+  },
+  {
+    q: "Which is equivalent to ∀x (P(x) ∧ Q(x))?",
+    options: [
+      "∀x P(x) ∧ ∀x Q(x)",
+      "∀x P(x) ∨ ∀x Q(x)",
+      "∃x P(x) ∧ ∃x Q(x)",
+      "∃x (P(x) ∧ Q(x))",
+    ],
+    correct: 0,
+    explanation: "Universal quantification distributes over conjunction.",
+  },
+
+  // Advanced Level
+  {
+    q: "Is ∀x (P(x) ∨ Q(x)) equivalent to ∀x P(x) ∨ ∀x Q(x)?",
+    options: [
+      "Yes, always",
+      "No, they can have different truth values",
+      "Only when domains are finite",
+      "Only when P and Q are the same",
+    ],
+    correct: 1,
+    explanation:
+      "No. Example: Integers are even OR odd (True), but it's not true that (All Integers are even) OR (All Integers are odd).",
+  },
+  {
+    q: "Which is equivalent to ∃x (P(x) ∨ Q(x))?",
+    options: [
+      "∃x P(x) ∨ ∃x Q(x)",
+      "∃x P(x) ∧ ∃x Q(x)",
+      "∀x P(x) ∨ ∀x Q(x)",
+      "∀x (P(x) ∨ Q(x))",
+    ],
+    correct: 0,
+    explanation: "Existential quantification distributes over disjunction.",
+  },
+  {
+    q: "Is ∃x (P(x) ∧ Q(x)) equivalent to ∃x P(x) ∧ ∃x Q(x)?",
+    options: [
+      "Yes, always",
+      "No, they can have different truth values",
+      "Only in infinite domains",
+      "Only when P equals Q",
+    ],
+    correct: 1,
+    explanation:
+      "No. 'Someone is tall' AND 'Someone is short' is true, but 'Someone is tall AND short' is false.",
+  },
+  {
+    q: "What is Universal Instantiation?",
+    options: [
+      "From ∀x P(x), conclude P(c) for any c in the domain",
+      "From P(c), conclude ∀x P(x)",
+      "From ∃x P(x), conclude P(c)",
+      "From P(c), conclude ∃x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "If something is true for everyone, it is true for any specific individual.",
+  },
+  {
+    q: "What is Universal Generalization?",
+    options: [
+      "From P(c) for arbitrary c, conclude ∀x P(x)",
+      "From ∀x P(x), conclude P(c)",
+      "From ∃x P(x), conclude P(c)",
+      "From P(c), conclude ∃x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "If we can prove P(c) for a generic, arbitrary element, it holds for all elements.",
+  },
+  {
+    q: "What is Existential Instantiation?",
+    options: [
+      "From ∃x P(x), conclude P(c) for some c",
+      "From P(c), conclude ∃x P(x)",
+      "From ∀x P(x), conclude P(c)",
+      "From P(c), conclude ∀x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "If something exists, we can give that specific instance a name (c).",
+  },
+  {
+    q: "What is Existential Generalization?",
+    options: [
+      "From P(c) for some c, conclude ∃x P(x)",
+      "From ∃x P(x), conclude P(c)",
+      "From ∀x P(x), conclude P(c)",
+      "From P(c) for arbitrary c, conclude ∀x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "If we find a specific instance P(c), we can conclude that there exists an x such that P(x).",
+  },
+  {
+    q: "In a direct proof of p → q, what do we assume?",
+    options: ["p is true", "q is true", "p is false", "q is false"],
+    correct: 0,
+    explanation:
+      "We assume the hypothesis is true and try to deduce that the conclusion is true.",
+  },
+  {
+    q: "In a proof by contraposition of p → q, what do we prove instead?",
+    options: ["¬q → ¬p", "q → p", "¬p → ¬q", "p ∧ ¬q"],
+    correct: 0,
+    explanation:
+      "We assume the conclusion is false and prove that the hypothesis must also be false.",
+  },
+  {
+    q: "In a proof by contradiction of p, what do we assume?",
+    options: ["p is true", "¬p is true", "p is false only", "Nothing"],
+    correct: 1,
+    explanation:
+      "We assume the negation of the statement we are trying to prove is true.",
+  },
+  {
+    q: "What do we aim to derive in a proof by contradiction?",
+    options: [
+      "A true statement",
+      "A contradiction",
+      "The original statement",
+      "A tautology",
+    ],
+    correct: 1,
+    explanation:
+      "We aim to reach a logical impossibility (like 1=0 or r ∧ ¬r), showing the assumption must be false.",
+  },
+  {
+    q: "If we want to prove n² is odd implies n is odd, which proof method uses: assume n is even and prove n² is even?",
+    options: [
+      "Direct proof",
+      "Proof by contraposition",
+      "Proof by contradiction",
+      "Proof by cases",
+    ],
+    correct: 1,
+    explanation: "This uses the contrapositive: ¬(n is odd) → ¬(n² is odd).",
+  },
+  {
+    q: 'What is the contrapositive of "If it is raining, then the ground is wet"?',
+    options: [
+      "If the ground is wet, then it is raining",
+      "If it is not raining, then the ground is not wet",
+      "If the ground is not wet, then it is not raining",
+      "It is raining and the ground is not wet",
+    ],
+    correct: 2,
+    explanation: "Switch and negate: If NOT wet, then NOT raining.",
+  },
+  {
+    q: "What logical equivalence is used in proof by contraposition?",
+    options: [
+      "p → q ≡ ¬q → ¬p",
+      "p → q ≡ q → p",
+      "p → q ≡ ¬p ∨ q",
+      "p → q ≡ ¬p → ¬q",
+    ],
+    correct: 0,
+    explanation:
+      "The implication and its contrapositive always have the same truth value.",
+  },
+  {
+    q: 'To prove "√2 is irrational" by contradiction, what do we assume?',
+    options: [
+      "√2 is rational",
+      "√2 is irrational",
+      "√2 is an integer",
+      "√2 does not exist",
+    ],
+    correct: 0,
+    explanation:
+      "We assume the opposite (that it IS rational) and show this leads to a contradiction.",
+  },
+  {
+    q: "What is a vacuous proof?",
+    options: [
+      "Proving p → q by showing p is false",
+      "Proving p → q by showing q is true",
+      "Proving p → q directly",
+      "Proving p → q by contradiction",
+    ],
+    correct: 0,
+    explanation:
+      "If the hypothesis p is false, the implication p → q is automatically true.",
+  },
+  {
+    q: "What is a trivial proof?",
+    options: [
+      "Proving p → q by showing q is true",
+      "Proving p → q by showing p is false",
+      "Proving p → q directly",
+      "Proving p → q by cases",
+    ],
+    correct: 0,
+    explanation:
+      "If the conclusion q is known to be true regardless of p, the implication is trivially true.",
+  },
+  {
+    q: "In proof by cases, if we want to prove p ∨ q → r, what do we prove?",
+    options: [
+      "p → r and q → r",
+      "p ∧ q → r",
+      "p → r or q → r",
+      "(p → r) ∨ (q → r)",
+    ],
+    correct: 0,
+    explanation: "We must show that r holds whether p is true OR q is true.",
+  },
+  {
+    q: "What does it mean for two propositions to be logically equivalent?",
+    options: [
+      "They have the same truth value for all possible truth assignments",
+      "They have the same truth value sometimes",
+      "They look similar",
+      "They use the same variables",
+    ],
+    correct: 0,
+    explanation: "Their truth tables are identical.",
+  },
+  {
+    q: "How can we show two propositions are NOT logically equivalent?",
+    options: [
+      "Find one truth assignment where they have different truth values",
+      "Prove they have different truth values for all assignments",
+      "Show they use different operators",
+      "Construct a truth table",
+    ],
+    correct: 0,
+    explanation:
+      "A single scenario where they differ is sufficient to prove inequality.",
+  },
+  {
+    q: "What is the absorption law?",
+    options: [
+      "p ∨ (p ∧ q) ≡ p",
+      "p ∧ (p ∨ q) ≡ p",
+      "Both A and B",
+      "Neither A nor B",
+    ],
+    correct: 2,
+    explanation:
+      "The Absorption law states that terms can be 'absorbed' into the dominant term in both conjunction and disjunction.",
+  },
+  {
+    q: "What is the complement law for conjunction?",
+    options: ["p ∧ ¬p ≡ F", "p ∨ ¬p ≡ T", "Both A and B", "p ∧ ¬p ≡ T"],
+    correct: 0,
+    explanation:
+      "A statement and its negation cannot both be true simultaneously.",
+  },
+  {
+    q: "What is the complement law for disjunction?",
+    options: ["p ∧ ¬p ≡ F", "p ∨ ¬p ≡ T", "p ∨ ¬p ≡ F", "Both A and B"],
+    correct: 1,
+    explanation: "Either a statement or its negation must be true.",
+  },
+  {
+    q: "What is the idempotent law for conjunction?",
+    options: ["p ∧ p ≡ p", "p ∨ p ≡ p", "p ∧ T ≡ p", "p ∨ F ≡ p"],
+    correct: 0,
+    explanation:
+      "Repeating the same statement in a conjunction does not change its truth value.",
+  },
+  {
+    q: "What is the idempotent law for disjunction?",
+    options: ["p ∧ p ≡ p", "p ∨ p ≡ p", "p ∨ T ≡ T", "p ∧ F ≡ F"],
+    correct: 1,
+    explanation:
+      "Repeating the same statement in a disjunction does not change its truth value.",
+  },
+  {
+    q: "How do we prove a biconditional p ↔ q?",
+    options: [
+      "Prove p → q and q → p",
+      "Prove p and q separately",
+      "Prove ¬p ↔ ¬q",
+      "Use a truth table only",
+    ],
+    correct: 0,
+    explanation:
+      "Biconditional equivalence requires implication in both directions.",
+  },
+  {
+    q: "What is the exportation law?",
+    options: [
+      "(p ∧ q) → r ≡ p → (q → r)",
+      "p → (q → r) ≡ (p → q) → r",
+      "p → q ≡ ¬p ∨ q",
+      "(p → q) ∧ (q → r) ≡ p → r",
+    ],
+    correct: 0,
+    explanation:
+      "This law allows shifting a conjunct from the hypothesis to a nested conditional.",
+  },
+  {
+    q: 'What method would you use to prove "If n² is even, then n is even"?',
+    options: [
+      "Contraposition (prove: if n is odd, then n² is odd)",
+      "Direct proof",
+      "Vacuous proof",
+      "Trivial proof",
+    ],
+    correct: 0,
+    explanation:
+      "Direct proof is hard here because n² being even involves a square root; contraposition uses simple multiplication.",
+  },
+  {
+    q: "To prove ∀x P(x) directly, what must we show?",
+    options: [
+      "P(x) is true for an arbitrary element x in the domain",
+      "P(x) is true for a specific x",
+      "P(x) is true for some x",
+      "∃x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "Using an 'arbitrary' element ensures the proof applies to the entire set without bias.",
+  },
+  {
+    q: "To disprove ∀x P(x), what must we show?",
+    options: [
+      "Find one counterexample where P(x) is false",
+      "Show P(x) is false for all x",
+      "Show P(x) is sometimes true",
+      "Prove ∃x ¬P(x) is false",
+    ],
+    correct: 0,
+    explanation: "One bad apple spoils the bunch for a 'universal' claim.",
+  },
+  {
+    q: "To prove ∃x P(x), what must we show?",
+    options: [
+      "Find one element c where P(c) is true",
+      "Show P(x) is true for all x",
+      "Show P(x) is false for some x",
+      "Prove ∀x P(x)",
+    ],
+    correct: 0,
+    explanation:
+      "Constructive proof: finding just one example is sufficient for existence.",
+  },
+  {
+    q: "To disprove ∃x P(x), what must we show?",
+    options: [
+      "Show P(x) is false for all x in the domain",
+      "Find one x where P(x) is false",
+      "Show P(x) is true sometimes",
+      "Find one x where P(x) is true",
+    ],
+    correct: 0,
+    explanation:
+      "You must prove that no matter which element you pick, P is never true.",
+  },
+  {
+    q: 'What is wrong with this argument? "All students are smart. John is smart. Therefore, John is a student."',
+    options: [
+      "This is the converse error (affirming the consequent)",
+      "This is a valid argument",
+      "This uses Modus Ponens correctly",
+      "This is a sound argument",
+    ],
+    correct: 0,
+    explanation:
+      "Just because John has the property (smart), it doesn't mean he belongs to the group (students).",
+  },
+  {
+    q: "What logical fallacy is: From p → q and ¬p, concluding ¬q?",
+    options: [
+      "Denying the antecedent",
+      "Affirming the consequent",
+      "Modus Ponens",
+      "Modus Tollens",
+    ],
+    correct: 0,
+    explanation:
+      "This is a formal fallacy. If p is false, q could still be true for other reasons.",
+  },
+  {
+    q: "What logical fallacy is: From p → q and q, concluding p?",
+    options: [
+      "Affirming the consequent",
+      "Denying the antecedent",
+      "Modus Tollens",
+      "Valid reasoning",
+    ],
+    correct: 0,
+    explanation:
+      "This assumes that q can only be caused by p, which the implication does not state.",
+  },
+];

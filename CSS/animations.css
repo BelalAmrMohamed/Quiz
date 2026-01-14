@@ -1,324 +1,492 @@
-/* animations.css - Reusable Background Animations for All Pages */
+/**
+ * ============================================================================
+ * PREMIUM ANIMATIONS SYSTEM
+ * Modern, performant animations for exceptional user experiences
+ * ============================================================================
+ */
 
-/* ==================== ANIMATED BACKGROUND SYSTEM ==================== */
+/* ============================================================================
+   THEME VARIABLES - Customize for dark/light themes
+   ============================================================================ */
 
-/* Main particle animation layer */
+:root {
+  /* Animation Timings */
+  --anim-duration-fast: 0.2s;
+  --anim-duration-base: 0.4s;
+  --anim-duration-slow: 0.6s;
+  --anim-duration-slower: 0.8s;
+
+  /* Easing Functions - Professional curves */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Background Particles - Light Theme */
+  --particle-primary: rgba(99, 102, 241, 0.08);
+  --particle-secondary: rgba(139, 92, 246, 0.06);
+  --particle-accent: rgba(236, 72, 153, 0.05);
+  --particle-glow: rgba(99, 102, 241, 0.03);
+
+  /* Gradient Orbs */
+  --orb-1: rgba(99, 102, 241, 0.06);
+  --orb-2: rgba(139, 92, 246, 0.05);
+  --orb-3: rgba(236, 72, 153, 0.04);
+
+  /* Overlay Effects */
+  --overlay-gradient: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05) 0%,
+    rgba(139, 92, 246, 0.03) 50%,
+    rgba(236, 72, 153, 0.02) 100%
+  );
+
+  /* Shimmer Effect */
+  --shimmer-gradient: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+
+  /* Glass Morphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: 20px;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --particle-primary: rgba(139, 92, 246, 0.12);
+  --particle-secondary: rgba(236, 72, 153, 0.1);
+  --particle-accent: rgba(59, 130, 246, 0.08);
+  --particle-glow: rgba(139, 92, 246, 0.06);
+
+  --orb-1: rgba(139, 92, 246, 0.08);
+  --orb-2: rgba(236, 72, 153, 0.07);
+  --orb-3: rgba(59, 130, 246, 0.06);
+
+  --overlay-gradient: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.08) 0%,
+    rgba(236, 72, 153, 0.06) 50%,
+    rgba(59, 130, 246, 0.04) 100%
+  );
+
+  --shimmer-gradient: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+
+  --glass-bg: rgba(17, 24, 39, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================================
+   AMBIENT BACKGROUND SYSTEM
+   Subtle, modern particle effects
+   ============================================================================ */
+
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   background: radial-gradient(
-      2px 2px at 20% 30%,
-      var(--anim-particle-1),
-      transparent
+      circle at 10% 20%,
+      var(--orb-1) 0%,
+      transparent 50%
     ),
-    radial-gradient(2px 2px at 60% 70%, var(--anim-particle-2), transparent),
-    radial-gradient(1px 1px at 50% 50%, var(--anim-particle-3), transparent),
-    radial-gradient(1px 1px at 80% 10%, var(--anim-particle-1), transparent),
-    radial-gradient(2px 2px at 90% 60%, var(--anim-particle-2), transparent),
-    radial-gradient(1px 1px at 33% 80%, var(--anim-particle-3), transparent),
-    radial-gradient(1px 1px at 15% 60%, var(--anim-particle-1), transparent);
-  background-size: 200% 200%, 180% 180%, 220% 220%, 190% 190%, 210% 210%,
-    195% 195%, 205% 205%;
-  background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
-    30% 70%;
-  animation: particleFloat1 20s ease-in-out infinite,
-    particleFloat2 15s ease-in-out infinite,
-    particleFloat3 18s ease-in-out infinite;
+    radial-gradient(circle at 90% 80%, var(--orb-2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--orb-3) 0%, transparent 50%);
+  background-size: 100% 100%;
+  animation: ambientOrbs 20s var(--ease-in-out-circ) infinite alternate;
   opacity: 1;
-  transition: opacity 0.5s ease;
+  will-change: transform;
 }
 
-/* Secondary floating orb layer */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   background-image: radial-gradient(
-      circle at 10% 20%,
-      var(--anim-orb) 0%,
-      transparent 3%
+      1px 1px at 15% 25%,
+      var(--particle-primary),
+      transparent
     ),
-    radial-gradient(circle at 80% 80%, var(--anim-orb) 0%, transparent 3%),
-    radial-gradient(circle at 40% 60%, var(--anim-orb) 0%, transparent 3%),
-    radial-gradient(circle at 70% 30%, var(--anim-orb) 0%, transparent 3%),
-    radial-gradient(circle at 25% 75%, var(--anim-orb) 0%, transparent 3%),
-    radial-gradient(circle at 90% 40%, var(--anim-orb) 0%, transparent 3%);
-  background-size: 100% 100%;
-  animation: particlePulse 12s ease-in-out infinite,
-    orbFloat 30s linear infinite;
-  opacity: 1;
-  transition: opacity 0.5s ease;
+    radial-gradient(1px 1px at 85% 75%, var(--particle-secondary), transparent),
+    radial-gradient(2px 2px at 45% 55%, var(--particle-accent), transparent),
+    radial-gradient(1px 1px at 65% 35%, var(--particle-primary), transparent),
+    radial-gradient(1px 1px at 25% 85%, var(--particle-secondary), transparent),
+    radial-gradient(2px 2px at 75% 15%, var(--particle-accent), transparent);
+  background-size: 250% 250%;
+  animation: floatingParticles 30s linear infinite;
+  opacity: 0.8;
 }
 
-/* ==================== ANIMATION KEYFRAMES ==================== */
-
-@keyframes particleFloat1 {
-  0%,
+@keyframes ambientOrbs {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
   100% {
-    background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%,
-      30% 70%;
-  }
-  33% {
-    background-position: 30% 40%, 70% 60%, 60% 40%, 90% 30%, 30% 70%, 80% 40%,
-      20% 80%;
-  }
-  66% {
-    background-position: 60% 80%, 40% 20%, 70% 60%, 85% 15%, 25% 75%, 75% 35%,
-      35% 65%;
+    transform: translate(20px, -30px) scale(1.1) rotate(10deg);
   }
 }
 
-@keyframes particleFloat2 {
-  0%,
-  100% {
-    transform: translateY(0px) translateX(0px);
+@keyframes floatingParticles {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 70% 30%;
   }
   50% {
-    transform: translateY(-20px) translateX(10px);
+    background-position: 100% 50%, 0% 50%, 60% 40%, 70% 30%, 30% 70%, 80% 40%;
   }
-}
-
-@keyframes particleFloat3 {
-  0%,
   100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
+    background-position: 0% 100%, 100% 0%, 50% 60%, 60% 40%, 40% 60%, 60% 50%;
   }
 }
 
-@keyframes particlePulse {
-  0%,
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1) rotate(5deg);
-    opacity: 0.8;
-  }
+/* ============================================================================
+   COMPONENT ENTRANCE ANIMATIONS
+   Premium fade & slide effects
+   ============================================================================ */
+
+.fade-in {
+  animation: fadeIn var(--anim-duration-base) var(--ease-out-expo) forwards;
 }
 
-@keyframes orbFloat {
+.fade-in-up {
+  animation: fadeInUp var(--anim-duration-slow) var(--ease-out-expo) forwards;
+}
+
+.fade-in-down {
+  animation: fadeInDown var(--anim-duration-slow) var(--ease-out-expo) forwards;
+}
+
+.fade-in-scale {
+  animation: fadeInScale var(--anim-duration-base) var(--ease-out-back) forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft var(--anim-duration-slow) var(--ease-out-expo) forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight var(--anim-duration-slow) var(--ease-out-expo)
+    forwards;
+}
+
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Staggered Children Animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp var(--anim-duration-slow) var(--ease-out-expo) forwards;
+}
+
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.stagger-children > *:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.stagger-children > *:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+/* ============================================================================
+   INTERACTIVE HOVER EFFECTS
+   Smooth, professional micro-interactions
+   ============================================================================ */
+
+.hover-lift {
+  transition: transform var(--anim-duration-fast) var(--ease-out-expo),
+    box-shadow var(--anim-duration-fast) var(--ease-out-expo);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2);
+}
+
+.hover-glow {
+  position: relative;
+  transition: all var(--anim-duration-fast) var(--ease-smooth);
+}
+
+.hover-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  opacity: 0;
+  background: var(--overlay-gradient);
+  transition: opacity var(--anim-duration-fast) var(--ease-smooth);
+  z-index: -1;
+  filter: blur(10px);
+}
+
+.hover-glow:hover::before {
+  opacity: 1;
+}
+
+.hover-scale {
+  transition: transform var(--anim-duration-fast) var(--ease-out-expo);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--shimmer-gradient);
+  transform: translateX(-100%);
+  transition: transform 0.6s var(--ease-smooth);
+}
+
+.hover-shimmer:hover::after {
+  transform: translateX(100%);
+}
+
+/* Button Hover Enhancement */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--anim-duration-base) var(--ease-out-expo);
+}
+
+.btn-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--anim-duration-base) var(--ease-out-expo);
+}
+
+.btn-premium:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-premium:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================================
+   CARD ANIMATIONS
+   Modern card presentations
+   ============================================================================ */
+
+.card {
+  transition: all var(--anim-duration-base) var(--ease-out-expo);
+}
+
+.card-float {
+  animation: cardFloat 6s var(--ease-in-out-circ) infinite;
+}
+
+@keyframes cardFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.card-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-reveal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-gradient);
+  opacity: 0;
+  transition: opacity var(--anim-duration-base) var(--ease-smooth);
+}
+
+.card-reveal:hover::before {
+  opacity: 1;
+}
+
+/* Glass Morphism Card */
+.card-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  transition: all var(--anim-duration-base) var(--ease-out-expo);
+}
+
+.card-glass:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-4px);
+}
+
+[data-theme="dark"] .card-glass:hover {
+  background: rgba(17, 24, 39, 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   MODAL & OVERLAY ANIMATIONS
+   Elegant modal presentations
+   ============================================================================ */
+
+.modal-overlay {
+  animation: overlayFadeIn var(--anim-duration-base) var(--ease-smooth) forwards;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  animation: modalSlideUp var(--anim-duration-slow) var(--ease-out-back)
+    forwards;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================================
+   LOADING ANIMATIONS
+   Premium loading states
+   ============================================================================ */
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(99, 102, 241, 0.1);
+  border-top-color: rgba(99, 102, 241, 1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* Additional animation for header/card accents */
-@keyframes gradient-shift {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
+.loading-dots::after {
+  content: "";
+  animation: dots 1.5s steps(4, end) infinite;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-/* ==================== ANIMATION DISABLED STATE ==================== */
-
-/* When animations are disabled via data attribute */
-[data-animations="disabled"] body::before,
-[data-animations="disabled"] body::after {
-  animation: none !important;
-  opacity: 0.15 !important;
-}
-
-[data-animations="disabled"] .header::before {
-  animation: none !important;
-}
-
-/* Disable floating animations but keep essential UI transitions */
-[data-animations="disabled"] .card::before,
-[data-animations="disabled"] .category-card::before,
-[data-animations="disabled"] .exam-card::before {
-  animation: none !important;
-}
-
-[data-animations="disabled"] .score-circle,
-[data-animations="disabled"] .question-card,
-[data-animations="disabled"] #scoreHeader,
-[data-animations="disabled"] .review-card,
-[data-animations="disabled"] .header h1 {
-  animation: none !important;
-}
-
-/* Keep UI interactions smooth */
-[data-animations="disabled"] body,
-[data-animations="disabled"] .card,
-[data-animations="disabled"] .menu-item,
-[data-animations="disabled"] .nav-btn,
-[data-animations="disabled"] .theme-selector-btn,
-[data-animations="disabled"] .option-row,
-[data-animations="disabled"] button,
-[data-animations="disabled"] a {
-  transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-/* ==================== REDUCED MOTION SUPPORT ==================== */
-
-/* Respect user's system preference for reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  body::before,
-  body::after {
-    animation: none !important;
-    opacity: 0.3;
-  }
-}
-
-/* Modal overlay and content */
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s ease;
-}
-
-/* Disable backdrop blur when animations are off (performance fix) */
-[data-animations="disabled"] .modal-overlay {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  animation: none !important;
-}
-
-.modal-card {
-  animation: scaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-[data-animations="disabled"] .modal-card {
-  animation: none !important;
-}
-
-/* Confetti Animation (Summary Page) */
-.confetti {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  background: var(--color-primary);
-  position: absolute;
-  animation: confetti-fall 3s ease-out forwards;
-  z-index: 1000;
-}
-
-@keyframes confetti-fall {
-  to {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Disable confetti when animations are off */
-[data-animations="disabled"] .confetti {
-  display: none;
-}
-
-/* ==================== UTILITY ANIMATIONS ==================== */
-
-/* Fade in up animation for cards */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scale in animation */
-@keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Celebration bounce animation */
-@keyframes celebration {
-  0% {
-    transform: scale(0.8) rotate(-5deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05) rotate(2deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-/* Pop in animation for badges */
-@keyframes popIn {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Slide in animation */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Fade in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Loading dots animation */
 @keyframes dots {
   0%,
   20% {
@@ -333,13 +501,376 @@ body::after {
   }
 }
 
-/* Timer tick animation */
-@keyframes tick {
+.loading-pulse {
+  animation: pulse 2s var(--ease-in-out-circ) infinite;
+}
+
+@keyframes pulse {
   0%,
   100% {
+    opacity: 1;
     transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s ease-in-out infinite;
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================================================
+   CELEBRATION ANIMATIONS
+   Success & achievement effects
+   ============================================================================ */
+
+.confetti-burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--particle-primary);
+  animation: confettiFall 3s var(--ease-out-expo) forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.success-bounce {
+  animation: successBounce 0.6s var(--ease-out-back) forwards;
+}
+
+@keyframes successBounce {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
   }
   50% {
     transform: scale(1.1);
   }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.celebration-pop {
+  animation: celebrationPop 0.5s var(--ease-spring) forwards;
+}
+
+@keyframes celebrationPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   PROGRESS & METERS
+   Animated progress indicators
+   ============================================================================ */
+
+.progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  transition: width var(--anim-duration-slower) var(--ease-out-expo);
+}
+
+.progress-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--shimmer-gradient);
+  animation: progressShimmer 2s linear infinite;
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Circular Progress */
+.circular-progress {
+  animation: circularSpin 2s linear infinite;
+}
+
+@keyframes circularSpin {
+  0% {
+    stroke-dashoffset: 280;
+    transform: rotate(0deg);
+  }
+  50% {
+    stroke-dashoffset: 75;
+    transform: rotate(180deg);
+  }
+  100% {
+    stroke-dashoffset: 280;
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   TOOLTIP & NOTIFICATION ANIMATIONS
+   ============================================================================ */
+
+.tooltip {
+  animation: tooltipSlideIn var(--anim-duration-fast) var(--ease-out-expo)
+    forwards;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.notification {
+  animation: notificationSlideIn var(--anim-duration-base) var(--ease-out-expo)
+    forwards;
+}
+
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-exit {
+  animation: notificationSlideOut var(--anim-duration-base) var(--ease-smooth)
+    forwards;
+}
+
+@keyframes notificationSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================================================
+   TEXT ANIMATIONS
+   Elegant typography effects
+   ============================================================================ */
+
+.text-gradient-shift {
+  background: linear-gradient(
+    90deg,
+    var(--particle-primary),
+    var(--particle-secondary),
+    var(--particle-accent),
+    var(--particle-primary)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s linear infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-reveal {
+  animation: textReveal var(--anim-duration-slow) var(--ease-out-expo) forwards;
+}
+
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ============================================================================
+   SCROLL ANIMATIONS
+   Trigger on viewport intersection (use with JS)
+   ============================================================================ */
+
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity var(--anim-duration-slow) var(--ease-out-expo),
+    transform var(--anim-duration-slow) var(--ease-out-expo);
+}
+
+.scroll-fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--anim-duration-slow) var(--ease-out-expo),
+    transform var(--anim-duration-slow) var(--ease-out-expo);
+}
+
+.scroll-scale-in.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================================
+   ACCESSIBILITY & PERFORMANCE
+   ============================================================================ */
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  body::before,
+  body::after {
+    animation: none !important;
+    opacity: 0.3 !important;
+  }
+}
+
+/* Manual animation disable toggle */
+[data-animations="disabled"] * {
+  animation: none !important;
+  transition-duration: 0.2s !important;
+}
+
+[data-animations="disabled"] body::before,
+[data-animations="disabled"] body::after {
+  animation: none !important;
+  opacity: 0.15 !important;
+}
+
+[data-animations="disabled"] .modal-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   Quick access animation helpers
+   ============================================================================ */
+
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-400 {
+  animation-delay: 0.4s;
+}
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.duration-fast {
+  animation-duration: var(--anim-duration-fast);
+}
+.duration-base {
+  animation-duration: var(--anim-duration-base);
+}
+.duration-slow {
+  animation-duration: var(--anim-duration-slow);
+}
+.duration-slower {
+  animation-duration: var(--anim-duration-slower);
+}
+
+/* Performance optimization */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+.gpu-accelerate {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }

@@ -1,0 +1,445 @@
+export const questions = [
+  // Basic Level
+  {
+    q: "What is a proposition?",
+    options: [
+      "A question",
+      "A command",
+      "A declarative sentence that is either true or false, but not both",
+      "An exclamation",
+    ],
+    correct: 2,
+    explanation:
+      "A proposition must be a declarative statement that has a specific truth value (true or false).",
+  },
+  {
+    q: "Which of the following is NOT a proposition?",
+    options: [
+      "2 + 3 = 5",
+      "What time is it?",
+      "Cairo is the capital of Egypt",
+      "5 - 2 = 1",
+    ],
+    correct: 1,
+    explanation:
+      "Questions are not propositions because they do not affirm or deny anything and thus lack a truth value.",
+  },
+  {
+    q: 'What is the truth value of the proposition "2 + 3 = 5"?',
+    options: ["True", "False", "Unknown", "Neither true nor false"],
+    correct: 0,
+    explanation:
+      "The mathematical statement is factually correct, so its truth value is True.",
+  },
+  {
+    q: 'Is "x + 3 = 7" a proposition?',
+    options: [
+      "Yes, always",
+      "No, because it contains a variable",
+      "Yes, if x is assigned a value",
+      "Both B and C are correct",
+    ],
+    correct: 3,
+    explanation:
+      "It is an open sentence (predicate). It is not a proposition until the variable 'x' is bound or assigned a value.",
+  },
+  {
+    q: "What symbol is used to denote negation?",
+    options: ["∧", "∨", "¬", "→"],
+    correct: 2,
+    explanation:
+      "The symbol ¬ (or sometimes ~) represents logical negation (NOT).",
+  },
+  {
+    q: "If p is true, what is the truth value of ¬p?",
+    options: ["True", "False", "Unknown", "Depends on context"],
+    correct: 1,
+    explanation: "Negation flips the truth value. If p is True, ¬p is False.",
+  },
+  {
+    q: "What does the symbol ∧ represent?",
+    options: [
+      "Disjunction (OR)",
+      "Conjunction (AND)",
+      "Negation (NOT)",
+      "Implication",
+    ],
+    correct: 1,
+    explanation:
+      "The symbol ∧ represents the logical conjunction, equivalent to 'AND'.",
+  },
+  {
+    q: "When is p ∧ q true?",
+    options: [
+      "When at least one of p or q is true",
+      "When both p and q are true",
+      "When p is true or q is false",
+      "When both p and q are false",
+    ],
+    correct: 1,
+    explanation: "A conjunction is true if and only if both operands are true.",
+  },
+  {
+    q: "What does the symbol ∨ represent?",
+    options: ["Conjunction", "Negation", "Disjunction", "Biconditional"],
+    correct: 2,
+    explanation:
+      "The symbol ∨ represents logical disjunction, equivalent to the inclusive 'OR'.",
+  },
+  {
+    q: "When is p ∨ q true?",
+    options: [
+      "Only when both are true",
+      "When at least one of p or q is true",
+      "Only when p is true",
+      "Never",
+    ],
+    correct: 1,
+    explanation:
+      "A disjunction is true if at least one of the propositions is true.",
+  },
+  {
+    q: "What is the symbol for exclusive OR (XOR)?",
+    options: ["∧", "∨", "⊕", "↔"],
+    correct: 2,
+    explanation:
+      "The symbol ⊕ represents exclusive OR, which is true only when inputs differ.",
+  },
+  {
+    q: "When is p ⊕ q true?",
+    options: [
+      "When both are true",
+      "When both are false",
+      "When exactly one is true",
+      "When at least one is true",
+    ],
+    correct: 2,
+    explanation:
+      "XOR is true only when the truth values of p and q are different (one true, one false).",
+  },
+  {
+    q: "What is the symbol for conditional (implication)?",
+    options: ["→", "↔", "∧", "∨"],
+    correct: 0,
+    explanation: "The arrow → denotes a conditional statement (if... then).",
+  },
+  {
+    q: "When is p → q false?",
+    options: [
+      "When p is true and q is false",
+      "When p is false and q is true",
+      "When both are false",
+      "When both are true",
+    ],
+    correct: 0,
+    explanation:
+      "An implication is only false when the hypothesis (p) is true but the conclusion (q) is false.",
+  },
+  {
+    q: "What is the symbol for biconditional?",
+    options: ["→", "↔", "⊕", "∧"],
+    correct: 1,
+    explanation:
+      "The double arrow ↔ denotes a biconditional statement (if and only if).",
+  },
+  {
+    q: "When is p ↔ q true?",
+    options: [
+      "When p and q have the same truth value",
+      "When p and q have different truth values",
+      "Only when both are true",
+      "Only when both are false",
+    ],
+    correct: 0,
+    explanation:
+      "A biconditional is true when both statements share the same truth value (both true or both false).",
+  },
+  {
+    q: "What is the converse of p → q?",
+    options: ["¬p → ¬q", "q → p", "¬q → ¬p", "p → ¬q"],
+    correct: 1,
+    explanation: "The converse switches the hypothesis and the conclusion.",
+  },
+  {
+    q: "What is the contrapositive of p → q?",
+    options: ["q → p", "¬p → ¬q", "¬q → ¬p", "p ↔ q"],
+    correct: 2,
+    explanation:
+      "The contrapositive switches and negates both the hypothesis and the conclusion.",
+  },
+  {
+    q: "What is the inverse of p → q?",
+    options: ["q → p", "¬p → ¬q", "¬q → ¬p", "p → ¬q"],
+    correct: 1,
+    explanation:
+      "The inverse negates both the hypothesis and the conclusion without switching them.",
+  },
+  {
+    q: "What is a tautology?",
+    options: [
+      "A statement that is always false",
+      "A statement that is always true",
+      "A statement that can be either true or false",
+      "A statement with no truth value",
+    ],
+    correct: 1,
+    explanation:
+      "A tautology is a compound proposition that is always true, regardless of the truth values of its variables.",
+  },
+  {
+    q: "What is a contradiction?",
+    options: [
+      "A statement that is always true",
+      "A statement that is always false",
+      "A statement with variable truth values",
+      "A statement that is neither true nor false",
+    ],
+    correct: 1,
+    explanation:
+      "A contradiction is a compound proposition that is always false.",
+  },
+  {
+    q: "What is p ∧ ¬p?",
+    options: [
+      "A tautology",
+      "A contradiction",
+      "Sometimes true, sometimes false",
+      "Always true",
+    ],
+    correct: 1,
+    explanation:
+      "A proposition cannot be both true and false at the same time, so this is always false (contradiction).",
+  },
+  {
+    q: "What is p ∨ ¬p?",
+    options: [
+      "A contradiction",
+      "A tautology",
+      "Sometimes true",
+      "Always false",
+    ],
+    correct: 1,
+    explanation:
+      "This is the law of excluded middle; a statement is either true or false, so the disjunction is always true (tautology).",
+  },
+  {
+    q: "In bit operations, what does 1 represent?",
+    options: ["False", "True", "Unknown", "Null"],
+    correct: 1,
+    explanation: "In binary logic, 1 represents True and 0 represents False.",
+  },
+  {
+    q: "What is the bitwise AND of 1 and 0?",
+    options: ["0", "1", "2", "Undefined"],
+    correct: 0,
+    explanation:
+      "1 AND 0 is equivalent to True AND False, which results in False (0).",
+  },
+  {
+    q: "What is the bitwise OR of 1 and 0?",
+    options: ["0", "1", "2", "Undefined"],
+    correct: 1,
+    explanation:
+      "1 OR 0 is equivalent to True OR False, which results in True (1).",
+  },
+  {
+    q: "What is the bitwise XOR of 1 and 1?",
+    options: ["0", "1", "2", "Undefined"],
+    correct: 0,
+    explanation: "XOR results in 0 (False) if the bits are the same.",
+  },
+  {
+    q: "What is the universal quantifier symbol?",
+    options: ["∃", "∀", "¬", "→"],
+    correct: 1,
+    explanation:
+      "The symbol ∀ (an inverted A) denotes 'for all' or 'for every'.",
+  },
+  {
+    q: "What does ∀x P(x) mean?",
+    options: [
+      "There exists an x such that P(x) is true",
+      "For all x, P(x) is true",
+      "P(x) is false for all x",
+      "P(x) is sometimes true",
+    ],
+    correct: 1,
+    explanation:
+      "It asserts that the predicate P holds for every element x in the domain.",
+  },
+  {
+    q: "What is the existential quantifier symbol?",
+    options: ["∀", "∃", "¬", "∧"],
+    correct: 1,
+    explanation: "The symbol ∃ (a reversed E) denotes 'there exists'.",
+  },
+
+  // Intermediate Level
+  {
+    q: "What does ∃x P(x) mean?",
+    options: [
+      "For all x, P(x) is true",
+      "There exists at least one x such that P(x) is true",
+      "P(x) is false for all x",
+      "No x makes P(x) true",
+    ],
+    correct: 1,
+    explanation:
+      "It asserts that there is at least one element in the domain for which P is true.",
+  },
+  {
+    q: "Which logic gate corresponds to negation?",
+    options: ["AND gate", "OR gate", "NOT gate", "XOR gate"],
+    correct: 2,
+    explanation: "A NOT gate inverts the input signal.",
+  },
+  {
+    q: "Which logic gate corresponds to conjunction?",
+    options: ["AND gate", "OR gate", "NOT gate", "NAND gate"],
+    correct: 0,
+    explanation: "An AND gate outputs high only if all inputs are high.",
+  },
+  {
+    q: "Which logic gate corresponds to disjunction?",
+    options: ["AND gate", "OR gate", "NOT gate", "NOR gate"],
+    correct: 1,
+    explanation: "An OR gate outputs high if at least one input is high.",
+  },
+  {
+    q: "What is De Morgan's first law?",
+    options: [
+      "¬(p ∧ q) ≡ ¬p ∨ ¬q",
+      "¬(p ∨ q) ≡ ¬p ∧ ¬q",
+      "¬(p → q) ≡ p ∧ ¬q",
+      "Both A and B",
+    ],
+    correct: 3,
+    explanation:
+      "De Morgan's laws describe how negation distributes over conjunctions and disjunctions. Both A and B represent these laws.",
+  },
+  {
+    q: "According to De Morgan's laws, ¬(p ∧ q) is equivalent to:",
+    options: ["¬p ∧ ¬q", "¬p ∨ ¬q", "p ∨ q", "p ∧ q"],
+    correct: 1,
+    explanation:
+      "The negation of a conjunction is the disjunction of the negations.",
+  },
+  {
+    q: "According to De Morgan's laws, ¬(p ∨ q) is equivalent to:",
+    options: ["¬p ∨ ¬q", "¬p ∧ ¬q", "p ∧ q", "p ∨ q"],
+    correct: 1,
+    explanation:
+      "The negation of a disjunction is the conjunction of the negations.",
+  },
+  {
+    q: "What is the double negation law?",
+    options: ["¬¬p ≡ p", "¬¬p ≡ ¬p", "¬p ≡ p", "p ≡ ¬p"],
+    correct: 0,
+    explanation: "Negating a negation returns the original truth value.",
+  },
+  {
+    q: "What is the identity law for disjunction?",
+    options: ["p ∨ T ≡ T", "p ∨ F ≡ p", "p ∧ T ≡ p", "p ∧ F ≡ F"],
+    correct: 1,
+    explanation: "Disjunction with False does not change the truth value of p.",
+  },
+  {
+    q: "What is the domination law for conjunction?",
+    options: ["p ∧ F ≡ F", "p ∧ T ≡ p", "p ∨ T ≡ T", "p ∨ F ≡ p"],
+    correct: 0,
+    explanation:
+      "Conjunction with False always results in False, dominating the expression.",
+  },
+  {
+    q: "What is p → q logically equivalent to?",
+    options: ["¬p ∨ q", "p ∨ q", "p ∧ q", "¬p ∧ q"],
+    correct: 0,
+    explanation:
+      "An implication is true if the hypothesis is false OR the conclusion is true.",
+  },
+  {
+    q: 'If p is "It is raining" and q is "The ground is wet," what is p → q?',
+    options: [
+      "It is raining and the ground is wet",
+      "If it is raining, then the ground is wet",
+      "It is raining or the ground is wet",
+      "The ground is wet if it is raining",
+    ],
+    correct: 1,
+    explanation: "This is the standard conditional form 'If p, then q'.",
+  },
+  {
+    q: "What is a counterexample for ∀x P(x)?",
+    options: [
+      "An element for which P(x) is true",
+      "An element for which P(x) is false",
+      "An element that doesn't exist",
+      "An element where P(x) is undefined",
+    ],
+    correct: 1,
+    explanation:
+      "A single instance where P(x) is false is sufficient to disprove a universal claim.",
+  },
+  {
+    q: "What is the negation of ∀x P(x)?",
+    options: ["∀x ¬P(x)", "∃x ¬P(x)", "¬∃x P(x)", "∃x P(x)"],
+    correct: 1,
+    explanation:
+      "To negate 'all', you only need to show 'there exists at least one that is not'.",
+  },
+  {
+    q: "What is the negation of ∃x P(x)?",
+    options: ["∃x ¬P(x)", "∀x P(x)", "∀x ¬P(x)", "¬∀x P(x)"],
+    correct: 2,
+    explanation:
+      "To negate 'there exists', you must show that 'for all, it is not true'.",
+  },
+  {
+    q: "Which has higher precedence: ¬ or ∧?",
+    options: ["¬", "∧", "They have equal precedence", "It depends on context"],
+    correct: 0,
+    explanation: "Negation binds more tightly than conjunction.",
+  },
+  {
+    q: "What is the order of precedence for logical operators (highest to lowest)?",
+    options: [
+      "¬, ∧, ∨, →, ↔",
+      "∧, ∨, ¬, →, ↔",
+      "¬, ∨, ∧, ↔, →",
+      "↔, →, ∨, ∧, ¬",
+    ],
+    correct: 0,
+    explanation:
+      "Standard precedence is NOT, then AND, then OR, then Implication, then Biconditional.",
+  },
+  {
+    q: 'When translating "All students have studied calculus," if the domain is all students, which is correct?',
+    options: ["∀x C(x)", "∃x C(x)", "∀x (S(x) → C(x))", "∃x (S(x) ∧ C(x))"],
+    correct: 0,
+    explanation:
+      "If the domain is already restricted to students, we simply say 'for all x, x studied calculus'.",
+  },
+  {
+    q: 'When translating "Some students have studied calculus," if the domain is all people, which is correct?',
+    options: [
+      "∀x (S(x) → C(x))",
+      "∃x (S(x) ∧ C(x))",
+      "∃x (S(x) → C(x))",
+      "∀x (S(x) ∧ C(x))",
+    ],
+    correct: 1,
+    explanation:
+      "For existential statements over a general domain, we use conjunction (AND) to specify the group and the property.",
+  },
+  {
+    q: "What is the commutative law for conjunction?",
+    options: [
+      "p ∧ q ≡ q ∧ p",
+      "p ∧ (q ∧ r) ≡ (p ∧ q) ∧ r",
+      "p ∧ q ≡ p ∨ q",
+      "p ∧ q ≡ ¬p ∨ ¬q",
+    ],
+    correct: 0,
+    explanation: "The order of operands in a conjunction does not matter.",
+  },
+];

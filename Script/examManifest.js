@@ -9,6 +9,18 @@ export const examList = [
     "category": "Computer Network"
   },
   {
+    "id": "50 MCQs on Chapter 1",
+    "title": "50 MCQs On Chapter 1",
+    "path": "../Exams/Discrete Structure/50 MCQs on Chapter 1.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "55 MCQs on Chapter 1",
+    "title": "55 MCQs On Chapter 1",
+    "path": "../Exams/Discrete Structure/55 MCQs on Chapter 1.js",
+    "category": "Discrete Structure"
+  },
+  {
     "id": "MCQs on Chapter 2",
     "title": "MCQs On Chapter 2",
     "path": "../Exams/Discrete Structure/MCQs on Chapter 2.js",
@@ -27,15 +39,21 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
+    "id": "Midterm 2026",
+    "title": "Midterm 2026",
+    "path": "../Exams/Discrete Structure/Midterm 2026.js",
+    "category": "Discrete Structure"
+  },
+  {
     "id": "Practical Exam - Model A",
     "title": "Practical Exam   Model A",
     "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
     "category": "Discrete Structure"
   },
   {
-    "id": "Quiz",
-    "title": "Quiz",
-    "path": "../Exams/Discrete Structure/Quiz.js",
+    "id": "Quiz 1",
+    "title": "Quiz 1",
+    "path": "../Exams/Discrete Structure/Quiz 1.js",
     "category": "Discrete Structure"
   },
   {
@@ -45,9 +63,27 @@ export const examList = [
     "category": "Discrete Structure"
   },
   {
-    "id": "Revision",
-    "title": "Revision",
-    "path": "../Exams/Discrete Structure/Revision.js",
+    "id": "Quiz 3",
+    "title": "Quiz 3",
+    "path": "../Exams/Discrete Structure/Quiz 3.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Quiz 4",
+    "title": "Quiz 4",
+    "path": "../Exams/Discrete Structure/Quiz 4.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Quiz 5",
+    "title": "Quiz 5",
+    "path": "../Exams/Discrete Structure/Quiz 5.js",
+    "category": "Discrete Structure"
+  },
+  {
+    "id": "Revision 1",
+    "title": "Revision 1",
+    "path": "../Exams/Discrete Structure/Revision 1.js",
     "category": "Discrete Structure"
   },
   {
@@ -321,31 +357,31 @@ export const examList = [
     "category": "Programming 2"
   },
   {
+    "id": "Programming 2-Quiz 1",
+    "title": "Quiz 1",
+    "path": "../Exams/Programming 2/Quiz 1.js",
+    "category": "Programming 2"
+  },
+  {
     "id": "Programming 2-Quiz 2",
     "title": "Quiz 2",
     "path": "../Exams/Programming 2/Quiz 2.js",
     "category": "Programming 2"
   },
   {
-    "id": "Quiz 1",
-    "title": "Quiz 1",
-    "path": "../Exams/Programming 2/Quiz 1.js",
-    "category": "Programming 2"
-  },
-  {
-    "id": "Quiz 3",
+    "id": "Programming 2-Quiz 3",
     "title": "Quiz 3",
     "path": "../Exams/Programming 2/Quiz 3.js",
     "category": "Programming 2"
   },
   {
-    "id": "Quiz 4",
+    "id": "Programming 2-Quiz 4",
     "title": "Quiz 4",
     "path": "../Exams/Programming 2/Quiz 4.js",
     "category": "Programming 2"
   },
   {
-    "id": "Quiz 5",
+    "id": "Programming 2-Quiz 5",
     "title": "Quiz 5",
     "path": "../Exams/Programming 2/Quiz 5.js",
     "category": "Programming 2"
@@ -396,6 +432,18 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
+        "id": "50 MCQs on Chapter 1",
+        "title": "50 MCQs On Chapter 1",
+        "path": "../Exams/Discrete Structure/50 MCQs on Chapter 1.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "55 MCQs on Chapter 1",
+        "title": "55 MCQs On Chapter 1",
+        "path": "../Exams/Discrete Structure/55 MCQs on Chapter 1.js",
+        "category": "Discrete Structure"
+      },
+      {
         "id": "MCQs on Chapter 2",
         "title": "MCQs On Chapter 2",
         "path": "../Exams/Discrete Structure/MCQs on Chapter 2.js",
@@ -414,9 +462,21 @@ export const categoryTree = {
         "category": "Discrete Structure"
       },
       {
+        "id": "Midterm 2026",
+        "title": "Midterm 2026",
+        "path": "../Exams/Discrete Structure/Midterm 2026.js",
+        "category": "Discrete Structure"
+      },
+      {
         "id": "Practical Exam - Model A",
         "title": "Practical Exam   Model A",
         "path": "../Exams/Discrete Structure/Practical Exam - Model A.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Quiz 1",
+        "title": "Quiz 1",
+        "path": "../Exams/Discrete Structure/Quiz 1.js",
         "category": "Discrete Structure"
       },
       {
@@ -426,21 +486,33 @@ export const categoryTree = {
         "category": "Discrete Structure"
       },
       {
-        "id": "Quiz",
-        "title": "Quiz",
-        "path": "../Exams/Discrete Structure/Quiz.js",
+        "id": "Quiz 3",
+        "title": "Quiz 3",
+        "path": "../Exams/Discrete Structure/Quiz 3.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Quiz 4",
+        "title": "Quiz 4",
+        "path": "../Exams/Discrete Structure/Quiz 4.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Quiz 5",
+        "title": "Quiz 5",
+        "path": "../Exams/Discrete Structure/Quiz 5.js",
+        "category": "Discrete Structure"
+      },
+      {
+        "id": "Revision 1",
+        "title": "Revision 1",
+        "path": "../Exams/Discrete Structure/Revision 1.js",
         "category": "Discrete Structure"
       },
       {
         "id": "Revision 2",
         "title": "Revision 2",
         "path": "../Exams/Discrete Structure/Revision 2.js",
-        "category": "Discrete Structure"
-      },
-      {
-        "id": "Revision",
-        "title": "Revision",
-        "path": "../Exams/Discrete Structure/Revision.js",
         "category": "Discrete Structure"
       }
     ]
@@ -785,7 +857,7 @@ export const categoryTree = {
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 1",
+        "id": "Programming 2-Quiz 1",
         "title": "Quiz 1",
         "path": "../Exams/Programming 2/Quiz 1.js",
         "category": "Programming 2"
@@ -797,19 +869,19 @@ export const categoryTree = {
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 3",
+        "id": "Programming 2-Quiz 3",
         "title": "Quiz 3",
         "path": "../Exams/Programming 2/Quiz 3.js",
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 4",
+        "id": "Programming 2-Quiz 4",
         "title": "Quiz 4",
         "path": "../Exams/Programming 2/Quiz 4.js",
         "category": "Programming 2"
       },
       {
-        "id": "Quiz 5",
+        "id": "Programming 2-Quiz 5",
         "title": "Quiz 5",
         "path": "../Exams/Programming 2/Quiz 5.js",
         "category": "Programming 2"
