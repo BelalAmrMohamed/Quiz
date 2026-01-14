@@ -39,17 +39,6 @@ export const themeManager = {
     this.updateThemeUI(theme);
   },
 
-  // applyAnimations(enabled) {
-  //   document.documentElement.setAttribute(
-  //     "data-animations",
-  //     enabled ? "enabled" : "disabled"
-  //   );
-  //   localStorage.setItem(ANIMATIONS_KEY, enabled ? "enabled" : "disabled");
-
-  //   // Update UI if elements exist
-  //   this.updateAnimationsUI(enabled);
-  // },
-
   applyAnimations(enabled) {
     // 1. Manage the physical CSS file in the <head>
     const ANIM_ID = "dynamic-animations-stylesheet";
