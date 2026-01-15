@@ -150,10 +150,7 @@ async function init() {
       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
     }
 
-    // Hide timer in practice mode
-    if (quizMode === "practice" && els.timerBadge) {
-      els.timerBadge.classList.add("hidden");
-    }
+    // Timer is now visible in all modes (no hiding)
 
     if (quizMode === "timed") {
       timeRemaining = questions.length * 30;
@@ -823,8 +820,6 @@ function saveState() {
 }
 
 function startTimer() {
-  if (quizMode === "practice") return;
-
   if (timerInterval) clearInterval(timerInterval);
 
   timerInterval = setInterval(() => {
@@ -845,7 +840,8 @@ function startTimer() {
         els.timer.textContent = `⏳ ${mins}:${secs}`;
         if (timeRemaining < 30) els.timer.style.color = "var(--color-error)";
       }
-    } else if (quizMode === "exam") {
+    } else {
+      // For practice and exam modes, count up
       timeElapsed++;
       const mins = Math.floor(timeElapsed / 60)
         .toString()

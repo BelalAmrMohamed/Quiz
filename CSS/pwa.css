@@ -1,0 +1,730 @@
+/* CSS/pwa.css - PWA Component Styles */
+
+/* ============================================
+   INSTALL BANNER
+   ============================================ */
+
+.install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #0088cc, #005999);
+  color: white;
+  padding: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.install-banner.show {
+  transform: translateY(0);
+}
+
+.install-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.install-banner-icon img {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.install-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.install-banner-text h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.install-banner-text p {
+  margin: 0 0 10px 0;
+  opacity: 0.9;
+}
+
+.install-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 0.9em;
+}
+
+.install-features li {
+  opacity: 0.95;
+}
+
+.install-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.install-btn {
+  background: white;
+  color: #0088cc;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dismiss-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Install Success Message */
+.install-success {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: white;
+  color: #333;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 10001;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  text-align: center;
+}
+
+.install-success.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.success-icon {
+  font-size: 4em;
+  margin-bottom: 20px;
+}
+
+.install-success h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.5em;
+}
+
+.install-success p {
+  margin: 0;
+  color: #666;
+}
+
+/* Header Install Button */
+.header-install-btn {
+  background: #0088cc;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.header-install-btn:hover {
+  background: #006699;
+  transform: scale(1.05);
+}
+
+/* ============================================
+   OFFLINE INDICATOR
+   ============================================ */
+
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 0.9em;
+  font-weight: 500;
+  z-index: 9999;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.offline-indicator.show {
+  transform: translateY(0);
+}
+
+.offline-indicator.offline {
+  background: #ff9800;
+  color: white;
+}
+
+.offline-indicator.online {
+  background: #4caf50;
+  color: white;
+}
+
+.indicator-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.indicator-icon {
+  font-size: 1.2em;
+}
+
+/* ============================================
+   NOTIFICATION BANNERS
+   ============================================ */
+
+.notification-banner {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #333;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 9998;
+  max-width: 400px;
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notification-icon {
+  font-size: 1.5em;
+  flex-shrink: 0;
+}
+
+.notification-text {
+  flex: 1;
+}
+
+.notification-text strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1.05em;
+}
+
+.notification-text p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.notification-action,
+.notification-close {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 8px;
+  transition: all 0.2s;
+}
+
+.notification-action {
+  background: #0088cc;
+  color: white;
+  font-weight: 500;
+}
+
+.notification-action:hover {
+  background: #006699;
+}
+
+.notification-close {
+  color: #999;
+}
+
+.notification-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Specific Banner Types */
+.notification-banner.streak-reminder {
+  border-left: 4px solid #ff5722;
+}
+
+.notification-banner.new-quiz {
+  border-left: 4px solid #4caf50;
+}
+
+.notification-banner.daily-reminder {
+  border-left: 4px solid #0088cc;
+}
+
+/* ============================================
+   ACHIEVEMENT POPUP
+   ============================================ */
+
+.achievement-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  z-index: 10002;
+  text-align: center;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid #ffa000;
+}
+
+.achievement-popup.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.achievement-badge {
+  font-size: 5em;
+  margin-bottom: 15px;
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.achievement-popup h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #ff6f00;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-title {
+  font-size: 1.4em;
+  font-weight: 600;
+  margin: 10px 0;
+  color: #333;
+}
+
+.achievement-desc {
+  font-size: 1em;
+  color: #555;
+  margin: 0;
+}
+
+/* ============================================
+   NOTIFICATION CENTER
+   ============================================ */
+
+.notification-center {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+  z-index: 10003;
+  transition: right 0.3s ease-in-out;
+  overflow-y: auto;
+}
+
+.notification-center.show {
+  right: 0;
+}
+
+.notification-center-header {
+  background: #0088cc;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.notification-center-header h3 {
+  margin: 0;
+  font-size: 1.3em;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.notification-center-body {
+  padding: 20px;
+}
+
+.notification-setting {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.notification-setting.time-picker {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.notification-setting.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-info label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 1.05em;
+}
+
+.setting-info p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 28px;
+  transition: 0.3s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .toggle-slider {
+  background-color: #0088cc;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+/* Time Picker */
+.time-picker input[type="time"] {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+  margin-top: 8px;
+}
+
+/* Enable Push Button */
+.enable-push-btn {
+  width: 100%;
+  padding: 14px;
+  background: #0088cc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s;
+}
+
+.enable-push-btn:hover {
+  background: #006699;
+  transform: translateY(-2px);
+}
+
+.notification-note {
+  text-align: center;
+  font-size: 0.85em;
+  color: #999;
+  margin-top: 20px;
+  padding: 0 10px;
+  line-height: 1.5;
+}
+
+/* Notification Center Button */
+.notification-center-btn {
+  background: #0088cc;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.notification-center-btn:hover {
+  background: #006699;
+  transform: scale(1.05);
+}
+
+.notification-center-btn.floating {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 9997;
+}
+
+/* ============================================
+   UPDATE NOTIFICATION
+   ============================================ */
+
+.update-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  background: #2196f3;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  transition: transform 0.3s ease-in-out;
+  max-width: 500px;
+}
+
+.update-notification.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+.update-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.update-icon {
+  font-size: 1.5em;
+}
+
+.update-text {
+  flex: 1;
+}
+
+.update-text strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.update-text p {
+  margin: 0;
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+.update-btn,
+.update-dismiss {
+  background: white;
+  color: #2196f3;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.update-dismiss {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.update-btn:hover {
+  transform: translateY(-2px);
+}
+
+.update-dismiss:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .install-banner-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .install-features {
+    justify-content: center;
+  }
+
+  .install-banner-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notification-center {
+    width: 100%;
+    right: -100%;
+  }
+
+  .notification-banner {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .notification-banner,
+  .notification-center {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+
+  .notification-text p {
+    color: #aaa;
+  }
+
+  .notification-setting {
+    border-bottom-color: #333;
+  }
+
+  .setting-info p {
+    color: #aaa;
+  }
+
+  .time-picker input[type="time"] {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #444;
+  }
+
+  .install-success {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+
+  .install-success p {
+    color: #aaa;
+  }
+}

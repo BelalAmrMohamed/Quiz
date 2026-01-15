@@ -1,0 +1,50 @@
+{
+  "name": "Quiz Master",
+  "short_name": "Quiz Master",
+  "description": "College quiz platform for Computers and AI Faculty students",
+  "start_url": "/Quiz/",
+  "scope": "/Quiz/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0088cc",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your progress and stats",
+      "url": "/Quiz/dashboard.html",
+      "icons": [{ "src": "images/icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Start Quiz",
+      "short_name": "Quiz",
+      "description": "Browse available quizzes",
+      "url": "/Quiz/index.html",
+      "icons": [{ "src": "images/icon.png", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/Quiz/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

@@ -2,3 +2,10 @@
 *.md
 *.bat
 !Readme.md
+
+# Service Worker cache
+sw-cache/
+
+# Temporary files
+images/laptop.png
+images/quiz.png

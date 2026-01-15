@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz In Progress - Master Your Knowledge</title>
+    <title>Quiz In Progress</title>
     <link rel="icon" href="images/icon.png" type="image/x-icon">
 
     <!-- Open Graph Meta Tags -->
@@ -18,6 +18,22 @@
     <meta property="og:image:height" content="1024">
     <meta property="og:site_name" content="Quiz by Belal Amr Mohamed">
     <meta property="og:locale" content="en_US">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0088cc">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quiz In Progress">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="images/icon.png">
+
+    <!-- PWA Styles -->
+    <link rel="stylesheet" href="CSS/pwa.css">
 
     <!-- CRITICAL: Anti-flash script -->
     <script>
@@ -177,6 +193,9 @@
             </button>
         </div>
     </div>
+
+    <!-- PWA Scripts -->
+    <script type="module" src="Script/pwa-init.js"></script>
     <script type="module" src="Script/quiz.js"></script>
 </body>
 

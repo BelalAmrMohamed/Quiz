@@ -178,7 +178,7 @@ function showModeSelection(examId, examTitle) {
         <button class="mode-btn" onclick="startQuiz('${examId}', 'practice')">
           <span class="icon">🛡️</span>
           <strong>Practice</strong>
-          <small>No timer, retry answers</small>
+          <small>Has a timer, and you can check answers</small>
         </button>
         <button class="mode-btn" onclick="startQuiz('${examId}', 'timed')">
           <span class="icon">⏱️</span>

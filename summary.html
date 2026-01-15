@@ -17,6 +17,22 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0088cc">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quiz Results">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="images/icon.png">
+
+    <!-- PWA Styles -->
+    <link rel="stylesheet" href="CSS/pwa.css">
+
     <!-- CRITICAL: Anti-flash script -->
     <script>
         (function () {
@@ -140,6 +156,8 @@
         <div class="watermark">Crafted by Belal Amr</div>
     </div>
 
+    <!-- PWA Scripts -->
+    <script type="module" src="Script/pwa-init.js"></script>
     <script type="module" src="Script/summary.js"></script>
 </body>
 

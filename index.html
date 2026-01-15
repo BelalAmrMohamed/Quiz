@@ -35,6 +35,22 @@
 
     <meta name="robots" content="index, follow">
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0088cc">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quiz Master">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="images/icon.png">
+
+    <!-- PWA Styles -->
+    <link rel="stylesheet" href="CSS/pwa.css">
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -158,6 +174,8 @@
         <div class="watermark">Crafted by Belal Amr</div>
     </div>
 
+    <!-- PWA Scripts -->
+    <script type="module" src="Script/pwa-init.js"></script>
     <script type="module" src="Script/index.js"></script>
 </body>
 
