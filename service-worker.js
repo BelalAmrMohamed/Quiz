@@ -4,11 +4,33 @@ const CACHE_NAME = `quiz-master-${CACHE_VERSION}`;
 
 // Only cache truly essential offline fallback files
 const CORE_ASSETS = [
-  "/Quiz/",
-  "/Quiz/index.html",
-  "/Quiz/CSS/styles.css",
-  "/Quiz/CSS/pwa.css",
-  "/Quiz/images/icon.png",
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/quiz.html`,
+  `${BASE_PATH}/summary.html`,
+  `${BASE_PATH}/dashboard.html`,
+  `${BASE_PATH}/CSS/styles.css`,
+  `${BASE_PATH}/CSS/quiz.css`,
+  `${BASE_PATH}/CSS/summary.css`,
+  `${BASE_PATH}/CSS/animations.css`,
+  `${BASE_PATH}/CSS/themes.css`,
+  `${BASE_PATH}/CSS/dashboard.css`,
+  `${BASE_PATH}/CSS/pwa.css`,
+  `${BASE_PATH}/Script/index.js`,
+  `${BASE_PATH}/Script/quiz.js`,
+  `${BASE_PATH}/Script/summary.js`,
+  `${BASE_PATH}/Script/dashboard.js`,
+  `${BASE_PATH}/Script/gameEngine.js`,
+  `${BASE_PATH}/Script/examManifest.js`,
+  `${BASE_PATH}/Script/anti-flash.js`,
+  `${BASE_PATH}/Script/theme-controller.js`,
+  `${BASE_PATH}/Script/notifications.js`,
+  `${BASE_PATH}/Script/install-prompt.js`,
+  `${BASE_PATH}/Script/offline-indicator.js`,
+  `${BASE_PATH}/Script/pwa-init.js`,
+  `${BASE_PATH}/images/icon.png`,
+  `${BASE_PATH}/images/thumbnail.png`,
+  `${BASE_PATH}/manifest.json`,
 ];
 
 // Install: Cache only minimal core files
