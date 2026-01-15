@@ -694,17 +694,3 @@ body {
   white-space: nowrap;
   border: 0;
 }
-
-/* Fix for Light Theme: Force all labels to be dark */
-[data-theme="light"] .theme-selector-btn .theme-btn-label {
-  color: #111827 !important; /* Dark color for light mode */
-  font-weight: 600;
-}
-
-/* Fix for Dark Themes: Force all labels to be white and bigger */
-[data-theme="dark-slate"] .theme-selector-btn .theme-btn-label,
-[data-theme="dark"] .theme-selector-btn .theme-btn-label {
-  color: #ffffff !important; /* White color for dark modes */
-  font-weight: 700;
-  font-size: 14px;
-}
