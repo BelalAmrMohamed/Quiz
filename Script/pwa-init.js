@@ -90,6 +90,18 @@ window.PWAManager = {
         this.serviceWorkerReady = true;
         break;
 
+      case "CACHE_PROGRESS":
+        console.log(`[PWA] Caching progress: ${data.cached}/${data.total}`);
+        this.updateCacheProgress(data.cached, data.total);
+        break;
+
+      case "CACHE_COMPLETE":
+        console.log(
+          `[PWA] ✅ Caching complete! ${data.cached}/${data.total} exams cached`
+        );
+        this.showCacheCompleteNotification(data.cached, data.total);
+        break;
+
       case "EXAMS_UPDATED":
         console.log("[PWA] Exam manifest updated");
         this.showUpdateNotification();
@@ -129,6 +141,74 @@ window.PWAManager = {
       navigator.serviceWorker.controller.postMessage({ type: "SKIP_WAITING" });
     }
     window.location.reload();
+  },
+
+  // Update cache progress indicator
+  updateCacheProgress(cached, total) {
+    const progressBar = document.getElementById("cacheProgressBar");
+
+    if (!progressBar) {
+      // Create progress bar if it doesn't exist
+      const progressContainer = document.createElement("div");
+      progressContainer.className = "cache-progress-container";
+      progressContainer.innerHTML = `
+        <div class="cache-progress-content">
+          <div class="cache-progress-icon">📥</div>
+          <div class="cache-progress-text">
+            <strong>Downloading quizzes for offline use</strong>
+            <p><span id="cacheProgressText">${cached}/${total}</span> quizzes</p>
+          </div>
+          <div class="cache-progress-bar-wrapper">
+            <div class="cache-progress-bar" id="cacheProgressBar" style="width: ${
+              (cached / total) * 100
+            }%"></div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(progressContainer);
+      setTimeout(() => progressContainer.classList.add("show"), 100);
+    } else {
+      // Update existing progress bar
+      const percentage = (cached / total) * 100;
+      progressBar.style.width = percentage + "%";
+      document.getElementById(
+        "cacheProgressText"
+      ).textContent = `${cached}/${total}`;
+    }
+  },
+
+  // Show cache complete notification
+  showCacheCompleteNotification(cached, total) {
+    // Remove progress bar
+    const progressContainer = document.querySelector(
+      ".cache-progress-container"
+    );
+    if (progressContainer) {
+      progressContainer.classList.remove("show");
+      setTimeout(() => progressContainer.remove(), 300);
+    }
+
+    // Show completion message
+    const notification = document.createElement("div");
+    notification.className = "cache-complete-notification";
+    notification.innerHTML = `
+      <div class="cache-complete-content">
+        <div class="cache-complete-icon">✅</div>
+        <div class="cache-complete-text">
+          <strong>Ready for offline use!</strong>
+          <p>${cached} quizzes are now available offline</p>
+        </div>
+        <button class="cache-complete-dismiss" onclick="this.closest('.cache-complete-notification').remove()">×</button>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add("show"), 100);
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      notification.classList.remove("show");
+      setTimeout(() => notification.remove(), 300);
+    }, 5000);
   },
 
   // Check for updates periodically (every 30 minutes)
