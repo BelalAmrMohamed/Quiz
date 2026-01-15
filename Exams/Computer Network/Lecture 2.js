@@ -1,0 +1,378 @@
+export const questions = [
+  {
+    q: "What is a computer network according to Lecture 2?",
+    options: [
+      "A single computer with multiple hard drives",
+      "Two or more computing devices connected to exchange information and share resources",
+      "A device that only stores information without processing it",
+      "A collection of isolated devices that cannot communicate",
+    ],
+    correct: 1,
+    explanation:
+      "A computer network is defined as two or more computing devices connected in a way that lets them exchange information and share resources. [1]",
+  },
+  {
+    q: "What is the definition of a network node?",
+    options: [
+      "A device that only creates information",
+      "A connection point in a communication network with capabilities to send, receive, store, or process information",
+      "The central cable in a bus topology",
+      "A software-only application used for security",
+    ],
+    correct: 1,
+    explanation:
+      "A network node is a connection point that can send, receive, store, process, or create information and forward transmissions. [1]",
+  },
+  {
+    q: "Which of the following is NOT a capability of a network node?",
+    options: [
+      "Send and receive information",
+      "Store and process information",
+      "Physically destroy data packets",
+      "Create information and forward transmissions",
+    ],
+    correct: 2,
+    explanation:
+      "Nodes have the capability to send, receive, store, process, create, and forward transmissions. [1]",
+  },
+  {
+    q: "In a network relationship, what is the role of a Client?",
+    options: [
+      "To provide functions or services to other devices",
+      "To request services and resources from servers",
+      "To act as a central hub for all connections",
+      "To block all incoming traffic",
+    ],
+    correct: 1,
+    explanation:
+      "A client is a device that requests services and resources from servers. [2]",
+  },
+  {
+    q: "In a network relationship, what is the role of a Server?",
+    options: [
+      "To request information from mobile devices",
+      "To provide functions or services to clients",
+      "To connect different Local Area Networks together",
+      "To act as the physical cable for transmission",
+    ],
+    correct: 1,
+    explanation: "A server provides functions or services to clients. [1, 2]",
+  },
+  {
+    q: "True or False: The same device can act as a client in some situations and a server in others.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Lecture 2 explicitly states that the same device can be a client in some situations and a server in others. [2]",
+  },
+  {
+    q: "In the YouTube example provided in the lecture, what is your computer's role?",
+    options: ["Server", "Node (Client)", "Firewall", "Router"],
+    correct: 1,
+    explanation:
+      "In the example, your computer acts as a client requesting a video from the YouTube server. [2]",
+  },
+  {
+    q: "What device is typically used to aggregate connections from multiple PCs or servers?",
+    options: ["Router", "Switch", "Firewall", "NIC"],
+    correct: 1,
+    explanation:
+      "Typically, we aggregate connections to a device called a switch. [2]",
+  },
+  {
+    q: "Which statement is true regarding the number of network interfaces on routers versus switches?",
+    options: [
+      "Routers usually have more interfaces than switches",
+      "Routers have fewer network interfaces than switches",
+      "They always have the exact same number of interfaces",
+      "Switches do not have network interfaces",
+    ],
+    correct: 1,
+    explanation: "Routers have fewer network interfaces than switches. [3]",
+  },
+  {
+    q: "What is the primary use of a Router?",
+    options: [
+      "To connect devices within a single LAN",
+      "To provide connectivity between different LANs",
+      "To act as a software-based firewall only",
+      "To store web pages locally",
+    ],
+    correct: 1,
+    explanation:
+      "Routers are used to provide connectivity between LANs and send data over the internet. [3]",
+  },
+  {
+    q: "What are Firewalls specifically defined as?",
+    options: [
+      "Devices that increase network bandwidth",
+      "Specialty network security devices that control traffic entering and exiting a network",
+      "Hardware used only to connect LANs",
+      "Cables that prevent electromagnetic interference",
+    ],
+    correct: 1,
+    explanation:
+      "Firewalls are specialty network security devices that monitor and control traffic based on configured rules. [3]",
+  },
+  {
+    q: "Where can a firewall be placed in a network?",
+    options: [
+      "Only outside the router",
+      "Only inside the internal network",
+      "Either 'inside' or 'outside' the network",
+      "Only on the client machine",
+    ],
+    correct: 2,
+    explanation:
+      "Firewalls can be placed 'inside' the network or 'outside' the network (relative to the router). [3]",
+  },
+  {
+    q: "What is the primary function of a Network Firewall?",
+    options: [
+      "A software application on a PC",
+      "A hardware device that filters traffic between networks",
+      "A cable that connects a PC to a switch",
+      "An algorithm that generates IP addresses",
+    ],
+    correct: 1,
+    explanation:
+      "Network firewalls are hardware devices that filter traffic between networks. [4]",
+  },
+  {
+    q: "What is a Host-based firewall?",
+    options: [
+      "A hardware device placed at the network edge",
+      "A software application that filters traffic entering and exiting a host machine",
+      "A type of router with many interfaces",
+      "A central hub in a star topology",
+    ],
+    correct: 1,
+    explanation:
+      "Host-based firewalls are software applications that filter traffic for a specific host, like a PC. [4]",
+  },
+  {
+    q: "What are 'Next-Generation Firewalls'?",
+    options: [
+      "Firewalls that do not require rules",
+      "Firewalls that include more modern and advanced filtering capabilities",
+      "Firewalls that only operate on the Physical layer",
+      "Firewalls used exclusively for online gaming",
+    ],
+    correct: 1,
+    explanation:
+      "Next-Generation Firewalls include more modern and advanced filtering capabilities. [3]",
+  },
+  {
+    q: "If an attacker tries to access a network, what should a properly configured firewall do?",
+    options: [
+      "Permit the traffic",
+      "Block the traffic",
+      "Forward the traffic to the server",
+      "Ignore the traffic",
+    ],
+    correct: 1,
+    explanation:
+      "If an attacker tries to access anything inside the network, the firewall should block it. [4]",
+  },
+  {
+    q: "True or False: A network node must be able to forward transmissions to other nodes.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Definition of a node includes the capability to forward transmissions to other network nodes. [1]",
+  },
+  {
+    q: "Which device is responsible for sending data over the Internet between different geographical branches?",
+    options: ["Switch", "Hub", "Router", "Host-based Firewall"],
+    correct: 2,
+    explanation:
+      "Routers are used to send data over the Internet and provide connectivity between LANs (e.g., NY to Tokyo). [3]",
+  },
+  {
+    q: "What determines which network traffic a firewall allows or blocks?",
+    options: [
+      "The speed of the connection",
+      "Configured security rules",
+      "The number of nodes in the network",
+      "The type of ethernet cable used",
+    ],
+    correct: 1,
+    explanation:
+      "Firewalls monitor and control network traffic based on configured rules. [3]",
+  },
+  {
+    q: "Essay: Describe the fundamental difference between a hardware network firewall and a software host-based firewall.",
+    options: [
+      "Network firewalls are hardware devices filtering traffic between networks, while host-based firewalls are software applications filtering traffic for a single machine.",
+    ],
+    correct: 0,
+    explanation: "Source: [4]",
+  },
+  {
+    q: "In the relationship example where PC1 sends a file to PC2, PC1 is the ______ and PC2 is the ______.",
+    options: [
+      "Server / Client",
+      "Client / Server",
+      "Router / Switch",
+      "Firewall / Node",
+    ],
+    correct: 1,
+    explanation:
+      "In the provided example, the device requesting/sending (PC1) is the client and the one receiving/providing (PC2) is the server. [2]",
+  },
+  {
+    q: "True or False: A switch is primarily used to provide connectivity between different LANs.",
+    options: ["False", "True"],
+    correct: 0,
+    explanation:
+      "Routers provide connectivity between LANs; switches aggregate connections within a LAN. [3]",
+  },
+  {
+    q: "Which device is described as having more network interfaces?",
+    options: ["Switch", "Router"],
+    correct: 0,
+    explanation:
+      "The lecture notes state routers have fewer network interfaces than switches. [3]",
+  },
+  {
+    q: "What is the purpose of a DMZ in the context of firewalls?",
+    options: [
+      "To increase the speed of the local network",
+      "To create a protected 'Demilitarized Zone' for security",
+      "To allow all traffic without filtering",
+      "To replace the need for a router",
+    ],
+    correct: 1,
+    explanation:
+      "Firewalls can be used to create a DMZ (mentioned in Summary/MCQ context). [MCQ.2.pdf/Summary]",
+  },
+  {
+    q: "A network node can be defined as a _______ point.",
+    options: ["Termination", "Connection", "Isolation", "Storage"],
+    correct: 1,
+    explanation:
+      "A network node is a connection point in a communication network. [1]",
+  },
+  {
+    q: "Which device allows home broadband users to connect multiple computers to the internet at once?",
+    options: ["Router", "Switch", "Server", "Client"],
+    correct: 0,
+    explanation:
+      "Routers send data over the internet and connect LANs to the outside world. [3]",
+  },
+  {
+    q: "True or False: Firewalls only protect the router itself.",
+    options: ["False", "True"],
+    correct: 0,
+    explanation:
+      "What's important is that they protect the end hosts inside, like PCs and Servers. [3]",
+  },
+  {
+    q: "The acronym 'NGFW' stands for:",
+    options: [
+      "Network Gate Forwarding Web",
+      "Next-Generation Firewall",
+      "New Global Firewall Wide",
+      "Node Gateway Filter Wall",
+    ],
+    correct: 1,
+    explanation: "NGFW stands for Next-Generation Firewall. [3]",
+  },
+  {
+    q: "Which capability allows a node to keep information for later use?",
+    options: ["Send", "Receive", "Store", "Process"],
+    correct: 2,
+    explanation:
+      "The capability to 'store' information is a function of a network node. [1]",
+  },
+  {
+    q: "If PC1 in New York Branch accesses SRV1 in Tokyo, the firewall should _______ the traffic if rules are set properly.",
+    options: ["Block", "Permit", "Unicast", "Encrypt"],
+    correct: 1,
+    explanation:
+      "If rules are configured properly, the firewall should permit authorized traffic. [4]",
+  },
+  {
+    q: "True or False: Host-based firewalls are hardware devices.",
+    options: ["False", "True"],
+    correct: 0,
+    explanation: "Host-based firewalls are software applications. [4]",
+  },
+  {
+    q: "What is the role of 'AirDrop' in the Client/Server examples?",
+    options: [
+      "A hardware device",
+      "An example where a device can be both client and server",
+      "A type of router",
+      "A security protocol for firewalls",
+    ],
+    correct: 1,
+    explanation:
+      "AirDrop is used to show that the same device can be a client or server in different situations. [2]",
+  },
+  {
+    q: "Which device is explicitly associated with 'filtering and forwarding frames' within a network?",
+    options: ["Router", "Switch", "Modem", "Server"],
+    correct: 1,
+    explanation:
+      "Switches filter and forward frames within the same network. [Summary/MCQ.2.pdf]",
+  },
+  {
+    q: "True or False: A router is essential for connecting a LAN to the internet.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Routers send data over the internet and connect LANs. [3]",
+  },
+  {
+    q: "In the provided diagrams, 'FW1' and 'FW2' represent:",
+    options: ["Fiber Wires", "Firewalls", "Forwarding Ways", "Frame Windows"],
+    correct: 1,
+    explanation: "FW stands for Firewall in the network diagrams. [3, 4]",
+  },
+  {
+    q: "Which capability of a node involves handling and changing data?",
+    options: ["Create", "Process", "Forward", "Store"],
+    correct: 1,
+    explanation:
+      "The capability to 'process' information is a function of a network node. [1]",
+  },
+  {
+    q: "True or False: A computer network requires at least two computing devices.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "A computer network is two or more computing devices connected together. [1]",
+  },
+  {
+    q: "Which of the following is a network node?",
+    options: [
+      "PC",
+      "Server",
+      "Printer connected to network",
+      "All of the above",
+    ],
+    correct: 3,
+    explanation:
+      "Any addressable device on a network capable of communication is a node. [1]",
+  },
+  {
+    q: "What is the primary goal of configuring rules on a firewall?",
+    options: [
+      "To increase the number of nodes",
+      "To determine which traffic is allowed or blocked",
+      "To change the MAC addresses of devices",
+      "To convert LAN to WAN",
+    ],
+    correct: 1,
+    explanation:
+      "Firewalls use rules to determine which network traffic should be permitted. [3, 4]",
+  },
+  {
+    q: "Essay: Summarize the primary function of a network Switch as described in Lecture 2.",
+    options: [
+      "A switch is used to aggregate connections from PCs and servers, allowing them to communicate within a local network.",
+    ],
+    correct: 0,
+    explanation: "Source: [2, 3]",
+  },
+];
