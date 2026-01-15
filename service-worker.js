@@ -1,37 +1,40 @@
-// service-worker.js - PWA Service Worker with Smart Caching
-const CACHE_VERSION = "v1.0.2";
+// service-worker.js - PWA Service Worker with Smart Caching (FIXED)
+const CACHE_VERSION = "v1.0.3";
 const CACHE_NAME = `quiz-master-${CACHE_VERSION}`;
-const EXAM_MANIFEST_URL = "/Quiz/Script/examManifest.js";
+
+// Determine the base path dynamically
+const BASE_PATH = self.location.pathname.includes("/Quiz/") ? "/Quiz" : "";
+const EXAM_MANIFEST_URL = `${BASE_PATH}/Script/examManifest.js`;
 
 // Core app shell (always cached immediately)
 const CORE_ASSETS = [
-  "/Quiz/",
-  "/Quiz/index.html",
-  "/Quiz/quiz.html",
-  "/Quiz/summary.html",
-  "/Quiz/dashboard.html",
-  "/Quiz/CSS/styles.css",
-  "/Quiz/CSS/quiz.css",
-  "/Quiz/CSS/summary.css",
-  "/Quiz/CSS/animations.css",
-  "/Quiz/CSS/themes.css",
-  "/Quiz/CSS/dashboard.css",
-  "/Quiz/CSS/pwa.css",
-  "/Quiz/Script/index.js",
-  "/Quiz/Script/quiz.js",
-  "/Quiz/Script/summary.js",
-  "/Quiz/Script/dashboard.js",
-  "/Quiz/Script/gameEngine.js",
-  "/Quiz/Script/examManifest.js",
-  "/Quiz/Script/anti-flash.js",
-  "/Quiz/Script/theme-controller.js",
-  "/Quiz/Script/notifications.js",
-  "/Quiz/Script/install-prompt.js",
-  "/Quiz/Script/offline-indicator.js",
-  "/Quiz/Script/pwa-init.js",
-  "/Quiz/images/icon.png",
-  "/Quiz/images/thumbnail.png",
-  "/Quiz/manifest.json",
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/quiz.html`,
+  `${BASE_PATH}/summary.html`,
+  `${BASE_PATH}/dashboard.html`,
+  `${BASE_PATH}/CSS/styles.css`,
+  `${BASE_PATH}/CSS/quiz.css`,
+  `${BASE_PATH}/CSS/summary.css`,
+  `${BASE_PATH}/CSS/animations.css`,
+  `${BASE_PATH}/CSS/themes.css`,
+  `${BASE_PATH}/CSS/dashboard.css`,
+  `${BASE_PATH}/CSS/pwa.css`,
+  `${BASE_PATH}/Script/index.js`,
+  `${BASE_PATH}/Script/quiz.js`,
+  `${BASE_PATH}/Script/summary.js`,
+  `${BASE_PATH}/Script/dashboard.js`,
+  `${BASE_PATH}/Script/gameEngine.js`,
+  `${BASE_PATH}/Script/examManifest.js`,
+  `${BASE_PATH}/Script/anti-flash.js`,
+  `${BASE_PATH}/Script/theme-controller.js`,
+  `${BASE_PATH}/Script/notifications.js`,
+  `${BASE_PATH}/Script/install-prompt.js`,
+  `${BASE_PATH}/Script/offline-indicator.js`,
+  `${BASE_PATH}/Script/pwa-init.js`,
+  `${BASE_PATH}/images/icon.png`,
+  `${BASE_PATH}/images/thumbnail.png`,
+  `${BASE_PATH}/manifest.json`,
 ];
 
 // Install: Cache only core assets (fast install)
@@ -44,20 +47,22 @@ self.addEventListener("install", (event) => {
 
       // Cache core assets first
       console.log("[SW] Caching core assets...");
-      try {
-        await cache.addAll(CORE_ASSETS);
-        console.log("[SW] ✅ Core assets cached successfully");
-      } catch (error) {
-        console.error("[SW] Failed to cache some core assets:", error);
-        // Cache them individually
-        for (const asset of CORE_ASSETS) {
-          try {
-            await cache.add(asset);
-          } catch (err) {
-            console.warn("[SW] Failed to cache:", asset, err.message);
-          }
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const asset of CORE_ASSETS) {
+        try {
+          await cache.add(asset);
+          successCount++;
+        } catch (err) {
+          console.warn("[SW] Failed to cache:", asset, err.message);
+          failCount++;
         }
       }
+
+      console.log(
+        `[SW] ✅ Core assets cached: ${successCount} success, ${failCount} failed`
+      );
 
       // Skip waiting to activate immediately
       await self.skipWaiting();
@@ -110,21 +115,41 @@ async function cacheExamsInBackground() {
     const cache = await caches.open(CACHE_NAME);
 
     // Fetch exam manifest
+    console.log("[SW] Fetching manifest from:", EXAM_MANIFEST_URL);
     const manifestResponse = await fetch(EXAM_MANIFEST_URL);
+
+    if (!manifestResponse.ok) {
+      throw new Error(`Failed to fetch manifest: ${manifestResponse.status}`);
+    }
+
     const manifestText = await manifestResponse.text();
 
-    // Extract exam paths from manifest
-    const pathMatches = manifestText.match(/"path":\s*"([^"]+)"/g);
-    if (!pathMatches) {
-      console.log("[SW] No exam paths found in manifest");
+    // Parse the manifest to extract exam paths
+    // The manifest is a JS module, so we need to extract the examList array
+    const examListMatch = manifestText.match(
+      /export const examList = (\[[\s\S]*?\]);/
+    );
+
+    if (!examListMatch) {
+      console.error("[SW] Could not parse examList from manifest");
       return;
     }
 
-    const examPaths = pathMatches
-      .map((match) => match.match(/"path":\s*"([^"]+)"/)[1])
-      .map((path) => path.replace(/^\.\.\//, "/Quiz/"));
+    // Parse the exam list JSON
+    const examListStr = examListMatch[1];
+    const examList = JSON.parse(examListStr);
 
-    console.log(`[SW] Found ${examPaths.length} exams to cache`);
+    console.log(`[SW] Found ${examList.length} exams in manifest`);
+
+    // Convert relative paths to absolute paths
+    const examPaths = examList.map((exam) => {
+      // exam.path looks like: "../Exams/Computer Network/Lecture 1 MCQ.js"
+      // Convert to: "/Exams/Computer Network/Lecture 1 MCQ.js" or "/Quiz/Exams/..."
+      const cleanPath = exam.path.replace(/^\.\.\//, "");
+      return `${BASE_PATH}/${cleanPath}`;
+    });
+
+    console.log("[SW] Sample exam paths:", examPaths.slice(0, 3));
 
     let cached = 0;
     let failed = 0;
@@ -150,18 +175,20 @@ async function cacheExamsInBackground() {
             if (response.ok) {
               await cache.put(path, response);
               cached++;
+              console.log(`[SW] ✓ Cached: ${path}`);
             } else {
               throw new Error(`HTTP ${response.status}`);
             }
           } catch (err) {
             failed++;
-            console.warn(`[SW] Failed to cache ${path}:`, err.message);
+            console.warn(`[SW] ✗ Failed to cache ${path}:`, err.message);
           }
         })
       );
 
       // Progress update every 10 exams
-      if ((i + BATCH_SIZE) % 10 === 0) {
+      const progress = i + BATCH_SIZE;
+      if (progress % 10 === 0 || progress >= examPaths.length) {
         const total = cached + alreadyCached;
         console.log(`[SW] Progress: ${total}/${examPaths.length} exams cached`);
 
@@ -197,6 +224,15 @@ async function cacheExamsInBackground() {
     });
   } catch (error) {
     console.error("[SW] Background caching failed:", error);
+
+    // Notify clients about the error
+    const clients = await self.clients.matchAll();
+    clients.forEach((client) => {
+      client.postMessage({
+        type: "CACHE_ERROR",
+        error: error.message,
+      });
+    });
   }
 }
 
@@ -238,7 +274,8 @@ self.addEventListener("fetch", (event) => {
         // Return offline page for HTML requests
         if (request.destination === "document") {
           const cache = await caches.open(CACHE_NAME);
-          return cache.match("/Quiz/index.html");
+          const fallback = await cache.match(`${BASE_PATH}/index.html`);
+          if (fallback) return fallback;
         }
 
         throw error;
@@ -321,10 +358,10 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body: data.body || "You have a new notification",
-    icon: "/Quiz/images/icon.png",
-    badge: "/Quiz/images/icon.png",
+    icon: `${BASE_PATH}/images/icon.png`,
+    badge: `${BASE_PATH}/images/icon.png`,
     vibrate: [200, 100, 200],
-    data: data.url || "/Quiz/",
+    data: data.url || `${BASE_PATH}/`,
     actions: [
       { action: "open", title: "Open Quiz Master" },
       { action: "close", title: "Close" },
@@ -339,6 +376,8 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
   if (event.action === "open" || !event.action) {
-    event.waitUntil(clients.openWindow(event.notification.data || "/Quiz/"));
+    event.waitUntil(
+      clients.openWindow(event.notification.data || `${BASE_PATH}/`)
+    );
   }
 });

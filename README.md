@@ -101,6 +101,8 @@ Quiz Website/
 ├── quiz.html
 ├── summary.html
 ├── dashboard.html
+├── manifest.json
+├── service-worker.js
 ├── .gitignore
 ├── README.md
 ├── LICENSE
@@ -111,28 +113,37 @@ Quiz Website/
 │   ├── styles.css
 │   ├── quiz.css
 │   ├── summary.css
-│   ├── animations.css
+│   ├── dashboard.css
 │   ├── themes.css
-│   └── dashboard.css
+│   ├── animations.css
+│   └── pwa.css
 │
 ├── images/
 │   ├── icon.png
-│   └── thumbnail.png
+│   ├── thumbnail.png
+│   ├── dashboard-thumbnail.jpg
+│   ├── quiz-thumbnail.jpegs
+│   └── summary-thumbnail.jpg
 │
 ├── Script/
 │   ├── index.js
 │   ├── quiz.js
 │   ├── summary.js
 │   ├── dashboard.js
-│   ├── gameEngine.js
-│   ├── examManifest.js
-│   ├── anti-flash.js
+│   ├── gameEngine.
+│   ├── install-prompt.js
+│   ├── notifications.js
+│   ├── offline-indicator.js
+│   ├── pwa-init.js
+│   ├── pwa-quiz-minimal.js
+│   ├── examManifest.js // Contains the paths of the actual quizzes
+│   ├── anti-flash.js // theme related
 │   └── theme-controller.js
 │
 ├── tools/
 │   └── generateExamManifest.js <- Auto generates "examManifest.js"
 │
-└── Exams/
+└── Exams/ // contains the quizzes that `examManifest` contains its paths
     ├── Category-1/           # Shows as folder
     │   ├── Subcategory-A/    # Shows as folder
     │   │   └── quiz-1.js       # Shows as exam

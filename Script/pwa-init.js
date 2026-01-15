@@ -4,6 +4,9 @@ import { NotificationManager } from "./notifications.js";
 import { InstallPrompt } from "./install-prompt.js";
 import { OfflineIndicator } from "./offline-indicator.js";
 
+// Detect base path
+const BASE_PATH = window.location.pathname.includes("/Quiz/") ? "/Quiz" : "";
+
 // Global PWA Manager
 window.PWAManager = {
   serviceWorkerReady: false,
@@ -41,12 +44,14 @@ window.PWAManager = {
     }
 
     try {
-      const registration = await navigator.serviceWorker.register(
-        "/Quiz/service-worker.js",
-        {
-          scope: "/Quiz/",
-        }
-      );
+      const swPath = `${BASE_PATH}/service-worker.js`;
+      const swScope = BASE_PATH ? `${BASE_PATH}/` : "/";
+
+      console.log(`[PWA] Registering SW at: ${swPath} with scope: ${swScope}`);
+
+      const registration = await navigator.serviceWorker.register(swPath, {
+        scope: swScope,
+      });
 
       console.log("[PWA] Service Worker registered:", registration.scope);
 
@@ -102,6 +107,11 @@ window.PWAManager = {
         this.showCacheCompleteNotification(data.cached, data.total);
         break;
 
+      case "CACHE_ERROR":
+        console.error("[PWA] Caching error:", data.error);
+        this.showCacheErrorNotification(data.error);
+        break;
+
       case "EXAMS_UPDATED":
         console.log("[PWA] Exam manifest updated");
         this.showUpdateNotification();
@@ -145,11 +155,11 @@ window.PWAManager = {
 
   // Update cache progress indicator
   updateCacheProgress(cached, total) {
-    const progressBar = document.getElementById("cacheProgressBar");
+    let progressContainer = document.querySelector(".cache-progress-container");
 
-    if (!progressBar) {
+    if (!progressContainer) {
       // Create progress bar if it doesn't exist
-      const progressContainer = document.createElement("div");
+      progressContainer = document.createElement("div");
       progressContainer.className = "cache-progress-container";
       progressContainer.innerHTML = `
         <div class="cache-progress-content">
@@ -170,10 +180,11 @@ window.PWAManager = {
     } else {
       // Update existing progress bar
       const percentage = (cached / total) * 100;
-      progressBar.style.width = percentage + "%";
-      document.getElementById(
-        "cacheProgressText"
-      ).textContent = `${cached}/${total}`;
+      const progressBar = document.getElementById("cacheProgressBar");
+      const progressText = document.getElementById("cacheProgressText");
+
+      if (progressBar) progressBar.style.width = percentage + "%";
+      if (progressText) progressText.textContent = `${cached}/${total}`;
     }
   },
 
@@ -211,13 +222,49 @@ window.PWAManager = {
     }, 5000);
   },
 
+  // Show cache error notification
+  showCacheErrorNotification(error) {
+    // Remove progress bar
+    const progressContainer = document.querySelector(
+      ".cache-progress-container"
+    );
+    if (progressContainer) {
+      progressContainer.classList.remove("show");
+      setTimeout(() => progressContainer.remove(), 300);
+    }
+
+    // Show error message
+    const notification = document.createElement("div");
+    notification.className = "cache-error-notification";
+    notification.innerHTML = `
+      <div class="cache-error-content">
+        <div class="cache-error-icon">⚠️</div>
+        <div class="cache-error-text">
+          <strong>Download failed</strong>
+          <p>Some quizzes couldn't be downloaded. They'll be available when online.</p>
+        </div>
+        <button class="cache-error-dismiss" onclick="this.closest('.cache-error-notification').remove()">×</button>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add("show"), 100);
+
+    // Auto-dismiss after 7 seconds
+    setTimeout(() => {
+      notification.classList.remove("show");
+      setTimeout(() => notification.remove(), 300);
+    }, 7000);
+  },
+
   // Check for updates periodically (every 30 minutes)
   startUpdateChecker() {
     setInterval(async () => {
       if ("serviceWorker" in navigator) {
+        const swScope = BASE_PATH ? `${BASE_PATH}/` : "/";
         const registration = await navigator.serviceWorker.getRegistration(
-          "/Quiz/"
+          swScope
         );
+
         if (registration) {
           registration.update();
 
