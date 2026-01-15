@@ -34,22 +34,24 @@ const CORE_ASSETS = [
 ];
 
 // Install: Cache only minimal core files
-self.addEventListener("install", (event) => {
-  console.log("[SW] Installing...");
+self.addEventListener("fetch", (event) => {
+  // We only want to intercept GET requests
+  if (event.request.method !== "GET") return;
 
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-
-      try {
-        await cache.addAll(CORE_ASSETS);
-        console.log("[SW] Core assets cached");
-      } catch (err) {
-        console.error("[SW] Failed to cache core assets:", err);
-      }
-
-      await self.skipWaiting();
-    })()
+  event.respondWith(
+    // Always try the network first
+    fetch(event.request)
+      .then((networkResponse) => {
+        // If successful, update the cache with the fresh version for next time
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        // Only if the network fails (offline), fall back to the cache
+        return caches.match(event.request);
+      })
   );
 });
 
