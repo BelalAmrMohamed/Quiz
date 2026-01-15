@@ -1,44 +1,54 @@
-// Script/install-prompt.js - PWA Installation Prompt
+// Script/install-prompt.js - PWA Installation Prompt (FIXED)
 
 let deferredPrompt = null;
+let isInstallBannerDismissed = false;
 
 export const InstallPrompt = {
   // Initialize install prompt
   init() {
+    console.log("[Install] Initializing...");
+
     // Listen for beforeinstallprompt event
     window.addEventListener("beforeinstallprompt", (e) => {
+      console.log("[Install] beforeinstallprompt event fired!");
+
       // Prevent default mini-infobar
       e.preventDefault();
 
       // Store the event for later use
       deferredPrompt = e;
 
-      // Notify that install is available
-      window.dispatchEvent(new Event("beforeinstallprompt"));
-
-      // Show custom install prompt immediately on first visit
-      if (!this.hasBeenDismissed()) {
-        this.showInstallBanner();
+      // Show custom install banner immediately on first visit
+      if (!this.hasBeenDismissed() && !this.isInstalled()) {
+        setTimeout(() => this.showInstallBanner(), 1000);
       }
+
+      // Notify that install is available (for menu button)
+      this.notifyInstallAvailable();
     });
 
     // Listen for app installed event
     window.addEventListener("appinstalled", () => {
-      console.log("[Install] PWA installed successfully");
+      console.log("[Install] PWA installed successfully!");
       this.hideInstallBanner();
       deferredPrompt = null;
-
-      // Show success message
       this.showSuccessMessage();
-
-      // Notify app installed
-      window.dispatchEvent(new Event("appinstalled"));
     });
 
     // Check if already installed (standalone mode)
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      console.log("[Install] App is running in standalone mode");
+    if (this.isInstalled()) {
+      console.log("[Install] App is already installed");
     }
+
+    // Load dismissed state
+    isInstallBannerDismissed =
+      localStorage.getItem("install_banner_dismissed") === "true";
+  },
+
+  // Notify that install is available
+  notifyInstallAvailable() {
+    // Dispatch custom event for menu button to show
+    window.dispatchEvent(new CustomEvent("installAvailable"));
   },
 
   // Check if install prompt can be shown
@@ -48,26 +58,35 @@ export const InstallPrompt = {
 
   // Show install (called from menu button)
   showInstall() {
+    console.log(
+      "[Install] showInstall called, deferredPrompt:",
+      !!deferredPrompt
+    );
+
+    if (this.isInstalled()) {
+      this.showModal(
+        "Already Installed",
+        "Quiz Master is already installed on this device!"
+      );
+      return;
+    }
+
     if (deferredPrompt) {
       this.triggerInstall();
-    } else if (!this.isInstalled()) {
+    } else {
       // Show manual instructions if prompt not available
-      alert(
-        "To install this app:\n\n" +
-          "• On Android/Chrome: Tap menu (⋮) → Install app\n" +
-          "• On iOS/Safari: Tap Share (⎙) → Add to Home Screen\n" +
-          "• On Desktop: Look for the install icon in the address bar"
-      );
+      this.showManualInstructions();
     }
   },
 
   // Check if install prompt has been dismissed
   hasBeenDismissed() {
-    return localStorage.getItem("install_banner_dismissed") === "true";
+    return isInstallBannerDismissed;
   },
 
   // Mark install prompt as dismissed
   markDismissed() {
+    isInstallBannerDismissed = true;
     localStorage.setItem("install_banner_dismissed", "true");
   },
 
@@ -95,20 +114,10 @@ export const InstallPrompt = {
         <div class="install-banner-text">
           <h3>Install Quiz Master</h3>
           <p>Get faster access and work offline!</p>
-          <ul class="install-features">
-            <li>📱 Quick access from home screen</li>
-            <li>📌 Works offline</li>
-            <li>⚡ Lightning fast</li>
-            <li>🔔 Get notifications</li>
-          </ul>
         </div>
         <div class="install-banner-actions">
-          <button class="install-btn" id="installBtn">
-            <span>🔥</span> Install App
-          </button>
-          <button class="dismiss-btn" id="dismissBtn">
-            Maybe Later
-          </button>
+          <button class="install-btn" id="installBtn">Install</button>
+          <button class="dismiss-btn" id="dismissBtn">×</button>
         </div>
       </div>
     `;
@@ -142,28 +151,80 @@ export const InstallPrompt = {
   async triggerInstall() {
     if (!deferredPrompt) {
       console.log("[Install] No deferred prompt available");
+      this.showManualInstructions();
       return;
     }
 
-    // Show the install prompt
-    deferredPrompt.prompt();
+    try {
+      // Show the install prompt
+      console.log("[Install] Showing install prompt...");
+      deferredPrompt.prompt();
 
-    // Wait for user response
-    const { outcome } = await deferredPrompt.userChoice;
+      // Wait for user response
+      const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === "accepted") {
-      console.log("[Install] User accepted the install prompt");
-    } else {
-      console.log("[Install] User dismissed the install prompt");
-      this.markDismissed();
+      if (outcome === "accepted") {
+        console.log("[Install] User accepted the install prompt");
+      } else {
+        console.log("[Install] User dismissed the install prompt");
+        this.markDismissed();
+      }
+    } catch (error) {
+      console.error("[Install] Error triggering install:", error);
+      this.showManualInstructions();
     }
 
     // Clear the deferred prompt
     deferredPrompt = null;
     this.hideInstallBanner();
+  },
 
-    // Update UI
-    window.dispatchEvent(new Event("appinstalled"));
+  // Show manual installation instructions
+  showManualInstructions() {
+    const modal = document.createElement("div");
+    modal.className = "install-modal";
+    modal.innerHTML = `
+      <div class="install-modal-content">
+        <button class="modal-close-btn" onclick="this.closest('.install-modal').remove()">×</button>
+        <h2>📱 Install Quiz Master</h2>
+        <p>Follow these steps to install the app on your device:</p>
+        
+        <div class="install-steps">
+          <div class="install-step">
+            <h3>🤖 Android (Chrome/Edge)</h3>
+            <ol>
+              <li>Tap the menu button (⋮) in the top right</li>
+              <li>Select "Install app" or "Add to Home screen"</li>
+              <li>Confirm to install</li>
+            </ol>
+          </div>
+          
+          <div class="install-step">
+            <h3>🍎 iOS (Safari)</h3>
+            <ol>
+              <li>Tap the Share button at the bottom</li>
+              <li>Scroll and tap "Add to Home Screen"</li>
+              <li>Tap "Add" to confirm</li>
+            </ol>
+          </div>
+          
+          <div class="install-step">
+            <h3>💻 Desktop (Chrome/Edge/Brave)</h3>
+            <ol>
+              <li>Look for the install icon (⊕) in the address bar</li>
+              <li>Click it and select "Install"</li>
+              <li>Or use browser menu → "Install Quiz Master"</li>
+            </ol>
+          </div>
+        </div>
+        
+        <button class="modal-primary-btn" onclick="this.closest('.install-modal').remove()">
+          Got it!
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add("show"), 100);
   },
 
   // Show success message after install
@@ -184,6 +245,22 @@ export const InstallPrompt = {
       message.classList.remove("show");
       setTimeout(() => message.remove(), 300);
     }, 4000);
+  },
+
+  // Show simple modal
+  showModal(title, message) {
+    const modal = document.createElement("div");
+    modal.className = "install-modal";
+    modal.innerHTML = `
+      <div class="install-modal-content">
+        <button class="modal-close-btn" onclick="this.closest('.install-modal').remove()">×</button>
+        <h2>${title}</h2>
+        <p>${message}</p>
+        <button class="modal-primary-btn" onclick="this.closest('.install-modal').remove()">OK</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add("show"), 100);
   },
 
   // Check if app is installed

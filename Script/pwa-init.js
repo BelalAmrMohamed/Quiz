@@ -1,4 +1,4 @@
-// Script/pwa-init.js - Initialize All PWA Features
+// Script/pwa-init.js - Initialize All PWA Features (FIXED)
 
 import { NotificationManager } from "./notifications.js";
 import { InstallPrompt } from "./install-prompt.js";
@@ -224,15 +224,21 @@ window.PWAManager = {
       });
     }
 
+    // Listen for custom install available event
+    window.addEventListener("installAvailable", () => {
+      console.log("[PWA] Install is available!");
+      this.updatePWAMenuUI();
+    });
+
+    // Listen for app installed
+    window.addEventListener("appinstalled", () => {
+      console.log("[PWA] App installed!");
+      this.updatePWAMenuUI();
+    });
+
     // Listen for online/offline events
     window.addEventListener("online", () => this.updatePWAMenuUI());
     window.addEventListener("offline", () => this.updatePWAMenuUI());
-
-    // Listen for install prompt events
-    window.addEventListener("beforeinstallprompt", () =>
-      this.updatePWAMenuUI()
-    );
-    window.addEventListener("appinstalled", () => this.updatePWAMenuUI());
   },
 
   // Update PWA menu UI based on current state
@@ -243,8 +249,10 @@ window.PWAManager = {
     if (installBtn) {
       if (InstallPrompt.canInstall()) {
         installBtn.style.display = "flex";
+        console.log("[PWA] Showing install button in menu");
       } else {
         installBtn.style.display = "none";
+        console.log("[PWA] Hiding install button in menu");
       }
     }
   },
