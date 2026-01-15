@@ -3,9 +3,57 @@
 
 export const examList = [
   {
-    "id": "Lecture 1 MCQ",
-    "title": "Lecture 1 MCQ",
-    "path": "../Exams/Computer Network/Lecture 1 MCQ.js",
+    "id": "Lecture 1",
+    "title": "Lecture 1",
+    "path": "../Exams/Computer Network/Lecture 1.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 2",
+    "title": "Lecture 2",
+    "path": "../Exams/Computer Network/Lecture 2.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 3",
+    "title": "Lecture 3",
+    "path": "../Exams/Computer Network/Lecture 3.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 4",
+    "title": "Lecture 4",
+    "path": "../Exams/Computer Network/Lecture 4.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 5",
+    "title": "Lecture 5",
+    "path": "../Exams/Computer Network/Lecture 5.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 6",
+    "title": "Lecture 6",
+    "path": "../Exams/Computer Network/Lecture 6.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 7",
+    "title": "Lecture 7",
+    "path": "../Exams/Computer Network/Lecture 7.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 8",
+    "title": "Lecture 8",
+    "path": "../Exams/Computer Network/Lecture 8.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lecture 9",
+    "title": "Lecture 9",
+    "path": "../Exams/Computer Network/Lecture 9.js",
     "category": "Computer Network"
   },
   {
@@ -422,9 +470,57 @@ export const categoryTree = {
     "subcategories": [],
     "exams": [
       {
-        "id": "Lecture 1 MCQ",
-        "title": "Lecture 1 MCQ",
-        "path": "../Exams/Computer Network/Lecture 1 MCQ.js",
+        "id": "Lecture 1",
+        "title": "Lecture 1",
+        "path": "../Exams/Computer Network/Lecture 1.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 2",
+        "title": "Lecture 2",
+        "path": "../Exams/Computer Network/Lecture 2.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 3",
+        "title": "Lecture 3",
+        "path": "../Exams/Computer Network/Lecture 3.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 4",
+        "title": "Lecture 4",
+        "path": "../Exams/Computer Network/Lecture 4.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 5",
+        "title": "Lecture 5",
+        "path": "../Exams/Computer Network/Lecture 5.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 6",
+        "title": "Lecture 6",
+        "path": "../Exams/Computer Network/Lecture 6.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 7",
+        "title": "Lecture 7",
+        "path": "../Exams/Computer Network/Lecture 7.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 8",
+        "title": "Lecture 8",
+        "path": "../Exams/Computer Network/Lecture 8.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lecture 9",
+        "title": "Lecture 9",
+        "path": "../Exams/Computer Network/Lecture 9.js",
         "category": "Computer Network"
       }
     ]
