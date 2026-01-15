@@ -41,7 +41,7 @@ export const OfflineIndicator = {
     this.indicator.innerHTML = `
       <div class="indicator-content">
         <span class="indicator-icon">📡</span>
-        <span class="indicator-text">Offline Mode - Using cached data</span>
+        <span class="indicator-text">Offline Mode</span>
       </div>
     `;
   },

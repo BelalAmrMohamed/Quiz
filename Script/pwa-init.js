@@ -27,8 +27,8 @@ window.PWAManager = {
     // 5. Check for updates periodically
     this.startUpdateChecker();
 
-    // 6. Create notification center button
-    this.createNotificationButton();
+    // 6. Integrate PWA features into side menu
+    this.integratePWAIntoSideMenu();
 
     console.log("[PWA] Initialization complete!");
   },
@@ -104,7 +104,7 @@ window.PWAManager = {
     }
   },
 
-  // Show update notification
+  // Show update notification (in-app banner)
   showUpdateNotification() {
     const banner = document.createElement("div");
     banner.className = "update-notification";
@@ -152,24 +152,100 @@ window.PWAManager = {
     }, 30 * 60 * 1000); // 30 minutes
   },
 
-  // Create notification center button in header
-  createNotificationButton() {
-    const btn = document.createElement("button");
-    btn.id = "notificationCenterBtn";
-    btn.className = "notification-center-btn";
-    btn.innerHTML = "🔔";
-    btn.title = "Notification Settings";
-    btn.onclick = () => NotificationManager.openNotificationCenter();
+  // Integrate PWA features into the side menu
+  integratePWAIntoSideMenu() {
+    // Wait for DOM to be ready
+    const waitForSideMenu = setInterval(() => {
+      const sideMenu = document.getElementById("sideMenu");
+      if (sideMenu) {
+        clearInterval(waitForSideMenu);
+        this.addPWAMenuItems(sideMenu);
+      }
+    }, 100);
 
-    // Try to add to header
-    const header =
-      document.querySelector("header") || document.querySelector(".header");
-    if (header) {
-      header.appendChild(btn);
-    } else {
-      // Fallback: Create floating button
-      btn.classList.add("floating");
-      document.body.appendChild(btn);
+    // Stop trying after 5 seconds
+    setTimeout(() => clearInterval(waitForSideMenu), 5000);
+  },
+
+  // Add PWA menu items to the side menu
+  addPWAMenuItems(sideMenu) {
+    const nav = sideMenu.querySelector("nav");
+    if (!nav) return;
+
+    // Create PWA section
+    const pwaSection = document.createElement("div");
+    pwaSection.className = "pwa-section";
+    pwaSection.innerHTML = `
+      <div class="menu-divider"></div>
+      <div class="pwa-section-header">App Features</div>
+      
+      <!-- Install App Button -->
+      <button class="menu-item pwa-install-btn" id="pwaInstallBtn" style="display: none;">
+        <span class="menu-item-icon">📱</span>
+        <span class="menu-item-text">Install App</span>
+      </button>
+
+      <!-- Notification Settings Button -->
+      <button class="menu-item pwa-notifications-btn" id="pwaNotificationsBtn">
+        <span class="menu-item-icon">🔔</span>
+        <span class="menu-item-text">Notification Settings</span>
+      </button>
+    `;
+
+    // Add to nav (before the last child or at the end)
+    nav.appendChild(pwaSection);
+
+    // Attach event listeners
+    this.attachPWAEventListeners();
+
+    // Update UI based on current state
+    this.updatePWAMenuUI();
+  },
+
+  // Attach event listeners to PWA menu items
+  attachPWAEventListeners() {
+    // Install button
+    const installBtn = document.getElementById("pwaInstallBtn");
+    if (installBtn) {
+      installBtn.addEventListener("click", () => {
+        InstallPrompt.showInstall();
+        // Close menu after action
+        document.getElementById("sideMenu")?.classList.remove("open");
+      });
+    }
+
+    // Notifications button
+    const notificationsBtn = document.getElementById("pwaNotificationsBtn");
+    if (notificationsBtn) {
+      notificationsBtn.addEventListener("click", () => {
+        NotificationManager.openNotificationCenter();
+        // Close menu after action
+        document.getElementById("sideMenu")?.classList.remove("open");
+      });
+    }
+
+    // Listen for online/offline events
+    window.addEventListener("online", () => this.updatePWAMenuUI());
+    window.addEventListener("offline", () => this.updatePWAMenuUI());
+
+    // Listen for install prompt events
+    window.addEventListener("beforeinstallprompt", () =>
+      this.updatePWAMenuUI()
+    );
+    window.addEventListener("appinstalled", () => this.updatePWAMenuUI());
+  },
+
+  // Update PWA menu UI based on current state
+  updatePWAMenuUI() {
+    const installBtn = document.getElementById("pwaInstallBtn");
+
+    // Show/hide install button based on availability
+    if (installBtn) {
+      if (InstallPrompt.canInstall()) {
+        installBtn.style.display = "flex";
+      } else {
+        installBtn.style.display = "none";
+      }
     }
   },
 
@@ -179,7 +255,6 @@ window.PWAManager = {
       serviceWorkerReady: this.serviceWorkerReady,
       isInstalled: InstallPrompt.isInstalled(),
       isOnline: navigator.onLine,
-      notificationsEnabled: Notification.permission === "granted",
     };
   },
 };

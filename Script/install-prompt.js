@@ -13,6 +13,9 @@ export const InstallPrompt = {
       // Store the event for later use
       deferredPrompt = e;
 
+      // Notify that install is available
+      window.dispatchEvent(new Event("beforeinstallprompt"));
+
       // Show custom install prompt immediately on first visit
       if (!this.hasBeenDismissed()) {
         this.showInstallBanner();
@@ -27,15 +30,35 @@ export const InstallPrompt = {
 
       // Show success message
       this.showSuccessMessage();
+
+      // Notify app installed
+      window.dispatchEvent(new Event("appinstalled"));
     });
 
     // Check if already installed (standalone mode)
     if (window.matchMedia("(display-mode: standalone)").matches) {
       console.log("[Install] App is running in standalone mode");
     }
+  },
 
-    // Create manual install button in header (always visible)
-    this.createInstallButton();
+  // Check if install prompt can be shown
+  canInstall() {
+    return deferredPrompt !== null && !this.isInstalled();
+  },
+
+  // Show install (called from menu button)
+  showInstall() {
+    if (deferredPrompt) {
+      this.triggerInstall();
+    } else if (!this.isInstalled()) {
+      // Show manual instructions if prompt not available
+      alert(
+        "To install this app:\n\n" +
+          "• On Android/Chrome: Tap menu (⋮) → Install app\n" +
+          "• On iOS/Safari: Tap Share (⎙) → Add to Home Screen\n" +
+          "• On Desktop: Look for the install icon in the address bar"
+      );
+    }
   },
 
   // Check if install prompt has been dismissed
@@ -55,6 +78,12 @@ export const InstallPrompt = {
       return;
     }
 
+    // Remove existing banner if any
+    const existingBanner = document.getElementById("installBanner");
+    if (existingBanner) {
+      return; // Banner already showing
+    }
+
     const banner = document.createElement("div");
     banner.id = "installBanner";
     banner.className = "install-banner";
@@ -68,14 +97,14 @@ export const InstallPrompt = {
           <p>Get faster access and work offline!</p>
           <ul class="install-features">
             <li>📱 Quick access from home screen</li>
-            <li>🔌 Works offline</li>
+            <li>📌 Works offline</li>
             <li>⚡ Lightning fast</li>
             <li>🔔 Get notifications</li>
           </ul>
         </div>
         <div class="install-banner-actions">
           <button class="install-btn" id="installBtn">
-            <span>📥</span> Install App
+            <span>🔥</span> Install App
           </button>
           <button class="dismiss-btn" id="dismissBtn">
             Maybe Later
@@ -112,9 +141,7 @@ export const InstallPrompt = {
   // Trigger install prompt
   async triggerInstall() {
     if (!deferredPrompt) {
-      alert(
-        "Install prompt not available. Try adding to home screen manually from your browser menu."
-      );
+      console.log("[Install] No deferred prompt available");
       return;
     }
 
@@ -134,6 +161,9 @@ export const InstallPrompt = {
     // Clear the deferred prompt
     deferredPrompt = null;
     this.hideInstallBanner();
+
+    // Update UI
+    window.dispatchEvent(new Event("appinstalled"));
   },
 
   // Show success message after install
@@ -156,89 +186,11 @@ export const InstallPrompt = {
     }, 4000);
   },
 
-  // Create permanent install button in header
-  createInstallButton() {
-    // Only show if not installed and prompt is available
-    window.addEventListener("beforeinstallprompt", () => {
-      const headerInstallBtn = document.createElement("button");
-      headerInstallBtn.id = "headerInstallBtn";
-      headerInstallBtn.className = "header-install-btn";
-      headerInstallBtn.innerHTML = "📥";
-      headerInstallBtn.title = "Install App";
-
-      headerInstallBtn.addEventListener("click", () => {
-        this.triggerInstall();
-      });
-
-      // Try to add to header
-      const header =
-        document.querySelector("header") || document.querySelector(".header");
-      if (header) {
-        header.appendChild(headerInstallBtn);
-      }
-    });
-  },
-
   // Check if app is installed
   isInstalled() {
     return (
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true
     );
-  },
-
-  // Get install instructions for different platforms
-  getInstallInstructions() {
-    const ua = navigator.userAgent.toLowerCase();
-
-    if (ua.includes("android")) {
-      return {
-        platform: "Android",
-        steps: [
-          "Tap the menu button (three dots) in your browser",
-          'Select "Install app" or "Add to Home screen"',
-          "Follow the prompts to install",
-        ],
-      };
-    } else if (ua.includes("iphone") || ua.includes("ipad")) {
-      return {
-        platform: "iOS",
-        steps: [
-          "Tap the Share button (square with arrow)",
-          'Scroll down and tap "Add to Home Screen"',
-          'Tap "Add" in the top right corner',
-        ],
-      };
-    } else {
-      return {
-        platform: "Desktop",
-        steps: [
-          "Look for the install icon in your address bar",
-          "Click it and follow the prompts",
-          "Or use the menu → Install Quiz Master",
-        ],
-      };
-    }
-  },
-
-  // Show install instructions modal
-  showInstallInstructions() {
-    const instructions = this.getInstallInstructions();
-
-    const modal = document.createElement("div");
-    modal.className = "install-instructions-modal";
-    modal.innerHTML = `
-      <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
-      <div class="modal-content">
-        <button class="modal-close" onclick="this.closest('.install-instructions-modal').remove()">✕</button>
-        <h2>Install on ${instructions.platform}</h2>
-        <ol class="install-steps">
-          ${instructions.steps.map((step) => `<li>${step}</li>`).join("")}
-        </ol>
-        <img src="/Quiz/images/icon.png" alt="Quiz Master" class="modal-icon">
-      </div>
-    `;
-    document.body.appendChild(modal);
-    setTimeout(() => modal.classList.add("show"), 100);
   },
 };

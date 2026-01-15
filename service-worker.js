@@ -1,5 +1,5 @@
 // service-worker.js - PWA Service Worker with Aggressive Caching
-const CACHE_VERSION = "v1.0.0";
+const CACHE_VERSION = "v1.0.1";
 const CACHE_NAME = `quiz-master-${CACHE_VERSION}`;
 const EXAM_MANIFEST_URL = "/Quiz/Script/examManifest.js";
 
@@ -16,6 +16,7 @@ const CORE_ASSETS = [
   "/Quiz/CSS/animations.css",
   "/Quiz/CSS/themes.css",
   "/Quiz/CSS/dashboard.css",
+  "/Quiz/CSS/pwa.css",
   "/Quiz/Script/index.js",
   "/Quiz/Script/quiz.js",
   "/Quiz/Script/summary.js",
@@ -35,7 +36,7 @@ const CORE_ASSETS = [
 
 // Install: Cache core assets + all exam files
 self.addEventListener("install", (event) => {
-  console.log("[SW] Installing...");
+  console.log("[SW] Installing version", CACHE_VERSION);
 
   event.waitUntil(
     (async () => {
@@ -43,7 +44,20 @@ self.addEventListener("install", (event) => {
 
       // Cache core assets first
       console.log("[SW] Caching core assets...");
-      await cache.addAll(CORE_ASSETS);
+      try {
+        await cache.addAll(CORE_ASSETS);
+        console.log("[SW] Core assets cached successfully");
+      } catch (error) {
+        console.error("[SW] Failed to cache some core assets:", error);
+        // Cache them individually
+        for (const asset of CORE_ASSETS) {
+          try {
+            await cache.add(asset);
+          } catch (err) {
+            console.warn("[SW] Failed to cache:", asset, err);
+          }
+        }
+      }
 
       // Fetch and cache ALL exam files
       try {
@@ -60,23 +74,26 @@ self.addEventListener("install", (event) => {
 
           console.log(`[SW] Found ${examPaths.length} exams to cache`);
 
-          // Cache exams in batches to avoid overwhelming
-          const batchSize = 10;
-          for (let i = 0; i < examPaths.length; i += batchSize) {
-            const batch = examPaths.slice(i, i + batchSize);
-            await Promise.allSettled(
-              batch.map((path) =>
-                cache.add(path).catch((err) => {
-                  console.warn(`[SW] Failed to cache ${path}:`, err);
-                })
-              )
-            );
-            console.log(
-              `[SW] Cached batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(
-                examPaths.length / batchSize
-              )}`
-            );
+          // Cache all exams (don't batch, just do them all)
+          let cached = 0;
+          let failed = 0;
+
+          for (const path of examPaths) {
+            try {
+              await cache.add(path);
+              cached++;
+              if (cached % 10 === 0) {
+                console.log(`[SW] Cached ${cached}/${examPaths.length} exams`);
+              }
+            } catch (err) {
+              failed++;
+              console.warn(`[SW] Failed to cache ${path}:`, err.message);
+            }
           }
+
+          console.log(
+            `[SW] Exam caching complete! Success: ${cached}, Failed: ${failed}`
+          );
         }
       } catch (error) {
         console.error("[SW] Failed to cache exams:", error);
@@ -84,14 +101,14 @@ self.addEventListener("install", (event) => {
 
       // Skip waiting to activate immediately
       await self.skipWaiting();
-      console.log("[SW] Installation complete!");
+      console.log("[SW] Installation complete! Version:", CACHE_VERSION);
     })()
   );
 });
 
 // Activate: Clean up old caches
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activating...");
+  console.log("[SW] Activating version", CACHE_VERSION);
 
   event.waitUntil(
     (async () => {
@@ -117,7 +134,7 @@ self.addEventListener("activate", (event) => {
         client.postMessage({ type: "SW_ACTIVATED", version: CACHE_VERSION });
       });
 
-      console.log("[SW] Activated!");
+      console.log("[SW] Activated! Version:", CACHE_VERSION);
     })()
   );
 });

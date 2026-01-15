@@ -169,20 +169,20 @@
 
 .offline-indicator {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  bottom: 20px;
+  left: 20px;
   padding: 12px 20px;
-  text-align: center;
+  border-radius: 8px;
   font-size: 0.9em;
   font-weight: 500;
   z-index: 9999;
-  transform: translateY(-100%);
+  transform: translateX(-120%);
   transition: transform 0.3s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .offline-indicator.show {
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .offline-indicator.offline {
@@ -204,6 +204,64 @@
 
 .indicator-icon {
   font-size: 1.2em;
+}
+
+/* ============================================
+   SIDE MENU PWA SECTION
+   ============================================ */
+
+.pwa-section {
+  margin-top: 0.5rem;
+}
+
+.pwa-section-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pwa-install-btn,
+.pwa-notifications-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  color: inherit;
+  font-size: 1rem;
+}
+
+.pwa-install-btn:hover,
+.pwa-notifications-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.menu-item-icon {
+  font-size: 1.2rem;
+  margin-right: 0.75rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.menu-item-text {
+  flex: 1;
+}
+
+.pwa-status-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 3px solid #ffc107;
+  margin: 0.5rem 0;
 }
 
 /* ============================================
@@ -294,16 +352,8 @@
 }
 
 /* Specific Banner Types */
-.notification-banner.streak-reminder {
-  border-left: 4px solid #ff5722;
-}
-
 .notification-banner.new-quiz {
   border-left: 4px solid #4caf50;
-}
-
-.notification-banner.daily-reminder {
-  border-left: 4px solid #0088cc;
 }
 
 /* ============================================
@@ -370,7 +420,7 @@
 }
 
 /* ============================================
-   NOTIFICATION CENTER
+   NOTIFICATION CENTER (SIDE PANEL)
    ============================================ */
 
 .notification-center {
@@ -431,6 +481,16 @@
   padding: 20px;
 }
 
+.notification-intro {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #1565c0;
+}
+
 .notification-setting {
   padding: 16px;
   border-bottom: 1px solid #e0e0e0;
@@ -440,9 +500,8 @@
   gap: 16px;
 }
 
-.notification-setting.time-picker {
-  flex-direction: column;
-  align-items: flex-start;
+.notification-setting:last-of-type {
+  border-bottom: none;
 }
 
 .notification-setting.disabled {
@@ -514,43 +573,18 @@ input:checked + .toggle-slider:before {
   transform: translateX(22px);
 }
 
-/* Time Picker */
-.time-picker input[type="time"] {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1em;
-  margin-top: 8px;
+.notification-info-box {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 4px;
 }
 
-/* Enable Push Button */
-.enable-push-btn {
-  width: 100%;
-  padding: 14px;
-  background: #0088cc;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.2s;
-}
-
-.enable-push-btn:hover {
-  background: #006699;
-  transform: translateY(-2px);
-}
-
-.notification-note {
-  text-align: center;
-  font-size: 0.85em;
-  color: #999;
-  margin-top: 20px;
-  padding: 0 10px;
-  line-height: 1.5;
+.notification-info-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #856404;
 }
 
 /* Notification Center Button */
@@ -688,6 +722,16 @@ input:checked + .toggle-slider:before {
     right: 10px;
     max-width: none;
   }
+
+  .offline-indicator {
+    left: 50%;
+    transform: translate(-50%, 120%);
+    bottom: 10px;
+  }
+
+  .offline-indicator.show {
+    transform: translate(-50%, 0);
+  }
 }
 
 /* ============================================
@@ -713,12 +757,6 @@ input:checked + .toggle-slider:before {
     color: #aaa;
   }
 
-  .time-picker input[type="time"] {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #444;
-  }
-
   .install-success {
     background: #1e1e1e;
     color: #e0e0e0;
@@ -726,5 +764,24 @@ input:checked + .toggle-slider:before {
 
   .install-success p {
     color: #aaa;
+  }
+
+  .pwa-section-header {
+    color: #aaa;
+  }
+
+  .pwa-install-btn:hover,
+  .pwa-notifications-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .notification-intro {
+    background: #1a3a52;
+    color: #64b5f6;
+  }
+
+  .notification-info-box {
+    background: #3a3000;
+    color: #ffd54f;
   }
 }

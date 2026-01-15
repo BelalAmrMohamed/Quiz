@@ -1,25 +1,11 @@
-// Script/notifications.js - Local Notification Manager (No Server Required)
+// Script/notifications.js - In-App Notification Manager (No Push Notifications)
 
 const NOTIFICATION_STORAGE_KEY = "quiz_notifications_settings";
-const LAST_ACTIVITY_KEY = "quiz_last_activity";
 
 export const NotificationManager = {
   // Initialize notification system
   async init() {
-    // Request permission if not already granted
-    if ("Notification" in window && Notification.permission === "default") {
-      // Don't auto-request, let user enable from settings
-      console.log("[Notifications] Permission not yet requested");
-    }
-
-    // Check for streak reminders on page load
-    this.checkStreakReminder();
-
-    // Update last activity
-    this.updateLastActivity();
-
-    // Schedule daily check
-    this.scheduleDailyCheck();
+    console.log("[Notifications] Initializing in-app notifications...");
 
     // Listen for new quiz updates from service worker
     if ("serviceWorker" in navigator) {
@@ -37,9 +23,6 @@ export const NotificationManager = {
     return stored
       ? JSON.parse(stored)
       : {
-          dailyReminder: false,
-          dailyReminderTime: "18:00",
-          streakReminder: true,
           achievementPopups: true,
           newQuizAlerts: true,
         };
@@ -48,59 +31,6 @@ export const NotificationManager = {
   // Save notification settings
   saveSettings(settings) {
     localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(settings));
-  },
-
-  // Request notification permission
-  async requestPermission() {
-    if (!("Notification" in window)) {
-      alert("This browser does not support notifications");
-      return false;
-    }
-
-    const permission = await Notification.requestPermission();
-    return permission === "granted";
-  },
-
-  // Update last activity timestamp
-  updateLastActivity() {
-    localStorage.setItem(LAST_ACTIVITY_KEY, new Date().toISOString());
-  },
-
-  // Check if user has been inactive for 3+ days
-  checkStreakReminder() {
-    const settings = this.getSettings();
-    if (!settings.streakReminder) return;
-
-    const lastActivity = localStorage.getItem(LAST_ACTIVITY_KEY);
-    if (!lastActivity) return;
-
-    const lastDate = new Date(lastActivity);
-    const now = new Date();
-    const daysDiff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
-
-    if (daysDiff >= 3) {
-      this.showStreakReminderBanner(daysDiff);
-    }
-  },
-
-  // Show streak reminder banner (in-app, not push notification)
-  showStreakReminderBanner(days) {
-    const banner = document.createElement("div");
-    banner.className = "notification-banner streak-reminder";
-    banner.innerHTML = `
-      <div class="notification-content">
-        <span class="notification-icon">🔥</span>
-        <div class="notification-text">
-          <strong>Your streak is waiting!</strong>
-          <p>You haven't studied in ${days} days. Keep your momentum going!</p>
-        </div>
-        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">✕</button>
-      </div>
-    `;
-    document.body.appendChild(banner);
-
-    // Auto-remove after 10 seconds
-    setTimeout(() => banner.remove(), 10000);
   },
 
   // Show achievement popup
@@ -129,7 +59,7 @@ export const NotificationManager = {
       setTimeout(() => popup.remove(), 300);
     }, 5000);
 
-    // Play sound if available
+    // Play sound
     this.playNotificationSound();
   },
 
@@ -155,69 +85,9 @@ export const NotificationManager = {
 
     // Show badge on app icon if supported
     this.updateAppBadge(1);
-  },
 
-  // Schedule daily reminder check
-  scheduleDailyCheck() {
-    const settings = this.getSettings();
-    if (!settings.dailyReminder) return;
-
-    // Check every minute if it's time for daily reminder
-    setInterval(() => {
-      this.checkDailyReminder();
-    }, 60000); // Every minute
-  },
-
-  // Check if it's time for daily reminder
-  checkDailyReminder() {
-    const settings = this.getSettings();
-    if (!settings.dailyReminder) return;
-
-    const now = new Date();
-    const [targetHour, targetMinute] = settings.dailyReminderTime
-      .split(":")
-      .map(Number);
-
-    // Check if current time matches reminder time (within 1 minute)
-    if (now.getHours() === targetHour && now.getMinutes() === targetMinute) {
-      const lastReminder = localStorage.getItem("last_daily_reminder");
-      const today = now.toDateString();
-
-      // Only show once per day
-      if (lastReminder !== today) {
-        this.sendDailyReminder();
-        localStorage.setItem("last_daily_reminder", today);
-      }
-    }
-  },
-
-  // Send daily reminder notification
-  async sendDailyReminder() {
-    if (Notification.permission === "granted") {
-      new Notification("Quiz Master - Daily Practice", {
-        body: "Time to sharpen your skills! 🎯",
-        icon: "/Quiz/images/icon.png",
-        badge: "/Quiz/images/icon.png",
-        tag: "daily-reminder",
-        requireInteraction: false,
-      });
-    } else {
-      // Show in-app banner instead
-      const banner = document.createElement("div");
-      banner.className = "notification-banner daily-reminder";
-      banner.innerHTML = `
-        <div class="notification-content">
-          <span class="notification-icon">🎯</span>
-          <div class="notification-text">
-            <strong>Daily Practice Time!</strong>
-            <p>Ready to test your knowledge?</p>
-          </div>
-          <button class="notification-action" onclick="window.location.href='/Quiz/'">Start Quiz</button>
-          <button class="notification-close" onclick="this.parentElement.parentElement.remove()">✕</button>
-        </div>
-      `;
-      document.body.appendChild(banner);
-    }
+    // Play sound
+    this.playNotificationSound();
   },
 
   // Update app badge (number on icon)
@@ -251,7 +121,7 @@ export const NotificationManager = {
     }
   },
 
-  // Create notification center UI
+  // Create notification center UI (side panel)
   createNotificationCenter() {
     const container = document.createElement("div");
     container.id = "notificationCenter";
@@ -266,40 +136,9 @@ export const NotificationManager = {
       </div>
       
       <div class="notification-center-body">
-        <div class="notification-setting">
-          <div class="setting-info">
-            <label>📅 Daily Study Reminder</label>
-            <p>Get reminded to practice every day</p>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="dailyReminderToggle" ${
-              settings.dailyReminder ? "checked" : ""
-            }>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <div class="notification-setting time-picker ${
-          settings.dailyReminder ? "" : "disabled"
-        }">
-          <label>⏰ Reminder Time</label>
-          <input type="time" id="dailyReminderTime" value="${
-            settings.dailyReminderTime
-          }" ${settings.dailyReminder ? "" : "disabled"}>
-        </div>
-
-        <div class="notification-setting">
-          <div class="setting-info">
-            <label>🔥 Streak Reminders</label>
-            <p>Get notified after 3 days of inactivity</p>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="streakReminderToggle" ${
-              settings.streakReminder ? "checked" : ""
-            }>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
+        <p class="notification-intro">
+          All notifications appear as in-app popups while you're using the quiz app.
+        </p>
 
         <div class="notification-setting">
           <div class="setting-info">
@@ -327,17 +166,9 @@ export const NotificationManager = {
           </label>
         </div>
 
-        <button class="enable-push-btn" id="enablePushBtn">
-          ${
-            Notification.permission === "granted"
-              ? "✅ Push Notifications Enabled"
-              : "🔔 Enable Push Notifications"
-          }
-        </button>
-
-        <p class="notification-note">
-          💡 Note: Notifications work best when the app is installed on your device.
-        </p>
+        <div class="notification-info-box">
+          <p>💡 <strong>Note:</strong> All notifications appear as popups within the app. They will only show when you have the quiz app open in your browser or installed on your device.</p>
+        </div>
       </div>
     `;
 
@@ -349,41 +180,10 @@ export const NotificationManager = {
 
   // Attach event listeners to notification center
   attachEventListeners() {
-    const dailyToggle = document.getElementById("dailyReminderToggle");
-    const dailyTime = document.getElementById("dailyReminderTime");
-    const streakToggle = document.getElementById("streakReminderToggle");
     const achievementToggle = document.getElementById(
       "achievementPopupsToggle"
     );
     const newQuizToggle = document.getElementById("newQuizAlertsToggle");
-    const enablePushBtn = document.getElementById("enablePushBtn");
-
-    dailyToggle?.addEventListener("change", (e) => {
-      const settings = this.getSettings();
-      settings.dailyReminder = e.target.checked;
-      this.saveSettings(settings);
-
-      const timePicker = dailyTime.closest(".time-picker");
-      if (e.target.checked) {
-        timePicker?.classList.remove("disabled");
-        dailyTime.disabled = false;
-      } else {
-        timePicker?.classList.add("disabled");
-        dailyTime.disabled = true;
-      }
-    });
-
-    dailyTime?.addEventListener("change", (e) => {
-      const settings = this.getSettings();
-      settings.dailyReminderTime = e.target.value;
-      this.saveSettings(settings);
-    });
-
-    streakToggle?.addEventListener("change", (e) => {
-      const settings = this.getSettings();
-      settings.streakReminder = e.target.checked;
-      this.saveSettings(settings);
-    });
 
     achievementToggle?.addEventListener("change", (e) => {
       const settings = this.getSettings();
@@ -395,22 +195,6 @@ export const NotificationManager = {
       const settings = this.getSettings();
       settings.newQuizAlerts = e.target.checked;
       this.saveSettings(settings);
-    });
-
-    enablePushBtn?.addEventListener("click", async () => {
-      if (Notification.permission === "granted") {
-        alert("Push notifications are already enabled! ✅");
-      } else {
-        const granted = await this.requestPermission();
-        if (granted) {
-          enablePushBtn.textContent = "✅ Push Notifications Enabled";
-          alert("Push notifications enabled! You will now receive reminders.");
-        } else {
-          alert(
-            "Please enable notifications in your browser settings to receive reminders."
-          );
-        }
-      }
     });
   },
 
