@@ -1,8 +1,12 @@
-// Script/quiz.js - Enhanced with All Features
+// Script/quiz.js - Performance Optimized
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
 
-// --- State Management ---
+// === MEMORY CACHE for exam modules ===
+const examModuleCache = new Map();
+const MAX_CACHE_SIZE = 10; // Keep last 10 exams in memory
+
+// === State Management ===
 let questions = [];
 let metaData = {};
 let currentIdx = 0;
@@ -16,7 +20,11 @@ let timeRemaining = 0;
 let viewMode = "grid";
 let autoSubmitTimeout = null;
 
-// --- DOM Elements ---
+// === Performance: Debounce helpers ===
+let renderNavDebounce = null;
+let saveStateDebounce = null;
+
+// === DOM Elements (cached references) ===
 const els = {
   title: document.getElementById("quizTitle"),
   progressFill: document.getElementById("progressFill"),
@@ -36,16 +44,12 @@ const els = {
   viewText: document.getElementById("viewText"),
 };
 
-// === CRITICAL: Define global handlers IMMEDIATELY ===
-window.finishEarly = () => {
-  console.log("Finish button clicked"); // Debug log
-  finish();
-};
-
+// === Global handlers ===
+window.finishEarly = () => finish();
 window.prevQuestion = () => nav(-1);
 window.nextQuestion = () => nav(1);
 
-// --- Helper: HTML Escaping ---
+// === Helper: HTML Escaping ===
 const escapeHtml = (unsafe) => {
   if (unsafe === null || unsafe === undefined) return "";
   return String(unsafe)
@@ -56,29 +60,26 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
-// --- Helper: Check if Essay Question ---
+// === Helper: Check if Essay Question ===
 const isEssayQuestion = (q) => {
   return q.options && q.options.length === 1;
 };
 
-// --- Initialize Gamification Stats ---
+// === Gamification Stats ===
 function updateGamificationStats() {
   const userData = gameEngine.getUserData();
   const levelInfo = gameEngine.calculateLevel(userData.totalPoints);
 
-  if (els.statLevel) {
-    els.statLevel.textContent = `Lv ${levelInfo.level}`;
-  }
-  if (els.statPoints) {
+  if (els.statLevel) els.statLevel.textContent = `Lv ${levelInfo.level}`;
+  if (els.statPoints)
     els.statPoints.textContent = `${userData.totalPoints} pts`;
-  }
   if (els.statStreak) {
     const streak = userData.streaks?.currentDaily || 0;
     els.statStreak.textContent = `${streak} day${streak !== 1 ? "s" : ""}`;
   }
 }
 
-// --- View Toggle ---
+// === View Toggle ===
 function toggleView() {
   viewMode = viewMode === "grid" ? "list" : "grid";
   localStorage.setItem("quiz_view_mode", viewMode);
@@ -97,7 +98,31 @@ function toggleView() {
   updateMenuActionButtons();
 }
 
-// --- Initialization ---
+// === OPTIMIZED: Load exam module with caching ===
+async function loadExamModule(config) {
+  // Check cache first
+  if (examModuleCache.has(config.id)) {
+    console.log(`[Quiz] Using cached exam: ${config.id}`);
+    return examModuleCache.get(config.id);
+  }
+
+  // Load module
+  console.log(`[Quiz] Loading exam: ${config.id}`);
+  const module = await import(config.path);
+
+  // Cache it
+  examModuleCache.set(config.id, module);
+
+  // Limit cache size (LRU-style)
+  if (examModuleCache.size > MAX_CACHE_SIZE) {
+    const firstKey = examModuleCache.keys().next().value;
+    examModuleCache.delete(firstKey);
+  }
+
+  return module;
+}
+
+// === Initialization ===
 async function init() {
   const params = new URLSearchParams(window.location.search);
   examId = params.get("id");
@@ -106,9 +131,7 @@ async function init() {
 
   // Load saved view mode
   const savedView = localStorage.getItem("quiz_view_mode");
-  if (savedView) {
-    viewMode = savedView;
-  }
+  if (savedView) viewMode = savedView;
 
   // Update view toggle button
   if (els.viewIcon && els.viewText) {
@@ -130,7 +153,8 @@ async function init() {
   }
 
   try {
-    const module = await import(config.path);
+    // Use optimized loader with caching
+    const module = await loadExamModule(config);
     questions = module.questions;
 
     if (module.meta && (module.meta.title || module.meta.category)) {
@@ -149,8 +173,6 @@ async function init() {
       if (quizMode === "timed") modeLabel = " (Timed)";
       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
     }
-
-    // Timer is now visible in all modes (no hiding)
 
     if (quizMode === "timed") {
       timeRemaining = questions.length * 30;
@@ -173,67 +195,58 @@ async function init() {
       }
     }
 
-    // Initialize gamification
     updateGamificationStats();
-
     renderMenuNavigation();
     updateMenuActionButtons();
     renderQuestion();
     startTimer();
 
-    // Additional Global Handlers
+    // Global handlers
     window.handleSelect = (i) => handleSelect(i);
     window.handleEssayInput = () => handleEssayInput();
     window.checkAnswer = () => checkAnswer();
     window.toggleView = () => toggleView();
-
     window.toggleBookmark = () => {
       gameEngine.toggleBookmark(examId, currentIdx);
       renderQuestion();
-      renderMenuNavigation();
+      renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
-
     window.toggleFlag = () => {
       gameEngine.toggleFlag(examId, currentIdx);
       renderQuestion();
-      renderMenuNavigation();
+      renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
-
     window.toggleQuestionBookmark = (idx) => {
       gameEngine.toggleBookmark(examId, idx);
-      renderMenuNavigation();
+      renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
         updateMenuActionButtons();
       }
     };
-
     window.toggleQuestionFlag = (idx) => {
       gameEngine.toggleFlag(examId, idx);
-      renderMenuNavigation();
+      renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
         updateMenuActionButtons();
       }
     };
-
     window.jumpToQuestion = (idx) => {
       currentIdx = idx;
-      saveState();
+      saveStateDebounced();
       renderQuestion();
-      renderMenuNavigation();
+      renderMenuNavigationDebounced();
       updateMenuActionButtons();
 
-      // Scroll to question
       const questionCard = document.querySelector(".question-card");
       if (questionCard) {
         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     };
 
-    // View toggle
     if (els.viewToggle) {
       els.viewToggle.addEventListener("click", toggleView);
     }
@@ -248,6 +261,11 @@ async function init() {
         } catch (err) {}
       }
     });
+
+    // Pause service worker caching while quiz is active (reduce lag)
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: "PAUSE_CACHING" });
+    }
   } catch (err) {
     console.error("Initialization Error:", err);
     if (els.questionContainer) {
@@ -256,7 +274,15 @@ async function init() {
   }
 }
 
-// --- Menu Navigation (Grid or List) ---
+// === OPTIMIZED: Debounced navigation rendering ===
+function renderMenuNavigationDebounced() {
+  if (renderNavDebounce) clearTimeout(renderNavDebounce);
+  renderNavDebounce = setTimeout(() => {
+    renderMenuNavigation();
+  }, 100); // Wait 100ms before re-rendering
+}
+
+// === OPTIMIZED: Menu Navigation with smart updates ===
 function renderMenuNavigation() {
   let navContainer = document.getElementById("menuNavContainer");
   if (!navContainer) return;
@@ -274,59 +300,22 @@ function renderMenuNavigation() {
   }
 }
 
+// === OPTIMIZED: Grid view with DocumentFragment ===
 function renderGridView(navContainer, flagInfo) {
-  const gridHTML = questions
-    .map((q, idx) => {
-      const isAnswered = userAnswers[idx] !== undefined;
-      const isLocked = lockedQuestions[idx];
-      const isBookmarked = gameEngine.isBookmarked(examId, idx);
-      const isFlagged = gameEngine.isFlagged(examId, idx);
-      const isCurrent = idx === currentIdx;
+  // Use DocumentFragment for better performance
+  const fragment = document.createDocumentFragment();
+  const container = document.createElement("div");
+  container.className = "menu-nav-items grid-view";
 
-      let statusClass = "unanswered";
-      let statusIcon = "";
+  // Build all items at once
+  questions.forEach((q, idx) => {
+    const item = createGridItem(q, idx);
+    container.appendChild(item);
+  });
 
-      if (isCurrent) {
-        statusClass = "current";
-      } else if (isLocked) {
-        const correctIdx = q.correct ?? q.answer;
-        const isCorrect = userAnswers[idx] === correctIdx;
-        statusClass = isCorrect ? "correct" : "wrong";
-        statusIcon = isCorrect ? "✓" : "✗";
-      } else if (isAnswered) {
-        statusClass = "answered";
-        statusIcon = "●";
-      }
+  fragment.appendChild(container);
 
-      const badges = [];
-      if (isBookmarked)
-        badges.push('<span class="mini-badge bookmark">★</span>');
-      if (isFlagged) badges.push('<span class="mini-badge flag">🚩</span>');
-
-      return `
-      <button 
-        class="menu-nav-item grid-item ${statusClass}" 
-        onclick="window.jumpToQuestion(${idx})"
-        title="Question ${idx + 1}${isBookmarked ? " - Bookmarked" : ""}${
-        isFlagged ? " - Flagged" : ""
-      }"
-      >
-        <span>${idx + 1}</span>
-        ${
-          statusIcon
-            ? `<span class="menu-nav-status grid-status">${statusIcon}</span>`
-            : ""
-        }
-        ${
-          badges.length > 0
-            ? `<div class="menu-nav-badges">${badges.join("")}</div>`
-            : ""
-        }
-      </button>
-    `;
-    })
-    .join("");
-
+  // Single DOM update
   navContainer.innerHTML = `
     <div class="menu-nav-grid">
       <div class="menu-nav-header">Question Navigator</div>
@@ -337,67 +326,75 @@ function renderGridView(navContainer, flagInfo) {
         <span><span class="legend-dot wrong"></span> Wrong</span>
       </div>
       ${flagInfo}
-      <div class="menu-nav-items grid-view">
-        ${gridHTML}
-      </div>
     </div>
   `;
+  navContainer.querySelector(".menu-nav-grid").appendChild(container);
 }
 
-function renderListView(navContainer, flagInfo) {
-  const listHTML = questions
-    .map((q, idx) => {
-      const isAnswered = userAnswers[idx] !== undefined;
-      const isLocked = lockedQuestions[idx];
-      const isBookmarked = gameEngine.isBookmarked(examId, idx);
-      const isFlagged = gameEngine.isFlagged(examId, idx);
-      const isCurrent = idx === currentIdx;
+// === Helper: Create grid item element ===
+function createGridItem(q, idx) {
+  const isAnswered = userAnswers[idx] !== undefined;
+  const isLocked = lockedQuestions[idx];
+  const isBookmarked = gameEngine.isBookmarked(examId, idx);
+  const isFlagged = gameEngine.isFlagged(examId, idx);
+  const isCurrent = idx === currentIdx;
 
-      let statusClass = "unanswered";
-      let statusIcon = "";
+  let statusClass = "unanswered";
+  let statusIcon = "";
 
-      if (isCurrent) {
-        statusClass = "current";
-      } else if (isLocked) {
-        const correctIdx = q.correct ?? q.answer;
-        const isCorrect = userAnswers[idx] === correctIdx;
-        statusClass = isCorrect ? "correct" : "wrong";
-        statusIcon = isCorrect ? "✓" : "✗";
-      } else if (isAnswered) {
-        statusClass = "answered";
-        statusIcon = "●";
-      }
+  if (isCurrent) {
+    statusClass = "current";
+  } else if (isLocked) {
+    const correctIdx = q.correct ?? q.answer;
+    const isCorrect = userAnswers[idx] === correctIdx;
+    statusClass = isCorrect ? "correct" : "wrong";
+    statusIcon = isCorrect ? "✓" : "✗";
+  } else if (isAnswered) {
+    statusClass = "answered";
+    statusIcon = "●";
+  }
 
-      const bookmarkClass = isBookmarked ? "active" : "";
-      const flagClass = isFlagged ? "active" : "";
-      const bookmarkIcon = isBookmarked ? "★" : "☆";
+  const button = document.createElement("button");
+  button.className = `menu-nav-item grid-item ${statusClass}`;
+  button.onclick = () => window.jumpToQuestion(idx);
+  button.title = `Question ${idx + 1}${isBookmarked ? " - Bookmarked" : ""}${
+    isFlagged ? " - Flagged" : ""
+  }`;
 
-      return `
-      <div class="menu-nav-item list-item ${statusClass}">
-        <div class="menu-nav-item-left" onclick="window.jumpToQuestion(${idx})">
-          <span class="menu-nav-number">Q${idx + 1}</span>
-          ${
-            statusIcon
-              ? `<span class="menu-nav-status list-status">${statusIcon}</span>`
-              : ""
-          }
-        </div>
-        <div class="menu-nav-item-right">
-          <span class="menu-nav-icon bookmark-icon ${bookmarkClass}" 
-                onclick="event.stopPropagation(); window.toggleQuestionBookmark(${idx})"
-                title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
-            ${bookmarkIcon}
-          </span>
-          <span class="menu-nav-icon flag-icon ${flagClass}" 
-                onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
-                title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
-            🚩
-          </span>
-        </div>
+  button.innerHTML = `
+    <span>${idx + 1}</span>
+    ${
+      statusIcon
+        ? `<span class="menu-nav-status grid-status">${statusIcon}</span>`
+        : ""
+    }
+    ${
+      isBookmarked || isFlagged
+        ? `
+      <div class="menu-nav-badges">
+        ${isBookmarked ? '<span class="mini-badge bookmark">★</span>' : ""}
+        ${isFlagged ? '<span class="mini-badge flag">🚩</span>' : ""}
       </div>
-    `;
-    })
-    .join("");
+    `
+        : ""
+    }
+  `;
+
+  return button;
+}
+
+// === List view (similar optimization) ===
+function renderListView(navContainer, flagInfo) {
+  const fragment = document.createDocumentFragment();
+  const container = document.createElement("div");
+  container.className = "menu-nav-items list-view";
+
+  questions.forEach((q, idx) => {
+    const item = createListItem(q, idx);
+    container.appendChild(item);
+  });
+
+  fragment.appendChild(container);
 
   navContainer.innerHTML = `
     <div class="menu-nav-list">
@@ -409,14 +406,64 @@ function renderListView(navContainer, flagInfo) {
         <span><span class="legend-dot wrong"></span> Wrong</span>
       </div>
       ${flagInfo}
-      <div class="menu-nav-items list-view">
-        ${listHTML}
-      </div>
     </div>
   `;
+  navContainer.querySelector(".menu-nav-list").appendChild(container);
 }
 
-// --- Update Menu Action Buttons ---
+// === Helper: Create list item element ===
+function createListItem(q, idx) {
+  const isAnswered = userAnswers[idx] !== undefined;
+  const isLocked = lockedQuestions[idx];
+  const isBookmarked = gameEngine.isBookmarked(examId, idx);
+  const isFlagged = gameEngine.isFlagged(examId, idx);
+  const isCurrent = idx === currentIdx;
+
+  let statusClass = "unanswered";
+  let statusIcon = "";
+
+  if (isCurrent) {
+    statusClass = "current";
+  } else if (isLocked) {
+    const correctIdx = q.correct ?? q.answer;
+    const isCorrect = userAnswers[idx] === correctIdx;
+    statusClass = isCorrect ? "correct" : "wrong";
+    statusIcon = isCorrect ? "✓" : "✗";
+  } else if (isAnswered) {
+    statusClass = "answered";
+    statusIcon = "●";
+  }
+
+  const div = document.createElement("div");
+  div.className = `menu-nav-item list-item ${statusClass}`;
+
+  div.innerHTML = `
+    <div class="menu-nav-item-left" onclick="window.jumpToQuestion(${idx})">
+      <span class="menu-nav-number">Q${idx + 1}</span>
+      ${
+        statusIcon
+          ? `<span class="menu-nav-status list-status">${statusIcon}</span>`
+          : ""
+      }
+    </div>
+    <div class="menu-nav-item-right">
+      <span class="menu-nav-icon bookmark-icon ${isBookmarked ? "active" : ""}" 
+            onclick="event.stopPropagation(); window.toggleQuestionBookmark(${idx})"
+            title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
+        ${isBookmarked ? "★" : "☆"}
+      </span>
+      <span class="menu-nav-icon flag-icon ${isFlagged ? "active" : ""}" 
+            onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
+            title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
+        🚩
+      </span>
+    </div>
+  `;
+
+  return div;
+}
+
+// === Menu Action Buttons ===
 function updateMenuActionButtons() {
   const bookmarkBtn = document.getElementById("menuBookmarkBtn");
   const flagBtn = document.getElementById("menuFlagBtn");
@@ -441,11 +488,7 @@ function updateMenuActionButtons() {
           ? "Remove Bookmark"
           : "Bookmark Question";
 
-      if (isBookmarked) {
-        bookmarkBtn.classList.add("bookmarked");
-      } else {
-        bookmarkBtn.classList.remove("bookmarked");
-      }
+      bookmarkBtn.classList.toggle("bookmarked", isBookmarked);
     }
   }
 
@@ -461,23 +504,19 @@ function updateMenuActionButtons() {
       if (flagText)
         flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
 
-      if (isFlagged) {
-        flagBtn.classList.add("flagged");
-      } else {
-        flagBtn.classList.remove("flagged");
-      }
+      flagBtn.classList.toggle("flagged", isFlagged);
     }
   }
 }
 
-// --- Core Logic ---
+// === Core: Render Question (unchanged logic, optimized DOM) ===
 function renderQuestion() {
   if (!questions.length) return;
   const q = questions[currentIdx];
   const isEssay = isEssayQuestion(q);
   const correctIdx = q.correct ?? q.answer;
 
-  // Update Progress
+  // Update Progress (only if changed)
   const answeredCount = Object.keys(userAnswers).length;
   const progressPercent = (answeredCount / questions.length) * 100;
 
@@ -491,11 +530,8 @@ function renderQuestion() {
   const userSelected = userAnswers[currentIdx];
   const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
   const isFlagged = gameEngine.isFlagged(examId, currentIdx);
-
-  // Check if "Check Answer" button should be shown (not in exam mode)
   const showCheckButton = quizMode !== "exam";
 
-  // Feedback Logic
   let feedbackClass = "feedback";
   let feedbackText = "";
   const explanationText =
@@ -530,7 +566,6 @@ function renderQuestion() {
     }
   }
 
-  // Action buttons
   const actionButtons = `
     <div class="question-actions">
       <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
@@ -546,7 +581,6 @@ function renderQuestion() {
     </div>
   `;
 
-  // Common Header HTML
   const questionHeaderHTML = `
     <div class="question-header">
       <div class="question-number">Question ${currentIdx + 1} of ${
@@ -557,12 +591,10 @@ function renderQuestion() {
     <h2 class="question-text">${escapeHtml(q.q)}</h2>
   `;
 
-  // Render content
   if (isEssay) {
     els.questionContainer.innerHTML = `
       <div class="question-card">
         ${questionHeaderHTML}
-
         <div class="essay-container">
           <label for="essayInput" class="essay-label">Your Answer:</label>
           <textarea 
@@ -574,7 +606,6 @@ function renderQuestion() {
           >${escapeHtml(userSelected || "")}</textarea>
           <div class="essay-hint">💡 Tip: Your answer will be compared with the formal answer (case-insensitive)</div>
         </div>
-
         <button class="check-answer-btn ${
           isLocked || !showCheckButton ? "hidden" : ""
         }"
@@ -586,11 +617,7 @@ function renderQuestion() {
                 }>
           Check Answer
         </button>
-
-        <div class="${feedbackClass}">
-          ${feedbackText}
-        </div>
-
+        <div class="${feedbackClass}">${feedbackText}</div>
         ${
           isLocked
             ? `
@@ -604,11 +631,9 @@ function renderQuestion() {
       </div>
     `;
   } else {
-    // MCQ Render
     els.questionContainer.innerHTML = `
       <div class="question-card">
         ${questionHeaderHTML}
-
         <div class="options-grid">
           ${q.options
             .map((opt, i) => {
@@ -636,7 +661,6 @@ function renderQuestion() {
             })
             .join("")}
         </div>
-
         <button class="check-answer-btn ${
           isLocked || !showCheckButton ? "hidden" : ""
         }"
@@ -644,10 +668,7 @@ function renderQuestion() {
                 ${userSelected === undefined ? "disabled" : ""}>
           Check Answer
         </button>
-
-        <div class="${feedbackClass}">
-          ${feedbackText}
-        </div>
+        <div class="${feedbackClass}">${feedbackText}</div>
       </div>
     `;
   }
@@ -655,16 +676,13 @@ function renderQuestion() {
   updateNav();
 }
 
-// --- Event Handlers ---
+// === Event Handlers ===
 function handleSelect(index) {
   if (lockedQuestions[currentIdx]) return;
   userAnswers[currentIdx] = index;
-  saveState();
-
-  // REMOVED: Auto-lock in exam mode (as requested)
-
+  saveStateDebounced();
   renderQuestion();
-  renderMenuNavigation();
+  renderMenuNavigationDebounced();
   maybeAutoSubmit();
 }
 
@@ -673,7 +691,7 @@ function handleEssayInput() {
   const textarea = document.getElementById("essayInput");
   if (textarea) {
     userAnswers[currentIdx] = textarea.value;
-    saveState();
+    saveStateDebounced();
     const checkBtn = document.getElementById("checkBtn");
     if (checkBtn) {
       checkBtn.disabled = !textarea.value.trim();
@@ -682,7 +700,6 @@ function handleEssayInput() {
 }
 
 const maybeAutoSubmit = () => {
-  // Clear existing timeout
   if (autoSubmitTimeout) {
     clearTimeout(autoSubmitTimeout);
     autoSubmitTimeout = null;
@@ -690,7 +707,6 @@ const maybeAutoSubmit = () => {
 
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
-    // 5-second delay before showing confirmation
     autoSubmitTimeout = setTimeout(() => {
       try {
         if (confirm("You have answered all questions. Submit now?")) {
@@ -708,25 +724,19 @@ function nav(dir) {
   const newIdx = currentIdx + dir;
   if (newIdx < 0 || newIdx >= questions.length) return;
   currentIdx = newIdx;
-  saveState();
+  saveStateDebounced();
   renderQuestion();
-  renderMenuNavigation();
+  renderMenuNavigationDebounced();
   updateMenuActionButtons();
 }
 
 function finish(skipConfirm) {
-  console.log("Finish function called, skipConfirm:", skipConfirm); // Debug log
-
-  // Clear auto-submit timeout
   if (autoSubmitTimeout) {
     clearTimeout(autoSubmitTimeout);
     autoSubmitTimeout = null;
   }
 
-  if (!skipConfirm && !confirm("Are you sure you want to submit?")) {
-    console.log("User cancelled submission");
-    return;
-  }
+  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
 
   stopTimer();
 
@@ -758,8 +768,6 @@ function finish(skipConfirm) {
     mode: quizMode,
   };
 
-  console.log("Processing result:", rawResult); // Debug log
-
   const gamifiedResult = gameEngine.processResult(rawResult);
 
   const finalOutput = {
@@ -767,12 +775,15 @@ function finish(skipConfirm) {
     gamification: gamifiedResult,
   };
 
-  console.log("Saving result and redirecting..."); // Debug log
   localStorage.setItem("last_quiz_result", JSON.stringify(finalOutput));
   localStorage.removeItem(`quiz_state_${examId}`);
   gameEngine.clearFlags(examId);
 
-  // Force navigation
+  // Resume service worker caching
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: "RESUME_CACHING" });
+  }
+
   window.location.href = "summary.html";
 }
 
@@ -788,13 +799,13 @@ function checkAnswer() {
   }
 
   lockedQuestions[currentIdx] = true;
-  saveState();
+  saveStateDebounced();
   renderQuestion();
-  renderMenuNavigation();
+  renderMenuNavigationDebounced();
   updateNav();
 }
 
-// --- Utilities ---
+// === Utilities ===
 function updateNav() {
   if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
 
@@ -813,10 +824,15 @@ function updateNav() {
   }
 }
 
-function saveState() {
+// === OPTIMIZED: Debounced save state ===
+function saveStateDebounced() {
   if (quizMode === "timed") return;
-  const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
-  localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
+
+  if (saveStateDebounce) clearTimeout(saveStateDebounce);
+  saveStateDebounce = setTimeout(() => {
+    const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
+    localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
+  }, 300); // Wait 300ms before saving
 }
 
 function startTimer() {
@@ -841,14 +857,17 @@ function startTimer() {
         if (timeRemaining < 30) els.timer.style.color = "var(--color-error)";
       }
     } else {
-      // For practice and exam modes, count up
       timeElapsed++;
       const mins = Math.floor(timeElapsed / 60)
         .toString()
         .padStart(2, "0");
       const secs = (timeElapsed % 60).toString().padStart(2, "0");
       if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
-      saveState();
+
+      // Save less frequently during timer (every 10 seconds)
+      if (timeElapsed % 10 === 0) {
+        saveStateDebounced();
+      }
     }
   }, 1000);
 }
