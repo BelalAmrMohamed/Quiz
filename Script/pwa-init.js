@@ -1,4 +1,4 @@
-// Script/pwa-init.js - Initialize All PWA Features (FIXED)
+// Script/pwa-init.js - Initialize All PWA Features (UPDATED)
 
 import { NotificationManager } from "./notifications.js";
 import { InstallPrompt } from "./install-prompt.js";
@@ -256,27 +256,37 @@ window.PWAManager = {
     }, 7000);
   },
 
-  // Check for updates periodically (every 30 minutes)
+  // UPDATED: Check for updates more frequently (every 5 minutes instead of 30)
   startUpdateChecker() {
-    setInterval(async () => {
-      if ("serviceWorker" in navigator) {
-        const swScope = BASE_PATH ? `${BASE_PATH}/` : "/";
-        const registration = await navigator.serviceWorker.getRegistration(
-          swScope
-        );
+    // Check immediately on startup
+    this.checkForUpdatesNow();
 
-        if (registration) {
-          registration.update();
+    // Then check every 5 minutes (quiz sites update frequently)
+    setInterval(() => {
+      this.checkForUpdatesNow();
+    }, 5 * 60 * 1000); // 5 minutes
+  },
 
-          // Also check for new exam content
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({
-              type: "CHECK_FOR_UPDATES",
-            });
-          }
+  // NEW: Immediate update check
+  async checkForUpdatesNow() {
+    if ("serviceWorker" in navigator) {
+      const swScope = BASE_PATH ? `${BASE_PATH}/` : "/";
+      const registration = await navigator.serviceWorker.getRegistration(
+        swScope
+      );
+
+      if (registration) {
+        // Force service worker to check for updates
+        registration.update();
+
+        // Also check for new exam content
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: "CHECK_FOR_UPDATES",
+          });
         }
       }
-    }, 30 * 60 * 1000); // 30 minutes
+    }
   },
 
   // Integrate PWA features into the side menu
