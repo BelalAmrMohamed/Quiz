@@ -767,3 +767,23 @@ body {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+/* Fix theme button text color for dark themes */
+[data-theme="dark-slate"] .theme-btn-label,
+[data-theme="dark"] .theme-btn-label {
+  color: #ffffff; /* Makes the text white */
+  font-weight: 600; /* Makes it look slightly 'bigger' and bolder */
+  font-size: 14px; /* Adjust this to make it even bigger if needed */
+}
+/* Fix for Light Theme: Force all labels to be dark */
+[data-theme="light"] .theme-selector-btn .theme-btn-label {
+  color: #111827 !important; /* Dark color for light mode */
+  font-weight: 600;
+}
+
+/* Fix for Dark Themes: Force all labels to be white and bigger */
+[data-theme="dark-slate"] .theme-selector-btn .theme-btn-label,
+[data-theme="dark"] .theme-selector-btn .theme-btn-label {
+  color: #ffffff !important; /* White color for dark modes */
+  font-weight: 700;
+  font-size: 14px;
+}
