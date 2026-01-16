@@ -1,46 +1,66 @@
 {
+  "id": "/Quiz/",
   "name": "Quiz Master",
   "short_name": "Quiz Master",
-  "description": "College quiz platform for Computers and AI Faculty students",
+  "description": "A premium college quiz platform for Computers and AI Faculty students. Practice exams, track performance, and study offline.",
   "start_url": "/Quiz/",
   "scope": "/Quiz/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "background_color": "#000000",
   "theme_color": "#0088cc",
   "orientation": "portrait-primary",
+  "categories": ["education", "productivity"],
+  "dir": "ltr",
+  "lang": "en-US",
   "icons": [
     {
-      "src": "images/icon.png",
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "images/icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "images/icon.png",
-      "sizes": "144x144",
-      "type": "image/png"
+      "src": "images/maskable-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["education", "productivity"],
-  "shortcuts": [
+  "screenshots": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "View your progress and stats",
-      "url": "/Quiz/dashboard.html",
-      "icons": [{ "src": "images/icon.png", "sizes": "192x192" }]
+      "src": "images/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Quiz Master Dashboard on Desktop"
     },
     {
-      "name": "Start Quiz",
-      "short_name": "Quiz",
-      "description": "Browse available quizzes",
-      "url": "/Quiz/index.html",
-      "icons": [{ "src": "images/icon.png", "sizes": "192x192" }]
+      "src": "images/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Interactive Quiz Player on Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Performance Dashboard",
+      "short_name": "Stats",
+      "description": "View your quiz progress and earned badges",
+      "url": "/Quiz/dashboard.html",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+quiz",
+      "url": "/Quiz/index.html?quiz=%s"
     }
   ]
 }
