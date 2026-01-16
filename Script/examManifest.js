@@ -3,58 +3,76 @@
 
 export const examList = [
   {
+    "id": "Lecture 1 MCQs",
+    "title": "Lecture 1 MCQs",
+    "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 1 MCQs.js",
+    "category": "Computer Network/أسئلة الدكتورة"
+  },
+  {
+    "id": "Lecture 2 MCQs",
+    "title": "Lecture 2 MCQs",
+    "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.js",
+    "category": "Computer Network/أسئلة الدكتورة"
+  },
+  {
+    "id": "Lecture 3 MCQs",
+    "title": "Lecture 3 MCQs",
+    "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.js",
+    "category": "Computer Network/أسئلة الدكتورة"
+  },
+  {
     "id": "Lecture 1",
     "title": "Lecture 1",
-    "path": "../Exams/Computer Network/Lecture 1.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 2",
     "title": "Lecture 2",
-    "path": "../Exams/Computer Network/Lecture 2.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 2.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 3",
     "title": "Lecture 3",
-    "path": "../Exams/Computer Network/Lecture 3.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 4",
     "title": "Lecture 4",
-    "path": "../Exams/Computer Network/Lecture 4.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 5",
     "title": "Lecture 5",
-    "path": "../Exams/Computer Network/Lecture 5.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 6",
     "title": "Lecture 6",
-    "path": "../Exams/Computer Network/Lecture 6.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 6.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 7",
     "title": "Lecture 7",
-    "path": "../Exams/Computer Network/Lecture 7.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 7.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 8",
     "title": "Lecture 8",
-    "path": "../Exams/Computer Network/Lecture 8.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "Lecture 9",
     "title": "Lecture 9",
-    "path": "../Exams/Computer Network/Lecture 9.js",
-    "category": "Computer Network"
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
     "id": "50 MCQs on Chapter 1",
@@ -467,61 +485,103 @@ export const categoryTree = {
       "Computer Network"
     ],
     "parent": null,
+    "subcategories": [
+      "Computer Network/أسئلة الدكتورة",
+      "Computer Network/أسئلة بالذكاء الإصطناعي"
+    ],
+    "exams": []
+  },
+  "Computer Network/أسئلة الدكتورة": {
+    "name": "أسئلة الدكتورة",
+    "path": [
+      "Computer Network",
+      "أسئلة الدكتورة"
+    ],
+    "parent": "Computer Network",
+    "subcategories": [],
+    "exams": [
+      {
+        "id": "Lecture 1 MCQs",
+        "title": "Lecture 1 MCQs",
+        "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 1 MCQs.js",
+        "category": "Computer Network/أسئلة الدكتورة"
+      },
+      {
+        "id": "Lecture 2 MCQs",
+        "title": "Lecture 2 MCQs",
+        "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.js",
+        "category": "Computer Network/أسئلة الدكتورة"
+      },
+      {
+        "id": "Lecture 3 MCQs",
+        "title": "Lecture 3 MCQs",
+        "path": "../Exams/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.js",
+        "category": "Computer Network/أسئلة الدكتورة"
+      }
+    ]
+  },
+  "Computer Network/أسئلة بالذكاء الإصطناعي": {
+    "name": "أسئلة بالذكاء الإصطناعي",
+    "path": [
+      "Computer Network",
+      "أسئلة بالذكاء الإصطناعي"
+    ],
+    "parent": "Computer Network",
     "subcategories": [],
     "exams": [
       {
         "id": "Lecture 1",
         "title": "Lecture 1",
-        "path": "../Exams/Computer Network/Lecture 1.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 2",
         "title": "Lecture 2",
-        "path": "../Exams/Computer Network/Lecture 2.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 2.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 3",
         "title": "Lecture 3",
-        "path": "../Exams/Computer Network/Lecture 3.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 4",
         "title": "Lecture 4",
-        "path": "../Exams/Computer Network/Lecture 4.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 5",
         "title": "Lecture 5",
-        "path": "../Exams/Computer Network/Lecture 5.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 6",
         "title": "Lecture 6",
-        "path": "../Exams/Computer Network/Lecture 6.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 6.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 7",
         "title": "Lecture 7",
-        "path": "../Exams/Computer Network/Lecture 7.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 7.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 8",
         "title": "Lecture 8",
-        "path": "../Exams/Computer Network/Lecture 8.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       },
       {
         "id": "Lecture 9",
         "title": "Lecture 9",
-        "path": "../Exams/Computer Network/Lecture 9.js",
-        "category": "Computer Network"
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       }
     ]
   },
