@@ -5,6 +5,10 @@ import { gameEngine } from "./gameEngine.js";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
 
+// Name
+const user = gameEngine.getUserData();
+const currentName = user.displayName || "User";
+
 // Helper to check if question is essay
 const isEssayQuestion = (q) => {
   return q.options && q.options.length === 1;
@@ -167,7 +171,11 @@ function renderHeader(
             <span>${percentage}%</span>
         </div>
         <div class="stats-text">
-            <h2>${percentage >= 70 ? "Great Job!" : "Keep Practicing"}</h2>
+            <h2>${
+              percentage >= 70
+                ? `Great Job! ${currentName}`
+                : `Keep Practicing ${currentName}`
+            }</h2>
             
             <div class="points-pill">
               <span>💎 +${points} Points</span>
@@ -775,8 +783,6 @@ function exportToPdf(config, questions) {
 
 // Change username
 window.changeUsername = function () {
-  const user = gameEngine.getUserData();
-  const currentName = user.displayName || "User";
   const newName = prompt("Enter your new display name:", currentName);
 
   if (newName && newName.trim() !== "") {

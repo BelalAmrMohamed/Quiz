@@ -41,7 +41,15 @@ function getRandomWelcomeMessage(name) {
 // Update welcome badge text
 function updateWelcomeMessage() {
   const name = getUserName();
-  userNameBadge.textContent = getRandomWelcomeMessage(name);
+  const messageTemplate = getRandomWelcomeMessage(name);
+
+  // Replace username with styled span
+  const styledMessage = messageTemplate.replace(
+    name,
+    `<span class="user-name">${name}</span>`
+  );
+
+  userNameBadge.innerHTML = styledMessage;
 }
 
 // Initial load

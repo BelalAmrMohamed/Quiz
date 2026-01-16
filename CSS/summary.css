@@ -353,6 +353,7 @@ body {
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--color-border-light);
   margin-top: 32px;
+  margin-bottom: 32px;
 }
 
 .question-card h2 {

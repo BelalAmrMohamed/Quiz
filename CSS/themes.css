@@ -787,3 +787,43 @@ body {
   font-weight: 700;
   font-size: 14px;
 }
+/* ============================================================================
+LIGHT THEME
+============================================================================ */
+[data-theme="light"] .header-badge {
+  background: rgba(255, 255, 255, 0.7);
+  color: #1e293b;
+}
+
+[data-theme="light"] .header-badge .user-name {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+/* ============================================================================
+DARK THEME
+============================================================================ */
+[data-theme="dark"] .header-badge {
+  background: rgba(30, 41, 59, 0.75);
+  color: #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .header-badge .user-name {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+}
+
+/* ============================================================================
+DARK SLATE THEME
+============================================================================ */
+[data-theme="dark-slate"] .header-badge {
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+}
+
+[data-theme="dark-slate"] .header-badge .user-name {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.16);
+}

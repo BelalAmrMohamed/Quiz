@@ -346,7 +346,7 @@ body {
   font-weight: 500;
 }
 
-.header-badge {
+/* .header-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -358,8 +358,122 @@ body {
 }
 
 .header-badge::before {
-  /* content: "✨"; */
   font-size: 1rem;
+} */
+
+/* ============================================================================
+HEADER BADGE – GAMIFIED WELCOME
+============================================================================ */
+
+.header-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 18px;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+
+  margin-bottom: 24px;
+
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.6);
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+
+  animation: badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    badgeFloat 6s ease-in-out infinite;
+
+  will-change: transform, box-shadow;
+}
+
+/* Emoji / icon before text */
+.header-badge::before {
+  content: "✨";
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+/* Make the USERNAME pop */
+.header-badge .user-name {
+  position: relative;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+
+  animation: namePulse 3s ease-in-out infinite;
+}
+
+/* Soft shine that moves across username */
+.header-badge .user-name::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  animation: nameShimmer 4s ease-in-out infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ============================================================================
+ANIMATIONS
+============================================================================ */
+
+@keyframes badgePopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes badgeFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes namePulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes nameShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  40% {
+    transform: translateX(120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
 }
 
 /* Premium Grid */
