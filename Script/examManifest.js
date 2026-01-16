@@ -75,6 +75,18 @@ export const examList = [
     "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
+    "id": "Our Mid",
+    "title": "Our Mid",
+    "path": "../Exams/Computer Network/Our Mid.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Previous Mid",
+    "title": "Previous Mid",
+    "path": "../Exams/Computer Network/Previous Mid.js",
+    "category": "Computer Network"
+  },
+  {
     "id": "50 MCQs on Chapter 1",
     "title": "50 MCQs On Chapter 1",
     "path": "../Exams/Discrete Structure/50 MCQs on Chapter 1.js",
@@ -489,7 +501,20 @@ export const categoryTree = {
       "Computer Network/أسئلة الدكتورة",
       "Computer Network/أسئلة بالذكاء الإصطناعي"
     ],
-    "exams": []
+    "exams": [
+      {
+        "id": "Our Mid",
+        "title": "Our Mid",
+        "path": "../Exams/Computer Network/Our Mid.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Previous Mid",
+        "title": "Previous Mid",
+        "path": "../Exams/Computer Network/Previous Mid.js",
+        "category": "Computer Network"
+      }
+    ]
   },
   "Computer Network/أسئلة الدكتورة": {
     "name": "أسئلة الدكتورة",
