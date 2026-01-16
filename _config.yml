@@ -7,38 +7,33 @@ author: "Belal Amr Mohamed"
 email: "belalamrofficial@gmail.com"
 
 # ------------------------------------
-# URL SETTINGS (Critical for SEO)
+# URL SETTINGS (Fixed)
 # ------------------------------------
-# Your main domain
-url: "https://belalamrmohamed.github.io/Quiz/"
-# The folder name of your repository
+# ⚠️ FIX: URL must NOT include the folder name ("/Quiz")
+url: "https://belalamrmohamed.github.io"
+# The folder name goes here
 baseurl: "/Quiz"
 
 # ------------------------------------
 # BUILD SETTINGS
 # ------------------------------------
-# Tells Jekyll to process these files/folders specifically
 include:
-  - _redirects
-  - .htaccess
   - manifest.json
   - service-worker.js
   - robots.txt
   - sitemap.xml
   - Exams
+# Removed: _redirects, .htaccess (These do not exist in your file list)
 
-# Tells Jekyll to ignore these (speeds up build time & keeps site clean)
 exclude:
   - tools
   - README.md
   - LICENSE
-  - Gemfile
-  - Gemfile.lock
-  - node_modules
   - .gitignore
+# Removed: Gemfile, node_modules (These do not exist in your file list)
 
 # ------------------------------------
-# PLUGINS (Enhances SEO automatically)
+# PLUGINS
 # ------------------------------------
 plugins:
   - jekyll-seo-tag
@@ -47,5 +42,4 @@ plugins:
 # ------------------------------------
 # THEME SETTINGS
 # ------------------------------------
-# This disables the default "Minima" theme so it doesn't mess with your custom HTML
 theme: null
