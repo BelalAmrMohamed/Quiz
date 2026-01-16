@@ -6,28 +6,63 @@ const container = document.getElementById("contentArea");
 const title = document.getElementById("pageTitle");
 const breadcrumb = document.getElementById("breadcrumb");
 
-// === USER PERSONALIZATION: Load user name from localStorage ===
-const userNameBadge = document.getElementById("user-name");
-const userName = gameEngine.getUserData()?.displayName || "User";
+// ============================================================================
+// USER PERSONALIZATION & GAMIFIED WELCOME SYSTEM
+// ============================================================================
 
-// Create a randomizoed welcome back message
+const userNameBadge = document.getElementById("user-name");
+
+// Safely get username
+function getUserName() {
+  return gameEngine.getUserData()?.displayName || "User";
+}
+
+// Gamified welcome message pool
 const welcomeMessages = [
-  `🏆 Welcome back, Champion ${userName}!`,
-  `🚀 Back already, ${userName}? Let’s continue the grind!`,
-  `🎮 Ready to play again, ${userName}? Your next challenge awaits.`,
-  `🔓 New challenge unlocked, ${userName}!`,
-  `✨ Your journey continues, ${userName}…`,
-  `🔥 Streak active! Jump back in, ${userName}!`,
-  `🧠 Knowledge power-up ready, ${userName}!`,
-  `⚡ XP boost incoming! Welcome back, ${userName}!`,
-  `📈 Progress detected. Keep going, ${userName}!`,
-  `👑 The legend returns… Welcome back, ${userName}!`,
+  (name) => `🏆 Welcome back, Champion ${name}!`,
+  (name) => `🚀 Back already, ${name}? Let’s continue the grind!`,
+  (name) => `🎮 Ready to play again, ${name}? Your next challenge awaits.`,
+  (name) => `🔓 New challenge unlocked, ${name}!`,
+  (name) => `✨ Your journey continues, ${name}…`,
+  (name) => `🔥 Streak active! Jump back in, ${name}!`,
+  (name) => `🧠 Knowledge power-up ready, ${name}!`,
+  (name) => `⚡ XP boost incoming! Welcome back, ${name}!`,
+  (name) => `📈 Progress detected. Keep going, ${name}!`,
+  (name) => `👑 The legend returns… Welcome back, ${name}!`,
 ];
 
-const randomMessage =
-  welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+// Pick a random welcome message
+function getRandomWelcomeMessage(name) {
+  const message =
+    welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+  return message(name);
+}
 
-userNameBadge.textContent = randomMessage;
+// Update welcome badge text
+function updateWelcomeMessage() {
+  const name = getUserName();
+  userNameBadge.textContent = getRandomWelcomeMessage(name);
+}
+
+// Initial load
+updateWelcomeMessage();
+
+// ============================================================================
+// USERNAME CHANGE HANDLER
+// ============================================================================
+
+window.changeUsername = function () {
+  const user = gameEngine.getUserData() || {};
+  const currentName = user.displayName || "User";
+  const newName = prompt("Enter your new display name:", currentName);
+
+  if (!newName || !newName.trim()) return;
+
+  user.displayName = newName.trim();
+  gameEngine.saveUserData(user);
+
+  updateWelcomeMessage();
+};
 // === End of the user message section ===
 
 let navigationStack = [];
