@@ -2,8 +2,13 @@
 <html lang="en">
 
 <head>
-    <!-- meta tags -->
     <meta charset="UTF-8">
+    <!-- Title and Favicon -->
+    <title>Quizzes</title>
+    <link rel="icon" href="images/icon.png" type="image/png">
+
+    <!-- meta tags -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -68,9 +73,28 @@
     </script>
     <!-- End of the meta tags Meta Tags -->
 
-    <!-- Title and Favicon -->
-    <title>Quizzes</title>
-    <link rel="icon" href="images/icon.png" type="image/x-icon">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Quiz Master",
+        "item": "https://belalamrmohamed.github.io/Quiz/"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Exams",
+        "item": "https://belalamrmohamed.github.io/Quiz/#categories"
+      },{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Quiz Player",
+        "item": "https://belalamrmohamed.github.io/Quiz/index.html"
+      }]
+    }
+    </script>
 
     <!-- CRITICAL: Anti-flash script -->
     <script>

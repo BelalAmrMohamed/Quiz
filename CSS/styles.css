@@ -1,6 +1,6 @@
 /* CSS/styles.css - Cleaned Main Page Styles */
-/* All theme variables are now in themes.css */
-/* All animations are now in animations.css */
+/* All theme variables are in themes.css */
+/* All animations are in animations.css */
 
 * {
   margin: 0;
@@ -345,21 +345,6 @@ body {
   margin: 0 auto;
   font-weight: 500;
 }
-
-/* .header-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 100px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
-.header-badge::before {
-  font-size: 1rem;
-} */
 
 /* ============================================================================
 HEADER BADGE – GAMIFIED WELCOME
