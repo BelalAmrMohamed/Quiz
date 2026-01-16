@@ -1,5 +1,4 @@
 // Script/gameEngine.js - Enhanced with Levels, Streaks, and More Badges
-import { NotificationManager } from "./notifications.js";
 const STORAGE_KEY = "quiz_user_profile";
 
 // Initial State
@@ -515,18 +514,6 @@ export const gameEngine = {
       mode: mode || "exam",
     };
     user.history.unshift(historyEntry);
-
-    if (newBadges.length > 0) {
-      newBadges.forEach((badgeId, index) => {
-        const badge = BADGES.find((b) => b.id === badgeId);
-        if (badge) {
-          // Delay each popup slightly
-          setTimeout(() => {
-            NotificationManager.showAchievement(badge);
-          }, index * 1500); // 1.5 second delay between badges
-        }
-      });
-    }
 
     // Update category progress
     if (!user.categoryProgress) user.categoryProgress = {};
