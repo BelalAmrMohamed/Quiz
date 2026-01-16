@@ -1,7 +1,4 @@
-*.txt
-*.md
 *.bat
-!Readme.md
 
 # Service Worker cache
 sw-cache/

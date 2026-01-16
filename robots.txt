@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://belalamrmohamed.github.io/Quiz/sitemap.xml
