@@ -108,6 +108,7 @@ Quiz Website/
 ├── LICENSE
 ├── robots.txt
 ├── sitemap.xml
+├── _config.yml
 │
 ├── CSS/
 │   ├── styles.css
