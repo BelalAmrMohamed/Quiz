@@ -772,3 +772,15 @@ function exportToPdf(config, questions) {
       });
   }, 100);
 }
+
+// Change username
+window.changeUsername = function () {
+  const user = gameEngine.getUserData();
+  const currentName = user.displayName || "User";
+  const newName = prompt("Enter your new display name:", currentName);
+
+  if (newName && newName.trim() !== "") {
+    user.displayName = newName.trim();
+    gameEngine.saveUserData(user);
+  }
+};
