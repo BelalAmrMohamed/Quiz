@@ -928,6 +928,9 @@ body {
     padding: 60px 12px 16px 12px;
   }
 
+  .loading {
+    padding: 0px;
+  }
   .stats-bar {
     padding: 0 12px;
   }

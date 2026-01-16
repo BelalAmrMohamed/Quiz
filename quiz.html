@@ -59,6 +59,7 @@
 </head>
 
 <body>
+    <!-- The status bar at the top -->
     <div class="stats-bar" id="statsBar">
         <div class="stats-content">
             <div class="stat-item">
@@ -79,6 +80,7 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
     </div>
 
+    <!-- The side menu -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <h3>Quick Access</h3>
@@ -97,10 +99,6 @@
             <button id="viewToggle" class="menu-item view-toggle-btn">
                 <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
             </button>
-
-            <!-- <button id="themeToggle" class="menu-item theme-btn">
-                <span class="theme-icon-display">☀️</span> Change Appearance
-            </button> -->
 
             <!-- NEW THEME CONTROLS -->
             <div class="theme-controls-section">
@@ -137,11 +135,13 @@
 
             <div class="menu-divider"></div>
 
+            <!-- List or Grid view navigations get displayed here -->
             <div id="menuNavContainer">
             </div>
 
             <div class="menu-divider"></div>
 
+            <!-- bookmark and flag buttons for the grid view only -->
             <button id="menuBookmarkBtn" class="menu-item action-btn" onclick="window.toggleBookmark()">
                 <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">Bookmark Question</span>
             </button>
@@ -153,6 +153,7 @@
     </div>
 
     <div class="container">
+        <!-- The top header containing the title and timer, etc... -->
         <div class="header">
             <div class="header-top">
                 <div class="header-title-section">
@@ -180,10 +181,12 @@
             </div>
         </div>
 
+        <!-- The questions get displayed here from the javascript -->
         <div id="questionContainer" class="loading">
             <p>Preparing your quiz experience</p>
         </div>
 
+        <!-- navigation buttons at the bottom -->
         <div class="navigation">
             <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>
                 ← Previous
