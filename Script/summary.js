@@ -1,5 +1,6 @@
 // Website/Script/summary.js
 import { examList } from "./examManifest.js";
+import { gameEngine } from "./gameEngine.js";
 
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
@@ -71,7 +72,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Review
   renderReview(container, questions, result.userAnswers);
+
+  // NEW: Badge notifications
+  const user = gameEngine.getUserData();
+  const displayName = user.displayName || "User";
+  const newBadges = result.gamification ? result.gamification.newBadges : [];
+  newBadges.forEach((badge, index) => {
+    setTimeout(() => {
+      showNotification(badge, displayName);
+    }, index * 500);
+  });
 });
+
+function showNotification(badge, displayName) {
+  const notification = document.createElement("div");
+  notification.className = "notification";
+  notification.innerHTML = `
+    <div class="notification-content">
+      <span class="notification-icon">${badge.icon}</span>
+      <div>
+        <strong>Congratulations, ${displayName}!</strong>
+        <p>You've earned the ${badge.title} badge!</p>
+      </div>
+      <button class="close-btn">×</button>
+    </div>
+  `;
+  document.getElementById("notification-container").appendChild(notification);
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 100);
+  const timeout = setTimeout(() => {
+    removeNotification(notification);
+  }, 5000);
+  notification.querySelector(".close-btn").addEventListener("click", () => {
+    clearTimeout(timeout);
+    removeNotification(notification);
+  });
+}
+
+function removeNotification(notif) {
+  notif.classList.add("hide");
+  setTimeout(() => {
+    notif.remove();
+  }, 300);
+}
 
 function goHome() {
   window.location.href = "index.html";
@@ -296,25 +340,25 @@ function exportToMarkdown(config, questions) {
   markdown += `---\n\n`;
 
   questions.forEach((q, index) => {
-    markdown += `### ${index + 1}. ${q.q}\n\n`;
+    markdown += `### Question ${index + 1}\n`;
+    markdown += `${q.q}\n\n`;
 
     if (isEssayQuestion(q)) {
-      markdown += `**Answer:**\n${q.options[0]}\n\n`;
+      markdown += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
     } else {
       q.options.forEach((opt, i) => {
         const letter = String.fromCharCode(65 + i);
-        markdown += `- ${letter}. ${opt}\n`;
+        markdown += `${letter}. ${opt}\n`;
       });
       markdown += `\n`;
-
       const correctLetter = String.fromCharCode(65 + q.correct);
-      markdown += `#### **Correct answer:** ${correctLetter}. ${
+      markdown += `**Correct Answer:** ${correctLetter}. ${
         q.options[q.correct]
       }\n\n`;
     }
 
     if (q.explanation) {
-      markdown += `> **Explanation:** ${q.explanation}\n\n`;
+      markdown += `**Explanation:**\n${q.explanation}\n\n`;
     }
 
     markdown += `---\n\n`;
@@ -324,7 +368,7 @@ function exportToMarkdown(config, questions) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${config.title || "quiz"}.md`;
+  a.download = `${config.title || "quiz_export"}.md`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -332,10 +376,10 @@ function exportToMarkdown(config, questions) {
 }
 
 // ==========================================
-// 2. Export to HTML (Dark Mode Enforced)
+// 2. Export to HTML
 // ==========================================
 function exportToHtml(config, questions) {
-  // Determine question types for the header
+  // Determine question types
   let hasMCQ = false;
   let hasTrueFalse = false;
   let hasEssay = false;
@@ -356,54 +400,64 @@ function exportToHtml(config, questions) {
 
   const date = new Date().toLocaleDateString();
 
-  // Build the HTML Content
-  let htmlContent = `<!DOCTYPE html>
+  let htmlContent = `
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${config.title || "Quiz Result"}</title>
+    <title>${config.title || "Quiz Examination"}</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --accent: #3b82f6;
-            --correct-bg: #1b4b28;
-            --correct-text: #86efac;
-            --border: #333;
-        }
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px 20px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background: #121212;
         }
-        h1 { color: #fff; text-align: center; margin-bottom: 10px; }
-        .meta { text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 0.9rem; }
+        h1 {
+            color: #ffffff;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .meta {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
         .question-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+            background: #1e1e1e;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #333;
         }
         .q-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            color: #aaa;
         }
-        .q-text { font-size: 1.1rem; margin-bottom: 20px; font-weight: 500; }
+        .q-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
         .option {
             padding: 10px 15px;
             margin-bottom: 8px;
