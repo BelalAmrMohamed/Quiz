@@ -56,6 +56,7 @@ Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly
     - [Data Storage Options:](#data-storage-options)
     - [Libraries to Consider:](#libraries-to-consider)
   - [📚 Resources](#-resources)
+    - [The purpose of `.nojekyll` :](#the-purpose-of-nojekyll-)
 
 ---
 
@@ -302,7 +303,6 @@ Start your HTML mastery journey today! 🚀
   - Bonus for speed (5 pts if answered quickly)
   - Streak bonuses (2x multiplier for 5+ correct in a row)
 - **Badges/Achievements**:
-
   - 🏆 "Perfect Score" - 100% on any quiz
   - ⚡ "Speed Demon" - Complete quiz in under 2 minutes
   - 🔥 "Week Warrior" - Take quizzes 7 days in a row
@@ -566,25 +566,21 @@ Start your HTML mastery journey today! 🚀
 ## 🔧 Quick Wins (Start Here)
 
 1. **Dark Mode** (2-3 hours)
-
    - CSS variables for themes
    - Toggle component
    - localStorage preference
 
 2. **Question Bookmarking** (4-5 hours)
-
    - Star icon on questions
    - localStorage array
    - Review page
 
 3. **Basic Gamification** (6-8 hours)
-
    - Points calculation
    - 5 starter badges
    - Simple leaderboard
 
 4. **Performance Dashboard** (8-10 hours)
-
    - History storage
    - Charts with Chart.js
    - Stats cards
@@ -632,3 +628,7 @@ Track these KPIs after implementing features:
 - [Gamification Best Practices](https://www.interaction-design.org/literature/article/gamification-101)
 - [Chart.js Documentation](https://www.chartjs.org/)
 - [IndexedDB Guide](https://javascript.info/indexeddb)
+
+#### The purpose of `.nojekyll` :
+
+tells GitHub to just serve the files exactly as they are, which helps bots reach your sitemap and manifest files without interference.
