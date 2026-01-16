@@ -21,6 +21,12 @@ export const examList = [
     "category": "Computer Network/أسئلة الدكتورة"
   },
   {
+    "id": "CIDAR notation",
+    "title": "CIDAR Notation",
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
     "id": "Lecture 1",
     "title": "Lecture 1",
     "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.js",
@@ -554,6 +560,12 @@ export const categoryTree = {
     "parent": "Computer Network",
     "subcategories": [],
     "exams": [
+      {
+        "id": "CIDAR notation",
+        "title": "CIDAR Notation",
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      },
       {
         "id": "Lecture 1",
         "title": "Lecture 1",
