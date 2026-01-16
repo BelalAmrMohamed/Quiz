@@ -1,365 +1,323 @@
 /* CSS/pwa.css - PWA Component Styles */
 
 /* ============================================
-   INSTALL BANNER
+   INSTALL MODAL
    ============================================ */
-
-.install-banner {
+.install-modal {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, #0088cc, #005999);
-  color: white;
-  padding: 20px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
-  transform: translateY(100%);
-  transition: transform 0.3s ease-in-out;
-}
-
-.install-banner.show {
-  transform: translateY(0);
-}
-
-.install-banner-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.install-banner-icon img {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.install-banner-text {
-  flex: 1;
-  min-width: 200px;
-}
-
-.install-banner-text h3 {
-  margin: 0 0 5px 0;
-  font-size: 1.3em;
-  font-weight: 600;
-}
-
-.install-banner-text p {
-  margin: 0 0 10px 0;
-  opacity: 0.9;
-}
-
-.install-features {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  font-size: 0.9em;
-}
-
-.install-features li {
-  opacity: 0.95;
-}
-
-.install-banner-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.install-btn {
-  background: white;
-  color: #0088cc;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-
-.install-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.dismiss-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.dismiss-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Install Success Message */
-.install-success {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  background: white;
-  color: #333;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  z-index: 10001;
-  opacity: 0;
-  transition: all 0.3s ease-in-out;
-  text-align: center;
-}
-
-.install-success.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.success-icon {
-  font-size: 4em;
-  margin-bottom: 20px;
-}
-
-.install-success h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.5em;
-}
-
-.install-success p {
-  margin: 0;
-  color: #666;
-}
-
-/* Header Install Button */
-.header-install-btn {
-  background: #0088cc;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 1.2em;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.header-install-btn:hover {
-  background: #006699;
-  transform: scale(1.05);
-}
-
-/* ============================================
-   OFFLINE INDICATOR
-   ============================================ */
-
-.offline-indicator {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9em;
-  font-weight: 500;
-  z-index: 9999;
-  transform: translateX(-120%);
-  transition: transform 0.3s ease-in-out;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.offline-indicator.show {
-  transform: translateX(0);
-}
-
-.offline-indicator.offline {
-  background: #ff9800;
-  color: white;
-}
-
-.offline-indicator.online {
-  background: #4caf50;
-  color: white;
-}
-
-.indicator-content {
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 20px;
+  backdrop-filter: blur(4px);
 }
 
-.indicator-icon {
-  font-size: 1.2em;
+.install-modal.show {
+  opacity: 1;
 }
 
-/* ============================================
-   SIDE MENU PWA SECTION
-   ============================================ */
-
-.pwa-section {
-  margin-top: 0.5rem;
-}
-
-.pwa-section-header {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #666;
-  padding: 0.75rem 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.pwa-install-btn,
-.pwa-notifications-btn {
-  display: flex;
-  align-items: center;
+.install-modal-content {
+  background: var(--color-surface, white);
+  border-radius: 20px;
+  padding: 35px;
+  max-width: 650px;
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  text-align: left;
-  color: inherit;
-  font-size: 1rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
 }
 
-.pwa-install-btn:hover,
-.pwa-notifications-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.menu-item-icon {
-  font-size: 1.2rem;
-  margin-right: 0.75rem;
-  width: 1.5rem;
-  text-align: center;
-}
-
-.menu-item-text {
-  flex: 1;
-}
-
-.pwa-status-item {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: #fff3cd;
-  color: #856404;
-  border-left: 3px solid #ffc107;
-  margin: 0.5rem 0;
-}
-
-/* ============================================
-   NOTIFICATION BANNERS
-   ============================================ */
-
-.notification-banner {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  color: #333;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 9998;
-  max-width: 400px;
-  animation: slideInRight 0.3s ease-in-out;
-}
-
-@keyframes slideInRight {
+@keyframes slideUp {
   from {
-    transform: translateX(120%);
+    transform: translateY(30px);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
-.notification-content {
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--color-background-secondary, #f0f0f0);
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--color-text-secondary, #666);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-weight: 300;
+  line-height: 1;
 }
 
-.notification-icon {
-  font-size: 1.5em;
+.modal-close-btn:hover {
+  background: var(--color-border, #e0e0e0);
+  color: var(--color-text-primary, #333);
+  transform: rotate(90deg);
+}
+
+.install-modal-content h2 {
+  margin: 0 0 15px 0;
+  color: var(--color-text-primary, #2c3e50);
+  font-size: 26px;
+  font-weight: 700;
+  padding-right: 40px;
+}
+
+.install-modal-content > p {
+  color: var(--color-text-secondary, #666);
+  margin: 0 0 30px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.install-step {
+  background: var(
+    --color-background-secondary,
+    linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)
+  );
+  border-radius: 15px;
+  padding: 25px;
+  border-left: 5px solid #4caf50;
+  transition: transform 0.2s;
+}
+
+.install-step:hover {
+  transform: translateX(5px);
+}
+
+.install-step h3 {
+  margin: 0 0 15px 0;
+  color: var(--color-text-primary, #2c3e50);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.install-step ol {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--color-text-secondary, #555);
+}
+
+.install-step li {
+  margin: 10px 0;
+  font-size: 15px;
+  line-height: 1.7;
+  padding-left: 5px;
+}
+
+.modal-primary-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.modal-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.modal-primary-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   INSTALL BANNER
+   ============================================ */
+.install-banner {
+  position: fixed;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 600px;
+  width: calc(100% - 40px);
+  background: var(--color-surface, white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding: 20px;
+}
+
+.install-banner.show {
+  bottom: 20px;
+}
+
+.install-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.install-banner-icon {
   flex-shrink: 0;
 }
 
-.notification-text {
+.install-banner-icon img {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.install-banner-text {
   flex: 1;
 }
 
-.notification-text strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 1.05em;
+.install-banner-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #2c3e50);
 }
 
-.notification-text p {
+.install-banner-text p {
   margin: 0;
-  font-size: 0.9em;
-  color: #666;
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
 }
 
-.notification-action,
-.notification-close {
-  background: transparent;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9em;
-  margin-left: 8px;
-  transition: all 0.2s;
+.install-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.notification-action {
-  background: #0088cc;
+.install-banner .install-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.notification-action:hover {
-  background: #006699;
+.install-banner .install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.notification-close {
-  color: #999;
+.install-banner .dismiss-btn {
+  padding: 10px;
+  background: var(--color-background-secondary, #f0f0f0);
+  color: var(--color-text-secondary, #666);
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.notification-close:hover {
-  background: #f0f0f0;
-  color: #333;
+.install-banner .dismiss-btn:hover {
+  background: var(--color-border, #e0e0e0);
+  color: var(--color-text-primary, #333);
 }
 
-/* Specific Banner Types */
-.notification-banner.new-quiz {
-  border-left: 4px solid #4caf50;
+/* ============================================
+   INSTALL SUCCESS MESSAGE
+   ============================================ */
+.install-success {
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface, white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding: 25px 35px;
+  min-width: 300px;
+  max-width: 90vw;
+}
+
+.install-success.show {
+  top: 20px;
+}
+
+.install-success-content {
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  animation: bounceIn 0.6s;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.install-success h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary, #2c3e50);
+}
+
+.install-success p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
 }
 
 /* ============================================
    ACHIEVEMENT POPUP
    ============================================ */
-
 .achievement-popup {
   position: fixed;
   top: 50%;
@@ -375,6 +333,8 @@
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 3px solid #ffa000;
+  max-width: 90vw;
+  width: auto;
 }
 
 .achievement-popup.show {
@@ -420,16 +380,227 @@
 }
 
 /* ============================================
-   NOTIFICATION CENTER (SIDE PANEL)
+   CACHE PROGRESS INDICATOR
    ============================================ */
+.cache-progress-container {
+  position: fixed;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 500px;
+  width: calc(100% - 40px);
+  background: var(--color-surface, white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 9998;
+  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding: 20px;
+}
 
+.cache-progress-container.show {
+  bottom: 20px;
+}
+
+.cache-progress-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cache-progress-icon {
+  font-size: 32px;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.cache-progress-text {
+  text-align: center;
+}
+
+.cache-progress-text strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #2c3e50);
+  margin-bottom: 4px;
+}
+
+.cache-progress-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+}
+
+.cache-progress-bar-wrapper {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cache-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+/* ============================================
+   CACHE COMPLETE NOTIFICATION
+   ============================================ */
+.cache-complete-notification {
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 450px;
+  width: calc(100% - 40px);
+  background: var(--color-surface, white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding: 20px;
+}
+
+.cache-complete-notification.show {
+  top: 20px;
+}
+
+.cache-complete-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.cache-complete-icon {
+  font-size: 40px;
+  animation: bounceIn 0.6s;
+  flex-shrink: 0;
+}
+
+.cache-complete-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.cache-complete-text strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #2c3e50);
+  margin-bottom: 4px;
+}
+
+.cache-complete-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+}
+
+.cache-complete-dismiss {
+  padding: 8px;
+  background: var(--color-background-secondary, #f0f0f0);
+  color: var(--color-text-secondary, #666);
+  border: none;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cache-complete-dismiss:hover {
+  background: var(--color-border, #e0e0e0);
+  color: var(--color-text-primary, #333);
+}
+
+/* ============================================
+   OFFLINE INDICATOR
+   ============================================ */
+.offline-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 500;
+  z-index: 9999;
+  transform: translateX(-120%);
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.offline-indicator.show {
+  transform: translateX(0);
+}
+
+.offline-indicator.offline {
+  background: #ff9800;
+  color: white;
+}
+
+.offline-indicator.online {
+  background: #4caf50;
+  color: white;
+}
+
+.quiz-offline-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 152, 0, 0.95);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   NOTIFICATION CENTER
+   ============================================ */
 .notification-center {
   position: fixed;
   top: 0;
   right: -400px;
   width: 400px;
   height: 100vh;
-  background: #fff;
+  background: var(--color-surface, #fff);
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
   z-index: 10003;
   transition: right 0.3s ease-in-out;
@@ -493,7 +664,7 @@
 
 .notification-setting {
   padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -502,11 +673,6 @@
 
 .notification-setting:last-of-type {
   border-bottom: none;
-}
-
-.notification-setting.disabled {
-  opacity: 0.5;
-  pointer-events: none;
 }
 
 .setting-info {
@@ -523,10 +689,9 @@
 .setting-info p {
   margin: 0;
   font-size: 0.9em;
-  color: #666;
+  color: var(--color-text-secondary, #666);
 }
 
-/* Toggle Switch */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -587,140 +752,13 @@ input:checked + .toggle-slider:before {
   color: #856404;
 }
 
-/* Notification Center Button */
-.notification-center-btn {
-  background: #0088cc;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 1.2em;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-}
-
-.notification-center-btn:hover {
-  background: #006699;
-  transform: scale(1.05);
-}
-
-.notification-center-btn.floating {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 9997;
-}
-
 /* ============================================
-   UPDATE NOTIFICATION
+   RESPONSIVE DESIGN
    ============================================ */
-
-.update-notification {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-120%);
-  background: #2196f3;
-  color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 9999;
-  transition: transform 0.3s ease-in-out;
-  max-width: 500px;
-}
-
-.update-notification.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-.update-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.update-icon {
-  font-size: 1.5em;
-}
-
-.update-text {
-  flex: 1;
-}
-
-.update-text strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.update-text p {
-  margin: 0;
-  font-size: 0.9em;
-  opacity: 0.9;
-}
-
-.update-btn,
-.update-dismiss {
-  background: white;
-  color: #2196f3;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.update-dismiss {
-  background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.update-btn:hover {
-  transform: translateY(-2px);
-}
-
-.update-dismiss:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* ============================================
-   MOBILE RESPONSIVE
-   ============================================ */
-
 @media (max-width: 768px) {
-  .install-banner-content {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .install-features {
-    justify-content: center;
-  }
-
-  .install-banner-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
   .notification-center {
     width: 100%;
     right: -100%;
-  }
-
-  .notification-banner {
-    left: 10px;
-    right: 10px;
-    max-width: none;
   }
 
   .offline-indicator {
@@ -734,919 +772,125 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* ============================================
-   DARK MODE SUPPORT
-   ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  .notification-banner,
-  .notification-center {
-    background: #1e1e1e;
-    color: #e0e0e0;
+@media (max-width: 600px) {
+  .install-modal-content {
+    padding: 25px 20px;
+    border-radius: 16px;
   }
 
-  .notification-text p {
-    color: #aaa;
+  .install-modal-content h2 {
+    font-size: 22px;
   }
 
-  .notification-setting {
-    border-bottom-color: #333;
+  .install-step {
+    padding: 20px;
   }
 
-  .setting-info p {
-    color: #aaa;
+  .install-step h3 {
+    font-size: 16px;
+  }
+
+  .install-step li {
+    font-size: 14px;
+  }
+
+  .install-banner {
+    bottom: -250px;
+    max-width: calc(100% - 20px);
+    width: calc(100% - 20px);
+    padding: 16px;
+  }
+
+  .install-banner.show {
+    bottom: 10px;
+  }
+
+  .install-banner-content {
+    flex-direction: row;
+    text-align: left;
+    gap: 12px;
+  }
+
+  .install-banner-icon img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .install-banner-text h3 {
+    font-size: 14px;
+  }
+
+  .install-banner-text p {
+    font-size: 12px;
+  }
+
+  .install-banner-actions {
+    width: 100%;
+    flex-direction: column;
+    margin-top: 12px;
+  }
+
+  .install-banner .install-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .install-banner .dismiss-btn {
+    width: 100%;
   }
 
   .install-success {
-    background: #1e1e1e;
-    color: #e0e0e0;
+    min-width: 0;
+    max-width: calc(100% - 20px);
+    padding: 20px;
+  }
+
+  .install-success h3 {
+    font-size: 18px;
   }
 
   .install-success p {
-    color: #aaa;
+    font-size: 13px;
   }
 
-  .pwa-section-header {
-    color: #aaa;
+  .achievement-popup {
+    padding: 30px 25px;
+    max-width: calc(100% - 40px);
   }
 
-  .pwa-install-btn:hover,
-  .pwa-notifications-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+  .achievement-badge {
+    font-size: 3.5em;
   }
 
-  .notification-intro {
-    background: #1a3a52;
-    color: #64b5f6;
+  .achievement-popup h3 {
+    font-size: 1.4em;
   }
 
-  .notification-info-box {
-    background: #3a3000;
-    color: #ffd54f;
-  }
-}
-/* Install Modal Styles */
-.install-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  padding: 20px;
-  backdrop-filter: blur(4px);
-}
-
-.install-modal.show {
-  opacity: 1;
-}
-
-.install-modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: 35px;
-  max-width: 650px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #f0f0f0;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #666;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.modal-close-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-  transform: rotate(90deg);
-}
-
-.install-modal-content h2 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 26px;
-  font-weight: 700;
-  padding-right: 40px;
-}
-
-.install-modal-content > p {
-  color: #666;
-  margin: 0 0 30px 0;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.install-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.install-step {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 15px;
-  padding: 25px;
-  border-left: 5px solid #4caf50;
-  transition: transform 0.2s;
-}
-
-.install-step:hover {
-  transform: translateX(5px);
-}
-
-.install-step h3 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-}
-
-.install-step ol {
-  margin: 0;
-  padding-left: 22px;
-  color: #555;
-}
-
-.install-step li {
-  margin: 10px 0;
-  font-size: 15px;
-  line-height: 1.7;
-  padding-left: 5px;
-}
-
-.modal-primary-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.modal-primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.modal-primary-btn:active {
-  transform: translateY(0);
-}
-
-/* Install Banner Styles */
-.install-banner {
-  position: fixed;
-  bottom: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 600px;
-  width: calc(100% - 40px);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 20px;
-}
-
-.install-banner.show {
-  bottom: 20px;
-}
-
-.install-banner-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.install-banner-icon {
-  flex-shrink: 0;
-}
-
-.install-banner-icon img {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.install-banner-text {
-  flex: 1;
-}
-
-.install-banner-text h3 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.install-banner-text p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-.install-banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.install-banner .install-btn {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.install-banner .install-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.install-banner .dismiss-btn {
-  padding: 10px;
-  background: #f0f0f0;
-  color: #666;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.install-banner .dismiss-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-}
-
-/* Install Success Message */
-.install-success {
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 10001;
-  transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 25px 35px;
-  min-width: 300px;
-}
-
-.install-success.show {
-  top: 20px;
-}
-
-.install-success-content {
-  text-align: center;
-}
-
-.success-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-  animation: bounceIn 0.6s;
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.install-success h3 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.install-success p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-  .install-modal-content {
-    padding: 25px 20px;
-    border-radius: 16px;
+  .achievement-title {
+    font-size: 1.2em;
   }
 
-  .install-modal-content h2 {
-    font-size: 22px;
+  .achievement-desc {
+    font-size: 0.9em;
   }
 
-  .install-step {
-    padding: 20px;
+  .cache-complete-notification {
+    max-width: calc(100% - 20px);
+    padding: 16px;
   }
 
-  .install-step h3 {
-    font-size: 16px;
+  .cache-complete-icon {
+    font-size: 32px;
   }
 
-  .install-step li {
+  .cache-complete-text strong {
     font-size: 14px;
   }
 
-  .install-banner-content {
-    flex-direction: column;
-    text-align: center;
+  .cache-complete-text p {
+    font-size: 12px;
   }
 
-  .install-banner-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .install-banner .install-btn {
-    flex: 1;
-  }
-}
-/* Install Modal Styles */
-.install-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  padding: 20px;
-  backdrop-filter: blur(4px);
-}
-
-.install-modal.show {
-  opacity: 1;
-}
-
-.install-modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: 35px;
-  max-width: 650px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #f0f0f0;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #666;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.modal-close-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-  transform: rotate(90deg);
-}
-
-.install-modal-content h2 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 26px;
-  font-weight: 700;
-  padding-right: 40px;
-}
-
-.install-modal-content > p {
-  color: #666;
-  margin: 0 0 30px 0;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.install-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.install-step {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 15px;
-  padding: 25px;
-  border-left: 5px solid #4caf50;
-  transition: transform 0.2s;
-}
-
-.install-step:hover {
-  transform: translateX(5px);
-}
-
-.install-step h3 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-}
-
-.install-step ol {
-  margin: 0;
-  padding-left: 22px;
-  color: #555;
-}
-
-.install-step li {
-  margin: 10px 0;
-  font-size: 15px;
-  line-height: 1.7;
-  padding-left: 5px;
-}
-
-.modal-primary-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.modal-primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.modal-primary-btn:active {
-  transform: translateY(0);
-}
-
-/* Install Banner Styles */
-.install-banner {
-  position: fixed;
-  bottom: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 600px;
-  width: calc(100% - 40px);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 20px;
-}
-
-.install-banner.show {
-  bottom: 20px;
-}
-
-.install-banner-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.install-banner-icon {
-  flex-shrink: 0;
-}
-
-.install-banner-icon img {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.install-banner-text {
-  flex: 1;
-}
-
-.install-banner-text h3 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.install-banner-text p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-.install-banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.install-banner .install-btn {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.install-banner .install-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.install-banner .dismiss-btn {
-  padding: 10px;
-  background: #f0f0f0;
-  color: #666;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.install-banner .dismiss-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-}
-
-/* Install Success Message */
-.install-success {
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 10001;
-  transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 25px 35px;
-  min-width: 300px;
-}
-
-.install-success.show {
-  top: 20px;
-}
-
-.install-success-content {
-  text-align: center;
-}
-
-.success-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-  animation: bounceIn 0.6s;
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.install-success h3 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.install-success p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-/* Cache Progress Indicator */
-.cache-progress-container {
-  position: fixed;
-  bottom: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 500px;
-  width: calc(100% - 40px);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 9998;
-  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 20px;
-}
-
-.cache-progress-container.show {
-  bottom: 20px;
-}
-
-.cache-progress-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cache-progress-icon {
-  font-size: 32px;
-  text-align: center;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.cache-progress-text {
-  text-align: center;
-}
-
-.cache-progress-text strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 4px;
-}
-
-.cache-progress-text p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-.cache-progress-bar-wrapper {
-  width: 100%;
-  height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.cache-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  transition: width 0.3s ease;
-  border-radius: 4px;
-}
-
-/* Cache Complete Notification */
-.cache-complete-notification {
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 450px;
-  width: calc(100% - 40px);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 10001;
-  transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  padding: 20px;
-}
-
-.cache-complete-notification.show {
-  top: 20px;
-}
-
-.cache-complete-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.cache-complete-icon {
-  font-size: 40px;
-  animation: bounceIn 0.6s;
-}
-
-.cache-complete-text {
-  flex: 1;
-}
-
-.cache-complete-text strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 4px;
-}
-
-.cache-complete-text p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-.cache-complete-dismiss {
-  padding: 8px;
-  background: #f0f0f0;
-  color: #666;
-  border: none;
-  border-radius: 8px;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.cache-complete-dismiss:hover {
-  background: #e0e0e0;
-  color: #333;
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-  .install-modal-content {
-    padding: 25px 20px;
-    border-radius: 16px;
-  }
-
-  .install-modal-content h2 {
-    font-size: 22px;
-  }
-
-  .install-step {
-    padding: 20px;
-  }
-
-  .install-step h3 {
-    font-size: 16px;
-  }
-
-  .install-step li {
-    font-size: 14px;
-  }
-
-  .install-banner-content {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .install-banner-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .install-banner .install-btn {
-    flex: 1;
-  }
-}
-/* Minimal offline indicator for quiz page */
-.quiz-offline-indicator {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 152, 0, 0.95);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  animation: slideInRight 0.3s ease;
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Make it less intrusive on mobile */
-@media (max-width: 600px) {
   .quiz-offline-indicator {
     top: 5px;
     right: 5px;
