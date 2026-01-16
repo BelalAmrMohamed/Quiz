@@ -1,9 +1,34 @@
 // Script/index.js - Performance Optimized
 import { examList, categoryTree } from "./examManifest.js";
+import { gameEngine, BADGES } from "./gameEngine.js"; // for the name badge
 
 const container = document.getElementById("contentArea");
 const title = document.getElementById("pageTitle");
 const breadcrumb = document.getElementById("breadcrumb");
+
+// === USER PERSONALIZATION: Load user name from localStorage ===
+const userNameBadge = document.getElementById("user-name");
+const userName = gameEngine.getUserData()?.displayName || "User";
+
+// Create a randomizoed welcome back message
+const welcomeMessages = [
+  `🏆 Welcome back, Champion ${userName}!`,
+  `🚀 Back already, ${userName}? Let’s continue the grind!`,
+  `🎮 Ready to play again, ${userName}? Your next challenge awaits.`,
+  `🔓 New challenge unlocked, ${userName}!`,
+  `✨ Your journey continues, ${userName}…`,
+  `🔥 Streak active! Jump back in, ${userName}!`,
+  `🧠 Knowledge power-up ready, ${userName}!`,
+  `⚡ XP boost incoming! Welcome back, ${userName}!`,
+  `📈 Progress detected. Keep going, ${userName}!`,
+  `👑 The legend returns… Welcome back, ${userName}!`,
+];
+
+const randomMessage =
+  welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+
+userNameBadge.textContent = randomMessage;
+// === End of the user message section ===
 
 let navigationStack = [];
 
