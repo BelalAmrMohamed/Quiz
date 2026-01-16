@@ -292,3 +292,61 @@ function startQuiz(id, mode) {
 
 // Make startQuiz available globally (for backwards compatibility if needed)
 window.startQuiz = startQuiz;
+
+// Add this to your main JavaScript file (e.g., Script/pwa-init.js or a shared script loaded in summary.html)
+
+// Global variable to store the deferred prompt
+let deferredPrompt;
+
+// Listen for the beforeinstallprompt event
+window.addEventListener("beforeinstallprompt", (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  // Optionally, show the install button if it was hidden
+  const installBtn = document.querySelector(".install-app");
+  if (installBtn) {
+    installBtn.style.display = "block"; // Show the button if criteria are met
+  }
+});
+
+// Handle the install button click
+document.addEventListener("DOMContentLoaded", () => {
+  const installBtn = document.querySelector(".install-app");
+  if (installBtn) {
+    // Initially hide the button until the event fires
+    installBtn.style.display = "none";
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) {
+        alert(
+          "The app is not installable at this time. Please check your browser support or PWA setup."
+        );
+        return;
+      }
+
+      // Show the install prompt
+      deferredPrompt.prompt();
+
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === "accepted") {
+        console.log("User accepted the install prompt");
+        // Optionally hide the button after installation
+        installBtn.style.display = "none";
+      } else {
+        console.log("User dismissed the install prompt");
+      }
+
+      // Clear the deferred prompt
+      deferredPrompt = null;
+    });
+  }
+});
+
+// Optional: Listen for successful installation
+window.addEventListener("appinstalled", () => {
+  console.log("PWA installed successfully");
+});
