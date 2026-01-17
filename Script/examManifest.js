@@ -21,6 +21,18 @@ export const examList = [
     "category": "Computer Network/أسئلة الدكتورة"
   },
   {
+    "id": "40 MCQs on Lecture 2",
+    "title": "40 MCQs On Lecture 2",
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
+    "id": "40 MCQs on Lecture 4",
+    "title": "40 MCQs On Lecture 4",
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
     "id": "CIDAR notation",
     "title": "CIDAR Notation",
     "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.js",
@@ -79,6 +91,18 @@ export const examList = [
     "title": "Lecture 9",
     "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.js",
     "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
+    "id": "Questions on Computer Networking",
+    "title": "Questions On Computer Networking",
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
+    "id": "Mid Exam",
+    "title": "Mid Exam",
+    "path": "../Exams/Computer Network/Mid Exam.js",
+    "category": "Computer Network"
   },
   {
     "id": "Our Mid",
@@ -509,6 +533,12 @@ export const categoryTree = {
     ],
     "exams": [
       {
+        "id": "Mid Exam",
+        "title": "Mid Exam",
+        "path": "../Exams/Computer Network/Mid Exam.js",
+        "category": "Computer Network"
+      },
+      {
         "id": "Our Mid",
         "title": "Our Mid",
         "path": "../Exams/Computer Network/Our Mid.js",
@@ -560,6 +590,18 @@ export const categoryTree = {
     "parent": "Computer Network",
     "subcategories": [],
     "exams": [
+      {
+        "id": "40 MCQs on Lecture 2",
+        "title": "40 MCQs On Lecture 2",
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      },
+      {
+        "id": "40 MCQs on Lecture 4",
+        "title": "40 MCQs On Lecture 4",
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      },
       {
         "id": "CIDAR notation",
         "title": "CIDAR Notation",
@@ -618,6 +660,12 @@ export const categoryTree = {
         "id": "Lecture 9",
         "title": "Lecture 9",
         "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      },
+      {
+        "id": "Questions on Computer Networking",
+        "title": "Questions On Computer Networking",
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.js",
         "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       }
     ]
