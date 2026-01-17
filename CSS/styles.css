@@ -470,13 +470,13 @@ ANIMATIONS
 
 @keyframes nameShimmer {
   0% {
-    transform: translateX(-15%);
+    transform: translateX(-12%);
   }
   40% {
-    transform: translateX(210%);
+    transform: translateX(215%);
   }
   100% {
-    transform: translateX(-15%);
+    transform: translateX(-12%);
   }
 }
 
