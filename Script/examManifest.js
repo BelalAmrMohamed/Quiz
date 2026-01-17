@@ -99,9 +99,21 @@ export const examList = [
     "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
-    "id": "Mid Exam",
-    "title": "Mid Exam",
-    "path": "../Exams/Computer Network/Mid Exam.js",
+    "id": "Revision",
+    "title": "Revision",
+    "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.js",
+    "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+  },
+  {
+    "id": "Lotus Mid 1",
+    "title": "Lotus Mid 1",
+    "path": "../Exams/Computer Network/Lotus Mid 1.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Lotus Mid 2",
+    "title": "Lotus Mid 2",
+    "path": "../Exams/Computer Network/Lotus Mid 2.js",
     "category": "Computer Network"
   },
   {
@@ -114,6 +126,12 @@ export const examList = [
     "id": "Previous Mid",
     "title": "Previous Mid",
     "path": "../Exams/Computer Network/Previous Mid.js",
+    "category": "Computer Network"
+  },
+  {
+    "id": "Unknown Mid Exam",
+    "title": "Unknown Mid Exam",
+    "path": "../Exams/Computer Network/Unknown Mid Exam.js",
     "category": "Computer Network"
   },
   {
@@ -533,9 +551,15 @@ export const categoryTree = {
     ],
     "exams": [
       {
-        "id": "Mid Exam",
-        "title": "Mid Exam",
-        "path": "../Exams/Computer Network/Mid Exam.js",
+        "id": "Lotus Mid 1",
+        "title": "Lotus Mid 1",
+        "path": "../Exams/Computer Network/Lotus Mid 1.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Lotus Mid 2",
+        "title": "Lotus Mid 2",
+        "path": "../Exams/Computer Network/Lotus Mid 2.js",
         "category": "Computer Network"
       },
       {
@@ -548,6 +572,12 @@ export const categoryTree = {
         "id": "Previous Mid",
         "title": "Previous Mid",
         "path": "../Exams/Computer Network/Previous Mid.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "Unknown Mid Exam",
+        "title": "Unknown Mid Exam",
+        "path": "../Exams/Computer Network/Unknown Mid Exam.js",
         "category": "Computer Network"
       }
     ]
@@ -666,6 +696,12 @@ export const categoryTree = {
         "id": "Questions on Computer Networking",
         "title": "Questions On Computer Networking",
         "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.js",
+        "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      },
+      {
+        "id": "Revision",
+        "title": "Revision",
+        "path": "../Exams/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.js",
         "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
       }
     ]
