@@ -1,4 +1,9 @@
 *.bat
+*.md
+*.txt
+
+!robots.txt
+!README.md
 
 # Service Worker cache
 sw-cache/
