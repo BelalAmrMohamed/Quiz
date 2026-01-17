@@ -2,7 +2,7 @@
   "id": "/Quiz/",
   "name": "Quiz Master",
   "short_name": "Quiz Master",
-  "description": "A premium college quiz platform for Computers and AI Faculty students. Practice exams, track performance, and study offline.",
+  "description": "A premium college quiz platform for Computers and AI Faculty students. Practice exams and track performance.",
   "start_url": "/Quiz/",
   "scope": "/Quiz/",
   "display": "standalone",
