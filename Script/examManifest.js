@@ -141,6 +141,12 @@ export const examList = [
     "category": "Computer Network"
   },
   {
+    "id": "فاينل الدكتورة في كلية علوم",
+    "title": "فاينل الدكتورة في كلية علوم",
+    "path": "../Exams/Computer Network/فاينل الدكتورة في كلية علوم.js",
+    "category": "Computer Network"
+  },
+  {
     "id": "50 MCQs on Chapter 1",
     "title": "50 MCQs On Chapter 1",
     "path": "../Exams/Discrete Structure/50 MCQs on Chapter 1.js",
@@ -590,6 +596,12 @@ export const categoryTree = {
         "id": "Unknown Mid Exam",
         "title": "Unknown Mid Exam",
         "path": "../Exams/Computer Network/Unknown Mid Exam.js",
+        "category": "Computer Network"
+      },
+      {
+        "id": "فاينل الدكتورة في كلية علوم",
+        "title": "فاينل الدكتورة في كلية علوم",
+        "path": "../Exams/Computer Network/فاينل الدكتورة في كلية علوم.js",
         "category": "Computer Network"
       }
     ]
