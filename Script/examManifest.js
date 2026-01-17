@@ -105,6 +105,12 @@ export const examList = [
     "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
   },
   {
+    "id": "IP Address",
+    "title": "IP Address",
+    "path": "../Exams/Computer Network/IP Address.js",
+    "category": "Computer Network"
+  },
+  {
     "id": "Lotus Mid 1",
     "title": "Lotus Mid 1",
     "path": "../Exams/Computer Network/Lotus Mid 1.js",
@@ -550,6 +556,12 @@ export const categoryTree = {
       "Computer Network/أسئلة بالذكاء الإصطناعي"
     ],
     "exams": [
+      {
+        "id": "IP Address",
+        "title": "IP Address",
+        "path": "../Exams/Computer Network/IP Address.js",
+        "category": "Computer Network"
+      },
       {
         "id": "Lotus Mid 1",
         "title": "Lotus Mid 1",
