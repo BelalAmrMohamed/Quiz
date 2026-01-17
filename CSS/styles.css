@@ -14,8 +14,14 @@ html {
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "Segoe UI", Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -90,7 +96,9 @@ body {
   font-size: 1rem;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .menu-item:hover {
@@ -270,7 +278,9 @@ body {
   -webkit-backdrop-filter: blur(var(--blur-md));
   border-radius: 12px;
   border: 1px solid;
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   width: fit-content;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -368,10 +378,12 @@ HEADER BADGE – GAMIFIED WELCOME
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.6);
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 
-  animation: badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+  animation:
+    badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     badgeFloat 6s ease-in-out infinite;
 
   will-change: transform, box-shadow;
@@ -395,19 +407,26 @@ HEADER BADGE – GAMIFIED WELCOME
   animation: namePulse 3s ease-in-out infinite;
 }
 
-/* Soft shine that moves across username */
-.header-badge .user-name::after {
+.header-badge::after {
   content: "";
   position: absolute;
-  inset: 0;
+
+  /* 1. Make the width smaller */
+  width: 30%;
+  height: 55%;
+
+  /* 2. Narrow the white light in the gradient */
   background: linear-gradient(
-    120deg,
+    90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0.6) 50%,
     transparent 100%
   );
-  transform: translateX(-120%);
-  animation: nameShimmer 4s ease-in-out infinite;
+
+  /* Start off-screen */
+  transform: translateX(-150%);
+  animation: nameShimmer 5s ease-in-out infinite;
+
   border-radius: inherit;
   pointer-events: none;
 }
@@ -451,13 +470,13 @@ ANIMATIONS
 
 @keyframes nameShimmer {
   0% {
-    transform: translateX(-150%);
+    transform: translateX(-15%);
   }
   40% {
-    transform: translateX(10%);
+    transform: translateX(210%);
   }
   100% {
-    transform: translateX(-150%);
+    transform: translateX(-15%);
   }
 }
 

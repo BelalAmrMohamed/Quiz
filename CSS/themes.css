@@ -45,13 +45,14 @@
   --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-sm:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
 
   /* Effects */
@@ -109,12 +110,12 @@
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5),
-    0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
-    0 4px 6px -4px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
-    0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.4);
 
   /* Effects */
@@ -172,12 +173,12 @@
 
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
-    0 4px 6px -4px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
-    0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
 
   /* Effects */
@@ -196,7 +197,9 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Cards and surfaces */
@@ -213,14 +216,18 @@ body {
 #scoreHeader {
   background-color: var(--color-surface);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Stats bar (quiz page) */
 .stats-bar {
   background-color: var(--color-surface);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Menu elements */
@@ -229,7 +236,9 @@ body {
   background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
-  transition: background-color 0.3s ease, border-color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
@@ -247,7 +256,9 @@ body {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(var(--blur-md));
   border-color: rgba(255, 255, 255, 0.8);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 [data-theme="dark-slate"] #breadcrumb,
@@ -261,7 +272,9 @@ body {
   background-color: var(--color-text-primary);
   color: white;
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
     border-color 0.3s ease;
 }
 
@@ -292,7 +305,9 @@ body {
 .option-row {
   background: var(--color-surface);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .option-row:hover {
@@ -314,7 +329,9 @@ body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
     border-color 0.3s ease;
 }
 
@@ -387,7 +404,9 @@ body {
   );
   color: var(--color-primary);
   border-color: rgba(99, 102, 241, 0.1);
-  transition: background-color 0.3s ease, color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
     border-color 0.3s ease;
 }
 
@@ -402,7 +421,9 @@ body {
   background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
-  transition: background-color 0.3s ease, border-color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
@@ -410,7 +431,9 @@ body {
   background: var(--color-success-light);
   border-color: var(--color-success);
   color: var(--color-success);
-  transition: background-color 0.3s ease, border-color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
@@ -428,7 +451,9 @@ body {
 .essay-answer-box {
   background: var(--color-background-secondary);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .essay-answer-box.user-essay {
@@ -474,7 +499,9 @@ body {
   background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
   border-color: #3b82f6;
   color: #1e40af;
-  transition: background-color 0.3s ease, border-color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
@@ -531,7 +558,9 @@ body {
 .new-badges-section {
   background: rgba(255, 255, 255, 0.5);
   border-color: var(--color-primary-light);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 [data-theme="dark-slate"] .new-badges-section,
@@ -543,7 +572,9 @@ body {
 .badge-item {
   background: var(--color-surface);
   border-color: var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 [data-theme="dark-slate"] .badge-item,
@@ -800,13 +831,24 @@ LIGHT THEME
   background: rgba(37, 99, 235, 0.12);
 }
 
+/* For the animation */
+[data-theme="light"] .header-badge::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(153, 204, 255, 0.6) 50%,
+    transparent 100%
+  );
+}
+
 /* ============================================================================
 DARK THEME
 ============================================================================ */
 [data-theme="dark"] .header-badge {
   background: rgba(30, 41, 59, 0.75);
   color: #e5e7eb;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
@@ -826,4 +868,15 @@ DARK SLATE THEME
 [data-theme="dark-slate"] .header-badge .user-name {
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.16);
+}
+
+/* For the animation */
+[data-theme="dark-slate"] .header-badge::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+
+    /* Pink animation */ rgba(255, 192, 203, 0.6) 50%,
+    transparent 100%
+  );
 }
