@@ -787,39 +787,45 @@ function finish(skipConfirm) {
 }
 
 function restart(skipConfirm) {
-  // 1. Confirmation check
+  // 1. Confirm Intent
   if (
     !skipConfirm &&
     !confirm("Are you sure you want to restart? Progress will be lost.")
   )
     return;
 
-  // 2. Clear critical timeouts/intervals immediately
+  // 2. SAFETY: Kill the pending save timer immediately.
+  // This prevents the previous state from overwriting our "clean slate"
+  // 300ms after this function runs.
+  if (saveStateDebounce) {
+    clearTimeout(saveStateDebounce);
+    saveStateDebounce = null;
+  }
+
+  // 3. Clear Intervals
   if (timerInterval) clearInterval(timerInterval);
   if (autoSubmitTimeout) {
     clearTimeout(autoSubmitTimeout);
     autoSubmitTimeout = null;
   }
 
-  // 3. Clear LocalStorage
+  // 4. Wipe Storage
   localStorage.removeItem(`quiz_state_${examId}`);
 
-  // 4. Reset Global State Variables
+  // 5. Reset Memory State
   currentIdx = 0;
   userAnswers = {};
   lockedQuestions = {};
   timeElapsed = 0;
 
-  // 5. Reset Timed Mode specific variables
+  // 6. Reset Timed Mode Logic
   if (quizMode === "timed") {
-    // Recalculate time remaining based on question count
     timeRemaining = questions.length * 30;
   }
 
-  // 6. Reset UI Elements
-  // Reset Timer Text to 00:00 or full time
+  // 7. Reset UI
   if (els.timer) {
-    els.timer.style.color = ""; // Reset red warning color
+    els.timer.style.color = "";
     if (quizMode === "timed") {
       const mins = Math.floor(timeRemaining / 60)
         .toString()
@@ -831,16 +837,14 @@ function restart(skipConfirm) {
     }
   }
 
-  // 7. Re-initialize Logic
+  // 8. Re-render
   renderQuestion();
-  renderMenuNavigation(); // Re-render nav to clear status colors
+  renderMenuNavigation();
   updateMenuActionButtons();
   startTimer();
 
-  // Optional: Scroll to top to ensure clean start
+  // 9. Scroll to top
   window.scrollTo(0, 0);
-
-  console.log("Quiz restarted successfully.");
 }
 
 function exit(skipConfirm) {
