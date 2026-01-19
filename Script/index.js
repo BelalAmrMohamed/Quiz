@@ -1,6 +1,5 @@
 // Script/index.js - Performance Optimized
 import { examList, categoryTree } from "./examManifest.js";
-import { gameEngine, BADGES } from "./gameEngine.js"; // for the name badge
 
 const container = document.getElementById("contentArea");
 const title = document.getElementById("pageTitle");
@@ -14,7 +13,7 @@ const userNameBadge = document.getElementById("user-name");
 
 // Safely get username
 function getUserName() {
-  return gameEngine.getUserData()?.displayName || "User";
+  return localStorage.getItem("username") || "User";
 }
 
 // Gamified welcome message pool
@@ -60,15 +59,12 @@ updateWelcomeMessage();
 // ============================================================================
 
 window.changeUsername = function () {
-  const user = gameEngine.getUserData() || {};
-  const currentName = user.displayName || "User";
+  const currentName = localStorage.getItem("username") || "User";
   const newName = prompt("Enter your new display name:", currentName);
 
   if (!newName || !newName.trim()) return;
 
-  user.displayName = newName.trim();
-  gameEngine.saveUserData(user);
-
+  localStorage.setItem("username", newName.trim());
   updateWelcomeMessage();
 };
 // === End of the user message section ===
