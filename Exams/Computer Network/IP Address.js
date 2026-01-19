@@ -1,3 +1,9 @@
+export const meta = {
+  title: "General Knowledge Quiz",
+  category: "Science",
+  description: "This quiz covers basic physics and biology.",
+};
+
 export const questions = [
   // First page - Find the Network ID, Broadcast ID, and First/Last Usable Host
   {

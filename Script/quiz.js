@@ -157,15 +157,11 @@ async function init() {
     const module = await loadExamModule(config);
     questions = module.questions;
 
-    if (module.meta && (module.meta.title || module.meta.category)) {
-      metaData = module.meta;
-    } else {
-      const parts = config.path.replace(/\\/g, "/").split("/");
-      const filename = parts[parts.length - 1] || "";
-      const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
-      const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
-      metaData = { title, category: parts[parts.length - 2] || "" };
-    }
+    const parts = config.path.replace(/\\/g, "/").split("/");
+    const filename = parts[parts.length - 1] || "";
+    const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
+    const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
+    metaData = { title, category: parts[parts.length - 2] || "" };
 
     if (els.title) {
       let modeLabel = "";
@@ -385,30 +381,33 @@ function createGridItem(q, idx) {
 
 // === List view (similar optimization) ===
 function renderListView(navContainer, flagInfo) {
-  const fragment = document.createDocumentFragment();
-  const container = document.createElement("div");
-  container.className = "menu-nav-items list-view";
+  // 1. Clear the container completely
+  navContainer.innerHTML = "";
 
+  // 2. Add Header and Legend as flat elements
+  const headerDiv = document.createElement("div");
+  headerDiv.innerHTML = `
+    <div class="menu-nav-header">QUESTION NAVIGATOR</div>
+    <div class="menu-nav-legend">
+      <span><span class="legend-dot current"></span> Current</span>
+      <span><span class="legend-dot answered"></span> Answered</span>
+      <span><span class="legend-dot correct"></span> Correct</span>
+      <span><span class="legend-dot wrong"></span> Wrong</span>
+    </div>
+    ${flagInfo || ""}
+  `;
+  navContainer.appendChild(headerDiv);
+
+  // 3. Create the list container (no height limits)
+  const listContainer = document.createElement("div");
+  listContainer.className = "menu-nav-items list-view";
+
+  // 4. Append buttons
   questions.forEach((q, idx) => {
-    const item = createListItem(q, idx);
-    container.appendChild(item);
+    listContainer.appendChild(createListItem(q, idx));
   });
 
-  fragment.appendChild(container);
-
-  navContainer.innerHTML = `
-    <div class="menu-nav-list">
-      <div class="menu-nav-header">Question Navigator</div>
-      <div class="menu-nav-legend">
-        <span><span class="legend-dot current"></span> Current</span>
-        <span><span class="legend-dot answered"></span> Answered</span>
-        <span><span class="legend-dot correct"></span> Correct</span>
-        <span><span class="legend-dot wrong"></span> Wrong</span>
-      </div>
-      ${flagInfo}
-    </div>
-  `;
-  navContainer.querySelector(".menu-nav-list").appendChild(container);
+  navContainer.appendChild(listContainer);
 }
 
 // === Helper: Create list item element ===
@@ -523,7 +522,7 @@ function renderQuestion() {
   if (els.progressFill) els.progressFill.style.width = `${progressPercent}%`;
   if (els.progressText)
     els.progressText.textContent = `${Math.round(
-      progressPercent
+      progressPercent,
     )}% (${answeredCount}/${questions.length})`;
 
   const isLocked = !!lockedQuestions[currentIdx];
@@ -554,14 +553,14 @@ function renderQuestion() {
         ? "Your answer matches! ✅"
         : "Your answer differs ⚠️";
       feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate. Your answer might still be correct in a different way.</div><div style="margin-top:8px">${escapeHtml(
-        explanationText
+        explanationText,
       )}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
       const statusMsg = isCorrect ? "Correct ✅" : `Wrong ❌`;
       feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
-        explanationText
+        explanationText,
       )}</div>`;
     }
   }
@@ -584,8 +583,8 @@ function renderQuestion() {
   const questionHeaderHTML = `
     <div class="question-header">
       <div class="question-number">Question ${currentIdx + 1} of ${
-    questions.length
-  }</div>
+        questions.length
+      }</div>
       ${actionButtons}
     </div>
     <h2 class="question-text">${escapeHtml(q.q)}</h2>
@@ -654,8 +653,8 @@ function renderQuestion() {
                   isSelected ? "checked" : ""
                 } 
                        ${isLocked ? "disabled" : ""} aria-label="Option ${
-                i + 1
-              }">
+                         i + 1
+                       }">
                 <span class="option-label">${escapeHtml(opt)}</span>
               </div>`;
             })
