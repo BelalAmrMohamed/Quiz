@@ -343,10 +343,8 @@ body {
 .menu-flag-count {
   font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
 }
 
 /* Grid View */

@@ -285,7 +285,7 @@ function renderMenuNavigation() {
   const flagCount = gameEngine.getFlaggedCount(examId);
   const flagInfo =
     flagCount > 0
-      ? `<div class="menu-flag-count">🚩 ${flagCount} flagged for review</div>`
+      ? `<span class="menu-flag-count">🚩 ${flagCount} flagged for review</span>`
       : "";
 
   if (viewMode === "grid") {
@@ -319,8 +319,8 @@ function renderGridView(navContainer, flagInfo) {
         <span><span class="legend-dot answered"></span> Answered</span>
         <span><span class="legend-dot correct"></span> Correct</span>
         <span><span class="legend-dot wrong"></span> Wrong</span>
-      </div>
-      ${flagInfo}
+        ${flagInfo}
+        </div>      
     </div>
   `;
   navContainer.querySelector(".menu-nav-grid").appendChild(container);
