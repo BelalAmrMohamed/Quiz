@@ -459,7 +459,7 @@ function createListItem(q, idx) {
       <span class="menu-nav-icon flag-icon ${isFlagged ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
             title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
-        🚩
+        ${isFlagged ? "🚩" : "🏳️"}
       </span>
     </div>
   `;
@@ -580,7 +580,7 @@ function renderQuestion() {
       <button class="flag-btn ${isFlagged ? "active" : ""}" 
               onclick="window.toggleFlag()" 
               title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
-        🚩
+        ${isFlagged ? "🚩" : "🏳️"}
       </button>
     </div>
   `;
