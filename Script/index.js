@@ -46,7 +46,7 @@ function updateWelcomeMessage() {
   // Replace username with styled span
   const styledMessage = messageTemplate.replace(
     name,
-    `<span class="user-name">${name}</span>`
+    `<span class="user-name">${name}</span>`,
   );
 
   userNameBadge.innerHTML = styledMessage;
@@ -299,17 +299,17 @@ function showModeSelection(examId, examTitle) {
     "🛡️",
     "Practice",
     "Has a timer, and you can check answers",
-    () => startQuiz(examId, "practice")
+    () => startQuiz(examId, "practice"),
   );
 
   // Timed mode
   const timedBtn = createModeButton("⏱️", "Timed", "30s per question", () =>
-    startQuiz(examId, "timed")
+    startQuiz(examId, "timed"),
   );
 
   // Exam mode
   const examBtn = createModeButton("📝", "Exam", "No checking answers!", () =>
-    startQuiz(examId, "exam")
+    startQuiz(examId, "exam"),
   );
 
   modeGrid.appendChild(practiceBtn);
@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
     installBtn.addEventListener("click", async () => {
       if (!deferredPrompt) {
         alert(
-          "The app is not installable at this time. Please check your browser support or PWA setup."
+          "The app is not installable at this time. Please check your browser support or PWA setup.",
         );
         return;
       }

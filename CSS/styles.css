@@ -363,8 +363,12 @@ HEADER BADGE – GAMIFIED WELCOME
 .header-badge {
   position: relative;
   display: inline-flex;
-  align-items: center;
   gap: 10px;
+
+  flex-wrap: wrap; /* Allows text to go to a second line if needed */
+  align-items: center;
+  justify-content: center;
+  text-align: center; /* Keeps text centered if it wraps */
 
   padding: 10px 18px;
   border-radius: 999px;
@@ -391,7 +395,6 @@ HEADER BADGE – GAMIFIED WELCOME
 
 /* Emoji / icon before text */
 .header-badge::before {
-  content: "✨";
   font-size: 1.05rem;
   opacity: 0.9;
 }
@@ -403,6 +406,8 @@ HEADER BADGE – GAMIFIED WELCOME
   letter-spacing: 0.2px;
   padding: 2px 6px;
   border-radius: 6px;
+  margin-right: 0;
+  margin-left: 0;
 
   animation: namePulse 3s ease-in-out infinite;
 }
