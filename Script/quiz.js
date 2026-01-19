@@ -320,7 +320,7 @@ function renderGridView(navContainer, flagInfo) {
         <span><span class="legend-dot correct"></span> Correct</span>
         <span><span class="legend-dot wrong"></span> Wrong</span>
         ${flagInfo}
-        </div>      
+        </div>
     </div>
   `;
   navContainer.querySelector(".menu-nav-grid").appendChild(container);
@@ -392,8 +392,9 @@ function renderListView(navContainer, flagInfo) {
       <span><span class="legend-dot answered"></span> Answered</span>
       <span><span class="legend-dot correct"></span> Correct</span>
       <span><span class="legend-dot wrong"></span> Wrong</span>
-    </div>
-    ${flagInfo || ""}
+     ${flagInfo || ""}     
+     </div>
+   
   `;
   navContainer.appendChild(headerDiv);
 
@@ -468,6 +469,7 @@ function updateMenuActionButtons() {
   const bookmarkIcon = document.getElementById("menuBookmarkIcon");
   const bookmarkText = document.getElementById("menuBookmarkText");
   const flagText = document.getElementById("menuFlagText");
+  const flagIcon = document.getElementById("menuFlagIcon");
 
   const isListView = viewMode === "list";
 
@@ -499,6 +501,7 @@ function updateMenuActionButtons() {
       flagBtn.disabled = false;
 
       const isFlagged = gameEngine.isFlagged(examId, currentIdx);
+      if (flagIcon) flagIcon.textContent = isFlagged ? "🚩" : "🏳️";
       if (flagText)
         flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
 
