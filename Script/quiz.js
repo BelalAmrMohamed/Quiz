@@ -2,12 +2,6 @@
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
 
-/*
-// Use for the restart button
-
-localStorage.removeItem(`quiz_state_${examId}`);
-*/
-
 // === MEMORY CACHE for exam modules ===
 const examModuleCache = new Map();
 const MAX_CACHE_SIZE = 10; // Keep last 10 exams in memory
@@ -557,7 +551,7 @@ function renderQuestion() {
       const statusMsg = isCorrect
         ? "Your answer matches! ✅"
         : "Your answer differs ⚠️";
-      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate. Your answer might still be correct in a different way.</div><div style="margin-top:8px">${escapeHtml(
+      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate.</div><div style="margin-top:8px">${escapeHtml(
         explanationText,
       )}</div>`;
     } else {
