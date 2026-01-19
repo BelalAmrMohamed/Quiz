@@ -1,8 +1,8 @@
 import os
 
 # Settings
-IGNORE_NAMES = ['node_modules', '.git', 'Exams', 'Context Map.txt', '.DS_Store']
-IGNORE_EXT = ['.pyc', '.tmp'] # Add extensions to ignore here
+IGNORE_NAMES = ['node_modules', '.git', 'Exams', 'Context Map.txt', '.DS_Store', 'google0c1df2c3df22a824.html']
+IGNORE_EXT = ['.pyc', '.tmp', '.bat'] # Add extensions to ignore here
 
 def generate_tree():
     script_dir = os.path.dirname(os.path.abspath(__file__))
