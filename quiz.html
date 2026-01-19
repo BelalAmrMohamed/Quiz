@@ -93,9 +93,15 @@
                 <span>✅</span> Complete Quiz
             </button>
 
-            <button id="viewToggle" class="menu-item view-toggle-btn">
-                <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
+            <button id="restartBtn" class="menu-item action-btn" onclick="restartQuiz()">
+                <span>🔁</span> Restart Quiz
             </button>
+
+            <button id="exitBtn" class="menu-item action-btn" onclick="exitQuiz()">
+                <span>🔚</span> Exit Quiz
+            </button>
+
+            <div class="menu-divider"></div>
 
             <!-- NEW THEME CONTROLS -->
             <div class="theme-controls-section">
@@ -129,6 +135,12 @@
                 </p>
             </div>
             <!-- End of the new theme cotrolls -->
+
+            <div class="menu-divider"></div>
+
+            <button id="viewToggle" class="menu-item view-toggle-btn">
+                <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
+            </button>
 
             <div class="menu-divider"></div>
 

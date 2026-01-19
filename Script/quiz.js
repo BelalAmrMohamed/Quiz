@@ -2,6 +2,12 @@
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
 
+/*
+// Use for the restart button
+
+localStorage.removeItem(`quiz_state_${examId}`);
+*/
+
 // === MEMORY CACHE for exam modules ===
 const examModuleCache = new Map();
 const MAX_CACHE_SIZE = 10; // Keep last 10 exams in memory
@@ -35,6 +41,8 @@ const els = {
   prevBtn: document.getElementById("prevBtn"),
   nextBtn: document.getElementById("nextBtn"),
   finishBtn: document.getElementById("finishBtn"),
+  restartBtn: document.getElementById("restartBtn"),
+  exitBtn: document.getElementById("exitBtn"),
   statsBar: document.getElementById("statsBar"),
   statLevel: document.getElementById("statLevel"),
   statPoints: document.getElementById("statPoints"),
@@ -46,6 +54,8 @@ const els = {
 
 // === Global handlers ===
 window.finishEarly = () => finish();
+window.restartQuiz = () => restart(); // Not implemented
+window.exitQuiz = () => exit();
 window.prevQuestion = () => nav(-1);
 window.nextQuestion = () => nav(1);
 
@@ -257,11 +267,6 @@ async function init() {
         } catch (err) {}
       }
     });
-
-    // Pause service worker caching while quiz is active (reduce lag)
-    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({ type: "PAUSE_CACHING" });
-    }
   } catch (err) {
     console.error("Initialization Error:", err);
     if (els.questionContainer) {
@@ -778,12 +783,72 @@ function finish(skipConfirm) {
   localStorage.removeItem(`quiz_state_${examId}`);
   gameEngine.clearFlags(examId);
 
-  // Resume service worker caching
-  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({ type: "RESUME_CACHING" });
+  window.location.href = "summary.html";
+}
+
+function restart(skipConfirm) {
+  // 1. Confirmation check
+  if (
+    !skipConfirm &&
+    !confirm("Are you sure you want to restart? Progress will be lost.")
+  )
+    return;
+
+  // 2. Clear critical timeouts/intervals immediately
+  if (timerInterval) clearInterval(timerInterval);
+  if (autoSubmitTimeout) {
+    clearTimeout(autoSubmitTimeout);
+    autoSubmitTimeout = null;
   }
 
-  window.location.href = "summary.html";
+  // 3. Clear LocalStorage
+  localStorage.removeItem(`quiz_state_${examId}`);
+
+  // 4. Reset Global State Variables
+  currentIdx = 0;
+  userAnswers = {};
+  lockedQuestions = {};
+  timeElapsed = 0;
+
+  // 5. Reset Timed Mode specific variables
+  if (quizMode === "timed") {
+    // Recalculate time remaining based on question count
+    timeRemaining = questions.length * 30;
+  }
+
+  // 6. Reset UI Elements
+  // Reset Timer Text to 00:00 or full time
+  if (els.timer) {
+    els.timer.style.color = ""; // Reset red warning color
+    if (quizMode === "timed") {
+      const mins = Math.floor(timeRemaining / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = (timeRemaining % 60).toString().padStart(2, "0");
+      els.timer.textContent = `⏳ ${mins}:${secs}`;
+    } else {
+      els.timer.textContent = `⏱ 00:00`;
+    }
+  }
+
+  // 7. Re-initialize Logic
+  renderQuestion();
+  renderMenuNavigation(); // Re-render nav to clear status colors
+  updateMenuActionButtons();
+  startTimer();
+
+  // Optional: Scroll to top to ensure clean start
+  window.scrollTo(0, 0);
+
+  console.log("Quiz restarted successfully.");
+}
+
+function exit(skipConfirm) {
+  if (!skipConfirm && !confirm("Are you sure you want to exit?")) return;
+
+  localStorage.removeItem(`quiz_state_${examId}`);
+
+  window.location.href = "index.html";
 }
 
 function checkAnswer() {
