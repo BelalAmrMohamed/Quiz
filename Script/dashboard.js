@@ -39,15 +39,12 @@ window.removeBookmark = function (key) {
 
 // Change username
 window.changeUsername = function () {
-  const user = gameEngine.getUserData();
-  const currentName = user.displayName || "User";
+  const currentName = localStorage.getItem("username") || "User";
   const newName = prompt("Enter your new display name:", currentName);
+  if (!newName || !newName.trim()) return;
 
-  if (newName && newName.trim() !== "") {
-    user.displayName = newName.trim();
-    gameEngine.saveUserData(user);
-    refreshUI();
-  }
+  localStorage.setItem("username", newName.trim());
+  refreshUI();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -70,9 +67,8 @@ function renderStats(user) {
 
   // Level Details
   document.getElementById("levelTitle").textContent = levelInfo.title;
-  document.getElementById(
-    "levelBadge"
-  ).innerHTML = `<span class="level-number">${levelInfo.level}</span>`;
+  document.getElementById("levelBadge").innerHTML =
+    `<span class="level-number">${levelInfo.level}</span>`;
   document.getElementById("levelProgressBar").style.width = `${
     levelInfo.progressPercent || 0
   }%`;
@@ -90,18 +86,18 @@ function renderStats(user) {
   if (user.history && user.history.length > 0) {
     const totalCorrect = user.history.reduce(
       (sum, h) => sum + (h.score || 0),
-      0
+      0,
     );
     const totalQuestions = user.history.reduce(
       (sum, h) => sum + (h.total || 0),
-      0
+      0,
     );
     const accuracy =
       totalQuestions > 0
         ? Math.round((totalCorrect / totalQuestions) * 100)
         : 0;
     const perfectCount = user.history.filter(
-      (h) => h.percentage === 100
+      (h) => h.percentage === 100,
     ).length;
 
     accuracyRateEl.textContent = `${accuracy}%`;
@@ -215,7 +211,7 @@ function renderLeaderboard(user) {
     { name: "Jessica Davis", points: 100 },
   ];
 
-  const displayName = user.displayName || "User";
+  const displayName = localStorage.getItem("username") || "User";
   const currentUser = {
     name: `${displayName} (You)`,
     points: user.totalPoints,
@@ -232,7 +228,7 @@ function renderLeaderboard(user) {
       <span>${entry.rank}. ${entry.name}</span>
       <strong>${entry.points.toLocaleString()} pts</strong>
     </div>
-  `
+  `,
     )
     .join("");
 }

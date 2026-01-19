@@ -1,13 +1,10 @@
 // Website/Script/summary.js
 import { examList } from "./examManifest.js";
-import { gameEngine } from "./gameEngine.js";
+
+const currentName = localStorage.getItem("username");
 
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
-
-// Name
-const user = gameEngine.getUserData();
-const currentName = user.displayName || "User";
 
 // Helper to check if question is essay
 const isEssayQuestion = (q) => {
@@ -71,19 +68,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     correct,
     wrong,
     skipped,
-    essayCount
+    essayCount,
   );
 
   // Review
   renderReview(container, questions, result.userAnswers);
 
   // NEW: Badge notifications
-  const user = gameEngine.getUserData();
-  const displayName = user.displayName || "User";
+  const userName = localStorage.getItem("username") || "User";
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
     setTimeout(() => {
-      showNotification(badge, displayName);
+      showNotification(badge, userName);
     }, index * 500);
   });
 });
@@ -134,7 +130,7 @@ function renderHeader(
   correct,
   wrong,
   skipped,
-  essayCount
+  essayCount,
 ) {
   const percentage = total > 0 ? Math.round((data.score / total) * 100) : 0;
   const timeStr = `${Math.floor(data.timeElapsed / 60)}m ${
@@ -157,7 +153,7 @@ function renderHeader(
               <span class="badge-icon">${b.icon}</span>
               <span class="badge-name">${b.title}</span>
             </div>
-          `
+          `,
             )
             .join("")}
         </div>
@@ -273,8 +269,8 @@ function renderReview(container, questions, userAnswers) {
       const statusClass = isCorrect
         ? "correct"
         : isSkipped
-        ? "skipped"
-        : "wrong";
+          ? "skipped"
+          : "wrong";
       const statusIcon = isCorrect ? "✅" : isSkipped ? "⚪" : "❌";
 
       const qText = escapeHTML(q.q);
@@ -715,8 +711,8 @@ function exportToPdf(config, questions) {
       contentHTML += `
         <div class="pdf-correct">
           <strong>Correct Answer:</strong> ${correctLetter}. ${
-        q.options[q.correct]
-      }
+            q.options[q.correct]
+          }
         </div>
       `;
     }
@@ -780,13 +776,3 @@ function exportToPdf(config, questions) {
       });
   }, 100);
 }
-
-// Change username
-window.changeUsername = function () {
-  const newName = prompt("Enter your new display name:", currentName);
-
-  if (newName && newName.trim() !== "") {
-    user.displayName = newName.trim();
-    gameEngine.saveUserData(user);
-  }
-};
