@@ -1,5 +1,4 @@
-/* 
-The next line runs this file which generates Script/examManifest.js
+/* The next line runs this file which generates Script/examManifest.js
 node tools/generateExamManifest.js
 */
 
@@ -12,7 +11,7 @@ async function walk(dir) {
     entries.map((entry) => {
       const res = path.resolve(dir, entry.name);
       return entry.isDirectory() ? walk(res) : res;
-    })
+    }),
   );
   return Array.prototype.concat(...files);
 }
@@ -25,41 +24,19 @@ async function buildCategoryTree(examsDir) {
   const tree = {};
   const usedIds = new Set();
 
-  function generateUniqueId(baseId, categoryPath) {
-    let id = baseId;
-    let counter = 1;
+  function generateUniqueId() {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    const idLength = 8;
+    let id;
 
-    // First try: use the base ID
-    if (!usedIds.has(id)) {
-      usedIds.add(id);
-      return id;
-    }
-
-    // Second try: append category name
-    const categoryName = categoryPath[categoryPath.length - 1] || "";
-    if (categoryName) {
-      id = `${categoryName}-${baseId}`;
-      if (!usedIds.has(id)) {
-        usedIds.add(id);
-        return id;
+    // Generate random IDs until we find one that hasn't been used
+    do {
+      id = "";
+      for (let i = 0; i < idLength; i++) {
+        id += charset.charAt(Math.floor(Math.random() * charset.length));
       }
-    }
+    } while (usedIds.has(id));
 
-    // Third try: append full path
-    if (categoryPath.length > 0) {
-      id = `${categoryPath.join("-")}-${baseId}`;
-      if (!usedIds.has(id)) {
-        usedIds.add(id);
-        return id;
-      }
-    }
-
-    // Last resort: append counter
-    id = baseId;
-    while (usedIds.has(`${id}-${counter}`)) {
-      counter++;
-    }
-    id = `${id}-${counter}`;
     usedIds.add(id);
     return id;
   }
@@ -179,7 +156,7 @@ async function generate() {
   console.log(
     `Generated ${allExams.length} exams across ${
       Object.keys(categoryTree).length
-    } categories`
+    } categories`,
   );
 }
 
