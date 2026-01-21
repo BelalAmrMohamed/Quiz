@@ -70,7 +70,6 @@
         }
     }
     </script>
-    <!-- End of the meta tags Meta Tags -->
 
     <script type="application/ld+json">
     {
@@ -113,6 +112,7 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="CSS/themes.css">
     <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/profile-styles.css">
 
     <!-- Theme Controller Script -->
     <script type="module" src="Script/theme-controller.js"></script>
@@ -136,8 +136,11 @@
                 <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
 
                 <div class="menu-divider"></div>
-                <button onclick="changeUsername()" class="menu-item">
-                    ✏️ Change Username
+                <button onclick="window.openProfileSettings()" class="menu-item">
+                    ⚙️ Profile Settings
+                </button>
+                <button onclick="window.openCourseManager()" class="menu-item">
+                    📚 Manage Courses
                 </button>
                 <div class="menu-divider"></div>
 
@@ -176,7 +179,7 @@
                     <div class="menu-divider"></div>
                     <button class="menu-item install-app">📱 Install App</button>
                 </div>
-                <!-- End of the theme cotrolls -->
+                <!-- End of the theme controls -->
 
             </nav>
         </div>

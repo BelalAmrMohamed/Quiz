@@ -1,5 +1,14 @@
-// Script/index.js - Performance Optimized
+// Script/index.js - Performance Optimized with Filtering & Subscriptions
 import { examList, categoryTree } from "./examManifest.js";
+import { userProfile } from "./userProfile.js";
+import { 
+  extractMetadata, 
+  filterCourses, 
+  getSubscribedCourses,
+  getAllRootCourses,
+  courseMatchesFilters,
+  getCourseItemCount
+} from "./filterUtils.js";
 
 const container = document.getElementById("contentArea");
 const title = document.getElementById("pageTitle");
@@ -11,17 +20,12 @@ const breadcrumb = document.getElementById("breadcrumb");
 
 const userNameBadge = document.getElementById("user-name");
 
-// Safely get username
-function getUserName() {
-  return localStorage.getItem("username") || "User";
-}
-
 // Gamified welcome message pool
 const welcomeMessages = [
   (name) => `🏆 Welcome back, Champion ${name}!`,
-  (name) => `🚀 Back already, ${name}? Let’s continue the grind!`,
+  (name) => `🚀 Back already, ${name}? Let's continue the grind!`,
   (name) => `🎮 Ready to play again, ${name}? Your next challenge awaits.`,
-  (name) => `🔓 New challenge unlocked, ${name}!`,
+  (name) => `🔔 New challenge unlocked, ${name}!`,
   (name) => `✨ Your journey continues, ${name}…`,
   (name) => `🔥 Streak active! Jump back in, ${name}!`,
   (name) => `🧠 Knowledge power-up ready, ${name}!`,
@@ -39,7 +43,8 @@ function getRandomWelcomeMessage(name) {
 
 // Update welcome badge text
 function updateWelcomeMessage() {
-  const name = getUserName();
+  const profile = userProfile.getProfile();
+  const name = profile.username;
   const messageTemplate = getRandomWelcomeMessage(name);
 
   // Replace username with styled span
@@ -55,29 +60,261 @@ function updateWelcomeMessage() {
 updateWelcomeMessage();
 
 // ============================================================================
-// USERNAME CHANGE HANDLER
+// PROFILE MANAGEMENT MODAL
 // ============================================================================
 
-window.changeUsername = function () {
-  const currentName = localStorage.getItem("username") || "User";
-  const newName = prompt("Enter your new display name:", currentName);
+window.openProfileSettings = function() {
+  const profile = userProfile.getProfile();
+  const metadata = extractMetadata(categoryTree);
 
-  if (!newName || !newName.trim()) return;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'profileModal';
 
-  localStorage.setItem("username", newName.trim());
-  updateWelcomeMessage();
+  const modalCard = document.createElement('div');
+  modalCard.className = 'modal-card profile-modal';
+
+  modalCard.innerHTML = `
+    <h2>⚙️ Profile Settings</h2>
+    
+    <div class="profile-section">
+      <label for="profileUsername">Display Name</label>
+      <input 
+        type="text" 
+        id="profileUsername" 
+        class="profile-input"
+        value="${escapeHtml(profile.username)}"
+        placeholder="Enter your name"
+      />
+    </div>
+
+    <div class="profile-section">
+      <h3>Academic Information</h3>
+      <p class="profile-hint">This helps us show you relevant courses</p>
+      
+      <div class="profile-grid">
+        <div>
+          <label for="profileFaculty">Faculty</label>
+          <select id="profileFaculty" class="profile-select">
+            <option value="All">All Faculties</option>
+            ${metadata.faculties.map(f => 
+              `<option value="${escapeHtml(f)}" ${f === profile.faculty ? 'selected' : ''}>${escapeHtml(f)}</option>`
+            ).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label for="profileYear">Year</label>
+          <select id="profileYear" class="profile-select">
+            <option value="All">All Years</option>
+            ${metadata.years.map(y => 
+              `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
+            ).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label for="profileTerm">Term</label>
+          <select id="profileTerm" class="profile-select">
+            <option value="All">All Terms</option>
+            ${metadata.terms.map(t => 
+              `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
+            ).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="profile-btn primary" onclick="window.saveProfileSettings()">
+        💾 Save Changes
+      </button>
+      <button class="profile-btn secondary" onclick="window.closeProfileModal()">
+        Cancel
+      </button>
+    </div>
+  `;
+
+  modal.appendChild(modalCard);
+  document.body.appendChild(modal);
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) window.closeProfileModal();
+  });
 };
-// === End of the user message section ===
+
+window.saveProfileSettings = function() {
+  const username = document.getElementById('profileUsername')?.value;
+  const faculty = document.getElementById('profileFaculty')?.value;
+  const year = document.getElementById('profileYear')?.value;
+  const term = document.getElementById('profileTerm')?.value;
+
+  const oldProfile = userProfile.getProfile();
+
+  // Update profile
+  if (username) userProfile.setUsername(username);
+  userProfile.updateAcademicInfo({ faculty, year, term });
+
+  // Check if academic info changed
+  const academicInfoChanged = 
+    oldProfile.faculty !== faculty ||
+    oldProfile.year !== year ||
+    oldProfile.term !== term;
+
+  if (academicInfoChanged) {
+    // Initialize default subscriptions for new academic info
+    userProfile.initializeDefaultSubscriptions(categoryTree);
+  }
+
+  // Update UI
+  updateWelcomeMessage();
+  window.closeProfileModal();
+  
+  // Refresh course view
+  renderRootCategories();
+};
+
+window.closeProfileModal = function() {
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.remove();
+};
+
+// ============================================================================
+// COURSE SUBSCRIPTION MANAGEMENT
+// ============================================================================
+
+window.openCourseManager = function() {
+  const profile = userProfile.getProfile();
+  const metadata = extractMetadata(categoryTree);
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'courseManagerModal';
+
+  const modalCard = document.createElement('div');
+  modalCard.className = 'modal-card course-manager-modal';
+
+  modalCard.innerHTML = `
+    <h2>📚 Manage Your Courses</h2>
+    <p class="course-manager-hint">Select courses you want to see on your dashboard</p>
+
+    <div class="course-manager-filters">
+      <select id="cmFaculty" class="course-filter-select">
+        <option value="All">All Faculties</option>
+        ${metadata.faculties.map(f => 
+          `<option value="${escapeHtml(f)}" ${f === profile.faculty ? 'selected' : ''}>${escapeHtml(f)}</option>`
+        ).join('')}
+      </select>
+
+      <select id="cmYear" class="course-filter-select">
+        <option value="All">All Years</option>
+        ${metadata.years.map(y => 
+          `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
+        ).join('')}
+      </select>
+
+      <select id="cmTerm" class="course-filter-select">
+        <option value="All">All Terms</option>
+        ${metadata.terms.map(t => 
+          `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
+        ).join('')}
+      </select>
+    </div>
+
+    <div id="courseManagerList" class="course-manager-list">
+      <!-- Course list will be rendered here -->
+    </div>
+
+    <div class="course-manager-actions">
+      <button class="profile-btn primary" onclick="window.closeCourseManager()">
+        ✅ Done
+      </button>
+    </div>
+  `;
+
+  modal.appendChild(modalCard);
+  document.body.appendChild(modal);
+
+  // Render initial course list
+  renderCourseManagerList();
+
+  // Add filter change listeners
+  ['cmFaculty', 'cmYear', 'cmTerm'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', renderCourseManagerList);
+  });
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) window.closeCourseManager();
+  });
+};
+
+function renderCourseManagerList() {
+  const listContainer = document.getElementById('courseManagerList');
+  if (!listContainer) return;
+
+  const faculty = document.getElementById('cmFaculty')?.value || 'All';
+  const year = document.getElementById('cmYear')?.value || 'All';
+  const term = document.getElementById('cmTerm')?.value || 'All';
+
+  const filteredCourses = filterCourses(categoryTree, { faculty, year, term });
+  const subscribedIds = userProfile.getSubscribedCourseIds();
+
+  if (filteredCourses.length === 0) {
+    listContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <p>No courses found with these filters</p>
+      </div>
+    `;
+    return;
+  }
+
+  listContainer.innerHTML = filteredCourses.map(course => {
+    const isSubscribed = subscribedIds.includes(course.id);
+    return `
+      <div class="course-manager-item ${isSubscribed ? 'subscribed' : ''}">
+        <div class="course-manager-info">
+          <h4>${escapeHtml(course.name)}</h4>
+          <p class="course-manager-meta">
+            ${escapeHtml(course.faculty)} • Year ${escapeHtml(course.year)} • Term ${escapeHtml(course.term)}
+          </p>
+        </div>
+        <button 
+          class="course-toggle-btn ${isSubscribed ? 'active' : ''}"
+          onclick="window.toggleCourseSubscription('${escapeHtml(course.id)}')"
+        >
+          ${isSubscribed ? '✓ Subscribed' : '+ Subscribe'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+window.toggleCourseSubscription = function(courseId) {
+  userProfile.toggleSubscription(courseId);
+  renderCourseManagerList();
+};
+
+window.closeCourseManager = function() {
+  const modal = document.getElementById('courseManagerModal');
+  if (modal) modal.remove();
+  
+  // Refresh main view
+  renderRootCategories();
+};
+
+// ============================================================================
+// NAVIGATION & RENDERING
+// ============================================================================
 
 let navigationStack = [];
-
-// === OPTIMIZATION: Lazy-load category tree ===
 let categoriesCache = null;
 
 function getCategoriesLazy() {
   if (categoriesCache) return categoriesCache;
 
-  // Process category tree only once and cache it
   categoriesCache = Object.values(categoryTree || {})
     .filter((cat) => !cat.parent)
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -85,7 +322,7 @@ function getCategoriesLazy() {
   return categoriesCache;
 }
 
-// === Initialize ===
+// Initialize
 renderRootCategories();
 
 function renderRootCategories() {
@@ -94,44 +331,67 @@ function renderRootCategories() {
 
   if (!title || !container) return;
 
-  title.textContent = "Select a Topic";
+  const subscribedIds = userProfile.getSubscribedCourseIds();
+  
+  // Get subscribed courses
+  const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
+
+  // Title based on subscription status
+  if (subscribedCourses.length > 0) {
+    title.textContent = "My Courses";
+  } else {
+    title.textContent = "All Courses";
+  }
+
   container.innerHTML = "";
   container.className = "grid-container";
 
-  // Use lazy-loaded categories
-  const rootCategories = getCategoriesLazy();
-
-  if (rootCategories.length === 0) {
-    // Fallback to old behavior if categoryTree not available
-    const categories = [
-      ...new Set(examList.map((e) => e.category || "General")),
-    ];
-
-    // Use DocumentFragment for better performance
-    const fragment = document.createDocumentFragment();
-
-    categories.forEach((cat) => {
-      const count = examList.filter((e) => e.category === cat).length;
-      const card = createCategoryCard(cat, count);
-      card.onclick = () => renderExams(cat);
-      fragment.appendChild(card);
-    });
-
-    container.appendChild(fragment);
-    return;
-  }
-
-  // Use DocumentFragment for better performance
   const fragment = document.createDocumentFragment();
 
-  rootCategories.forEach((category) => {
-    const itemCount = category.subcategories.length + category.exams.length;
-    const card = createCategoryCard(category.name, itemCount, true);
-    card.onclick = () => renderCategory(category);
-    fragment.appendChild(card);
-  });
+  // Action buttons at top
+  // const actionBar = document.createElement('div');
+  // actionBar.className = 'dashboard-actions';
+  // actionBar.innerHTML = `
+  //   <button class="dashboard-action-btn" onclick="window.openProfileSettings()">
+  //     ⚙️ Profile Settings
+  //   </button>
+  //   <button class="dashboard-action-btn" onclick="window.openCourseManager()">
+  //     📚 Manage Courses
+  //   </button>
+  // `;
+  // fragment.appendChild(actionBar);
+
+  // Show subscribed courses if any
+  if (subscribedCourses.length > 0) {
+    subscribedCourses.forEach(course => {
+      const itemCount = getCourseItemCount(course);
+      const card = createCategoryCard(course.name, itemCount, true, course);
+      card.onclick = () => renderCategory(categoryTree[course.key]);
+      fragment.appendChild(card);
+    });
+  } else {
+    // Show all courses if no subscriptions
+    const rootCategories = getCategoriesLazy();
+    rootCategories.forEach((category) => {
+      const itemCount = getCourseItemCount(category);
+      const card = createCategoryCard(category.name, itemCount, true, category);
+      card.onclick = () => renderCategory(category);
+      fragment.appendChild(card);
+    });
+  }
 
   container.appendChild(fragment);
+
+  // Show empty state if no courses at all
+  if (subscribedCourses.length === 0 && getCategoriesLazy().length === 0) {
+    container.innerHTML += `
+      <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <h3>No Courses Available</h3>
+        <p>Check back later for new content!</p>
+      </div>
+    `;
+  }
 }
 
 function renderCategory(category) {
@@ -142,14 +402,13 @@ function renderCategory(category) {
   container.innerHTML = "";
   container.className = "grid-container";
 
-  // Use DocumentFragment for better DOM performance
   const fragment = document.createDocumentFragment();
 
   // Render subcategories
   category.subcategories.forEach((subCatKey) => {
     const subCat = categoryTree[subCatKey];
     if (subCat) {
-      const itemCount = subCat.subcategories.length + subCat.exams.length;
+      const itemCount = getCourseItemCount(subCat);
       const card = createCategoryCard(subCat.name, itemCount, true);
       card.onclick = () => renderCategory(subCat);
       fragment.appendChild(card);
@@ -162,7 +421,6 @@ function renderCategory(category) {
     fragment.appendChild(card);
   });
 
-  // Single DOM update
   container.appendChild(fragment);
 
   // Show empty state if no content
@@ -177,37 +435,13 @@ function renderCategory(category) {
   }
 }
 
-function renderExams(categoryName) {
-  // Fallback for old single-level categories
-  title.textContent = `${categoryName} Exams`;
-  breadcrumb.style.display = "block";
-  breadcrumb.onclick = renderRootCategories;
-
-  container.innerHTML = "";
-  container.className = "grid-container";
-
-  const exams = examList.filter((e) => e.category === categoryName);
-
-  // Use DocumentFragment for better performance
-  const fragment = document.createDocumentFragment();
-
-  exams.forEach((exam) => {
-    const card = createExamCard(exam);
-    fragment.appendChild(card);
-  });
-
-  container.appendChild(fragment);
-}
-
-// === OPTIMIZED: Create category card with proper element creation ===
-function createCategoryCard(name, itemCount, isFolder = false) {
+function createCategoryCard(name, itemCount, isFolder = false, courseData = null) {
   const card = document.createElement("div");
   card.className = "card category-card";
 
   const icon = isFolder ? "📁" : "📂";
   const itemText = itemCount === 1 ? "item" : "items";
 
-  // Use createElement for better performance than innerHTML in loops
   const iconDiv = document.createElement("div");
   iconDiv.className = "icon";
   iconDiv.textContent = icon;
@@ -218,14 +452,24 @@ function createCategoryCard(name, itemCount, isFolder = false) {
   const p = document.createElement("p");
   p.textContent = `${itemCount} ${itemText}`;
 
-  card.appendChild(iconDiv);
-  card.appendChild(h3);
-  card.appendChild(p);
+  // Add course metadata if available
+  if (courseData && courseData.faculty && courseData.year && courseData.term) {
+    const metaDiv = document.createElement("div");
+    metaDiv.className = "course-meta";
+    metaDiv.textContent = `${courseData.faculty} • Y${courseData.year} • T${courseData.term}`;
+    card.appendChild(iconDiv);
+    card.appendChild(h3);
+    card.appendChild(metaDiv);
+    card.appendChild(p);
+  } else {
+    card.appendChild(iconDiv);
+    card.appendChild(h3);
+    card.appendChild(p);
+  }
 
   return card;
 }
 
-// === OPTIMIZED: Create exam card with proper element creation ===
 function createExamCard(exam) {
   const card = document.createElement("div");
   card.className = "card exam-card";
@@ -254,11 +498,10 @@ function updateBreadcrumb() {
   }
 
   breadcrumb.style.display = "flex";
-
   const breadcrumbText = breadcrumb.querySelector(".breadcrumb-text");
 
   if (navigationStack.length === 1) {
-    breadcrumbText.textContent = "Back to Categories";
+    breadcrumbText.textContent = "Back to Courses";
     breadcrumb.onclick = renderRootCategories;
   } else {
     const parentName = navigationStack[navigationStack.length - 2].name;
@@ -272,12 +515,10 @@ function updateBreadcrumb() {
   }
 }
 
-// === OPTIMIZED: Mode selection modal with event delegation ===
 function showModeSelection(examId, examTitle) {
   const modal = document.createElement("div");
   modal.className = "modal-overlay";
 
-  // Create modal structure
   const modalCard = document.createElement("div");
   modalCard.className = "modal-card";
 
@@ -290,7 +531,6 @@ function showModeSelection(examId, examTitle) {
   const modeGrid = document.createElement("div");
   modeGrid.className = "mode-grid";
 
-  // Practice mode
   const practiceBtn = createModeButton(
     "🛡️",
     "Practice",
@@ -298,12 +538,10 @@ function showModeSelection(examId, examTitle) {
     () => startQuiz(examId, "practice"),
   );
 
-  // Timed mode
   const timedBtn = createModeButton("⏱️", "Timed", "30s per question", () =>
     startQuiz(examId, "timed"),
   );
 
-  // Exam mode
   const examBtn = createModeButton("📝", "Exam", "No checking answers!", () =>
     startQuiz(examId, "exam"),
   );
@@ -326,7 +564,6 @@ function showModeSelection(examId, examTitle) {
   document.body.appendChild(modal);
 }
 
-// === Helper: Create mode button ===
 function createModeButton(icon, title, description, onClick) {
   const btn = document.createElement("button");
   btn.className = "mode-btn";
@@ -349,37 +586,42 @@ function createModeButton(icon, title, description, onClick) {
   return btn;
 }
 
-// === Helper: Start quiz ===
 function startQuiz(id, mode) {
   window.location.href = `quiz.html?id=${id}&mode=${mode}`;
 }
 
-// Make startQuiz available globally (for backwards compatibility if needed)
+// Helper function
+function escapeHtml(unsafe) {
+  if (unsafe === null || unsafe === undefined) return "";
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Make functions available globally
 window.startQuiz = startQuiz;
 
-// Add this to your main JavaScript file (e.g., Script/pwa-init.js or a shared script loaded in summary.html)
+// ============================================================================
+// PWA INSTALLATION
+// ============================================================================
 
-// Global variable to store the deferred prompt
 let deferredPrompt;
 
-// Listen for the beforeinstallprompt event
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Prevent the mini-infobar from appearing on mobile
   e.preventDefault();
-  // Stash the event so it can be triggered later
   deferredPrompt = e;
-  // Optionally, show the install button if it was hidden
   const installBtn = document.querySelector(".install-app");
   if (installBtn) {
-    installBtn.style.display = "block"; // Show the button if criteria are met
+    installBtn.style.display = "block";
   }
 });
 
-// Handle the install button click
 document.addEventListener("DOMContentLoaded", () => {
   const installBtn = document.querySelector(".install-app");
   if (installBtn) {
-    // Initially hide the button until the event fires
     installBtn.style.display = "none";
 
     installBtn.addEventListener("click", async () => {
@@ -390,27 +632,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Show the install prompt
       deferredPrompt.prompt();
-
-      // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
 
       if (outcome === "accepted") {
         console.log("User accepted the install prompt");
-        // Optionally hide the button after installation
         installBtn.style.display = "none";
       } else {
         console.log("User dismissed the install prompt");
       }
 
-      // Clear the deferred prompt
       deferredPrompt = null;
     });
   }
 });
 
-// Optional: Listen for successful installation
 window.addEventListener("appinstalled", () => {
   console.log("PWA installed successfully");
 });

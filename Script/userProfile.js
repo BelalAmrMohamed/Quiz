@@ -1,0 +1,220 @@
+// Script/userProfile.js - User Profile & Subscription Management
+// Centralized user profile management for the Quiz Master PWA
+
+/**
+ * User Profile Structure:
+ * {
+ *   username: string,
+ *   faculty: string,
+ *   year: string,
+ *   term: string,
+ *   subscribedCourseIds: string[]
+ * }
+ */
+
+const STORAGE_KEY = 'quiz_user_profile';
+const DEFAULT_PROFILE = {
+  username: 'User',
+  faculty: 'All',
+  year: 'All',
+  term: 'All',
+  subscribedCourseIds: []
+};
+
+export class UserProfileManager {
+  constructor() {
+    this.profile = this.loadProfile();
+  }
+
+  /**
+   * Load user profile from localStorage
+   * CRITICAL: Maintains backward compatibility with standalone "username" key
+   */
+  loadProfile() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      let profile = { ...DEFAULT_PROFILE };
+      
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        profile = {
+          ...DEFAULT_PROFILE,
+          ...parsed,
+          subscribedCourseIds: parsed.subscribedCourseIds || []
+        };
+      }
+      
+      // BACKWARD COMPATIBILITY: Always prioritize standalone "username" key
+      const standaloneUsername = localStorage.getItem('username');
+      if (standaloneUsername) {
+        profile.username = standaloneUsername;
+      }
+      
+      return profile;
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+    
+    // Fallback: check for standalone username even if profile load fails
+    const standaloneUsername = localStorage.getItem('username');
+    return {
+      ...DEFAULT_PROFILE,
+      username: standaloneUsername || DEFAULT_PROFILE.username
+    };
+  }
+
+  /**
+   * Save user profile to localStorage
+   * CRITICAL: Syncs username to standalone "username" key for backward compatibility
+   */
+  saveProfile() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
+      
+      // BACKWARD COMPATIBILITY: Always sync username to standalone key
+      localStorage.setItem('username', this.profile.username);
+    } catch (error) {
+      console.error('Error saving user profile:', error);
+    }
+  }
+
+  /**
+   * Get current profile
+   */
+  getProfile() {
+    return { ...this.profile };
+  }
+
+  /**
+   * Update username
+   */
+  setUsername(username) {
+    if (!username || !username.trim()) return false;
+    this.profile.username = username.trim();
+    this.saveProfile();
+    return true;
+  }
+
+  /**
+   * Update user's faculty, year, and term
+   * @param {Object} updates - { faculty?, year?, term? }
+   */
+  updateAcademicInfo(updates) {
+    const { faculty, year, term } = updates;
+    
+    if (faculty !== undefined) this.profile.faculty = faculty;
+    if (year !== undefined) this.profile.year = year;
+    if (term !== undefined) this.profile.term = term;
+    
+    this.saveProfile();
+  }
+
+  /**
+   * Check if a course ID is subscribed
+   */
+  isSubscribed(courseId) {
+    return this.profile.subscribedCourseIds.includes(courseId);
+  }
+
+  /**
+   * Subscribe to a course
+   */
+  subscribeToCourse(courseId) {
+    if (!courseId) return false;
+    if (!this.isSubscribed(courseId)) {
+      this.profile.subscribedCourseIds.push(courseId);
+      this.saveProfile();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Unsubscribe from a course
+   */
+  unsubscribeFromCourse(courseId) {
+    const index = this.profile.subscribedCourseIds.indexOf(courseId);
+    if (index > -1) {
+      this.profile.subscribedCourseIds.splice(index, 1);
+      this.saveProfile();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Toggle subscription for a course
+   */
+  toggleSubscription(courseId) {
+    if (this.isSubscribed(courseId)) {
+      return this.unsubscribeFromCourse(courseId);
+    } else {
+      return this.subscribeToCourse(courseId);
+    }
+  }
+
+  /**
+   * Get all subscribed course IDs
+   */
+  getSubscribedCourseIds() {
+    return [...this.profile.subscribedCourseIds];
+  }
+
+  /**
+   * Set subscribed courses (replaces entire array)
+   */
+  setSubscribedCourses(courseIds) {
+    this.profile.subscribedCourseIds = Array.isArray(courseIds) ? [...courseIds] : [];
+    this.saveProfile();
+  }
+
+  /**
+   * Initialize default subscriptions based on academic info
+   * This should be called when user first sets their faculty/year/term
+   */
+  initializeDefaultSubscriptions(categoryTree) {
+    const { faculty, year, term } = this.profile;
+    
+    // Don't auto-subscribe if user hasn't set their info yet
+    if (faculty === 'All' || year === 'All' || term === 'All') {
+      return [];
+    }
+
+    const matchingCourses = [];
+    
+    // Find all courses that match user's academic info
+    Object.values(categoryTree).forEach(category => {
+      // Only consider top-level categories (courses) with metadata
+      if (!category.parent && category.faculty && category.year && category.term) {
+        if (
+          category.faculty === faculty &&
+          category.year === year &&
+          category.term === term &&
+          category.id
+        ) {
+          matchingCourses.push(category.id);
+        }
+      }
+    });
+
+    // Add matching courses to subscriptions (without duplicates)
+    matchingCourses.forEach(courseId => {
+      if (!this.isSubscribed(courseId)) {
+        this.subscribeToCourse(courseId);
+      }
+    });
+
+    return matchingCourses;
+  }
+
+  /**
+   * Reset profile to defaults
+   */
+  reset() {
+    this.profile = { ...DEFAULT_PROFILE };
+    this.saveProfile();
+  }
+}
+
+// Create singleton instance
+export const userProfile = new UserProfileManager();
