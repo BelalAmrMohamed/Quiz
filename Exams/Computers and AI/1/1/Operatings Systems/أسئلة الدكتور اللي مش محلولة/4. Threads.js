@@ -1,0 +1,118 @@
+export const questions = [
+  {
+    q: "How many threads does a traditional, heavyweight process have?",
+    options: ["One single thread of control"],
+    correct: 0,
+    explanation: "Standard processes perform one task at a time.",
+  },
+  {
+    q: "Provide at least three benefits of multithreaded programming.",
+    options: ["Responsiveness, resource sharing, and economy"],
+    correct: 0,
+    explanation:
+      "Threads allow a program to keep running even if part of it is blocked.",
+  },
+  {
+    q: "True or False? Concurrency is only possible with parallelism.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False. Concurrency can exist on a single processor by interleaving execution.",
+  },
+  {
+    q: "True or False? Amdahl's Law addresses the disproportionate effect of the serial portion of a program.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "True. It shows that the speedup is limited by the part of the code that cannot be parallelized.",
+  },
+  {
+    q: "What are the two general types of parallelism?",
+    options: ["Data parallelism and Task parallelism"],
+    correct: 0,
+    explanation:
+      "Data parallelism distributes data across cores; task parallelism distributes different tasks.",
+  },
+  {
+    q: "List the three common ways of mapping user threads to kernel threads.",
+    options: ["Many-to-One, One-to-One, and Many-to-Many"],
+    correct: 0,
+    explanation:
+      "These models determine how the OS manages threads created by the programmer.",
+  },
+  {
+    q: "True or False? Only Linux and Windows implement the one-to-one model.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation: "False. Many modern operating systems use this model.",
+  },
+  {
+    q: "What are the two approaches for implementing a thread library?",
+    options: ["User-space library and Kernel-level library"],
+    correct: 0,
+    explanation:
+      "User-space libraries have no kernel support; kernel-level ones are supported directly by the OS.",
+  },
+  {
+    q: "What are the three main thread libraries in use?",
+    options: ["POSIX Pthreads, Windows threads, and Java threads"],
+    correct: 0,
+    explanation:
+      "These are the primary APIs developers use to create multithreaded apps.",
+  },
+  {
+    q: "True or False? PThreads is only a specification, not an implementation.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "True. Pthreads defines the behavior, and individual systems provide the actual code.",
+  },
+  {
+    q: "What is the PThread API for creating a thread?",
+    options: ["pthread_create()"],
+    correct: 0,
+    explanation: "This function is used to initialize and start a new Pthread.",
+  },
+  {
+    q: "What is the Windows API for creating a thread?",
+    options: ["CreateThread()"],
+    correct: 0,
+    explanation:
+      "This is the primary function for thread creation in the Win32 API.",
+  },
+  {
+    q: "What Java method is used for allocating and initializing a new thread in the JVM?",
+    options: ["start()"],
+    correct: 0,
+    explanation:
+      "Calling start() allocates memory and starts the thread's run() method.",
+  },
+  {
+    q: "Provide at least two techniques for supporting implicit threading.",
+    options: ["Thread pools and OpenMP"],
+    correct: 0,
+    explanation:
+      "Implicit threading lets the compiler or runtime manage threads for the developer.",
+  },
+  {
+    q: "True or False? Grand Central Dispatch only works for Apple's Mac OS X and iOS.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "True. GCD is Apple's specific technology for handling multicore task management.",
+  },
+  {
+    q: "What are the two scenarios for canceling a target thread?",
+    options: ["Asynchronous cancellation and Deferred cancellation"],
+    correct: 0,
+    explanation:
+      "Asynchronous stops immediately; deferred waits for the thread to reach a safe 'cancellation point'.",
+  },
+  {
+    q: "What term does Linux use to refer to a process or a thread?",
+    options: ["Task"],
+    correct: 0,
+    explanation:
+      "The Linux kernel handles processes and threads similarly, calling both 'tasks'.",
+  },
+];

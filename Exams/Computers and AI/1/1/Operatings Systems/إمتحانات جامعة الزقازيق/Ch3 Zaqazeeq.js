@@ -1,0 +1,240 @@
+export const questions = [
+  {
+    q: "Which of the following is NOT a characteristic of a process in an operating system?",
+    options: [
+      "It has a unique process ID.",
+      "It requires system resources.",
+      "It is a single program that can only run on a single CPU.",
+      "It contains a program counter and a stack.",
+    ],
+    correct: 2,
+    explanation:
+      "Modern processes can often run on multiple CPUs (multiprocessing) or have multiple threads.",
+  },
+  {
+    q: "Which of the following is the first step in process creation?",
+    options: [
+      "Allocation of memory",
+      "Loading program into memory",
+      "Assigning a unique process ID",
+      "Creating a process control block (PCB)",
+    ],
+    correct: 2,
+    explanation:
+      "The first step in creating a process is assigning it a unique identification number.",
+  },
+  {
+    q: "Which state does a process enter after being created and before it starts executing?",
+    options: ["Ready", "New", "Running", "Blocked"],
+    correct: 1,
+    explanation:
+      "The 'New' state is where a process is being created before it moves to the ready queue.",
+  },
+  {
+    q: "What is the role of the fork() system call in UNIX?",
+    options: [
+      "It creates a new process by duplicating the calling process.",
+      "It terminates the current process.",
+      "It suspends the current process.",
+      "It waits for a child process to complete.",
+    ],
+    correct: 0,
+    explanation:
+      "The fork() call creates a new child process that is a duplicate of the parent.",
+  },
+  {
+    q: "Which system call is used to terminate a process in UNIX?",
+    options: ["exit()", "fork()", "wait()", "kill()"],
+    correct: 0,
+    explanation:
+      "The exit() system call is used to finish or terminate a process.",
+  },
+  {
+    q: "What is the purpose of the wait() system call in UNIX?",
+    options: [
+      "It waits for the process to enter the running state.",
+      "It makes the parent process wait for the termination of a child process.",
+      "It terminates the current process.",
+      "It blocks the process until an I/O operation is complete.",
+    ],
+    correct: 1,
+    explanation:
+      "The wait() call allows a parent to pause until its child process has finished.",
+  },
+  {
+    q: "Which of the following is the primary function of the long-term scheduler?",
+    options: [
+      "To decide which process to execute next.",
+      "To load processes into memory.",
+      "To select processes from the job pool.",
+      "To allocate CPU time to the processes.",
+    ],
+    correct: 2,
+    explanation:
+      "The long-term scheduler selects processes from a pool to be loaded into memory for execution.",
+  },
+  {
+    q: "What is the state of a process that is ready to run but waiting for CPU time?",
+    options: ["Running", "Blocked", "Ready", "New"],
+    correct: 2,
+    explanation:
+      "A process in the 'Ready' state is prepared to run but is waiting for the CPU to be assigned.",
+  },
+  {
+    q: "What is the main purpose of the process scheduler in an operating system?",
+    options: [
+      "To assign priorities to processes.",
+      "To select the next process to be executed by the CPU.",
+      "To allocate memory to processes.",
+      "To handle I/O operations for processes.",
+    ],
+    correct: 1,
+    explanation:
+      "The scheduler decides which process gets to use the CPU next.",
+  },
+  {
+    q: "What happens when the system call fork() is executed in a UNIX-like operating system?",
+    options: [
+      "A new child process is created, which is identical to the parent process.",
+      "The current process is replaced by a new program.",
+      "The parent process is suspended, and the child process runs.",
+      "The parent process is terminated.",
+    ],
+    correct: 0,
+    explanation:
+      "Executing fork() results in a child process that is a copy of the parent process.",
+  },
+  {
+    q: "What is the role of the short-term scheduler in an operating system?",
+    options: [
+      "It selects processes for execution from the ready queue.",
+      "It creates new processes.",
+      "It loads the program into memory.",
+      "It manages long-term process scheduling.",
+    ],
+    correct: 0,
+    explanation:
+      "The short-term scheduler selects a process from the ready queue to give it the CPU.",
+  },
+  {
+    q: "Which of the following is an example of a long-term scheduler's action?",
+    options: [
+      "Deciding which process to load from the disk into memory.",
+      "Allocating CPU time to a process.",
+      "Switching between running processes.",
+      "Managing process queues.",
+    ],
+    correct: 0,
+    explanation:
+      "The long-term scheduler handles loading processes from the disk to memory.",
+  },
+  {
+    q: "A process in the ready state is waiting for I/O operations to complete. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  A process waiting for I/O is in the 'Waiting' or 'Blocked' state, not 'Ready'.",
+  },
+  {
+    q: "The process scheduler is responsible for moving processes between the ready and running states. (T or F)",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "True.  The scheduler chooses ready processes to run on the CPU.",
+  },
+  {
+    q: "A parent process cannot terminate until all of its child processes have terminated. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  In some systems, a parent can terminate before its children, though it is not ideal.",
+  },
+  {
+    q: "A process can directly access hardware resources without the intervention of the operating system. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  The operating system must manage and intervene in hardware access for security and coordination.",
+  },
+  {
+    q: "The main role of the long-term scheduler is to allocate CPU time to processes. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  Allocating CPU time is the job of the short-term scheduler.",
+  },
+  {
+    q: "The process control block (PCB) stores the state of the process, including the contents of CPU registers. (T or F)",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "True.  The PCB acts as a data structure to store all information needed to manage a process.",
+  },
+  {
+    q: "A parent process cannot perform any action until its child process has completed execution. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  Parents and children can run concurrently unless the parent specifically calls wait().",
+  },
+  {
+    q: "Process is a passive entity stored on disk. (T or F)",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "False.  A program is a passive entity; a process is an active entity.",
+  },
+  {
+    q: "List the different states of a process in an operating system.",
+    options: ["New, Ready, Running, Waiting (Blocked), and Terminated."],
+    correct: 0,
+    explanation:
+      "As a process executes, it moves through several distinct states: **new** (the process is being created), **ready** (waiting to be assigned to a processor), **running** (instructions are being executed), **waiting** (waiting for an event such as I/O completion), and **terminated** (execution has finished) [1].",
+  },
+  {
+    q: "State the purpose of a Process Control Block (PCB).",
+    options: [
+      "Process identification, Program counter, CPU scheduling, and Memory-management.",
+    ],
+    correct: 0,
+    explanation:
+      "The PCB, also known as a **task control block**, contains all the information needed to manage a process, including its current state, CPU registers, memory-management information, and I/O status [1, 2]. This allows the operating system to perform **context switching** by saving the state of a current process and reloading the state of another [3, 4].",
+  },
+  {
+    q: "State the role of the short-term scheduler in process management.",
+    options: [
+      "Selects which process should be executed next and allocates CPU.",
+    ],
+    correct: 0,
+    explanation:
+      "The **short-term scheduler** (or CPU scheduler) picks a process from the **ready queue** and allocates the CPU to it [5, 6]. Because this scheduler is invoked very frequently—often every few milliseconds—it must be exceptionally **fast** to minimize overhead [5].",
+  },
+  {
+    q: "List the different types of process schedulers.",
+    options: ["Short term, long term, and medium term."],
+    correct: 0,
+    explanation:
+      "The **short-term scheduler** selects processes for CPU execution, the **long-term scheduler** determines which processes are brought into the ready queue to control the degree of multiprogramming, and the **medium-term scheduler** can decrease that degree by swapping processes in and out of memory [5, 7, 8].",
+  },
+  {
+    q: "List the scheduling queues of processes.",
+    options: ["Job queue, ready queue, and device queue."],
+    correct: 0,
+    explanation:
+      "The operating system maintains a **job queue** for all processes, a **ready queue** for processes in main memory that are ready to execute, and various **device queues** for processes waiting for specific I/O devices [9]. Processes migrate between these queues throughout their lifecycle as their needs change [9].",
+  },
+  {
+    q: "State Advantages of process cooperation (at least three).",
+    options: ["Information sharing, Computation speedup, and modularity."],
+    correct: 0,
+    explanation:
+      "Cooperating processes provide **information sharing** for common data, **computation speedup** by breaking tasks into subtasks that run in parallel across multiple cores, and **modularity** by dividing system functions into separate processes or threads [10-12].",
+  },
+  {
+    q: "What are the main types of pipes?",
+    options: ["Ordinary pipe and named pipe."],
+    correct: 0,
+    explanation:
+      "Pipes act as conduits for communication between processes; **ordinary pipes** are typically used for communication between a parent and its child and cannot be accessed externally, while **named pipes** (as listed in your options) are a standard mechanism for more flexible process communication [13]. Ordinary pipes are restricted in that they generally require a relationship between the communicating processes [13].",
+  },
+];

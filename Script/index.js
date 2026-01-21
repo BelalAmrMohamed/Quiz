@@ -7,7 +7,9 @@ import {
   getSubscribedCourses,
   getAllRootCourses,
   courseMatchesFilters,
-  getCourseItemCount
+  getCourseItemCount,
+  getAvailableYears,
+  getAvailableTerms
 } from "./filterUtils.js";
 
 const container = document.getElementById("contentArea");
@@ -74,6 +76,13 @@ window.openProfileSettings = function() {
   const modalCard = document.createElement('div');
   modalCard.className = 'modal-card profile-modal';
 
+  // Get available years and terms for current selection
+  const availableYears = profile.faculty === 'All' 
+    ? metadata.years 
+    : getAvailableYears(categoryTree, profile.faculty);
+  
+  const availableTerms = getAvailableTerms(categoryTree, profile.faculty, profile.year);
+
   modalCard.innerHTML = `
     <h2>⚙️ Profile Settings</h2>
     
@@ -107,7 +116,7 @@ window.openProfileSettings = function() {
           <label for="profileYear">Year</label>
           <select id="profileYear" class="profile-select">
             <option value="All">All Years</option>
-            ${metadata.years.map(y => 
+            ${availableYears.map(y => 
               `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
             ).join('')}
           </select>
@@ -117,7 +126,7 @@ window.openProfileSettings = function() {
           <label for="profileTerm">Term</label>
           <select id="profileTerm" class="profile-select">
             <option value="All">All Terms</option>
-            ${metadata.terms.map(t => 
+            ${availableTerms.map(t => 
               `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
             ).join('')}
           </select>
@@ -138,11 +147,73 @@ window.openProfileSettings = function() {
   modal.appendChild(modalCard);
   document.body.appendChild(modal);
 
+  // Setup cascading dropdown listeners for Profile Settings
+  setupProfileDropdownCascade();
+
   // Close on overlay click
   modal.addEventListener('click', (e) => {
     if (e.target === modal) window.closeProfileModal();
   });
 };
+
+/**
+ * Setup cascading dropdown behavior for Profile Settings modal
+ */
+function setupProfileDropdownCascade() {
+  const facultySelect = document.getElementById('profileFaculty');
+  const yearSelect = document.getElementById('profileYear');
+  const termSelect = document.getElementById('profileTerm');
+
+  if (!facultySelect || !yearSelect || !termSelect) return;
+
+  // When faculty changes, update year and term dropdowns
+  facultySelect.addEventListener('change', () => {
+    const selectedFaculty = facultySelect.value;
+    
+    // Update year dropdown
+    const availableYears = selectedFaculty === 'All' 
+      ? extractMetadata(categoryTree).years 
+      : getAvailableYears(categoryTree, selectedFaculty);
+    
+    const currentYear = yearSelect.value;
+    yearSelect.innerHTML = '<option value="All">All Years</option>' + 
+      availableYears.map(y => 
+        `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
+      ).join('');
+    
+    // Restore selection if still valid, otherwise reset to "All"
+    if (availableYears.includes(currentYear)) {
+      yearSelect.value = currentYear;
+    } else {
+      yearSelect.value = 'All';
+    }
+    
+    // Trigger year change to update terms
+    yearSelect.dispatchEvent(new Event('change'));
+  });
+
+  // When year changes, update term dropdown
+  yearSelect.addEventListener('change', () => {
+    const selectedFaculty = facultySelect.value;
+    const selectedYear = yearSelect.value;
+    
+    // Update term dropdown
+    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
+    
+    const currentTerm = termSelect.value;
+    termSelect.innerHTML = '<option value="All">All Terms</option>' + 
+      availableTerms.map(t => 
+        `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
+      ).join('');
+    
+    // Restore selection if still valid, otherwise reset to "All"
+    if (availableTerms.includes(currentTerm)) {
+      termSelect.value = currentTerm;
+    } else {
+      termSelect.value = 'All';
+    }
+  });
+}
 
 window.saveProfileSettings = function() {
   const username = document.getElementById('profileUsername')?.value;
@@ -195,6 +266,13 @@ window.openCourseManager = function() {
   const modalCard = document.createElement('div');
   modalCard.className = 'modal-card course-manager-modal';
 
+  // Get available years and terms for current profile selection
+  const availableYears = profile.faculty === 'All' 
+    ? metadata.years 
+    : getAvailableYears(categoryTree, profile.faculty);
+  
+  const availableTerms = getAvailableTerms(categoryTree, profile.faculty, profile.year);
+
   modalCard.innerHTML = `
     <h2>📚 Manage Your Courses</h2>
     <p class="course-manager-hint">Select courses you want to see on your dashboard</p>
@@ -209,14 +287,14 @@ window.openCourseManager = function() {
 
       <select id="cmYear" class="course-filter-select">
         <option value="All">All Years</option>
-        ${metadata.years.map(y => 
+        ${availableYears.map(y => 
           `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
         ).join('')}
       </select>
 
       <select id="cmTerm" class="course-filter-select">
         <option value="All">All Terms</option>
-        ${metadata.terms.map(t => 
+        ${availableTerms.map(t => 
           `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
         ).join('')}
       </select>
@@ -236,19 +314,84 @@ window.openCourseManager = function() {
   modal.appendChild(modalCard);
   document.body.appendChild(modal);
 
+  // Setup cascading dropdown listeners for Course Manager
+  setupCourseManagerDropdownCascade();
+
   // Render initial course list
   renderCourseManagerList();
-
-  // Add filter change listeners
-  ['cmFaculty', 'cmYear', 'cmTerm'].forEach(id => {
-    document.getElementById(id)?.addEventListener('change', renderCourseManagerList);
-  });
 
   // Close on overlay click
   modal.addEventListener('click', (e) => {
     if (e.target === modal) window.closeCourseManager();
   });
 };
+
+/**
+ * Setup cascading dropdown behavior for Course Manager modal
+ */
+function setupCourseManagerDropdownCascade() {
+  const facultySelect = document.getElementById('cmFaculty');
+  const yearSelect = document.getElementById('cmYear');
+  const termSelect = document.getElementById('cmTerm');
+
+  if (!facultySelect || !yearSelect || !termSelect) return;
+
+  // When faculty changes, update year and term dropdowns
+  facultySelect.addEventListener('change', () => {
+    const selectedFaculty = facultySelect.value;
+    
+    // Update year dropdown
+    const availableYears = selectedFaculty === 'All' 
+      ? extractMetadata(categoryTree).years 
+      : getAvailableYears(categoryTree, selectedFaculty);
+    
+    const currentYear = yearSelect.value;
+    yearSelect.innerHTML = '<option value="All">All Years</option>' + 
+      availableYears.map(y => 
+        `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
+      ).join('');
+    
+    // Restore selection if still valid, otherwise reset to "All"
+    if (availableYears.includes(currentYear)) {
+      yearSelect.value = currentYear;
+    } else {
+      yearSelect.value = 'All';
+    }
+    
+    // Trigger year change to update terms
+    yearSelect.dispatchEvent(new Event('change'));
+  });
+
+  // When year changes, update term dropdown
+  yearSelect.addEventListener('change', () => {
+    const selectedFaculty = facultySelect.value;
+    const selectedYear = yearSelect.value;
+    
+    // Update term dropdown
+    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
+    
+    const currentTerm = termSelect.value;
+    termSelect.innerHTML = '<option value="All">All Terms</option>' + 
+      availableTerms.map(t => 
+        `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
+      ).join('');
+    
+    // Restore selection if still valid, otherwise reset to "All"
+    if (availableTerms.includes(currentTerm)) {
+      termSelect.value = currentTerm;
+    } else {
+      termSelect.value = 'All';
+    }
+    
+    // Re-render course list after cascade updates
+    renderCourseManagerList();
+  });
+
+  // When term changes, re-render course list
+  termSelect.addEventListener('change', () => {
+    renderCourseManagerList();
+  });
+}
 
 function renderCourseManagerList() {
   const listContainer = document.getElementById('courseManagerList');
@@ -348,7 +491,7 @@ function renderRootCategories() {
 
   const fragment = document.createDocumentFragment();
 
-  // Action buttons at top
+  // // Action buttons at top
   // const actionBar = document.createElement('div');
   // actionBar.className = 'dashboard-actions';
   // actionBar.innerHTML = `

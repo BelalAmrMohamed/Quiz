@@ -1,0 +1,281 @@
+export const questions = [
+  // ... previous 25 questions
+  {
+    q: "Which organization created the OSI model?",
+    options: ["IEEE", "ISO", "ANSI", "IETF"],
+    correct: 1,
+    explanation:
+      "The International Organization for Standardization (ISO) developed the OSI model in 1984.",
+  },
+  {
+    q: "How many layers are in the OSI model?",
+    options: ["5", "6", "7", "8"],
+    correct: 2,
+    explanation:
+      "The OSI model consists of 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, and Application.",
+  },
+  {
+    q: "Which OSI layer is responsible for converting data into a format suitable for transmission (including encryption and compression)?",
+    options: ["Application", "Presentation", "Session", "Transport"],
+    correct: 1,
+    explanation:
+      "The Presentation layer ensures that data is in a usable format and is where data encryption occurs.",
+  },
+  {
+    q: "Which OSI layer handles logical addressing (like IP addresses)?",
+    options: ["Network", "Data Link", "Physical", "Transport"],
+    correct: 0,
+    explanation: "The Network layer handles logical addressing and routing.",
+  },
+  {
+    q: "Which layer of the OSI model is responsible for establishing, managing, and terminating connections?",
+    options: ["Session", "Transport", "Network", "Presentation"],
+    correct: 0,
+    explanation:
+      "The Session layer manages the sessions (connections) between different applications.",
+  },
+  {
+    q: "The Data Link layer is also known as which layer in the TCP/IP model?",
+    options: ["Internet", "Network Interface", "Application", "Transport"],
+    correct: 1,
+    explanation:
+      "In the 4-layer TCP/IP model, the Link layer (or Network Interface) combines the OSI Physical and Data Link layers.",
+  },
+  {
+    q: "Which layer of the OSI model deals with voltage levels and cable specifications?",
+    options: ["Physical", "Data Link", "Network", "Transport"],
+    correct: 0,
+    explanation:
+      "The Physical layer defines hardware, cabling, and the electrical signals used to transmit bits.",
+  },
+  {
+    q: "Which TCP/IP layer corresponds to the Transport layer in OSI?",
+    options: ["Application", "Transport", "Internet", "Link"],
+    correct: 1,
+    explanation:
+      "The Transport layer in both models handles end-to-end communication (TCP/UDP).",
+  },
+  {
+    q: "Which device operates at the Network layer?",
+    options: ["Switch", "Hub", "Router", "Repeater"],
+    correct: 2,
+    explanation:
+      "Routers use IP addresses at the Network layer to determine the best path for data packets.",
+  },
+  {
+    q: "Encapsulation adds information to data as it travels ______ the OSI stack.",
+    options: ["Up", "Down", "Laterally", "None"],
+    correct: 1,
+    explanation:
+      "As data moves from Application down to Physical, each layer adds its own header (encapsulation).",
+  },
+  {
+    q: "Which OSI layer ensures end-to-end communication and data segmentation?",
+    options: ["Transport", "Network", "Session", "Data Link"],
+    correct: 0,
+    explanation:
+      "The Transport layer is responsible for breaking data into segments and ensuring reliable delivery.",
+  },
+  {
+    q: "Which protocol operates at the Application layer?",
+    options: ["TCP", "IP", "HTTP", "Ethernet"],
+    correct: 2,
+    explanation: "HTTP is used by web browsers at the Application layer.",
+  },
+  {
+    q: "Which layer is responsible for detecting and correcting Physical layer errors?",
+    options: ["Data Link", "Network", "Transport", "Session"],
+    correct: 0,
+    explanation:
+      "The Data Link layer uses frames and checksums (FCS) to detect errors in the physical transmission.",
+  },
+  {
+    q: "Which of the following is not a layer in the TCP/IP model?",
+    options: ["Application", "Presentation", "Internet", "Link"],
+    correct: 1,
+    explanation:
+      "The TCP/IP model does not have a separate Presentation or Session layer; these functions are handled by the Application layer.",
+  },
+  {
+    q: "The OSI model is primarily used today as:",
+    options: [
+      "A strict implementation guide",
+      "A way to describe network architecture",
+      "A replacement for TCP/IP",
+      "A hardware standard",
+    ],
+    correct: 1,
+    explanation:
+      "The OSI model is a theoretical reference model used for teaching and troubleshooting.",
+  },
+  {
+    q: "Which layer translates data between network and application formats?",
+    options: ["Presentation", "Session", "Application", "Transport"],
+    correct: 0,
+    explanation: "The Presentation layer acts as a translator for the network.",
+  },
+  {
+    q: "Which layer uses MAC addresses?",
+    options: ["Network", "Data Link", "Physical", "Transport"],
+    correct: 1,
+    explanation:
+      "Media Access Control (MAC) addresses are used at Layer 2 (Data Link).",
+  },
+  {
+    q: "In TCP/IP, which layer combines OSI’s Presentation and Session layers?",
+    options: ["Application", "Transport", "Internet", "Link"],
+    correct: 0,
+    explanation:
+      "The Application layer in TCP/IP encompasses the top three layers of the OSI model.",
+  },
+  {
+    q: "Which OSI layer provides node-to-node connectivity?",
+    options: ["Data Link", "Network", "Physical", "Transport"],
+    correct: 0,
+    explanation:
+      "The Data Link layer handles communication between two directly connected nodes.",
+  },
+  {
+    q: "Which TCP/IP layer includes HTTP and FTP?",
+    options: ["Application", "Transport", "Internet", "Link"],
+    correct: 0,
+    explanation:
+      "High-level protocols like HTTP and FTP reside in the Application layer.",
+  },
+  {
+    q: "Which OSI layer is closest to the user?",
+    options: ["Physical", "Application", "Network", "Session"],
+    correct: 1,
+    explanation:
+      "The Application layer interacts directly with software applications used by humans.",
+  },
+  {
+    q: "Which of these is a Transport layer protocol?",
+    options: ["IP", "TCP", "Ethernet", "HTTP"],
+    correct: 1,
+    explanation:
+      "TCP (Transmission Control Protocol) is the primary Layer 4 protocol.",
+  },
+  {
+    q: "Which OSI layer manages dialogues between applications?",
+    options: ["Session", "Presentation", "Application", "Transport"],
+    correct: 0,
+    explanation:
+      "The Session layer establishes and checkpoints dialogues between hosts.",
+  },
+  {
+    q: "Which TCP/IP layer handles routing and logical addressing?",
+    options: ["Link", "Internet", "Transport", "Application"],
+    correct: 1,
+    explanation:
+      "The Internet layer of TCP/IP is equivalent to the OSI Network layer.",
+  },
+  {
+    q: "Which device works at the Data Link layer?",
+    options: ["Router", "Switch", "Hub", "Gateway"],
+    correct: 1,
+    explanation: "Switches process frames based on MAC addresses at Layer 2.",
+  },
+  {
+    q: "Which OSI layer is responsible for breaking data into segments?",
+    options: ["Transport", "Network", "Data Link", "Physical"],
+    correct: 0,
+    explanation: "Data is called 'Segments' at the Transport layer.",
+  },
+  {
+    q: "In the OSI model, the PDU at the Network layer is called:",
+    options: ["Frame", "Packet", "Segment", "Bit"],
+    correct: 1,
+    explanation:
+      "PDU stands for Protocol Data Unit; it is a 'Packet' at the Network layer.",
+  },
+  {
+    q: "Which model is actually implemented in modern networks?",
+    options: ["OSI model", "TCP/IP model", "Both equally", "Neither"],
+    correct: 1,
+    explanation:
+      "While we use OSI for reference, the internet and modern networks run on the TCP/IP stack.",
+  },
+  {
+    q: "Which layer of the OSI model performs encryption and decryption?",
+    options: ["Application", "Presentation", "Session", "Transport"],
+    correct: 1,
+    explanation: "Encryption is a key function of the Presentation layer.",
+  },
+  {
+    q: "The process of removing headers/trailers as data moves up the OSI stack is called:",
+    options: ["Encapsulation", "Decapsulation", "Segmentation", "Translation"],
+    correct: 1,
+    explanation:
+      "Decapsulation is the reverse of encapsulation, occurring at the receiving host.",
+  },
+  // True or False Questions
+  {
+    q: "True or False: The OSI model was created by the IEEE.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "It was created by ISO (International Organization for Standardization).",
+  },
+  {
+    q: "True or False: The TCP/IP model has 5 layers.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "The standard TCP/IP model has 4 layers (though some variations use 5).",
+  },
+  {
+    q: "True or False: The Transport layer in OSI is responsible for logical addressing.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "Logical addressing is the responsibility of the Network layer.",
+  },
+  {
+    q: "True or False: Routers operate at the Network layer.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Routers route packets using Layer 3 (Network) IP addresses.",
+  },
+  {
+    q: "True or False: The Presentation layer handles encryption.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Data representation, including encryption, is handled at Layer 6.",
+  },
+  {
+    q: "True or False: The Physical layer deals with MAC addressing.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation: "MAC addressing occurs at the Data Link layer (Layer 2).",
+  },
+  {
+    q: "True or False: The TCP/IP model’s Application layer includes OSI’s Application, Presentation, and Session layers.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Correct. The TCP/IP Application layer handles all top-level functions.",
+  },
+  {
+    q: "True or False: Encapsulation happens as data moves up the OSI stack.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "Encapsulation happens as data moves DOWN; Decapsulation happens as it moves UP.",
+  },
+  {
+    q: "True or False: The Data Link layer provides end-to-end communication.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "The Data Link layer provides hop-to-hop communication; Transport provides end-to-end.",
+  },
+  {
+    q: "True or False: HTTP is an Application layer protocol in TCP/IP.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "HTTP is one of the most common protocols at the Application layer.",
+  },
+];

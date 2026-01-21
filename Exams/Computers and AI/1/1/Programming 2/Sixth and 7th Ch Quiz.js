@@ -1,0 +1,155 @@
+export const questions = [
+  {
+    q: "What does the 'Cascading' in Cascading Style Sheets (CSS) refer to?",
+    options: [
+      "The way images flow around text",
+      "The process of combining multiple style sheets and resolving conflicts between them",
+      "The method of downloading files from a server",
+      "A specific type of font animation",
+    ],
+    correct: 1,
+    explanation:
+      "Cascading means style information is passed down from higher-level sheets until overridden by a command with more weight, resolving conflicts during the process [1].",
+  },
+  {
+    q: "Which organization created CSS to solve formatting problems in HTML?",
+    options: [
+      "IEEE",
+      "Microsoft",
+      "The World Wide Web Consortium (W3C)",
+      "Google",
+    ],
+    correct: 2,
+    explanation:
+      "To solve the nightmare of manual formatting in early HTML versions, the W3C created CSS [2].",
+  },
+  {
+    q: "What are the three ways to insert a style sheet into an HTML document?",
+    options: [
+      "Direct, Indirect, and External",
+      "Internal, External, and Inline",
+      "Header, Body, and Footer",
+      "Linked, Embedded, and Attached",
+    ],
+    correct: 1,
+    explanation:
+      "Styles can be inserted via an external style sheet, an internal style sheet, or inline styles [3].",
+  },
+  {
+    q: "Which HTML tag is used to link an external CSS file to an HTML page?",
+    options: ["<style>", "<link>", "<css>", "<script>"],
+    correct: 1,
+    explanation:
+      "The <link> tag is used in the head section to define an external style sheet [4-6].",
+  },
+  {
+    q: "In CSS syntax, what does the 'declaration block' contain?",
+    options: [
+      "The HTML element name only",
+      "One or more declarations separated by semicolons, each with a property and a value",
+      "The file path to the image",
+      "A list of all linked JavaScript files",
+    ],
+    correct: 1,
+    explanation:
+      "A declaration block contains one or more declarations (e.g., color: red;) separated by semicolons [7].",
+  },
+  {
+    q: "What is the correct way to write a comment in CSS?",
+    options: ["// comment", "<!-- comment -->", "/* comment */", "' comment"],
+    correct: 2,
+    explanation: "A CSS comment starts with /* and ends with */ [8].",
+  },
+  {
+    q: "If a font name consists of more than one word, how should it be written in the font-family property?",
+    options: [
+      "Separated by dashes",
+      "Enclosed in quotation marks",
+      "Capitalized only",
+      "Linked with underscores",
+    ],
+    correct: 1,
+    explanation:
+      "If the name of a font family is more than one word, it must be in quotation marks, such as 'Times New Roman' [9, 10].",
+  },
+  {
+    q: "How many pixels (px) are typically equal to 1 em in the default browser setting?",
+    options: ["10px", "12px", "14px", "16px"],
+    correct: 3,
+    explanation: "The default size for 1em is 16px [11].",
+  },
+  {
+    q: "What are the four components of the CSS Box Model, starting from the innermost layer?",
+    options: [
+      "Margin, Border, Padding, Content",
+      "Content, Padding, Border, Margin",
+      "Padding, Margin, Content, Border",
+      "Border, Margin, Padding, Content",
+    ],
+    correct: 1,
+    explanation:
+      "The box model consists of content, padding, border, and margin [12, 13].",
+  },
+  {
+    q: "Which CSS property is used to create space around elements, inside any defined borders?",
+    options: ["margin", "spacing", "padding", "border-width"],
+    correct: 2,
+    explanation:
+      "Padding clears an area around the content inside the border, while margin clears space outside the border [5, 6, 13, 14].",
+  },
+  {
+    q: "When using the shorthand padding property 'padding: 25px 50px 75px 100px;', what is the correct order of the sides?",
+    options: [
+      "Top, Left, Bottom, Right",
+      "Top, Right, Bottom, Left",
+      "Bottom, Top, Left, Right",
+      "Left, Right, Top, Bottom",
+    ],
+    correct: 1,
+    explanation:
+      "The shorthand order for four values is Top, Right, Bottom, and then Left [15].",
+  },
+  {
+    q: "Which style insertion method has the highest priority (is the most powerful) in the cascading order?",
+    options: [
+      "External style sheet",
+      "Browser default",
+      "Inline style",
+      "Internal style sheet",
+    ],
+    correct: 2,
+    explanation:
+      "Inline styles (inside an HTML element) have the highest priority, followed by internal, then external, and finally browser defaults [16].",
+  },
+  {
+    q: "Which of the following properties is NOT typically inherited by child elements from their parents?",
+    options: ["color", "font-family", "margin", "text-align"],
+    correct: 2,
+    explanation:
+      "While properties like color and font-family are inherited, layout properties like margin, padding, border, and background-color are not [17].",
+  },
+  {
+    q: "In CSS, how do you select elements with the class name 'menu'?",
+    options: ["#menu", "menu", ".menu", "*menu"],
+    correct: 2,
+    explanation:
+      "Classes are defined and selected using a period (.) followed by the class name [18-20].",
+  },
+  {
+    q: "Which symbol is used for the universal selector, which affects all elements on a page?",
+    options: ["#", ".", ">", "*"],
+    correct: 3,
+    explanation:
+      "The universal selector is represented by the asterisk (*) symbol [18].",
+  },
+];
+
+/*
+analogy
+To understand the **CSS Box Model**, 
+imagine you are mailing a delicate gift in a box. 
+The **Gift** itself is the **Content**. The **Bubble Wrap** 
+you wrap around the gift to keep it safe inside the box is the **Padding**. 
+The **Cardboard Box** that contains everything is the **Border**. Finally, the **Empty Space** 
+you leave on your porch so the delivery driver has room to set the box down is the **Margin**.
+*/

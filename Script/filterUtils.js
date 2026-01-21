@@ -37,6 +37,75 @@ export function extractMetadata(categoryTree) {
   }
   
   /**
+   * Get available years for a specific faculty (cascading filter)
+   * @param {Object} categoryTree - The category tree
+   * @param {string} faculty - Selected faculty ('All' or specific faculty)
+   * @returns {Array} Array of available years
+   */
+  export function getAvailableYears(categoryTree, faculty) {
+    const years = new Set();
+  
+    Object.values(categoryTree).forEach(category => {
+      if (!category.parent && category.year) {
+        // If "All" is selected, include all years
+        if (faculty === 'All') {
+          years.add(category.year);
+        } 
+        // Otherwise, only include years for the selected faculty
+        else if (category.faculty === faculty) {
+          years.add(category.year);
+        }
+      }
+    });
+  
+    return Array.from(years).sort((a, b) => {
+      const numA = parseInt(a);
+      const numB = parseInt(b);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+  }
+  
+  /**
+   * Get available terms for a specific faculty and year (cascading filter)
+   * @param {Object} categoryTree - The category tree
+   * @param {string} faculty - Selected faculty ('All' or specific faculty)
+   * @param {string} year - Selected year ('All' or specific year)
+   * @returns {Array} Array of available terms
+   */
+  export function getAvailableTerms(categoryTree, faculty, year) {
+    const terms = new Set();
+  
+    Object.values(categoryTree).forEach(category => {
+      if (!category.parent && category.term) {
+        // If both faculty and year are "All", include all terms
+        if (faculty === 'All' && year === 'All') {
+          terms.add(category.term);
+        }
+        // If only faculty is "All", filter by year
+        else if (faculty === 'All' && category.year === year) {
+          terms.add(category.term);
+        }
+        // If only year is "All", filter by faculty
+        else if (year === 'All' && category.faculty === faculty) {
+          terms.add(category.term);
+        }
+        // If both are specified, filter by both
+        else if (category.faculty === faculty && category.year === year) {
+          terms.add(category.term);
+        }
+      }
+    });
+  
+    return Array.from(terms).sort((a, b) => {
+      const numA = parseInt(a);
+      const numB = parseInt(b);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+  }
+  
+  /**
    * Filter courses based on faculty, year, and term
    * Supports "All" option for each filter
    */
