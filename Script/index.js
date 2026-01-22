@@ -683,8 +683,142 @@ function createExamCard(exam) {
     }
 
     if (format === "quiz") {
-      const qJson = JSON.stringify(questions);
-      const quizHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${config.title || "Practice Quiz"}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}.container{max-width:800px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:30px;text-align:center}.header h1{font-size:28px;margin-bottom:10px}.header p{opacity:.9;font-size:14px}.quiz-body{padding:30px}.question-card{background:#f8f9fa;border-radius:12px;padding:25px;margin-bottom:25px;border:2px solid #e9ecef}.question-card.answered{border-color:#667eea}.question-num{color:#667eea;font-weight:700;font-size:14px;margin-bottom:15px}.question-text{font-size:18px;font-weight:600;margin-bottom:20px;color:#2d3748;line-height:1.6}.options{display:flex;flex-direction:column;gap:12px}.option-btn{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:15px 20px;text-align:left;cursor:pointer;transition:all .3s ease;font-size:16px;color:#2d3748}.option-btn:hover{border-color:#667eea;background:#f0f4ff;transform:translateX(5px)}.option-btn.selected{background:#667eea;color:#fff;border-color:#667eea}.option-btn.correct{background:#48bb78;color:#fff;border-color:#48bb78}.option-btn.wrong{background:#f56565;color:#fff;border-color:#f56565}.option-btn.disabled{cursor:not-allowed;opacity:.6}.essay-input{width:100%;min-height:120px;padding:15px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:15px;resize:vertical}.essay-input:focus{outline:0;border-color:#667eea}.controls{display:flex;gap:15px;justify-content:center;padding:20px;background:#f8f9fa;flex-wrap:wrap}.btn{padding:12px 30px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s}.btn-primary{background:#667eea;color:#fff}.btn-primary:hover{background:#5a67d8;transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,.4)}.btn-secondary{background:#e2e8f0;color:#2d3748}.btn-secondary:hover{background:#cbd5e0}.results{padding:30px;text-align:center;display:none}.results.show{display:block}.score-circle{width:150px;height:150px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff}.score-circle.pass{background:linear-gradient(135deg,#48bb78,#38a169)}.score-circle.fail{background:linear-gradient(135deg,#f56565,#e53e3e)}.explanation{background:#ebf8ff;border-left:4px solid #4299e1;padding:15px;margin-top:15px;border-radius:8px;font-size:14px;color:#2c5282;display:none}.explanation.show{display:block}@media(max-width:600px){.container{border-radius:0}.header{padding:20px}.quiz-body{padding:20px}}</style></head><body><div class="container"><div class="header"><h1>${config.title || "Practice Quiz"}</h1><p>Total Questions: ${questions.length} | Practice Mode</p></div><div id="quizBody" class="quiz-body"></div><div class="controls"><button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset Quiz</button><button class="btn btn-primary" onclick="submitQuiz()">✓ Submit Quiz</button></div><div id="results" class="results"></div></div><script>const questions=${qJson};let userAnswers=new Array(questions.length).fill(null);let submitted=false;function isEssayQuestion(q){return q.options&&q.options.length===1}function renderQuiz(){const quizBody=document.getElementById("quizBody");let html="";questions.forEach((q,index)=>{const isEssay=isEssayQuestion(q);html+='<div class="question-card" id="q'+index+'"><div class="question-num">Question '+(index+1)+'</div><div class="question-text">'+esc(q.q)+'</div>';if(isEssay){html+='<textarea class="essay-input" id="essay'+index+'" placeholder="Type your answer here..." oninput="saveEssayAnswer('+index+', this.value)">'+(userAnswers[index]||"")+"</textarea>"}else{html+='<div class="options">';q.options.forEach((opt,i)=>{const letter=String.fromCharCode(65+i);html+='<button class="option-btn" id="btn'+index+'_'+i+'" onclick="selectAnswer('+index+','+i+')"><strong>'+letter+'.</strong> '+esc(opt)+"</button>"});html+="</div>"}if(q.explanation){html+='<div class="explanation" id="exp'+index+'"><strong>💡 Explanation:</strong> '+esc(q.explanation)+"</div>"}html+="</div>"});quizBody.innerHTML=html}function escapeHTML(str){if(str==null)return"";const div=document.createElement(\"div\");div.textContent=str;return div.innerHTML}const esc=escapeHTML;function selectAnswer(qIndex,optIndex){if(submitted)return;userAnswers[qIndex]=optIndex;const card=document.getElementById(\"q\"+qIndex);card.classList.add(\"answered\");card.querySelectorAll(\".option-btn\").forEach((btn,i)=>{btn.classList.remove(\"selected\");if(i===optIndex)btn.classList.add(\"selected\")})}function saveEssayAnswer(qIndex,value){userAnswers[qIndex]=value.trim()||null;const card=document.getElementById(\"q\"+qIndex);if(value.trim())card.classList.add(\"answered\");else card.classList.remove(\"answered\")}function submitQuiz(){if(submitted)return;submitted=true;let correct=0,totalScorable=0;questions.forEach((q,index)=>{if(isEssayQuestion(q))return;totalScorable++;const userAns=userAnswers[index];const isCorrect=userAns===q.correct;if(isCorrect)correct++;const card=document.getElementById(\"q\"+index);card.querySelectorAll(\".option-btn\").forEach((btn,i)=>{btn.classList.add(\"disabled\");if(i===q.correct)btn.classList.add(\"correct\");else if(i===userAns&&!isCorrect)btn.classList.add(\"wrong\")});const exp=document.getElementById(\"exp\"+index);if(exp)exp.classList.add(\"show\")});const pct=totalScorable>0?Math.round((correct/totalScorable)*100):0;const resultsDiv=document.getElementById(\"results\");resultsDiv.innerHTML='<div class="score-circle '+(pct>=70?"pass":"fail")+'">'+pct+'%</div><h2>'+(pct>=70?"Great Job!":"Keep Practicing!")+"</h2><p style=\"margin-top:15px;font-size:18px;color:#4a5568\">Score: "+correct+" / "+totalScorable+'</p><p style="margin-top:10px;color:#718096">Scroll up to review explanations</p>';resultsDiv.classList.add(\"show\");resultsDiv.scrollIntoView({behavior:\"smooth\",block:\"center\"})}function resetQuiz(){submitted=false;userAnswers=new Array(questions.length).fill(null);document.getElementById(\"results\").classList.remove(\"show\");renderQuiz();window.scrollTo({top:0,behavior:\"smooth\"})}renderQuiz();</script></body></html>`;
+      const qJson = JSON.stringify(questions).replace(/<\/script/gi, "<\\/script");
+      const quizHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${config.title || "Practice Quiz"}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+.container{max-width:800px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:30px;text-align:center}
+.header h1{font-size:28px;margin-bottom:10px}
+.header p{opacity:.9;font-size:14px}
+.quiz-body{padding:30px}
+.question-card{background:#f8f9fa;border-radius:12px;padding:25px;margin-bottom:25px;border:2px solid #e9ecef}
+.question-card.answered{border-color:#667eea}
+.question-num{color:#667eea;font-weight:700;font-size:14px;margin-bottom:15px}
+.question-text{font-size:18px;font-weight:600;margin-bottom:20px;color:#2d3748;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:12px}
+.option-btn{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:15px 20px;text-align:left;cursor:pointer;transition:all .3s ease;font-size:16px;color:#2d3748}
+.option-btn:hover{border-color:#667eea;background:#f0f4ff;transform:translateX(5px)}
+.option-btn.selected{background:#667eea;color:#fff;border-color:#667eea}
+.option-btn.correct{background:#48bb78;color:#fff;border-color:#48bb78}
+.option-btn.wrong{background:#f56565;color:#fff;border-color:#f56565}
+.option-btn.disabled{cursor:not-allowed;opacity:.6}
+.essay-input{width:100%;min-height:120px;padding:15px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:15px;resize:vertical}
+.essay-input:focus{outline:0;border-color:#667eea}
+.controls{display:flex;gap:15px;justify-content:center;padding:20px;background:#f8f9fa;flex-wrap:wrap}
+.btn{padding:12px 30px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s}
+.btn-primary{background:#667eea;color:#fff}
+.btn-primary:hover{background:#5a67d8;transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,.4)}
+.btn-secondary{background:#e2e8f0;color:#2d3748}
+.btn-secondary:hover{background:#cbd5e0}
+.results{padding:30px;text-align:center;display:none}
+.results.show{display:block}
+.score-circle{width:150px;height:150px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff}
+.score-circle.pass{background:linear-gradient(135deg,#48bb78,#38a169)}
+.score-circle.fail{background:linear-gradient(135deg,#f56565,#e53e3e)}
+.explanation{background:#ebf8ff;border-left:4px solid #4299e1;padding:15px;margin-top:15px;border-radius:8px;font-size:14px;color:#2c5282;display:none}
+.explanation.show{display:block}
+@media(max-width:600px){.container{border-radius:0}.header{padding:20px}.quiz-body{padding:20px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>${config.title || "Practice Quiz"}</h1>
+<p>Total Questions: ${questions.length} | Practice Mode</p>
+</div>
+<div id="quizBody" class="quiz-body"></div>
+<div class="controls">
+<button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset Quiz</button>
+<button class="btn btn-primary" onclick="submitQuiz()">✓ Submit Quiz</button>
+</div>
+<div id="results" class="results"></div>
+</div>
+<script>
+const questions=${qJson};
+let userAnswers=new Array(questions.length).fill(null);
+let submitted=false;
+function isEssayQuestion(q){return q.options&&q.options.length===1}
+function escapeHTML(str){if(str==null||str===undefined)return "";var d=document.createElement("div");d.textContent=str;return d.innerHTML}
+function renderQuiz(){
+var quizBody=document.getElementById("quizBody");
+var html="";
+for(var i=0;i<questions.length;i++){
+var q=questions[i];
+var isEssay=isEssayQuestion(q);
+html+='<div class="question-card" id="q'+i+'"><div class="question-num">Question '+(i+1)+'</div><div class="question-text">'+escapeHTML(q.q)+'</div>';
+if(isEssay){
+html+='<textarea class="essay-input" id="essay'+i+'" placeholder="Type your answer here..." oninput="saveEssayAnswer('+i+', this.value)">'+(userAnswers[i]||"")+"</textarea>";
+}else{
+html+='<div class="options">';
+for(var j=0;j<q.options.length;j++){
+var letter=String.fromCharCode(65+j);
+html+='<button class="option-btn" id="btn'+i+'_'+j+'" onclick="selectAnswer('+i+','+j+')"><strong>'+letter+'.</strong> '+escapeHTML(q.options[j])+"</button>";
+}
+html+="</div>";
+}
+if(q.explanation){html+='<div class="explanation" id="exp'+i+'"><strong>💡 Explanation:</strong> '+escapeHTML(q.explanation)+"</div>"}
+html+="</div>";
+}
+quizBody.innerHTML=html;
+}
+function selectAnswer(qIndex,optIndex){
+if(submitted)return;
+userAnswers[qIndex]=optIndex;
+var card=document.getElementById("q"+qIndex);
+card.classList.add("answered");
+var btns=card.querySelectorAll(".option-btn");
+for(var k=0;k<btns.length;k++){btns[k].classList.remove("selected");if(k===optIndex)btns[k].classList.add("selected")}
+}
+function saveEssayAnswer(qIndex,value){
+userAnswers[qIndex]=value.trim()||null;
+var card=document.getElementById("q"+qIndex);
+if(value.trim())card.classList.add("answered");else card.classList.remove("answered");
+}
+function submitQuiz(){
+if(submitted)return;
+submitted=true;
+var correct=0,totalScorable=0;
+for(var i=0;i<questions.length;i++){
+var q=questions[i];
+if(isEssayQuestion(q))continue;
+totalScorable++;
+var userAns=userAnswers[i];
+var isCorrect=userAns===q.correct;
+if(isCorrect)correct++;
+var card=document.getElementById("q"+i);
+var btns=card.querySelectorAll(".option-btn");
+for(var k=0;k<btns.length;k++){
+btns[k].classList.add("disabled");
+if(k===q.correct)btns[k].classList.add("correct");
+else if(k===userAns&&!isCorrect)btns[k].classList.add("wrong");
+}
+var exp=document.getElementById("exp"+i);
+if(exp)exp.classList.add("show");
+}
+var pct=totalScorable>0?Math.round((correct/totalScorable)*100):0;
+var resultsDiv=document.getElementById("results");
+resultsDiv.innerHTML='<div class="score-circle '+(pct>=70?"pass":"fail")+'">'+pct+'%</div><h2>'+(pct>=70?"Great Job!":"Keep Practicing!")+'</h2><p style="margin-top:15px;font-size:18px;color:#4a5568">Score: '+correct+' / '+totalScorable+'</p><p style="margin-top:10px;color:#718096">Scroll up to review explanations</p>';
+resultsDiv.classList.add("show");
+resultsDiv.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function resetQuiz(){
+submitted=false;
+userAnswers=new Array(questions.length).fill(null);
+document.getElementById("results").classList.remove("show");
+renderQuiz();
+window.scrollTo({top:0,behavior:"smooth"});
+}
+renderQuiz();
+</script>
+</body>
+</html>`;
       blobDownload(new Blob([quizHtml], { type: "text/html;charset=utf-8" }), "text/html", `${config.title || "practice_quiz"}.html`);
       return;
     }
@@ -698,7 +832,8 @@ function createExamCard(exam) {
       else if (hasEssay) qt = "Mixed (MCQ, True/False, Essay)";
       const pdfContainer = document.createElement("div");
       pdfContainer.id = "pdf-export-container";
-      pdfContainer.style.cssText = "background:#fff;position:absolute;left:-9999px;top:0;width:210mm;";
+      pdfContainer.style.background = "#ffffff";
+      document.body.appendChild(pdfContainer);
       let contentHTML = `<style>#pdf-export-wrapper{font-family:'Times New Roman',serif;color:#000!important;background:#fff!important;line-height:1.5}#pdf-export-wrapper h1,#pdf-export-wrapper h2,#pdf-export-wrapper p,#pdf-export-wrapper div,#pdf-export-wrapper span{color:#000!important}.pdf-card{border:1px solid #ddd;background:#fafafa!important;padding:15px;margin-bottom:20px;page-break-inside:avoid}.pdf-correct{background:#e8f5e9!important;border-left:4px solid #4caf50;padding:10px;margin-top:10px;color:#000!important}.pdf-essay{background:#fff3e0!important;border-left:4px solid #ff9800;padding:10px;margin-top:10px;color:#000!important}.pdf-explain{background:#e3f2fd!important;border-left:4px solid #2196f3;padding:10px;margin-top:10px;font-style:italic;color:#000!important}</style><div id="pdf-export-wrapper" style="padding:20px"><div style="text-align:center;border-bottom:2px solid #000;padding-bottom:15px;margin-bottom:30px"><h1 style="font-size:24px;margin:0;text-transform:uppercase">${config.title || "Quiz Examination"}</h1><p style="font-size:14px;margin:5px 0"><strong>Total Questions:</strong> ${questions.length} &nbsp;|&nbsp; <strong>Type:</strong> ${qt}</p></div>`;
       questions.forEach((q, i) => {
         contentHTML += `<div class="pdf-card"><div style="font-weight:bold;font-size:14px;margin-bottom:8px">Question ${i + 1}</div><div style="font-size:13px;margin-bottom:12px">${q.q}</div>`;
@@ -713,7 +848,6 @@ function createExamCard(exam) {
       });
       contentHTML += `<div style="margin-top:30px;text-align:center;font-size:10px;border-top:1px solid #ccc;padding-top:10px">Generated on ${new Date().toLocaleDateString()}</div></div>`;
       pdfContainer.innerHTML = contentHTML;
-      document.body.appendChild(pdfContainer);
       const opts = { margin: [10, 10, 10, 10], filename: `${config.title || "quiz"}.pdf`, image: { type: "jpeg", quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff", scrollY: 0, windowHeight: pdfContainer.scrollHeight }, jsPDF: { unit: "mm", format: "a4", orientation: "portrait" } };
       setTimeout(() => {
         html2pdf().set(opts).from(pdfContainer).save().then(() => { if (pdfContainer.parentNode) document.body.removeChild(pdfContainer); }).catch((err) => { console.error(err); if (pdfContainer.parentNode) document.body.removeChild(pdfContainer); alert("Failed to generate PDF."); });
