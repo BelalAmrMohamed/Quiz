@@ -491,19 +491,6 @@ function renderRootCategories() {
 
   const fragment = document.createDocumentFragment();
 
-  // // Action buttons at top
-  // const actionBar = document.createElement('div');
-  // actionBar.className = 'dashboard-actions';
-  // actionBar.innerHTML = `
-  //   <button class="dashboard-action-btn" onclick="window.openProfileSettings()">
-  //     ⚙️ Profile Settings
-  //   </button>
-  //   <button class="dashboard-action-btn" onclick="window.openCourseManager()">
-  //     📚 Manage Courses
-  //   </button>
-  // `;
-  // fragment.appendChild(actionBar);
-
   // Show subscribed courses if any
   if (subscribedCourses.length > 0) {
     subscribedCourses.forEach(course => {
