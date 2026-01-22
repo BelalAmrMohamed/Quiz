@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://quizzydiv.vercel.app/sitemap.xml
+Sitemap: https://divquizzes.vercel.app/sitemap.xml
