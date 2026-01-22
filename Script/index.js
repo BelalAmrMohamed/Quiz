@@ -724,6 +724,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .score-circle.fail{background:linear-gradient(135deg,#f56565,#e53e3e)}
 .explanation{background:#ebf8ff;border-left:4px solid #4299e1;padding:15px;margin-top:15px;border-radius:8px;font-size:14px;color:#2c5282;display:none}
 .explanation.show{display:block}
+.model-answer{background:#e8f5e9;border-left:4px solid #4caf50;padding:12px 15px;margin-top:15px;border-radius:8px;font-size:14px;color:#1b5e20;display:none}
+.model-answer.show{display:block}
+.essay-input.disabled{cursor:not-allowed;opacity:0.8;background:#f1f5f9}
 @media(max-width:600px){.container{border-radius:0}.header{padding:20px}.quiz-body{padding:20px}}
 </style>
 </head>
@@ -755,6 +758,7 @@ var isEssay=isEssayQuestion(q);
 html+='<div class="question-card" id="q'+i+'"><div class="question-num">Question '+(i+1)+'</div><div class="question-text">'+escapeHTML(q.q)+'</div>';
 if(isEssay){
 html+='<textarea class="essay-input" id="essay'+i+'" placeholder="Type your answer here..." oninput="saveEssayAnswer('+i+', this.value)">'+(userAnswers[i]||"")+"</textarea>";
+html+='<div class="model-answer" id="modelAns'+i+'"><strong>Correct Answer / Model Answer:</strong><br>'+escapeHTML(q.options[0])+"</div>";
 }else{
 html+='<div class="options">';
 for(var j=0;j<q.options.length;j++){
@@ -787,7 +791,15 @@ submitted=true;
 var correct=0,totalScorable=0;
 for(var i=0;i<questions.length;i++){
 var q=questions[i];
-if(isEssayQuestion(q))continue;
+if(isEssayQuestion(q)){
+var essayEl=document.getElementById("essay"+i);
+if(essayEl){essayEl.readOnly=true;essayEl.classList.add("disabled")}
+var modelEl=document.getElementById("modelAns"+i);
+if(modelEl)modelEl.classList.add("show");
+var exp=document.getElementById("exp"+i);
+if(exp)exp.classList.add("show");
+continue;
+}
 totalScorable++;
 var userAns=userAnswers[i];
 var isCorrect=userAns===q.correct;
@@ -917,6 +929,9 @@ renderQuiz();
   downloadBtn.className = "start-btn";
   downloadBtn.style.flex = "1";
   downloadBtn.style.minWidth = "0";
+  downloadBtn.style.background = "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)";
+  downloadBtn.style.color = "white";
+  downloadBtn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.4)";
   downloadBtn.textContent = "Download";
   downloadBtn.onclick = (ev) => {
     ev.stopPropagation();

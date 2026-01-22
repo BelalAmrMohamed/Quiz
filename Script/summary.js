@@ -540,6 +540,9 @@ function exportToQuiz(config, questions) {
         .score-circle.fail { background: linear-gradient(135deg, #f56565, #e53e3e); }
         .explanation { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 15px; margin-top: 15px; border-radius: 8px; font-size: 14px; color: #2c5282; display: none; }
         .explanation.show { display: block; }
+        .model-answer { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px 15px; margin-top: 15px; border-radius: 8px; font-size: 14px; color: #1b5e20; display: none; }
+        .model-answer.show { display: block; }
+        .essay-input.disabled { cursor: not-allowed; opacity: 0.8; background: #f1f5f9; }
         @media (max-width: 600px) { .container { border-radius: 0; } .header { padding: 20px; } .quiz-body { padding: 20px; } }
     </style>
 </head>
@@ -583,6 +586,9 @@ function exportToQuiz(config, questions) {
                         'placeholder="Type your answer here..." ' +
                         'oninput="saveEssayAnswer(' + index + ', this.value)"' +
                         '>' + (userAnswers[index] || '') + '</textarea>';
+                    html += '<div class="model-answer" id="modelAns' + index + '">' +
+                        '<strong>Correct Answer / Model Answer:</strong><br>' +
+                        escapeHTML(q.options[0]) + '</div>';
                 } else {
                     html += '<div class="options">';
                     q.options.forEach((opt, i) => {
@@ -652,7 +658,18 @@ function exportToQuiz(config, questions) {
             let totalScorable = 0;
 
             questions.forEach((q, index) => {
-                if (isEssayQuestion(q)) return;
+                if (isEssayQuestion(q)) {
+                    const essayEl = document.getElementById('essay' + index);
+                    if (essayEl) {
+                        essayEl.readOnly = true;
+                        essayEl.classList.add('disabled');
+                    }
+                    const modelEl = document.getElementById('modelAns' + index);
+                    if (modelEl) modelEl.classList.add('show');
+                    const exp = document.getElementById('exp' + index);
+                    if (exp) exp.classList.add('show');
+                    return;
+                }
                 
                 totalScorable++;
                 const userAns = userAnswers[index];
