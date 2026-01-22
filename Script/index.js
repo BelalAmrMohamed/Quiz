@@ -586,7 +586,24 @@ function createCategoryCard(name, itemCount, isFolder = false, courseData = null
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
     const metaDiv = document.createElement("div");
     metaDiv.className = "course-meta";
-    metaDiv.textContent = `${courseData.faculty} • Y${courseData.year} • T${courseData.term}`;
+    
+    // Create individual badges
+    const facultyBadge = document.createElement("span");
+    facultyBadge.className = "course-meta-badge faculty";
+    facultyBadge.textContent = courseData.faculty;
+    
+    const yearBadge = document.createElement("span");
+    yearBadge.className = "course-meta-badge year";
+    yearBadge.textContent = `Y${courseData.year}`;
+    
+    const termBadge = document.createElement("span");
+    termBadge.className = "course-meta-badge term";
+    termBadge.textContent = `T${courseData.term}`;
+    
+    metaDiv.appendChild(facultyBadge);
+    metaDiv.appendChild(yearBadge);
+    metaDiv.appendChild(termBadge);
+    
     card.appendChild(iconDiv);
     card.appendChild(h3);
     card.appendChild(metaDiv);
