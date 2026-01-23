@@ -267,6 +267,16 @@ export const gameEngine = {
 
   // 4. Update Streak
   updateStreak(user) {
+    // FIX: Initialize streaks object if it doesn't exist
+    if (!user.streaks) {
+      user.streaks = {
+        currentDaily: 0,
+        longestStreak: 0,
+        lastLoginDate: null,
+        consecutivePerfect: 0,
+      };
+    }
+
     const today = new Date().toDateString();
     const lastLogin = user.streaks.lastLoginDate;
 
@@ -308,8 +318,6 @@ export const gameEngine = {
   },
 
   // 5. Process Quiz Result
-  // Inside gameEngine.js
-
   processResult(result) {
     const user = this.getUserData();
     const { score, total, timeElapsed, examId, mode } = result;
