@@ -10,39 +10,39 @@ export class CanvasAnimationController {
     this.w = 0;
     this.h = 0;
     this.isEnabled = true;
-    this.currentTheme = 'light';
-    
+    this.currentTheme = "light";
+
     // Mouse interaction object
     this.mouse = {
       x: null,
       y: null,
-      radius: 150 // Interaction radius
+      radius: 150, // Interaction radius
     };
 
-    // Theme-specific colors
+    // Theme-specific colors - FIXED: Light theme now uses proper light background
     this.themeColors = {
       light: {
-        background: '#050505',
-        particles: 'rgba(255, 255, 255, 0.8)',
-        connections: 'rgba(100, 200, 255, 0.5)'
+        background: "#fafbfc", // FIXED: Changed from '#050505' to match theme
+        particles: "rgba(99, 102, 241, 0.6)",
+        connections: "rgba(139, 92, 246, 0.4)",
       },
-      'dark-slate': {
-        background: '#0f172a',
-        particles: 'rgba(99, 102, 241, 0.8)',
-        connections: 'rgba(139, 92, 246, 0.5)'
+      "dark-slate": {
+        background: "#0f172a",
+        particles: "rgba(99, 102, 241, 0.8)",
+        connections: "rgba(139, 92, 246, 0.5)",
       },
       dark: {
-        background: '#121212',
-        particles: 'rgba(59, 130, 246, 0.8)',
-        connections: 'rgba(139, 92, 246, 0.5)'
-      }
+        background: "#121212",
+        particles: "rgba(59, 130, 246, 0.8)",
+        connections: "rgba(139, 92, 246, 0.5)",
+      },
     };
   }
 
   init() {
     // Create canvas element
-    this.canvas = document.createElement('canvas');
-    this.canvas.id = 'canvas-bg';
+    this.canvas = document.createElement("canvas");
+    this.canvas.id = "canvas-bg";
     this.canvas.style.cssText = `
       position: fixed;
       top: 0;
@@ -52,24 +52,24 @@ export class CanvasAnimationController {
       z-index: -1;
       pointer-events: none;
     `;
-    
+
     // Insert canvas as first child of body
     document.body.insertBefore(this.canvas, document.body.firstChild);
-    
-    this.ctx = this.canvas.getContext('2d', { alpha: false });
-    
+
+    this.ctx = this.canvas.getContext("2d", { alpha: false });
+
     // Set initial dimensions
     this.resize();
-    
+
     // Setup event listeners
     this.setupEventListeners();
-    
+
     // Detect current theme
     this.updateTheme();
-    
+
     // Check if animations are enabled
     this.checkAnimationState();
-    
+
     // Start animation if enabled
     if (this.isEnabled) {
       this.start();
@@ -78,19 +78,19 @@ export class CanvasAnimationController {
 
   setupEventListeners() {
     // Track mouse position
-    window.addEventListener('mousemove', (event) => {
+    window.addEventListener("mousemove", (event) => {
       this.mouse.x = event.x;
       this.mouse.y = event.y;
     });
 
     // Remove mouse interaction when cursor leaves window
-    window.addEventListener('mouseout', () => {
+    window.addEventListener("mouseout", () => {
       this.mouse.x = null;
       this.mouse.y = null;
     });
 
     // Handle resize
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       this.resize();
       this.initParticles();
     });
@@ -98,10 +98,14 @@ export class CanvasAnimationController {
     // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'data-theme') {
+        if (mutation.attributeName === "data-theme") {
           this.updateTheme();
+          // Redraw immediately with new theme colors
+          if (this.isEnabled) {
+            this.clearCanvas();
+          }
         }
-        if (mutation.attributeName === 'data-animations') {
+        if (mutation.attributeName === "data-animations") {
           this.checkAnimationState();
         }
       });
@@ -109,7 +113,7 @@ export class CanvasAnimationController {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['data-theme', 'data-animations']
+      attributeFilter: ["data-theme", "data-animations"],
     });
   }
 
@@ -119,13 +123,15 @@ export class CanvasAnimationController {
   }
 
   updateTheme() {
-    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const theme =
+      document.documentElement.getAttribute("data-theme") || "light";
     this.currentTheme = theme;
   }
 
   checkAnimationState() {
-    const animationsEnabled = document.documentElement.getAttribute('data-animations') !== 'disabled';
-    
+    const animationsEnabled =
+      document.documentElement.getAttribute("data-animations") !== "disabled";
+
     if (animationsEnabled && !this.isEnabled) {
       this.isEnabled = true;
       this.start();
@@ -137,7 +143,7 @@ export class CanvasAnimationController {
 
   initParticles() {
     this.particlesArray = [];
-    
+
     // Adjust particle count based on screen size for performance
     const numberOfParticles = Math.min((this.w * this.h) / 9000, 150);
 
@@ -150,9 +156,9 @@ export class CanvasAnimationController {
     return {
       x: Math.random() * this.w,
       y: Math.random() * this.h,
-      directionX: (Math.random() * 1) - 0.5,
-      directionY: (Math.random() * 1) - 0.5,
-      size: (Math.random() * 2) + 1
+      directionX: Math.random() * 1 - 0.5,
+      directionY: Math.random() * 1 - 0.5,
+      size: Math.random() * 2 + 1,
     };
   }
 
@@ -194,7 +200,7 @@ export class CanvasAnimationController {
 
   drawParticle(particle) {
     const colors = this.themeColors[this.currentTheme];
-    
+
     this.ctx.beginPath();
     this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2, false);
     this.ctx.fillStyle = colors.particles;
@@ -204,19 +210,21 @@ export class CanvasAnimationController {
   connectParticles() {
     const colors = this.themeColors[this.currentTheme];
     const maxDistance = (this.w / 7) * (this.h / 7);
-    
+
     for (let a = 0; a < this.particlesArray.length; a++) {
       for (let b = a + 1; b < this.particlesArray.length; b++) {
         const particleA = this.particlesArray[a];
         const particleB = this.particlesArray[b];
-        
-        const distanceSquared = 
-          ((particleA.x - particleB.x) * (particleA.x - particleB.x)) +
-          ((particleA.y - particleB.y) * (particleA.y - particleB.y));
+
+        const distanceSquared =
+          (particleA.x - particleB.x) * (particleA.x - particleB.x) +
+          (particleA.y - particleB.y) * (particleA.y - particleB.y);
 
         if (distanceSquared < maxDistance) {
-          const opacity = 1 - (distanceSquared / 20000);
-          this.ctx.strokeStyle = colors.connections.replace('0.5)', `${opacity})`);
+          const opacity = 1 - distanceSquared / 20000;
+          this.ctx.strokeStyle = colors.connections
+            .replace("0.5)", `${opacity})`)
+            .replace("0.4)", `${opacity})`);
           this.ctx.lineWidth = 1;
           this.ctx.beginPath();
           this.ctx.moveTo(particleA.x, particleA.y);
@@ -227,14 +235,17 @@ export class CanvasAnimationController {
     }
   }
 
+  clearCanvas() {
+    const colors = this.themeColors[this.currentTheme];
+    this.ctx.fillStyle = colors.background;
+    this.ctx.fillRect(0, 0, this.w, this.h);
+  }
+
   animate() {
     if (!this.isEnabled) return;
 
-    const colors = this.themeColors[this.currentTheme];
-    
     // Clear with theme background
-    this.ctx.fillStyle = colors.background;
-    this.ctx.fillRect(0, 0, this.w, this.h);
+    this.clearCanvas();
 
     // Update and draw particles
     for (let i = 0; i < this.particlesArray.length; i++) {
@@ -260,22 +271,20 @@ export class CanvasAnimationController {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
-    
-    // Clear canvas
-    if (this.ctx) {
-      const colors = this.themeColors[this.currentTheme];
-      this.ctx.fillStyle = colors.background;
-      this.ctx.fillRect(0, 0, this.w, this.h);
+
+    // FIXED: Clear canvas and hide it to restore body background
+    if (this.canvas) {
+      this.canvas.style.display = "none";
     }
   }
 
   destroy() {
     this.stop();
-    
+
     if (this.canvas && this.canvas.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
     }
-    
+
     this.canvas = null;
     this.ctx = null;
     this.particlesArray = [];
@@ -287,8 +296,9 @@ let animationInstance = null;
 
 function initCanvasAnimation() {
   // Only initialize if animations are enabled
-  const animationsEnabled = document.documentElement.getAttribute('data-animations') !== 'disabled';
-  
+  const animationsEnabled =
+    document.documentElement.getAttribute("data-animations") !== "disabled";
+
   if (animationsEnabled && !animationInstance) {
     animationInstance = new CanvasAnimationController();
     animationInstance.init();
@@ -298,11 +308,12 @@ function initCanvasAnimation() {
   }
 }
 
-// Initialize on DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initCanvasAnimation);
+// FIXED: Better initialization timing
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initCanvasAnimation);
 } else {
-  initCanvasAnimation();
+  // DOM already loaded, wait a bit for theme to be applied
+  setTimeout(initCanvasAnimation, 0);
 }
 
 // Export for manual control if needed

@@ -35,6 +35,9 @@ export const themeManager = {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem(THEME_KEY, theme);
 
+    // FIXED: Ensure body background is restored when animations are off
+    this.restoreBodyBackground();
+
     // Update UI if elements exist
     this.updateThemeUI(theme);
   },
@@ -45,28 +48,64 @@ export const themeManager = {
     let link = document.getElementById(ANIM_ID);
 
     if (enabled) {
+      // Show canvas if it exists
+      const canvas = document.getElementById("canvas-bg");
+      if (canvas) {
+        canvas.style.display = "block";
+      }
+
       if (!link) {
         link = document.createElement("link");
         link.id = ANIM_ID;
         link.rel = "stylesheet";
-        link.href = "CSS/animations.css"; // Ensure this path matches your folder structure
+        link.href = "CSS/animations.css";
         document.head.appendChild(link);
       }
     } else {
-      if (link) {
-        link.remove(); // This completely unloads the file and its rules
+      // FIXED: Hide canvas and restore body background
+      const canvas = document.getElementById("canvas-bg");
+      if (canvas) {
+        canvas.style.display = "none";
       }
+
+      if (link) {
+        link.remove();
+      }
+
+      // FIXED: Restore body background immediately
+      this.restoreBodyBackground();
     }
 
     // 2. Existing logic for attributes and storage
     document.documentElement.setAttribute(
       "data-animations",
-      enabled ? "enabled" : "disabled"
+      enabled ? "enabled" : "disabled",
     );
     localStorage.setItem(ANIMATIONS_KEY, enabled ? "enabled" : "disabled");
 
     // 3. Update UI
     this.updateAnimationsUI(enabled);
+  },
+
+  // FIXED: New method to restore body background
+  restoreBodyBackground() {
+    const animationsEnabled = this.getAnimationsEnabled();
+
+    if (!animationsEnabled) {
+      // Force body to use theme background color
+      const currentTheme = this.getCurrentTheme();
+      const themeBackgrounds = {
+        light: "#fafbfc",
+        "dark-slate": "#0f172a",
+        dark: "#121212",
+      };
+
+      document.body.style.backgroundColor =
+        themeBackgrounds[currentTheme] || themeBackgrounds.light;
+    } else {
+      // Let canvas handle the background
+      document.body.style.backgroundColor = "";
+    }
   },
 
   getCurrentTheme() {
@@ -178,6 +217,9 @@ export const themeManager = {
     // Initialize UI state
     this.updateThemeUI(this.getCurrentTheme());
     this.updateAnimationsUI(this.getAnimationsEnabled());
+
+    // FIXED: Ensure body background is correct on initialization
+    this.restoreBodyBackground();
   },
 };
 

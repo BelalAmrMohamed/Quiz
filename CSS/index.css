@@ -824,7 +824,7 @@ ANIMATIONS
   gap: 8px;
   margin: 8px 0;
   flex-wrap: wrap;
-  justify-content: center; 
+  justify-content: center;
 }
 
 .course-meta-badge {
@@ -862,15 +862,15 @@ ANIMATIONS
   .course-meta-badge {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
-  
+
   .course-meta-badge.faculty {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   }
-  
+
   .course-meta-badge.year {
     background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   }
-  
+
   .course-meta-badge.term {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   }
@@ -890,7 +890,7 @@ ANIMATIONS
 
 /* Add small icons/symbols */
 .course-meta-badge::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   background: rgba(255, 255, 255, 0.4);

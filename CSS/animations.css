@@ -63,14 +63,22 @@ CANVAS BACKGROUND INTEGRATION
 Canvas animations are now handled by canvas-animation.js module
 Body background will be controlled by canvas or fallback to theme color
 ============================================================================ */
+
+/* FIXED: Ensure body background is visible when animations are enabled */
 body {
-  /* Fallback background when canvas is disabled */
+  /* Fallback background when canvas is disabled or loading */
   background-color: var(--color-background);
+  transition: background-color 0.3s ease;
 }
 
-/* Hide canvas when animations are disabled */
+/* FIXED: Properly hide canvas when animations are disabled */
 [data-animations="disabled"] #canvas-bg {
   display: none !important;
+}
+
+/* FIXED: Ensure canvas is visible when animations are enabled */
+[data-animations="enabled"] #canvas-bg {
+  display: block !important;
 }
 
 /* ============================================================================
