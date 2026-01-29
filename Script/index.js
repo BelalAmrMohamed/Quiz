@@ -1,15 +1,15 @@
 // Script/index.js - Performance Optimized with Filtering & Subscriptions
 import { examList, categoryTree } from "./examManifest.js";
 import { userProfile } from "./userProfile.js";
-import { 
-  extractMetadata, 
-  filterCourses, 
+import {
+  extractMetadata,
+  filterCourses,
   getSubscribedCourses,
   getAllRootCourses,
   courseMatchesFilters,
   getCourseItemCount,
   getAvailableYears,
-  getAvailableTerms
+  getAvailableTerms,
 } from "./filterUtils.js";
 
 const container = document.getElementById("contentArea");
@@ -65,23 +65,28 @@ updateWelcomeMessage();
 // PROFILE MANAGEMENT MODAL
 // ============================================================================
 
-window.openProfileSettings = function() {
+window.openProfileSettings = function () {
   const profile = userProfile.getProfile();
   const metadata = extractMetadata(categoryTree);
 
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.id = 'profileModal';
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "profileModal";
 
-  const modalCard = document.createElement('div');
-  modalCard.className = 'modal-card profile-modal';
+  const modalCard = document.createElement("div");
+  modalCard.className = "modal-card profile-modal";
 
   // Get available years and terms for current selection
-  const availableYears = profile.faculty === 'All' 
-    ? metadata.years 
-    : getAvailableYears(categoryTree, profile.faculty);
-  
-  const availableTerms = getAvailableTerms(categoryTree, profile.faculty, profile.year);
+  const availableYears =
+    profile.faculty === "All"
+      ? metadata.years
+      : getAvailableYears(categoryTree, profile.faculty);
+
+  const availableTerms = getAvailableTerms(
+    categoryTree,
+    profile.faculty,
+    profile.year,
+  );
 
   modalCard.innerHTML = `
     <h2>⚙️ Profile Settings</h2>
@@ -106,9 +111,12 @@ window.openProfileSettings = function() {
           <label for="profileFaculty">Faculty</label>
           <select id="profileFaculty" class="profile-select">
             <option value="All">All Faculties</option>
-            ${metadata.faculties.map(f => 
-              `<option value="${escapeHtml(f)}" ${f === profile.faculty ? 'selected' : ''}>${escapeHtml(f)}</option>`
-            ).join('')}
+            ${metadata.faculties
+              .map(
+                (f) =>
+                  `<option value="${escapeHtml(f)}" ${f === profile.faculty ? "selected" : ""}>${escapeHtml(f)}</option>`,
+              )
+              .join("")}
           </select>
         </div>
 
@@ -116,9 +124,12 @@ window.openProfileSettings = function() {
           <label for="profileYear">Year</label>
           <select id="profileYear" class="profile-select">
             <option value="All">All Years</option>
-            ${availableYears.map(y => 
-              `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
-            ).join('')}
+            ${availableYears
+              .map(
+                (y) =>
+                  `<option value="${escapeHtml(y)}" ${y === profile.year ? "selected" : ""}>Year ${escapeHtml(y)}</option>`,
+              )
+              .join("")}
           </select>
         </div>
 
@@ -126,9 +137,12 @@ window.openProfileSettings = function() {
           <label for="profileTerm">Term</label>
           <select id="profileTerm" class="profile-select">
             <option value="All">All Terms</option>
-            ${availableTerms.map(t => 
-              `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
-            ).join('')}
+            ${availableTerms
+              .map(
+                (t) =>
+                  `<option value="${escapeHtml(t)}" ${t === profile.term ? "selected" : ""}>Term ${escapeHtml(t)}</option>`,
+              )
+              .join("")}
           </select>
         </div>
       </div>
@@ -151,7 +165,7 @@ window.openProfileSettings = function() {
   setupProfileDropdownCascade();
 
   // Close on overlay click
-  modal.addEventListener('click', (e) => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) window.closeProfileModal();
   });
 };
@@ -160,66 +174,79 @@ window.openProfileSettings = function() {
  * Setup cascading dropdown behavior for Profile Settings modal
  */
 function setupProfileDropdownCascade() {
-  const facultySelect = document.getElementById('profileFaculty');
-  const yearSelect = document.getElementById('profileYear');
-  const termSelect = document.getElementById('profileTerm');
+  const facultySelect = document.getElementById("profileFaculty");
+  const yearSelect = document.getElementById("profileYear");
+  const termSelect = document.getElementById("profileTerm");
 
   if (!facultySelect || !yearSelect || !termSelect) return;
 
   // When faculty changes, update year and term dropdowns
-  facultySelect.addEventListener('change', () => {
+  facultySelect.addEventListener("change", () => {
     const selectedFaculty = facultySelect.value;
-    
+
     // Update year dropdown
-    const availableYears = selectedFaculty === 'All' 
-      ? extractMetadata(categoryTree).years 
-      : getAvailableYears(categoryTree, selectedFaculty);
-    
+    const availableYears =
+      selectedFaculty === "All"
+        ? extractMetadata(categoryTree).years
+        : getAvailableYears(categoryTree, selectedFaculty);
+
     const currentYear = yearSelect.value;
-    yearSelect.innerHTML = '<option value="All">All Years</option>' + 
-      availableYears.map(y => 
-        `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
-      ).join('');
-    
+    yearSelect.innerHTML =
+      '<option value="All">All Years</option>' +
+      availableYears
+        .map(
+          (y) =>
+            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
+        )
+        .join("");
+
     // Restore selection if still valid, otherwise reset to "All"
     if (availableYears.includes(currentYear)) {
       yearSelect.value = currentYear;
     } else {
-      yearSelect.value = 'All';
+      yearSelect.value = "All";
     }
-    
+
     // Trigger year change to update terms
-    yearSelect.dispatchEvent(new Event('change'));
+    yearSelect.dispatchEvent(new Event("change"));
   });
 
   // When year changes, update term dropdown
-  yearSelect.addEventListener('change', () => {
+  yearSelect.addEventListener("change", () => {
     const selectedFaculty = facultySelect.value;
     const selectedYear = yearSelect.value;
-    
+
     // Update term dropdown
-    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
-    
+    const availableTerms = getAvailableTerms(
+      categoryTree,
+      selectedFaculty,
+      selectedYear,
+    );
+
     const currentTerm = termSelect.value;
-    termSelect.innerHTML = '<option value="All">All Terms</option>' + 
-      availableTerms.map(t => 
-        `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
-      ).join('');
-    
+    termSelect.innerHTML =
+      '<option value="All">All Terms</option>' +
+      availableTerms
+        .map(
+          (t) =>
+            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
+        )
+        .join("");
+
     // Restore selection if still valid, otherwise reset to "All"
     if (availableTerms.includes(currentTerm)) {
       termSelect.value = currentTerm;
     } else {
-      termSelect.value = 'All';
+      termSelect.value = "All";
     }
   });
 }
 
-window.saveProfileSettings = function() {
-  const username = document.getElementById('profileUsername')?.value;
-  const faculty = document.getElementById('profileFaculty')?.value;
-  const year = document.getElementById('profileYear')?.value;
-  const term = document.getElementById('profileTerm')?.value;
+window.saveProfileSettings = function () {
+  const username = document.getElementById("profileUsername")?.value;
+  const faculty = document.getElementById("profileFaculty")?.value;
+  const year = document.getElementById("profileYear")?.value;
+  const term = document.getElementById("profileTerm")?.value;
 
   const oldProfile = userProfile.getProfile();
 
@@ -228,7 +255,7 @@ window.saveProfileSettings = function() {
   userProfile.updateAcademicInfo({ faculty, year, term });
 
   // Check if academic info changed
-  const academicInfoChanged = 
+  const academicInfoChanged =
     oldProfile.faculty !== faculty ||
     oldProfile.year !== year ||
     oldProfile.term !== term;
@@ -241,13 +268,13 @@ window.saveProfileSettings = function() {
   // Update UI
   updateWelcomeMessage();
   window.closeProfileModal();
-  
+
   // Refresh course view
   renderRootCategories();
 };
 
-window.closeProfileModal = function() {
-  const modal = document.getElementById('profileModal');
+window.closeProfileModal = function () {
+  const modal = document.getElementById("profileModal");
   if (modal) modal.remove();
 };
 
@@ -255,23 +282,28 @@ window.closeProfileModal = function() {
 // COURSE SUBSCRIPTION MANAGEMENT
 // ============================================================================
 
-window.openCourseManager = function() {
+window.openCourseManager = function () {
   const profile = userProfile.getProfile();
   const metadata = extractMetadata(categoryTree);
-  
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.id = 'courseManagerModal';
 
-  const modalCard = document.createElement('div');
-  modalCard.className = 'modal-card course-manager-modal';
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "courseManagerModal";
+
+  const modalCard = document.createElement("div");
+  modalCard.className = "modal-card course-manager-modal";
 
   // Get available years and terms for current profile selection
-  const availableYears = profile.faculty === 'All' 
-    ? metadata.years 
-    : getAvailableYears(categoryTree, profile.faculty);
-  
-  const availableTerms = getAvailableTerms(categoryTree, profile.faculty, profile.year);
+  const availableYears =
+    profile.faculty === "All"
+      ? metadata.years
+      : getAvailableYears(categoryTree, profile.faculty);
+
+  const availableTerms = getAvailableTerms(
+    categoryTree,
+    profile.faculty,
+    profile.year,
+  );
 
   modalCard.innerHTML = `
     <h2>📚 Manage Your Courses</h2>
@@ -280,23 +312,32 @@ window.openCourseManager = function() {
     <div class="course-manager-filters">
       <select id="cmFaculty" class="course-filter-select">
         <option value="All">All Faculties</option>
-        ${metadata.faculties.map(f => 
-          `<option value="${escapeHtml(f)}" ${f === profile.faculty ? 'selected' : ''}>${escapeHtml(f)}</option>`
-        ).join('')}
+        ${metadata.faculties
+          .map(
+            (f) =>
+              `<option value="${escapeHtml(f)}" ${f === profile.faculty ? "selected" : ""}>${escapeHtml(f)}</option>`,
+          )
+          .join("")}
       </select>
 
       <select id="cmYear" class="course-filter-select">
         <option value="All">All Years</option>
-        ${availableYears.map(y => 
-          `<option value="${escapeHtml(y)}" ${y === profile.year ? 'selected' : ''}>Year ${escapeHtml(y)}</option>`
-        ).join('')}
+        ${availableYears
+          .map(
+            (y) =>
+              `<option value="${escapeHtml(y)}" ${y === profile.year ? "selected" : ""}>Year ${escapeHtml(y)}</option>`,
+          )
+          .join("")}
       </select>
 
       <select id="cmTerm" class="course-filter-select">
         <option value="All">All Terms</option>
-        ${availableTerms.map(t => 
-          `<option value="${escapeHtml(t)}" ${t === profile.term ? 'selected' : ''}>Term ${escapeHtml(t)}</option>`
-        ).join('')}
+        ${availableTerms
+          .map(
+            (t) =>
+              `<option value="${escapeHtml(t)}" ${t === profile.term ? "selected" : ""}>Term ${escapeHtml(t)}</option>`,
+          )
+          .join("")}
       </select>
     </div>
 
@@ -321,7 +362,7 @@ window.openCourseManager = function() {
   renderCourseManagerList();
 
   // Close on overlay click
-  modal.addEventListener('click', (e) => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) window.closeCourseManager();
   });
 };
@@ -330,76 +371,89 @@ window.openCourseManager = function() {
  * Setup cascading dropdown behavior for Course Manager modal
  */
 function setupCourseManagerDropdownCascade() {
-  const facultySelect = document.getElementById('cmFaculty');
-  const yearSelect = document.getElementById('cmYear');
-  const termSelect = document.getElementById('cmTerm');
+  const facultySelect = document.getElementById("cmFaculty");
+  const yearSelect = document.getElementById("cmYear");
+  const termSelect = document.getElementById("cmTerm");
 
   if (!facultySelect || !yearSelect || !termSelect) return;
 
   // When faculty changes, update year and term dropdowns
-  facultySelect.addEventListener('change', () => {
+  facultySelect.addEventListener("change", () => {
     const selectedFaculty = facultySelect.value;
-    
+
     // Update year dropdown
-    const availableYears = selectedFaculty === 'All' 
-      ? extractMetadata(categoryTree).years 
-      : getAvailableYears(categoryTree, selectedFaculty);
-    
+    const availableYears =
+      selectedFaculty === "All"
+        ? extractMetadata(categoryTree).years
+        : getAvailableYears(categoryTree, selectedFaculty);
+
     const currentYear = yearSelect.value;
-    yearSelect.innerHTML = '<option value="All">All Years</option>' + 
-      availableYears.map(y => 
-        `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
-      ).join('');
-    
+    yearSelect.innerHTML =
+      '<option value="All">All Years</option>' +
+      availableYears
+        .map(
+          (y) =>
+            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
+        )
+        .join("");
+
     // Restore selection if still valid, otherwise reset to "All"
     if (availableYears.includes(currentYear)) {
       yearSelect.value = currentYear;
     } else {
-      yearSelect.value = 'All';
+      yearSelect.value = "All";
     }
-    
+
     // Trigger year change to update terms
-    yearSelect.dispatchEvent(new Event('change'));
+    yearSelect.dispatchEvent(new Event("change"));
   });
 
   // When year changes, update term dropdown
-  yearSelect.addEventListener('change', () => {
+  yearSelect.addEventListener("change", () => {
     const selectedFaculty = facultySelect.value;
     const selectedYear = yearSelect.value;
-    
+
     // Update term dropdown
-    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
-    
+    const availableTerms = getAvailableTerms(
+      categoryTree,
+      selectedFaculty,
+      selectedYear,
+    );
+
     const currentTerm = termSelect.value;
-    termSelect.innerHTML = '<option value="All">All Terms</option>' + 
-      availableTerms.map(t => 
-        `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
-      ).join('');
-    
+    termSelect.innerHTML =
+      '<option value="All">All Terms</option>' +
+      availableTerms
+        .map(
+          (t) =>
+            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
+        )
+        .join("");
+
     // Restore selection if still valid, otherwise reset to "All"
     if (availableTerms.includes(currentTerm)) {
       termSelect.value = currentTerm;
     } else {
-      termSelect.value = 'All';
+      termSelect.value = "All";
     }
-    
+
     // Re-render course list after cascade updates
     renderCourseManagerList();
   });
 
   // When term changes, re-render course list
-  termSelect.addEventListener('change', () => {
+  termSelect.addEventListener("change", () => {
     renderCourseManagerList();
   });
 }
 
 function renderCourseManagerList() {
-  const listContainer = document.getElementById('courseManagerList');
+  const listContainer = document.getElementById("courseManagerList");
   if (!listContainer) return;
 
-  const faculty = document.getElementById('cmFaculty')?.value || 'All';
-  const year = document.getElementById('cmYear')?.value || 'All';
-  const term = document.getElementById('cmTerm')?.value || 'All';
+  const faculty = document.getElementById("cmFaculty")?.value || "All";
+  const year = document.getElementById("cmYear")?.value || "All";
+  const term = document.getElementById("cmTerm")?.value || "All";
 
   const filteredCourses = filterCourses(categoryTree, { faculty, year, term });
   const subscribedIds = userProfile.getSubscribedCourseIds();
@@ -414,10 +468,11 @@ function renderCourseManagerList() {
     return;
   }
 
-  listContainer.innerHTML = filteredCourses.map(course => {
-    const isSubscribed = subscribedIds.includes(course.id);
-    return `
-      <div class="course-manager-item ${isSubscribed ? 'subscribed' : ''}">
+  listContainer.innerHTML = filteredCourses
+    .map((course) => {
+      const isSubscribed = subscribedIds.includes(course.id);
+      return `
+      <div class="course-manager-item ${isSubscribed ? "subscribed" : ""}">
         <div class="course-manager-info">
           <h4>${escapeHtml(course.name)}</h4>
           <p class="course-manager-meta">
@@ -425,25 +480,26 @@ function renderCourseManagerList() {
           </p>
         </div>
         <button 
-          class="course-toggle-btn ${isSubscribed ? 'active' : ''}"
+          class="course-toggle-btn ${isSubscribed ? "active" : ""}"
           onclick="window.toggleCourseSubscription('${escapeHtml(course.id)}')"
         >
-          ${isSubscribed ? '✓ Subscribed' : '+ Subscribe'}
+          ${isSubscribed ? "✓ Subscribed" : "+ Subscribe"}
         </button>
       </div>
     `;
-  }).join('');
+    })
+    .join("");
 }
 
-window.toggleCourseSubscription = function(courseId) {
+window.toggleCourseSubscription = function (courseId) {
   userProfile.toggleSubscription(courseId);
   renderCourseManagerList();
 };
 
-window.closeCourseManager = function() {
-  const modal = document.getElementById('courseManagerModal');
+window.closeCourseManager = function () {
+  const modal = document.getElementById("courseManagerModal");
   if (modal) modal.remove();
-  
+
   // Refresh main view
   renderRootCategories();
 };
@@ -475,7 +531,7 @@ function renderRootCategories() {
   if (!title || !container) return;
 
   const subscribedIds = userProfile.getSubscribedCourseIds();
-  
+
   // Get subscribed courses
   const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
 
@@ -493,7 +549,7 @@ function renderRootCategories() {
 
   // Show subscribed courses if any
   if (subscribedCourses.length > 0) {
-    subscribedCourses.forEach(course => {
+    subscribedCourses.forEach((course) => {
       const itemCount = getCourseItemCount(course);
       const card = createCategoryCard(course.name, itemCount, true, course);
       card.onclick = () => renderCategory(categoryTree[course.key]);
@@ -565,7 +621,12 @@ function renderCategory(category) {
   }
 }
 
-function createCategoryCard(name, itemCount, isFolder = false, courseData = null) {
+function createCategoryCard(
+  name,
+  itemCount,
+  isFolder = false,
+  courseData = null,
+) {
   const card = document.createElement("div");
   card.className = "card category-card";
 
@@ -586,24 +647,24 @@ function createCategoryCard(name, itemCount, isFolder = false, courseData = null
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
     const metaDiv = document.createElement("div");
     metaDiv.className = "course-meta";
-    
+
     // Create individual badges
     const facultyBadge = document.createElement("span");
     facultyBadge.className = "course-meta-badge faculty";
     facultyBadge.textContent = courseData.faculty;
-    
+
     const yearBadge = document.createElement("span");
     yearBadge.className = "course-meta-badge year";
-    yearBadge.textContent = `Y${courseData.year}`;
-    
+    yearBadge.textContent = `Year ${courseData.year}`;
+
     const termBadge = document.createElement("span");
     termBadge.className = "course-meta-badge term";
-    termBadge.textContent = `T${courseData.term}`;
-    
+    termBadge.textContent = `Term${courseData.term}`;
+
     metaDiv.appendChild(facultyBadge);
     metaDiv.appendChild(yearBadge);
     metaDiv.appendChild(termBadge);
-    
+
     card.appendChild(iconDiv);
     card.appendChild(h3);
     card.appendChild(metaDiv);
@@ -649,30 +710,49 @@ function createExamCard(exam) {
     };
 
     if (format === "md") {
-      let hasMCQ = false, hasTF = false, hasEssay = false;
+      let hasMCQ = false,
+        hasTF = false,
+        hasEssay = false;
       questions.forEach((q) => {
         if (isEssayQ(q)) hasEssay = true;
         else if (q.options.length === 2) hasTF = true;
         else hasMCQ = true;
       });
-      let qt = hasEssay && !hasMCQ && !hasTF ? "Essay/Definitions" : hasEssay ? "Mixed (MCQ, True/False, Essay)" : hasMCQ && hasTF ? "MCQ and True/False" : hasTF ? "True/False only" : "MCQ only";
+      let qt =
+        hasEssay && !hasMCQ && !hasTF
+          ? "Essay/Definitions"
+          : hasEssay
+            ? "Mixed (MCQ, True/False, Essay)"
+            : hasMCQ && hasTF
+              ? "MCQ and True/False"
+              : hasTF
+                ? "True/False only"
+                : "MCQ only";
       let md = `# ${config.title || "Quiz"}\n**Number of questions:** ${questions.length}\n**Questions' type:** ${qt}\n\n---\n\n`;
       questions.forEach((q, i) => {
         md += `### Question ${i + 1}\n${q.q}\n\n`;
         if (isEssayQ(q)) md += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
         else {
-          q.options.forEach((opt, j) => { md += `${String.fromCharCode(65 + j)}. ${opt}\n`; });
+          q.options.forEach((opt, j) => {
+            md += `${String.fromCharCode(65 + j)}. ${opt}\n`;
+          });
           md += `\n**Correct Answer:** ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}\n\n`;
         }
         if (q.explanation) md += `**Explanation:**\n${q.explanation}\n\n`;
         md += `---\n\n`;
       });
-      blobDownload(new Blob([md], { type: "text/markdown;charset=utf-8" }), "text/markdown", `${config.title || "quiz_export"}.md`);
+      blobDownload(
+        new Blob([md], { type: "text/markdown;charset=utf-8" }),
+        "text/markdown",
+        `${config.title || "quiz_export"}.md`,
+      );
       return;
     }
 
     if (format === "html") {
-      let hasMCQ = false, hasTF = false, hasEssay = false;
+      let hasMCQ = false,
+        hasTF = false,
+        hasEssay = false;
       questions.forEach((q) => {
         if (isEssayQ(q)) hasEssay = true;
         else if (q.options.length === 2) hasTF = true;
@@ -685,22 +765,33 @@ function createExamCard(exam) {
       let html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${config.title || "Quiz Examination"}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.6;color:#e0e0e0;background:#121212}h1{color:#fff;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:30px;text-align:center}.meta{text-align:center;color:#888;margin-bottom:40px;font-style:italic}.question-card{background:#1e1e1e;border-radius:12px;padding:25px;margin-bottom:30px;box-shadow:0 4px 12px rgba(0,0,0,.3);border:1px solid #333}.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:.9rem;color:#aaa}.q-text{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:20px}.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.option{padding:10px 15px;margin-bottom:8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.95rem}.correct-answer{background:var(--correct-bg);color:var(--correct-text);border:1px solid #22c55e;font-weight:600;margin-top:15px;padding:12px 15px;border-radius:8px}.explanation{margin-top:15px;padding:15px;background:rgba(59,130,246,.1);border-left:3px solid var(--accent);color:#dbeafe;font-size:.95rem}.essay-box{background:#2a2a2a;padding:15px;border-radius:8px;border-left:3px solid #f59e0b;margin-top:10px}.footer{text-align:center;margin-top:50px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border);padding-top:20px}</style></head><body><h1>${config.title || "Quiz Examination"}</h1><div class="meta">Total Questions: ${questions.length} • Type: ${qt} • Date: ${date}</div>`;
       questions.forEach((q, i) => {
         html += `<div class="question-card"><div class="q-header"><span>Question ${i + 1}</span><span>${isEssayQ(q) ? "Essay" : "MCQ"}</span></div><div class="q-text">${q.q}</div>`;
-        if (isEssayQ(q)) html += `<div class="essay-box"><strong style="color:#f59e0b;display:block;margin-bottom:5px">Formal Answer / Key Points:</strong>${q.options[0]}</div>`;
+        if (isEssayQ(q))
+          html += `<div class="essay-box"><strong style="color:#f59e0b;display:block;margin-bottom:5px">Formal Answer / Key Points:</strong>${q.options[0]}</div>`;
         else {
           html += `<div class="options-list">`;
-          q.options.forEach((opt, j) => { html += `<div class="option"><strong>${String.fromCharCode(65 + j)}.</strong> ${opt}</div>`; });
+          q.options.forEach((opt, j) => {
+            html += `<div class="option"><strong>${String.fromCharCode(65 + j)}.</strong> ${opt}</div>`;
+          });
           html += `</div><div class="correct-answer">✓ Correct Answer: ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</div>`;
         }
-        if (q.explanation) html += `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`;
+        if (q.explanation)
+          html += `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`;
         html += `</div>`;
       });
       html += `<div class="footer">Generated by Quiz App</div></body></html>`;
-      blobDownload(new Blob([html], { type: "text/html;charset=utf-8" }), "text/html", `${config.title || "quiz_export"}.html`);
+      blobDownload(
+        new Blob([html], { type: "text/html;charset=utf-8" }),
+        "text/html",
+        `${config.title || "quiz_export"}.html`,
+      );
       return;
     }
 
     if (format === "quiz") {
-      const qJson = JSON.stringify(questions).replace(/<\/script/gi, "<\\/script");
+      const qJson = JSON.stringify(questions).replace(
+        /<\/script/gi,
+        "<\\/script",
+      );
       const quizHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -848,14 +939,27 @@ renderQuiz();
 </script>
 </body>
 </html>`;
-      blobDownload(new Blob([quizHtml], { type: "text/html;charset=utf-8" }), "text/html", `${config.title || "practice_quiz"}.html`);
+      blobDownload(
+        new Blob([quizHtml], { type: "text/html;charset=utf-8" }),
+        "text/html",
+        `${config.title || "practice_quiz"}.html`,
+      );
       return;
     }
 
     if (format === "pdf") {
-      if (typeof html2pdf === "undefined") { alert("PDF library is not loaded. Please try again."); return; }
-      let hasMCQ = false, hasTF = false, hasEssay = false;
-      questions.forEach((q) => { if (isEssayQ(q)) hasEssay = true; else if (q.options.length === 2) hasTF = true; else hasMCQ = true; });
+      if (typeof html2pdf === "undefined") {
+        alert("PDF library is not loaded. Please try again.");
+        return;
+      }
+      let hasMCQ = false,
+        hasTF = false,
+        hasEssay = false;
+      questions.forEach((q) => {
+        if (isEssayQ(q)) hasEssay = true;
+        else if (q.options.length === 2) hasTF = true;
+        else hasMCQ = true;
+      });
       let qt = "Multiple Choice";
       if (hasEssay && !hasMCQ && !hasTF) qt = "Essay/Definitions";
       else if (hasEssay) qt = "Mixed (MCQ, True/False, Essay)";
@@ -866,40 +970,91 @@ renderQuiz();
       let contentHTML = `<style>#pdf-export-wrapper{font-family:'Times New Roman',serif;color:#000!important;background:#fff!important;line-height:1.5}#pdf-export-wrapper h1,#pdf-export-wrapper h2,#pdf-export-wrapper p,#pdf-export-wrapper div,#pdf-export-wrapper span{color:#000!important}.pdf-card{border:1px solid #ddd;background:#fafafa!important;padding:15px;margin-bottom:20px;page-break-inside:avoid}.pdf-correct{background:#e8f5e9!important;border-left:4px solid #4caf50;padding:10px;margin-top:10px;color:#000!important}.pdf-essay{background:#fff3e0!important;border-left:4px solid #ff9800;padding:10px;margin-top:10px;color:#000!important}.pdf-explain{background:#e3f2fd!important;border-left:4px solid #2196f3;padding:10px;margin-top:10px;font-style:italic;color:#000!important}</style><div id="pdf-export-wrapper" style="padding:20px"><div style="text-align:center;border-bottom:2px solid #000;padding-bottom:15px;margin-bottom:30px"><h1 style="font-size:24px;margin:0;text-transform:uppercase">${config.title || "Quiz Examination"}</h1><p style="font-size:14px;margin:5px 0"><strong>Total Questions:</strong> ${questions.length} &nbsp;|&nbsp; <strong>Type:</strong> ${qt}</p></div>`;
       questions.forEach((q, i) => {
         contentHTML += `<div class="pdf-card"><div style="font-weight:bold;font-size:14px;margin-bottom:8px">Question ${i + 1}</div><div style="font-size:13px;margin-bottom:12px">${q.q}</div>`;
-        if (isEssayQ(q)) contentHTML += `<div class="pdf-essay"><strong>Answer:</strong><br>${q.options[0]}</div>`;
+        if (isEssayQ(q))
+          contentHTML += `<div class="pdf-essay"><strong>Answer:</strong><br>${q.options[0]}</div>`;
         else {
           contentHTML += `<div style="margin-left:15px">`;
-          q.options.forEach((opt, j) => { contentHTML += `<div style="margin-bottom:5px;font-size:12px"><strong>${String.fromCharCode(65 + j)}.</strong> ${opt}</div>`; });
+          q.options.forEach((opt, j) => {
+            contentHTML += `<div style="margin-bottom:5px;font-size:12px"><strong>${String.fromCharCode(65 + j)}.</strong> ${opt}</div>`;
+          });
           contentHTML += `</div><div class="pdf-correct"><strong>Correct Answer:</strong> ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</div>`;
         }
-        if (q.explanation) contentHTML += `<div class="pdf-explain"><strong>Explanation:</strong> ${q.explanation}</div>`;
+        if (q.explanation)
+          contentHTML += `<div class="pdf-explain"><strong>Explanation:</strong> ${q.explanation}</div>`;
         contentHTML += `</div>`;
       });
       contentHTML += `<div style="margin-top:30px;text-align:center;font-size:10px;border-top:1px solid #ccc;padding-top:10px">Generated on ${new Date().toLocaleDateString()}</div></div>`;
       pdfContainer.innerHTML = contentHTML;
-      const opts = { margin: [10, 10, 10, 10], filename: `${config.title || "quiz"}.pdf`, image: { type: "jpeg", quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff", scrollY: 0, windowHeight: pdfContainer.scrollHeight }, jsPDF: { unit: "mm", format: "a4", orientation: "portrait" } };
+      const opts = {
+        margin: [10, 10, 10, 10],
+        filename: `${config.title || "quiz"}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+          scrollY: 0,
+          windowHeight: pdfContainer.scrollHeight,
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      };
       setTimeout(() => {
-        html2pdf().set(opts).from(pdfContainer).save().then(() => { if (pdfContainer.parentNode) document.body.removeChild(pdfContainer); }).catch((err) => { console.error(err); if (pdfContainer.parentNode) document.body.removeChild(pdfContainer); alert("Failed to generate PDF."); });
+        html2pdf()
+          .set(opts)
+          .from(pdfContainer)
+          .save()
+          .then(() => {
+            if (pdfContainer.parentNode)
+              document.body.removeChild(pdfContainer);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (pdfContainer.parentNode)
+              document.body.removeChild(pdfContainer);
+            alert("Failed to generate PDF.");
+          });
       }, 100);
     }
   };
 
-  const loadPdfLib = () => new Promise((resolve, reject) => {
-    if (typeof html2pdf !== "undefined") { resolve(); return; }
-    const s = document.createElement("script");
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-    s.onload = resolve;
-    s.onerror = () => reject(new Error("PDF library failed to load"));
-    document.head.appendChild(s);
-  });
+  const loadPdfLib = () =>
+    new Promise((resolve, reject) => {
+      if (typeof html2pdf !== "undefined") {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("PDF library failed to load"));
+      document.head.appendChild(s);
+    });
 
   const onDownloadOption = async (format, modalEl) => {
     modalEl.remove();
-    const config = { id: exam.id, title: exam.title || exam.id, path: exam.path };
+    const config = {
+      id: exam.id,
+      title: exam.title || exam.id,
+      path: exam.path,
+    };
     let mod;
-    try { mod = await import(config.path); } catch (e) { alert("Failed to load exam."); return; }
+    try {
+      mod = await import(config.path);
+    } catch (e) {
+      alert("Failed to load exam.");
+      return;
+    }
     const questions = mod.questions;
-    if (format === "pdf") { try { await loadPdfLib(); } catch { alert("PDF library could not be loaded."); return; } }
+    if (format === "pdf") {
+      try {
+        await loadPdfLib();
+      } catch {
+        alert("PDF library could not be loaded.");
+        return;
+      }
+    }
     runExport(format, config, questions);
   };
 
@@ -927,7 +1082,10 @@ renderQuiz();
       const b = document.createElement("button");
       b.className = "mode-btn";
       b.innerHTML = `<span class="icon">${icon}</span><strong>${label}</strong>`;
-      b.onclick = (ev) => { ev.stopPropagation(); onDownloadOption(format, modal); };
+      b.onclick = (ev) => {
+        ev.stopPropagation();
+        onDownloadOption(format, modal);
+      };
       grid.appendChild(b);
     });
     const closeBtn = document.createElement("button");
@@ -939,14 +1097,17 @@ renderQuiz();
     modalCard.appendChild(grid);
     modalCard.appendChild(closeBtn);
     modal.appendChild(modalCard);
-    requestAnimationFrame(() => { document.body.appendChild(modal); });
+    requestAnimationFrame(() => {
+      document.body.appendChild(modal);
+    });
   };
 
   const downloadBtn = document.createElement("button");
   downloadBtn.className = "start-btn";
   downloadBtn.style.flex = "1";
   downloadBtn.style.minWidth = "0";
-  downloadBtn.style.background = "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)";
+  downloadBtn.style.background =
+    "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)";
   downloadBtn.style.color = "white";
   downloadBtn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.4)";
   downloadBtn.textContent = "Download";
