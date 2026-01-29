@@ -308,12 +308,35 @@ function initCanvasAnimation() {
   }
 }
 
+// FIXED: Listen for animation state changes to handle runtime toggles
+function setupAnimationStateListener() {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === "data-animations") {
+        // Re-run initialization when animation state changes
+        initCanvasAnimation();
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-animations"],
+  });
+}
+
 // FIXED: Better initialization timing
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initCanvasAnimation);
+  document.addEventListener("DOMContentLoaded", () => {
+    initCanvasAnimation();
+    setupAnimationStateListener();
+  });
 } else {
   // DOM already loaded, wait a bit for theme to be applied
-  setTimeout(initCanvasAnimation, 0);
+  setTimeout(() => {
+    initCanvasAnimation();
+    setupAnimationStateListener();
+  }, 0);
 }
 
 // Export for manual control if needed
