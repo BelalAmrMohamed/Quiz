@@ -2508,122 +2508,6 @@ quizApp.init();
 
       const renderScorePage = () => {
         addGameHeader();
-
-        // Main achievement card
-        const cardY = currentY;
-        const cardHeight = 85;
-        drawCard(MARGINS.left, cardY, contentWidth, cardHeight);
-
-        // "QUEST COMPLETE!" banner
-        currentY = cardY + 5;
-        doc.setFillColor(...COLORS.primary);
-        doc.roundedRect(
-          MARGINS.left + 12,
-          currentY,
-          contentWidth - 24,
-          12,
-          2,
-          2,
-          "F",
-        );
-        doc.setTextColor(...COLORS.textWhite);
-        doc.setFontSize(SIZES.titleFont);
-        doc.setFont("helvetica", "bold");
-        doc.text("QUIZ COMPLETE!", pageWidth / 2, currentY + 9, {
-          align: "center",
-        });
-        currentY += 22;
-
-        // Achievement circle with score
-        const circleY = currentY + 13;
-        const radius = 18;
-
-        // Outer ring
-        doc.setFillColor(...COLORS.secondary);
-        doc.circle(pageWidth / 2, circleY, radius + 1.5, "F");
-
-        // Inner circle
-        doc.setFillColor(
-          ...(scoreData.isPassing ? COLORS.success : COLORS.warning),
-        );
-        doc.circle(pageWidth / 2, circleY, radius, "F");
-
-        // Score text
-        doc.setTextColor(...COLORS.textWhite);
-        doc.setFontSize(22);
-        doc.setFont("helvetica", "bold");
-        doc.text(`${scoreData.percentage}%`, pageWidth / 2, circleY + 2, {
-          align: "center",
-        });
-
-        currentY = circleY + radius + 10;
-
-        // Motivational message
-        doc.setFontSize(18);
-        doc.setTextColor(...COLORS.primary);
-        const message = scoreData.isPassing ? "LEGENDARY!" : "KEEP GRINDING!";
-        doc.text(message, pageWidth / 2, currentY, { align: "center" });
-        currentY += 9;
-
-        // Stats row
-        doc.setFontSize(SIZES.questionFont);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(...COLORS.textDark);
-        doc.text(
-          `Score: ${scoreData.correct} / ${scoreData.totalScorable}`,
-          pageWidth / 2,
-          currentY,
-          { align: "center" },
-        );
-        currentY += 5;
-
-        doc.setFontSize(SIZES.optionFont);
-        doc.setTextColor(...COLORS.textLight);
-        doc.text(
-          `Correct: ${scoreData.correct}  Wrong: ${scoreData.wrong}  Skipped: ${scoreData.skipped}`,
-          pageWidth / 2,
-          currentY,
-          { align: "center" },
-        );
-
-        currentY = cardY + cardHeight + 10;
-
-        // Progress bar
-        const progressY = currentY;
-        drawProgressBar(
-          MARGINS.left + 18,
-          progressY,
-          contentWidth - 36,
-          SIZES.progressBarHeight,
-          scoreData.percentage,
-        );
-        currentY = progressY + SIZES.progressBarHeight + 3;
-
-        // Progress percentage
-        doc.setFontSize(SIZES.labelFont);
-        doc.setTextColor(...COLORS.textLight);
-        doc.text(`${scoreData.percentage}% Complete`, pageWidth / 2, currentY, {
-          align: "center",
-        });
-        currentY += 10;
-
-        // Section divider
-        doc.setDrawColor(...COLORS.primary);
-        doc.setLineWidth(1.2);
-        doc.line(
-          MARGINS.left + 25,
-          currentY,
-          pageWidth - MARGINS.right - 25,
-          currentY,
-        );
-        currentY += 8;
-
-        // // "Question Review" header
-        // doc.setFontSize(SIZES.headingFont);
-        // doc.setFont("helvetica", "bold");
-        // doc.setTextColor(...COLORS.primary);
-        // doc.text("QUEST LOG", MARGINS.left, currentY);
-        // currentY += 8;
       };
 
       renderScorePage();
@@ -2705,21 +2589,6 @@ quizApp.init();
           headerY + 5.5,
         );
 
-        // Status badge
-        const { statusText, statusColor } = getQuestionStatus(
-          question,
-          userAns,
-          isEssay,
-        );
-        doc.setTextColor(...COLORS.textWhite);
-        doc.setFontSize(SIZES.optionFont);
-        doc.text(
-          statusText,
-          pageWidth - MARGINS.right - SIZES.cardPadding - 2.5,
-          headerY + 5.5,
-          { align: "right" },
-        );
-
         currentY = headerY + 15;
 
         // Question text
@@ -2742,22 +2611,6 @@ quizApp.init();
         }
 
         currentY = cardY + totalCardHeight + SIZES.cardMargin;
-      };
-
-      const getQuestionStatus = (question, userAns, isEssay) => {
-        if (isEssay) {
-          return { statusText: "ESSAY", statusColor: COLORS.warning };
-        }
-
-        const isSkipped = userAns === undefined || userAns === null;
-        if (isSkipped) {
-          return { statusText: "SKIPPED", statusColor: COLORS.textLight };
-        }
-
-        const isCorrect = userAns === question.correct;
-        return isCorrect
-          ? { statusText: "CORRECT", statusColor: COLORS.success }
-          : { statusText: "WRONG", statusColor: COLORS.error };
       };
 
       const renderEssayAnswer = (question, userAns) => {
