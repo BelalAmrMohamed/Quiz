@@ -12,8 +12,7 @@ Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly
   - [Table of contents](#table-of-contents)
   - [Key Features](#key-features)
   - [Live Link](#live-link)
-  - [Project structure](#project-structure)
-  - [The additional `Exam` folder's format](#the-additional-exam-folders-format)
+  - [The `Exam` folder's format](#the-exam-folders-format)
   - [How quizzes are formatted](#how-quizzes-are-formatted)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -57,61 +56,15 @@ Access the hosted version:
 
 ---
 
-## Project structure
-
-```
-Quiz/
-├── LICENSE
-├── README.md
-├── _config.yml
-├── dashboard.html
-├── favicon.png
-├── index.html
-├── manifest.json
-├── quiz.html
-├── robots.txt
-├── service-worker.js
-├── sitemap.xml
-├── summary.html
-├── Script/
-│   ├── anti-flash.js
-│   ├── dashboard.js
-│   ├── examManifest.js
-│   ├── filterUtils.js
-│   ├── gameEngine.js
-│   ├── index.js
-│   ├── quiz.js
-│   ├── summary.js
-│   ├── theme-controller.js
-│   └── userProfile.js
-├── images/
-│   ├── dashboard-thumbnail.jpg
-│   ├── icon-192.png
-│   ├── icon-512.png
-│   ├── icon.png
-│   ├── laptop.png
-│   ├── maskable-icon.png
-│   ├── quiz-thumbnail.jpeg
-│   ├── quiz.png
-│   ├── screenshot-desktop.png
-│   ├── screenshot-mobile.png
-│   ├── summary-thumbnail.jpg
-│   └── thumbnail.png
-└── tools/
-    ├── generateExamManifest.js
-    └── map.js
-```
-
-## The additional `Exam` folder's format
+## The `Exam` folder's format
 
 ```markdown
-Exams / {faculty [metadata]} / {year [metadata]} / {term [metadata]} / {Courses} / {optional subfolders} / {quiz}.js 
+Exams / {faculty [metadata]} / {year [metadata]} / {term [metadata]} / {Courses} / {optional subfolders} / {quiz}.js
 ```
 
 - The `Exam` folder is in the root folder `Quiz` next to `tools`, `Script` and the rest of the folders
 - The first 3 levels are for the metadata and aren't listed as folders nor in the `categorytree`
 - The actual courses and the `categorytree` begin from level 4 and forward
-
 
 ## How quizzes are formatted
 
@@ -153,5 +106,4 @@ Start your HTML mastery journey today! 🚀
 
 ## The purpose of `.nojekyll` :
 
-tells GitHub to just serve the files exactly as they are, which helps bots reach your sitemap and manifest files without interference.
-
+tells GitHub to just serve the files exactly as they are, which helps bots reach the sitemap and manifest files without interference.

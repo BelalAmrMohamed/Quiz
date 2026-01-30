@@ -1,17 +1,27 @@
+// tools/map.js
+// Run this in the terminal: node tools/map.js
+// The generated file will be in the root folder `Context Map.txt`
+
 const fs = require("fs");
 const path = require("path");
 
-// Settings
-const EXCEPTION_NAMES = ["README.md", "robots.txt"]; // Files to keep even if they have an ignored extension
+// Start of Settings
+
+// Files/Folders to ignore
 const IGNORE_NAMES = [
-  "node_modules",
   ".git",
   "Exams",
   "Context Map.txt",
-  ".DS_Store",
   "google0c1df2c3df22a824.html",
 ];
+
+// Extensions to ignore
 const IGNORE_EXT = [".pyc", ".tmp", ".bat", ".txt", ".md"];
+
+// Files to keep even if they have an ignored extension
+const EXCEPTION_NAMES = ["README.md", "robots.txt"];
+
+// End of Settings
 
 function generateTree() {
   const scriptDir = __dirname;
