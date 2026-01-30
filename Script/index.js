@@ -114,7 +114,9 @@ window.openProfileSettings = function () {
             ${metadata.faculties
               .map(
                 (f) =>
-                  `<option value="${escapeHtml(f)}" ${f === profile.faculty ? "selected" : ""}>${escapeHtml(f)}</option>`,
+                  `<option value="${escapeHtml(f)}" ${
+                    f === profile.faculty ? "selected" : ""
+                  }>${escapeHtml(f)}</option>`,
               )
               .join("")}
           </select>
@@ -127,7 +129,9 @@ window.openProfileSettings = function () {
             ${availableYears
               .map(
                 (y) =>
-                  `<option value="${escapeHtml(y)}" ${y === profile.year ? "selected" : ""}>Year ${escapeHtml(y)}</option>`,
+                  `<option value="${escapeHtml(y)}" ${
+                    y === profile.year ? "selected" : ""
+                  }>Year ${escapeHtml(y)}</option>`,
               )
               .join("")}
           </select>
@@ -140,7 +144,9 @@ window.openProfileSettings = function () {
             ${availableTerms
               .map(
                 (t) =>
-                  `<option value="${escapeHtml(t)}" ${t === profile.term ? "selected" : ""}>Term ${escapeHtml(t)}</option>`,
+                  `<option value="${escapeHtml(t)}" ${
+                    t === profile.term ? "selected" : ""
+                  }>Term ${escapeHtml(t)}</option>`,
               )
               .join("")}
           </select>
@@ -315,7 +321,9 @@ window.openCourseManager = function () {
         ${metadata.faculties
           .map(
             (f) =>
-              `<option value="${escapeHtml(f)}" ${f === profile.faculty ? "selected" : ""}>${escapeHtml(f)}</option>`,
+              `<option value="${escapeHtml(f)}" ${
+                f === profile.faculty ? "selected" : ""
+              }>${escapeHtml(f)}</option>`,
           )
           .join("")}
       </select>
@@ -325,7 +333,9 @@ window.openCourseManager = function () {
         ${availableYears
           .map(
             (y) =>
-              `<option value="${escapeHtml(y)}" ${y === profile.year ? "selected" : ""}>Year ${escapeHtml(y)}</option>`,
+              `<option value="${escapeHtml(y)}" ${
+                y === profile.year ? "selected" : ""
+              }>Year ${escapeHtml(y)}</option>`,
           )
           .join("")}
       </select>
@@ -335,7 +345,9 @@ window.openCourseManager = function () {
         ${availableTerms
           .map(
             (t) =>
-              `<option value="${escapeHtml(t)}" ${t === profile.term ? "selected" : ""}>Term ${escapeHtml(t)}</option>`,
+              `<option value="${escapeHtml(t)}" ${
+                t === profile.term ? "selected" : ""
+              }>Term ${escapeHtml(t)}</option>`,
           )
           .join("")}
       </select>
@@ -476,7 +488,9 @@ function renderCourseManagerList() {
         <div class="course-manager-info">
           <h4>${escapeHtml(course.name)}</h4>
           <p class="course-manager-meta">
-            ${escapeHtml(course.faculty)} • Year ${escapeHtml(course.year)} • Term ${escapeHtml(course.term)}
+            ${escapeHtml(course.faculty)} • Year ${escapeHtml(
+        course.year,
+      )} • Term ${escapeHtml(course.term)}
           </p>
         </div>
         <button 
@@ -722,13 +736,15 @@ function createExamCard(exam) {
         hasEssay && !hasMCQ && !hasTF
           ? "Essay/Definitions"
           : hasEssay
-            ? "Mixed (MCQ, True/False, Essay)"
-            : hasMCQ && hasTF
-              ? "MCQ and True/False"
-              : hasTF
-                ? "True/False only"
-                : "MCQ only";
-      let md = `# ${config.title || "Quiz"}\n**Number of questions:** ${questions.length}\n**Questions' type:** ${qt}\n\n---\n\n`;
+          ? "Mixed (MCQ, True/False, Essay)"
+          : hasMCQ && hasTF
+          ? "MCQ and True/False"
+          : hasTF
+          ? "True/False only"
+          : "MCQ only";
+      let md = `# ${config.title || "Quiz"}\n**Number of questions:** ${
+        questions.length
+      }\n**Questions' type:** ${qt}\n\n---\n\n`;
       questions.forEach((q, i) => {
         md += `### Question ${i + 1}\n${q.q}\n\n`;
         if (isEssayQ(q)) md += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
@@ -736,7 +752,9 @@ function createExamCard(exam) {
           q.options.forEach((opt, j) => {
             md += `${String.fromCharCode(65 + j)}. ${opt}\n`;
           });
-          md += `\n**Correct Answer:** ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}\n\n`;
+          md += `\n**Correct Answer:** ${String.fromCharCode(
+            65 + q.correct,
+          )}. ${q.options[q.correct]}\n\n`;
         }
         if (q.explanation) md += `**Explanation:**\n${q.explanation}\n\n`;
         md += `---\n\n`;
@@ -762,17 +780,31 @@ function createExamCard(exam) {
       if (hasEssay && !hasMCQ && !hasTF) qt = "Essay/Definitions";
       else if (hasEssay) qt = "Mixed (MCQ, True/False, Essay)";
       const date = new Date().toLocaleDateString();
-      let html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${config.title || "Quiz Examination"}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.6;color:#e0e0e0;background:#121212}h1{color:#fff;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:30px;text-align:center}.meta{text-align:center;color:#888;margin-bottom:40px;font-style:italic}.question-card{background:#1e1e1e;border-radius:12px;padding:25px;margin-bottom:30px;box-shadow:0 4px 12px rgba(0,0,0,.3);border:1px solid #333}.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:.9rem;color:#aaa}.q-text{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:20px}.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.option{padding:10px 15px;margin-bottom:8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.95rem}.correct-answer{background:var(--correct-bg);color:var(--correct-text);border:1px solid #22c55e;font-weight:600;margin-top:15px;padding:12px 15px;border-radius:8px}.explanation{margin-top:15px;padding:15px;background:rgba(59,130,246,.1);border-left:3px solid var(--accent);color:#dbeafe;font-size:.95rem}.essay-box{background:#2a2a2a;padding:15px;border-radius:8px;border-left:3px solid #f59e0b;margin-top:10px}.footer{text-align:center;margin-top:50px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border);padding-top:20px}</style></head><body><h1>${config.title || "Quiz Examination"}</h1><div class="meta">Total Questions: ${questions.length} • Type: ${qt} • Date: ${date}</div>`;
+      let html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${
+        config.title || "Quiz Examination"
+      }</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.6;color:#e0e0e0;background:#121212}h1{color:#fff;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:30px;text-align:center}.meta{text-align:center;color:#888;margin-bottom:40px;font-style:italic}.question-card{background:#1e1e1e;border-radius:12px;padding:25px;margin-bottom:30px;box-shadow:0 4px 12px rgba(0,0,0,.3);border:1px solid #333}.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:.9rem;color:#aaa}.q-text{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:20px}.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.option{padding:10px 15px;margin-bottom:8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.95rem}.correct-answer{background:var(--correct-bg);color:var(--correct-text);border:1px solid #22c55e;font-weight:600;margin-top:15px;padding:12px 15px;border-radius:8px}.explanation{margin-top:15px;padding:15px;background:rgba(59,130,246,.1);border-left:3px solid var(--accent);color:#dbeafe;font-size:.95rem}.essay-box{background:#2a2a2a;padding:15px;border-radius:8px;border-left:3px solid #f59e0b;margin-top:10px}.footer{text-align:center;margin-top:50px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border);padding-top:20px}</style></head><body><h1>${
+        config.title || "Quiz Examination"
+      }</h1><div class="meta">Total Questions: ${
+        questions.length
+      } • Type: ${qt} • Date: ${date}</div>`;
       questions.forEach((q, i) => {
-        html += `<div class="question-card"><div class="q-header"><span>Question ${i + 1}</span><span>${isEssayQ(q) ? "Essay" : "MCQ"}</span></div><div class="q-text">${q.q}</div>`;
+        html += `<div class="question-card"><div class="q-header"><span>Question ${
+          i + 1
+        }</span><span>${
+          isEssayQ(q) ? "Essay" : "MCQ"
+        }</span></div><div class="q-text">${q.q}</div>`;
         if (isEssayQ(q))
           html += `<div class="essay-box"><strong style="color:#f59e0b;display:block;margin-bottom:5px">Formal Answer / Key Points:</strong>${q.options[0]}</div>`;
         else {
           html += `<div class="options-list">`;
           q.options.forEach((opt, j) => {
-            html += `<div class="option"><strong>${String.fromCharCode(65 + j)}.</strong> ${opt}</div>`;
+            html += `<div class="option"><strong>${String.fromCharCode(
+              65 + j,
+            )}.</strong> ${opt}</div>`;
           });
-          html += `</div><div class="correct-answer">✓ Correct Answer: ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</div>`;
+          html += `</div><div class="correct-answer">✓ Correct Answer: ${String.fromCharCode(
+            65 + q.correct,
+          )}. ${q.options[q.correct]}</div>`;
         }
         if (q.explanation)
           html += `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`;
@@ -806,24 +838,276 @@ function createExamCard(exam) {
   box-sizing: border-box;
 }
 
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --border-color: #e2e8f0;
+  --card-bg: #f8f9fa;
+  --card-answered: #f0f4ff;
+  --gradient-start: #667eea;
+  --gradient-end: #764ba2;
+  --success: #48bb78;
+  --error: #f56565;
+  --info: #4299e1;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-lg: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a202c;
+  --bg-secondary: #2d3748;
+  --bg-tertiary: #4a5568;
+  --text-primary: #f7fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #a0aec0;
+  --border-color: #4a5568;
+  --card-bg: #2d3748;
+  --card-answered: #3e4c63;
+  --gradient-start: #667eea;
+  --gradient-end: #764ba2;
+  --success: #48bb78;
+  --error: #f56565;
+  --info: #4299e1;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.5);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   min-height: 100vh;
   padding: 20px;
+  transition: background 0.3s ease;
+}
+
+/* Hamburger Menu Button */
+.menu-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  width: 50px;
+  height: 50px;
+  background: var(--gradient-start);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px var(--shadow-lg);
+}
+
+.menu-toggle span {
+  width: 24px;
+  height: 3px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Side Menu */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 320px;
+  height: 100vh;
+  background: var(--bg-primary);
+  box-shadow: 4px 0 20px var(--shadow-lg);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+.side-menu-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.side-menu-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.side-menu-header {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  color: #fff;
+  padding: 25px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.side-menu-header h2 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.side-menu-header p {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.side-menu-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.menu-section {
+  margin-bottom: 25px;
+}
+
+.menu-section h3 {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.dark-mode-toggle:hover {
+  background: var(--bg-tertiary);
+}
+
+.dark-mode-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: var(--border-color);
+  border-radius: 13px;
+  transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+  background: var(--gradient-start);
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(24px);
+}
+
+/* Question Navigator */
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.nav-btn {
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 14px;
+  text-align: center;
+}
+
+.nav-btn:hover {
+  border-color: var(--gradient-start);
+  background: var(--card-answered);
+  transform: scale(1.05);
+}
+
+.nav-btn.answered {
+  background: var(--card-answered);
+  border-color: var(--gradient-start);
+  color: var(--gradient-start);
+}
+
+.nav-btn.current {
+  background: var(--gradient-start);
+  color: #fff;
+  border-color: var(--gradient-start);
 }
 
 .container {
   max-width: 900px;
   margin: 0 auto;
-  background: #fff;
+  background: var(--bg-primary);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--shadow-lg);
   overflow: hidden;
+  transition: background 0.3s ease;
 }
 
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: #fff;
   padding: 30px;
   text-align: center;
@@ -841,7 +1125,7 @@ body {
 
 /* Progress Bar */
 .progress-container {
-  background: #e2e8f0;
+  background: rgba(255, 255, 255, 0.2);
   height: 8px;
   width: 100%;
   border-radius: 4px;
@@ -863,74 +1147,22 @@ body {
   opacity: 0.9;
 }
 
-/* Quiz Navigation */
-.quiz-nav {
-  background: #f8f9fa;
-  padding: 20px;
-  border-bottom: 1px solid #e2e8f0;
-  display: none;
-}
-
-.quiz-nav.show {
-  display: block;
-}
-
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
-  gap: 8px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.nav-btn {
-  padding: 10px;
-  border: 2px solid #e2e8f0;
-  background: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-  font-size: 14px;
-}
-
-.nav-btn:hover {
-  border-color: #667eea;
-  transform: scale(1.05);
-}
-
-.nav-btn.answered {
-  background: #ebf4ff;
-  border-color: #667eea;
-  color: #667eea;
-}
-
-.nav-btn.current {
-  background: #667eea;
-  color: #fff;
-  border-color: #667eea;
-}
-
 .quiz-body {
   padding: 30px;
 }
 
 .question-card {
-  background: #f8f9fa;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 25px;
   margin-bottom: 25px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .question-card.answered {
-  border-color: #667eea;
-  background: #f0f4ff;
-}
-
-.question-card.hidden {
-  display: none;
+  border-color: var(--gradient-start);
+  background: var(--card-answered);
 }
 
 .question-header {
@@ -943,7 +1175,7 @@ body {
 }
 
 .question-num {
-  color: #667eea;
+  color: var(--gradient-start);
   font-weight: 700;
   font-size: 14px;
 }
@@ -967,7 +1199,7 @@ body {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: #2d3748;
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
@@ -978,28 +1210,28 @@ body {
 }
 
 .option-btn {
-  background: #fff;
-  border: 2px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   padding: 15px 20px;
   text-align: left;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 16px;
-  color: #2d3748;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .option-btn:hover:not(.disabled) {
-  border-color: #667eea;
-  background: #f0f4ff;
+  border-color: var(--gradient-start);
+  background: var(--card-answered);
   transform: translateX(5px);
 }
 
 .option-btn:focus {
-  outline: 2px solid #667eea;
+  outline: 2px solid var(--gradient-start);
   outline-offset: 2px;
 }
 
@@ -1010,40 +1242,41 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #e2e8f0;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
   font-weight: 700;
   flex-shrink: 0;
   transition: all 0.3s;
 }
 
 .option-btn.selected .option-letter {
-  background: #667eea;
+  background: var(--gradient-start);
   color: #fff;
 }
 
 .option-btn.correct .option-letter {
-  background: #48bb78;
+  background: var(--success);
   color: #fff;
 }
 
 .option-btn.wrong .option-letter {
-  background: #f56565;
+  background: var(--error);
   color: #fff;
 }
 
 .option-btn.selected {
-  background: #ebf4ff;
-  border-color: #667eea;
+  background: var(--card-answered);
+  border-color: var(--gradient-start);
 }
 
 .option-btn.correct {
   background: #e8f5e9;
-  border-color: #48bb78;
+  border-color: var(--success);
 }
 
 .option-btn.wrong {
   background: #fee;
-  border-color: #f56565;
+  border-color: var(--error);
 }
 
 .option-btn.disabled {
@@ -1055,32 +1288,34 @@ body {
   width: 100%;
   min-height: 150px;
   padding: 15px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   font-family: inherit;
   font-size: 15px;
   resize: vertical;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
   line-height: 1.6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .essay-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--gradient-start);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .essay-input.disabled {
   cursor: not-allowed;
   opacity: 0.8;
-  background: #f1f5f9;
+  background: var(--bg-secondary);
 }
 
 .char-count {
   text-align: right;
   margin-top: 8px;
   font-size: 13px;
-  color: #718096;
+  color: var(--text-muted);
 }
 
 .controls {
@@ -1088,9 +1323,9 @@ body {
   gap: 15px;
   justify-content: center;
   padding: 20px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   flex-wrap: wrap;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
 }
 
 .btn {
@@ -1107,12 +1342,12 @@ body {
 }
 
 .btn:focus {
-  outline: 2px solid #667eea;
+  outline: 2px solid var(--gradient-start);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  background: #667eea;
+  background: var(--gradient-start);
   color: #fff;
 }
 
@@ -1123,12 +1358,12 @@ body {
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #2d3748;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-  background: #cbd5e0;
+  background: var(--border-color);
 }
 
 .btn:disabled {
@@ -1157,7 +1392,7 @@ body {
   font-size: 42px;
   font-weight: 700;
   color: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px var(--shadow);
 }
 
 .score-circle.pass {
@@ -1170,14 +1405,14 @@ body {
 
 .results h2 {
   font-size: 28px;
-  color: #2d3748;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .results-detail {
   margin-top: 20px;
   padding: 20px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 12px;
   display: inline-block;
 }
@@ -1185,12 +1420,12 @@ body {
 .results-detail p {
   margin: 8px 0;
   font-size: 16px;
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .explanation {
   background: #ebf8ff;
-  border-left: 4px solid #4299e1;
+  border-left: 4px solid var(--info);
   padding: 15px;
   margin-top: 15px;
   border-radius: 8px;
@@ -1200,6 +1435,11 @@ body {
   display: none;
 }
 
+[data-theme="dark"] .explanation {
+  background: #1e3a5f;
+  color: #90cdf4;
+}
+
 .explanation.show {
   display: block;
   animation: slideDown 0.3s ease;
@@ -1207,7 +1447,7 @@ body {
 
 .model-answer {
   background: #e8f5e9;
-  border-left: 4px solid #4caf50;
+  border-left: 4px solid var(--success);
   padding: 15px;
   margin-top: 15px;
   border-radius: 8px;
@@ -1215,6 +1455,11 @@ body {
   color: #1b5e20;
   line-height: 1.6;
   display: none;
+}
+
+[data-theme="dark"] .model-answer {
+  background: #1e4620;
+  color: #9ae6b4;
 }
 
 .model-answer.show {
@@ -1231,7 +1476,7 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 1100;
   align-items: center;
   justify-content: center;
 }
@@ -1241,23 +1486,23 @@ body {
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--bg-primary);
   padding: 30px;
   border-radius: 16px;
   max-width: 400px;
   margin: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--shadow-lg);
   animation: modalSlideIn 0.3s ease;
 }
 
 .modal-content h3 {
   margin-bottom: 15px;
-  color: #2d3748;
+  color: var(--text-primary);
   font-size: 20px;
 }
 
 .modal-content p {
-  color: #4a5568;
+  color: var(--text-secondary);
   margin-bottom: 20px;
   line-height: 1.6;
 }
@@ -1315,13 +1560,61 @@ body {
     font-size: 16px;
   }
   
+  .side-menu {
+    width: 280px;
+    left: -280px;
+  }
+  
   .nav-grid {
-    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .menu-toggle {
+    width: 45px;
+    height: 45px;
   }
 }
 </style>
 </head>
 <body>
+<!-- Hamburger Menu Button -->
+<button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Side Menu Overlay -->
+<div class="side-menu-overlay" id="menuOverlay"></div>
+
+<!-- Side Menu -->
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-header">
+    <h2>Quiz Navigator</h2>
+    <p>Jump to any question</p>
+  </div>
+  
+  <div class="side-menu-content">
+    <div class="menu-section">
+      <h3>Settings</h3>
+      <div class="dark-mode-toggle" id="darkModeToggle">
+        <div class="dark-mode-label">
+          <span id="themeIcon">🌙</span>
+          <span>Dark Mode</span>
+        </div>
+        <div class="toggle-switch" id="toggleSwitch">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="menu-section">
+      <h3>Questions</h3>
+      <div class="nav-grid" id="navGrid"></div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
   <div class="header">
     <h1>${config.title || "Practice Quiz"}</h1>
@@ -1329,11 +1622,9 @@ body {
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <div class="progress-text" id="progressText">0 of ${questions.length} answered</div>
-  </div>
-  
-  <div id="quizNav" class="quiz-nav">
-    <div class="nav-grid" id="navGrid"></div>
+    <div class="progress-text" id="progressText">0 of ${
+      questions.length
+    } answered</div>
   </div>
   
   <div id="quizBody" class="quiz-body"></div>
@@ -1369,12 +1660,75 @@ const quizApp = {
   userAnswers: new Array(questions.length).fill(null),
   submitted: false,
   currentQuestion: 0,
+  darkMode: false,
 
   init() {
+    this.loadDarkModePreference();
     this.renderQuiz();
     this.renderNav();
     this.updateProgress();
     this.addKeyboardShortcuts();
+    this.setupMenuToggle();
+    this.setupDarkModeToggle();
+  },
+
+  loadDarkModePreference() {
+    const savedTheme = localStorage.getItem('quizTheme');
+    this.darkMode = savedTheme === 'dark';
+    this.applyTheme();
+  },
+
+  applyTheme() {
+    if (this.darkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('themeIcon').textContent = '☀️';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      document.getElementById('themeIcon').textContent = '🌙';
+    }
+    
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    toggleSwitch.classList.toggle('active', this.darkMode);
+  },
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+    localStorage.setItem('quizTheme', this.darkMode ? 'dark' : 'light');
+    this.applyTheme();
+  },
+
+  setupDarkModeToggle() {
+    const toggle = document.getElementById('darkModeToggle');
+    toggle.addEventListener('click', () => this.toggleDarkMode());
+  },
+
+  setupMenuToggle() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuToggle.addEventListener('click', () => this.toggleMenu());
+    overlay.addEventListener('click', () => this.closeMenu());
+  },
+
+  toggleMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuToggle.classList.toggle('active');
+    sideMenu.classList.toggle('open');
+    overlay.classList.toggle('show');
+  },
+
+  closeMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuToggle.classList.remove('active');
+    sideMenu.classList.remove('open');
+    overlay.classList.remove('show');
   },
 
   isEssayQuestion(question) {
@@ -1396,7 +1750,6 @@ const quizApp = {
       </button>\`
     ).join("");
     navGrid.innerHTML = navHtml;
-    document.getElementById("quizNav").classList.add("show");
   },
 
   renderQuiz() {
@@ -1522,6 +1875,7 @@ const quizApp = {
     if (card) {
       card.scrollIntoView({ behavior: "smooth", block: "center" });
       this.currentQuestion = qIndex;
+      this.closeMenu();
     }
   },
 
@@ -1609,7 +1963,7 @@ const quizApp = {
         <p><strong>Percentage:</strong> \${percent}%</p>
         <p><strong>Status:</strong> \${passed ? "✓ Passed" : "✗ Not Passed"}</p>
       </div>
-      <p style="margin-top:20px;color:#718096">Scroll up to review explanations and answers</p>
+      <p style="margin-top:20px;color:var(--text-muted)">Scroll up to review explanations and answers</p>
     \`;
     
     resultsDiv.classList.add("show");
@@ -1662,6 +2016,14 @@ const quizApp = {
       // Close modal with Escape
       if (e.key === "Escape") {
         this.closeModal();
+        this.closeMenu();
+      }
+      
+      // Toggle menu with 'M' key
+      if (e.key === 'm' || e.key === 'M') {
+        if (!document.getElementById("modal").classList.contains("show")) {
+          this.toggleMenu();
+        }
       }
     });
 
