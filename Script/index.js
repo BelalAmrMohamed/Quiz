@@ -918,8 +918,15 @@ body {
   transition: all 0.3s ease;
 }
 
+.menu-toggle.active span {
+  position: absolute;
+  top: 50%; 
+  left: 55%; 
+  margin: -2px 0 0 -15px; 
+}
+
 .menu-toggle.active span:nth-child(1) {
-  transform: rotate(45deg) translate(7px, 7px);
+  transform: rotate(45deg);
 }
 
 .menu-toggle.active span:nth-child(2) {
@@ -927,9 +934,8 @@ body {
 }
 
 .menu-toggle.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
+  transform: rotate(-45deg);
 }
-
 /* Side Menu */
 .side-menu {
   position: fixed;
