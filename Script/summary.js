@@ -1,7 +1,7 @@
 // Website/Script/summary.js
 import { examList } from "./examManifest.js";
 
-const currentName = localStorage.getItem("username");
+const currentName = localStorage.getItem("username") || "User";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
 
@@ -785,7 +785,7 @@ function exportToPdf(config, questions, userAnswers) {
       doc.setFontSize(SIZES.footerFont);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...COLORS.primary);
-      doc.text(`Level ${currentLevel}`, MARGINS.left, footerY + 4);
+      doc.text(`Page ${currentLevel}`, MARGINS.left, footerY + 4);
 
       // Branding (right)
       doc.setFont("helvetica", "normal");
@@ -897,7 +897,7 @@ function exportToPdf(config, questions, userAnswers) {
       doc.setTextColor(...COLORS.textWhite);
       doc.setFontSize(SIZES.titleFont);
       doc.setFont("helvetica", "bold");
-      doc.text("Quiz COMPLETE!", pageWidth / 2, currentY + 9, {
+      doc.text("QUIZ COMPLETE!", pageWidth / 2, currentY + 9, {
         align: "center",
       });
       currentY += 22;
@@ -1315,7 +1315,7 @@ function exportToPdf(config, questions, userAnswers) {
       doc.setFontSize(32);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...COLORS.primary);
-      doc.text("GAME", pageWidth / 2, currentY, { align: "center" });
+      doc.text("End", pageWidth / 2, currentY, { align: "center" });
       currentY += 14;
 
       // CTA heading
@@ -1330,7 +1330,7 @@ function exportToPdf(config, questions, userAnswers) {
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...COLORS.textLight);
       doc.text(
-        "Continue your quest with more challenges!",
+        "Continue your journey with more challenges!",
         pageWidth / 2,
         currentY,
         {
@@ -1354,12 +1354,12 @@ function exportToPdf(config, questions, userAnswers) {
         align: "center",
       });
 
-      currentY += 15;
+      currentY += 25;
 
       // URL
       doc.setFontSize(SIZES.optionFont);
       doc.setTextColor(...COLORS.info);
-      doc.setFont("helvetica", "normal");
+      doc.setFont("helvetica", "bold");
       doc.text("https://divquizzes.vercel.app/", pageWidth / 2, currentY, {
         align: "center",
       });
