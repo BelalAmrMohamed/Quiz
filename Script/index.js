@@ -2386,7 +2386,6 @@ quizApp.init();
         const headerText = sanitizeText(config.title || "Quiz Quest");
         doc.text(headerText, MARGINS.left, 11);
 
-        // Trophy text instead of emoji for safety
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
 
@@ -2409,7 +2408,7 @@ quizApp.init();
         doc.setLineWidth(0.8);
         doc.line(0, footerY - 2, pageWidth, footerY - 2);
 
-        // Level indicator (left)
+        // Page indicator (left)
         doc.setFontSize(SIZES.footerFont);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...COLORS.primary);
