@@ -792,6 +792,7 @@ function createExamCard(exam) {
         /<\/script/gi,
         "<\\/script",
       );
+
       const quizHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -799,146 +800,886 @@ function createExamCard(exam) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${config.title || "Practice Quiz"}</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
-.container{max-width:800px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
-.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:30px;text-align:center}
-.header h1{font-size:28px;margin-bottom:10px}
-.header p{opacity:.9;font-size:14px}
-.quiz-body{padding:30px}
-.question-card{background:#f8f9fa;border-radius:12px;padding:25px;margin-bottom:25px;border:2px solid #e9ecef}
-.question-card.answered{border-color:#667eea}
-.question-num{color:#667eea;font-weight:700;font-size:14px;margin-bottom:15px}
-.question-text{font-size:18px;font-weight:600;margin-bottom:20px;color:#2d3748;line-height:1.6}
-.options{display:flex;flex-direction:column;gap:12px}
-.option-btn{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:15px 20px;text-align:left;cursor:pointer;transition:all .3s ease;font-size:16px;color:#2d3748}
-.option-btn:hover{border-color:#667eea;background:#f0f4ff;transform:translateX(5px)}
-.option-btn.selected{background:#667eea;color:#fff;border-color:#667eea}
-.option-btn.correct{background:#48bb78;color:#fff;border-color:#48bb78}
-.option-btn.wrong{background:#f56565;color:#fff;border-color:#f56565}
-.option-btn.disabled{cursor:not-allowed;opacity:.6}
-.essay-input{width:100%;min-height:120px;padding:15px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:15px;resize:vertical}
-.essay-input:focus{outline:0;border-color:#667eea}
-.controls{display:flex;gap:15px;justify-content:center;padding:20px;background:#f8f9fa;flex-wrap:wrap}
-.btn{padding:12px 30px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s}
-.btn-primary{background:#667eea;color:#fff}
-.btn-primary:hover{background:#5a67d8;transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,.4)}
-.btn-secondary{background:#e2e8f0;color:#2d3748}
-.btn-secondary:hover{background:#cbd5e0}
-.results{padding:30px;text-align:center;display:none}
-.results.show{display:block}
-.score-circle{width:150px;height:150px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff}
-.score-circle.pass{background:linear-gradient(135deg,#48bb78,#38a169)}
-.score-circle.fail{background:linear-gradient(135deg,#f56565,#e53e3e)}
-.explanation{background:#ebf8ff;border-left:4px solid #4299e1;padding:15px;margin-top:15px;border-radius:8px;font-size:14px;color:#2c5282;display:none}
-.explanation.show{display:block}
-.model-answer{background:#e8f5e9;border-left:4px solid #4caf50;padding:12px 15px;margin-top:15px;border-radius:8px;font-size:14px;color:#1b5e20;display:none}
-.model-answer.show{display:block}
-.essay-input.disabled{cursor:not-allowed;opacity:0.8;background:#f1f5f9}
-@media(max-width:600px){.container{border-radius:0}.header{padding:20px}.quiz-body{padding:20px}}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.header p {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* Progress Bar */
+.progress-container {
+  background: #e2e8f0;
+  height: 8px;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #48bb78, #38a169);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* Quiz Navigation */
+.quiz-nav {
+  background: #f8f9fa;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: none;
+}
+
+.quiz-nav.show {
+  display: block;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+  gap: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.nav-btn {
+  padding: 10px;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.nav-btn:hover {
+  border-color: #667eea;
+  transform: scale(1.05);
+}
+
+.nav-btn.answered {
+  background: #ebf4ff;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.nav-btn.current {
+  background: #667eea;
+  color: #fff;
+  border-color: #667eea;
+}
+
+.quiz-body {
+  padding: 30px;
+}
+
+.question-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.question-card.answered {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.question-card.hidden {
+  display: none;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.question-num {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.question-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.question-badge.essay {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.question-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2d3748;
+  line-height: 1.6;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-btn {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 15px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.option-btn:hover:not(.disabled) {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: translateX(5px);
+}
+
+.option-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.option-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.option-btn.selected .option-letter {
+  background: #667eea;
+  color: #fff;
+}
+
+.option-btn.correct .option-letter {
+  background: #48bb78;
+  color: #fff;
+}
+
+.option-btn.wrong .option-letter {
+  background: #f56565;
+  color: #fff;
+}
+
+.option-btn.selected {
+  background: #ebf4ff;
+  border-color: #667eea;
+}
+
+.option-btn.correct {
+  background: #e8f5e9;
+  border-color: #48bb78;
+}
+
+.option-btn.wrong {
+  background: #fee;
+  border-color: #f56565;
+}
+
+.option-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.essay-input {
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  resize: vertical;
+  transition: border-color 0.3s;
+  line-height: 1.6;
+}
+
+.essay-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.essay-input.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+  background: #f1f5f9;
+}
+
+.char-count {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #718096;
+}
+
+.controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+  flex-wrap: wrap;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e0;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.results {
+  padding: 30px;
+  text-align: center;
+  display: none;
+}
+
+.results.show {
+  display: block;
+}
+
+.score-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.score-circle.pass {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+.score-circle.fail {
+  background: linear-gradient(135deg, #f56565, #e53e3e);
+}
+
+.results h2 {
+  font-size: 28px;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+.results-detail {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.results-detail p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.explanation {
+  background: #ebf8ff;
+  border-left: 4px solid #4299e1;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2c5282;
+  line-height: 1.6;
+  display: none;
+}
+
+.explanation.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+.model-answer {
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1b5e20;
+  line-height: 1.6;
+  display: none;
+}
+
+.model-answer.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+/* Confirmation Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 400px;
+  margin: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-content h3 {
+  margin-bottom: 15px;
+  color: #2d3748;
+  font-size: 20px;
+}
+
+.modal-content p {
+  color: #4a5568;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    border-radius: 0;
+  }
+  
+  .header {
+    padding: 20px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+  }
+  
+  .quiz-body {
+    padding: 20px;
+  }
+  
+  .question-card {
+    padding: 20px;
+  }
+  
+  .question-text {
+    font-size: 16px;
+  }
+  
+  .nav-grid {
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  }
+}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<h1>${config.title || "Practice Quiz"}</h1>
-<p>Total Questions: ${questions.length} | Practice Mode</p>
+  <div class="header">
+    <h1>${config.title || "Practice Quiz"}</h1>
+    <p>Total Questions: ${questions.length} | Practice Mode</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 of ${questions.length} answered</div>
+  </div>
+  
+  <div id="quizNav" class="quiz-nav">
+    <div class="nav-grid" id="navGrid"></div>
+  </div>
+  
+  <div id="quizBody" class="quiz-body"></div>
+  
+  <div class="controls">
+    <button class="btn btn-secondary" onclick="quizApp.reset()" aria-label="Reset quiz">
+      🔄 Reset Quiz
+    </button>
+    <button class="btn btn-primary" onclick="quizApp.submit()" id="submitBtn" aria-label="Submit quiz">
+      ✓ Submit Quiz
+    </button>
+  </div>
+  
+  <div id="results" class="results"></div>
 </div>
-<div id="quizBody" class="quiz-body"></div>
-<div class="controls">
-<button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset Quiz</button>
-<button class="btn btn-primary" onclick="submitQuiz()">✓ Submit Quiz</button>
+
+<!-- Confirmation Modal -->
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h3 id="modalTitle">Confirm Action</h3>
+    <p id="modalMessage"></p>
+    <div class="modal-buttons">
+      <button class="btn btn-secondary" onclick="quizApp.closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
 </div>
-<div id="results" class="results"></div>
-</div>
+
 <script>
-const questions=${qJson};
-let userAnswers=new Array(questions.length).fill(null);
-let submitted=false;
-function isEssayQuestion(q){return q.options&&q.options.length===1}
-function escapeHTML(str){if(str==null||str===undefined)return "";var d=document.createElement("div");d.textContent=str;return d.innerHTML}
-function renderQuiz(){
-var quizBody=document.getElementById("quizBody");
-var html="";
-for(var i=0;i<questions.length;i++){
-var q=questions[i];
-var isEssay=isEssayQuestion(q);
-html+='<div class="question-card" id="q'+i+'"><div class="question-num">Question '+(i+1)+'</div><div class="question-text">'+escapeHTML(q.q)+'</div>';
-if(isEssay){
-html+='<textarea class="essay-input" id="essay'+i+'" placeholder="Type your answer here..." oninput="saveEssayAnswer('+i+', this.value)">'+(userAnswers[i]||"")+"</textarea>";
-html+='<div class="model-answer" id="modelAns'+i+'"><strong>Correct Answer / Model Answer:</strong><br>'+escapeHTML(q.options[0])+"</div>";
-}else{
-html+='<div class="options">';
-for(var j=0;j<q.options.length;j++){
-var letter=String.fromCharCode(65+j);
-html+='<button class="option-btn" id="btn'+i+'_'+j+'" onclick="selectAnswer('+i+','+j+')"><strong>'+letter+'.</strong> '+escapeHTML(q.options[j])+"</button>";
-}
-html+="</div>";
-}
-if(q.explanation){html+='<div class="explanation" id="exp'+i+'"><strong>💡 Explanation:</strong> '+escapeHTML(q.explanation)+"</div>"}
-html+="</div>";
-}
-quizBody.innerHTML=html;
-}
-function selectAnswer(qIndex,optIndex){
-if(submitted)return;
-userAnswers[qIndex]=optIndex;
-var card=document.getElementById("q"+qIndex);
-card.classList.add("answered");
-var btns=card.querySelectorAll(".option-btn");
-for(var k=0;k<btns.length;k++){btns[k].classList.remove("selected");if(k===optIndex)btns[k].classList.add("selected")}
-}
-function saveEssayAnswer(qIndex,value){
-userAnswers[qIndex]=value.trim()||null;
-var card=document.getElementById("q"+qIndex);
-if(value.trim())card.classList.add("answered");else card.classList.remove("answered");
-}
-function submitQuiz(){
-if(submitted)return;
-submitted=true;
-var correct=0,totalScorable=0;
-for(var i=0;i<questions.length;i++){
-var q=questions[i];
-if(isEssayQuestion(q)){
-var essayEl=document.getElementById("essay"+i);
-if(essayEl){essayEl.readOnly=true;essayEl.classList.add("disabled")}
-var modelEl=document.getElementById("modelAns"+i);
-if(modelEl)modelEl.classList.add("show");
-var exp=document.getElementById("exp"+i);
-if(exp)exp.classList.add("show");
-continue;
-}
-totalScorable++;
-var userAns=userAnswers[i];
-var isCorrect=userAns===q.correct;
-if(isCorrect)correct++;
-var card=document.getElementById("q"+i);
-var btns=card.querySelectorAll(".option-btn");
-for(var k=0;k<btns.length;k++){
-btns[k].classList.add("disabled");
-if(k===q.correct)btns[k].classList.add("correct");
-else if(k===userAns&&!isCorrect)btns[k].classList.add("wrong");
-}
-var exp=document.getElementById("exp"+i);
-if(exp)exp.classList.add("show");
-}
-var pct=totalScorable>0?Math.round((correct/totalScorable)*100):0;
-var resultsDiv=document.getElementById("results");
-resultsDiv.innerHTML='<div class="score-circle '+(pct>=70?"pass":"fail")+'">'+pct+'%</div><h2>'+(pct>=70?"Great Job!":"Keep Practicing!")+'</h2><p style="margin-top:15px;font-size:18px;color:#4a5568">Score: '+correct+' / '+totalScorable+'</p><p style="margin-top:10px;color:#718096">Scroll up to review explanations</p>';
-resultsDiv.classList.add("show");
-resultsDiv.scrollIntoView({behavior:"smooth",block:"center"});
-}
-function resetQuiz(){
-submitted=false;
-userAnswers=new Array(questions.length).fill(null);
-document.getElementById("results").classList.remove("show");
-renderQuiz();
-window.scrollTo({top:0,behavior:"smooth"});
-}
-renderQuiz();
+const questions = ${qJson};
+
+const quizApp = {
+  userAnswers: new Array(questions.length).fill(null),
+  submitted: false,
+  currentQuestion: 0,
+
+  init() {
+    this.renderQuiz();
+    this.renderNav();
+    this.updateProgress();
+    this.addKeyboardShortcuts();
+  },
+
+  isEssayQuestion(question) {
+    return question.options && question.options.length === 1;
+  },
+
+  escapeHTML(str) {
+    if (str == null) return "";
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  },
+
+  renderNav() {
+    const navGrid = document.getElementById("navGrid");
+    const navHtml = questions.map((_, i) => 
+      \`<button class="nav-btn" id="nav\${i}" onclick="quizApp.jumpToQuestion(\${i})" aria-label="Go to question \${i + 1}">
+        \${i + 1}
+      </button>\`
+    ).join("");
+    navGrid.innerHTML = navHtml;
+    document.getElementById("quizNav").classList.add("show");
+  },
+
+  renderQuiz() {
+    const quizBody = document.getElementById("quizBody");
+    const html = questions.map((q, i) => this.renderQuestion(q, i)).join("");
+    quizBody.innerHTML = html;
+  },
+
+  renderQuestion(q, i) {
+    const isEssay = this.isEssayQuestion(q);
+    const badgeText = isEssay ? "Essay" : "Multiple Choice";
+    const badgeClass = isEssay ? "essay" : "";
+
+    let optionsHtml = "";
+    if (isEssay) {
+      const savedAnswer = this.userAnswers[i] || "";
+      optionsHtml = \`
+        <textarea 
+          class="essay-input" 
+          id="essay\${i}" 
+          placeholder="Type your answer here..." 
+          oninput="quizApp.saveEssayAnswer(\${i}, this.value)"
+          aria-label="Essay answer for question \${i + 1}"
+        >\${savedAnswer}</textarea>
+        <div class="char-count" id="charCount\${i}">
+          \${savedAnswer.length} characters
+        </div>
+        <div class="model-answer" id="modelAns\${i}">
+          <strong>✓ Correct Answer / Model Answer:</strong><br>
+          \${this.escapeHTML(q.options[0])}
+        </div>
+      \`;
+    } else {
+      optionsHtml = \`<div class="options">\${
+        q.options.map((opt, j) => {
+          const letter = String.fromCharCode(65 + j);
+          return \`
+            <button 
+              class="option-btn" 
+              id="btn\${i}_\${j}" 
+              onclick="quizApp.selectAnswer(\${i}, \${j})"
+              aria-label="Option \${letter}: \${this.escapeHTML(opt)}"
+            >
+              <span class="option-letter">\${letter}</span>
+              <span>\${this.escapeHTML(opt)}</span>
+            </button>
+          \`;
+        }).join("")
+      }</div>\`;
+    }
+
+    const explanationHtml = q.explanation ? 
+      \`<div class="explanation" id="exp\${i}">
+        <strong>💡 Explanation:</strong> \${this.escapeHTML(q.explanation)}
+      </div>\` : "";
+
+    return \`
+      <div class="question-card" id="q\${i}">
+        <div class="question-header">
+          <div class="question-num">Question \${i + 1}</div>
+          <div class="question-badge \${badgeClass}">\${badgeText}</div>
+        </div>
+        <div class="question-text">\${this.escapeHTML(q.q)}</div>
+        \${optionsHtml}
+        \${explanationHtml}
+      </div>
+    \`;
+  },
+
+  selectAnswer(qIndex, optIndex) {
+    if (this.submitted) return;
+
+    this.userAnswers[qIndex] = optIndex;
+    const card = document.getElementById(\`q\${qIndex}\`);
+    card.classList.add("answered");
+
+    const buttons = card.querySelectorAll(".option-btn");
+    buttons.forEach((btn, i) => {
+      btn.classList.toggle("selected", i === optIndex);
+    });
+
+    this.updateProgress();
+    this.updateNavButton(qIndex);
+  },
+
+  saveEssayAnswer(qIndex, value) {
+    const trimmed = value.trim();
+    this.userAnswers[qIndex] = trimmed || null;
+    
+    const card = document.getElementById(\`q\${qIndex}\`);
+    card.classList.toggle("answered", !!trimmed);
+    
+    const charCount = document.getElementById(\`charCount\${qIndex}\`);
+    if (charCount) {
+      charCount.textContent = \`\${value.length} characters\`;
+    }
+
+    this.updateProgress();
+    this.updateNavButton(qIndex);
+  },
+
+  updateProgress() {
+    const answered = this.userAnswers.filter(a => a !== null).length;
+    const total = questions.length;
+    const percent = (answered / total) * 100;
+
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    
+    progressBar.style.width = \`\${percent}%\`;
+    progressText.textContent = \`\${answered} of \${total} answered\`;
+  },
+
+  updateNavButton(qIndex) {
+    const navBtn = document.getElementById(\`nav\${qIndex}\`);
+    if (navBtn) {
+      navBtn.classList.toggle("answered", this.userAnswers[qIndex] !== null);
+    }
+  },
+
+  jumpToQuestion(qIndex) {
+    const card = document.getElementById(\`q\${qIndex}\`);
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      this.currentQuestion = qIndex;
+    }
+  },
+
+  submit() {
+    if (this.submitted) return;
+
+    const unanswered = this.userAnswers.filter(a => a === null).length;
+    if (unanswered > 0) {
+      this.showModal(
+        "Incomplete Quiz",
+        \`You have \${unanswered} unanswered question(s). Do you want to submit anyway?\`,
+        () => this.performSubmit()
+      );
+    } else {
+      this.performSubmit();
+    }
+  },
+
+  performSubmit() {
+    this.closeModal();
+    this.submitted = true;
+
+    let correct = 0;
+    let totalScorable = 0;
+
+    questions.forEach((q, i) => {
+      if (this.isEssayQuestion(q)) {
+        this.handleEssaySubmission(i);
+      } else {
+        totalScorable++;
+        const isCorrect = this.handleMCQSubmission(q, i);
+        if (isCorrect) correct++;
+      }
+
+      const exp = document.getElementById(\`exp\${i}\`);
+      if (exp) exp.classList.add("show");
+    });
+
+    this.showResults(correct, totalScorable);
+    document.getElementById("submitBtn").disabled = true;
+  },
+
+  handleEssaySubmission(qIndex) {
+    const essayEl = document.getElementById(\`essay\${qIndex}\`);
+    if (essayEl) {
+      essayEl.readOnly = true;
+      essayEl.classList.add("disabled");
+    }
+
+    const modelEl = document.getElementById(\`modelAns\${qIndex}\`);
+    if (modelEl) modelEl.classList.add("show");
+  },
+
+  handleMCQSubmission(q, qIndex) {
+    const userAns = this.userAnswers[qIndex];
+    const isCorrect = userAns === q.correct;
+
+    const card = document.getElementById(\`q\${qIndex}\`);
+    const buttons = card.querySelectorAll(".option-btn");
+    
+    buttons.forEach((btn, k) => {
+      btn.classList.add("disabled");
+      if (k === q.correct) {
+        btn.classList.add("correct");
+      } else if (k === userAns && !isCorrect) {
+        btn.classList.add("wrong");
+      }
+    });
+
+    return isCorrect;
+  },
+
+  showResults(correct, totalScorable) {
+    const percent = totalScorable > 0 ? Math.round((correct / totalScorable) * 100) : 0;
+    const passed = percent >= 70;
+    
+    const resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = \`
+      <div class="score-circle \${passed ? "pass" : "fail"}">
+        \${percent}%
+      </div>
+      <h2>\${passed ? "🎉 Great Job!" : "📚 Keep Practicing!"}</h2>
+      <div class="results-detail">
+        <p><strong>Score:</strong> \${correct} / \${totalScorable} correct</p>
+        <p><strong>Percentage:</strong> \${percent}%</p>
+        <p><strong>Status:</strong> \${passed ? "✓ Passed" : "✗ Not Passed"}</p>
+      </div>
+      <p style="margin-top:20px;color:#718096">Scroll up to review explanations and answers</p>
+    \`;
+    
+    resultsDiv.classList.add("show");
+    setTimeout(() => {
+      resultsDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 300);
+  },
+
+  reset() {
+    this.showModal(
+      "Reset Quiz",
+      "Are you sure you want to reset the quiz? All your answers will be lost.",
+      () => this.performReset()
+    );
+  },
+
+  performReset() {
+    this.closeModal();
+    this.submitted = false;
+    this.userAnswers = new Array(questions.length).fill(null);
+    this.currentQuestion = 0;
+
+    document.getElementById("results").classList.remove("show");
+    document.getElementById("submitBtn").disabled = false;
+    
+    this.renderQuiz();
+    this.renderNav();
+    this.updateProgress();
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  },
+
+  showModal(title, message, onConfirm) {
+    const modal = document.getElementById("modal");
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalMessage").textContent = message;
+    
+    const confirmBtn = document.getElementById("modalConfirm");
+    confirmBtn.onclick = onConfirm;
+    
+    modal.classList.add("show");
+  },
+
+  closeModal() {
+    document.getElementById("modal").classList.remove("show");
+  },
+
+  addKeyboardShortcuts() {
+    document.addEventListener("keydown", (e) => {
+      // Close modal with Escape
+      if (e.key === "Escape") {
+        this.closeModal();
+      }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById("modal").addEventListener("click", (e) => {
+      if (e.target.id === "modal") {
+        this.closeModal();
+      }
+    });
+  }
+};
+
+// Initialize the quiz when the page loads
+quizApp.init();
 </script>
 </body>
 </html>`;
+
       blobDownload(
         new Blob([quizHtml], { type: "text/html;charset=utf-8" }),
         "text/html",
