@@ -1,13 +1,16 @@
 // Script/index.js - Performance Optimized with Filtering & Subscriptions
-import { examList, categoryTree } from "./examManifest.js";
+import { categoryTree } from "./examManifest.js";
 import { userProfile } from "./userProfile.js";
-import { runExport } from "./Export-Functions.js";
+import {
+  exportToQuiz,
+  exportToPdfNoAns,
+  exportToHtmlNoAns,
+  exportToMarkdownNoAns,
+} from "./Export-Functions.js";
 import {
   extractMetadata,
   filterCourses,
   getSubscribedCourses,
-  getAllRootCourses,
-  courseMatchesFilters,
   getCourseItemCount,
   getAvailableYears,
   getAvailableTerms,
@@ -747,7 +750,20 @@ function createExamCard(exam) {
         return;
       }
     }
-    runExport(format, config, questions);
+    switch (format) {
+      case "quiz":
+        exportToQuiz(config, questions);
+        break;
+      case "pdf":
+        exportToPdfNoAns(config, questions);
+        break;
+      case "html":
+        exportToHtmlNoAns(config, questions);
+        break;
+      case "md":
+        exportToMarkdownNoAns(config, questions);
+        break;
+    }
   };
 
   const showDownloadPopup = () => {
