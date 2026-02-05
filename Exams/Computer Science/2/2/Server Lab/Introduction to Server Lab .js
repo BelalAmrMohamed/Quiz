@@ -1,0 +1,110 @@
+export const questions = [
+  // MCQs
+  {
+    q: "In web terms, what is a 'Client'?",
+    options: [
+      "The computer that stores the website",
+      "The user's web browser (like Chrome)",
+      "The internet cable",
+      "The electricity provider",
+    ],
+    correct: 1,
+    explanation:
+      "The client is the device or software that requests to see a website.",
+  },
+  {
+    q: "Where does 'Server-side' code run?",
+    options: [
+      "On your phone",
+      "On a remote computer called a server",
+      "In a physical mailbox",
+      "Inside your monitor",
+    ],
+    correct: 1,
+    explanation:
+      "Server-side code (like PHP or Node.js) runs on the server before sending the result to you.",
+  },
+  {
+    q: "What does HTML provide to a webpage?",
+    options: [
+      "Logic and Math",
+      "Structure and Content",
+      "Design and Colors",
+      "Database storage",
+    ],
+    correct: 1,
+    explanation:
+      "HTML is the skeleton of the page; it defines headings, paragraphs, and links.",
+  },
+  {
+    q: "Which protocol is used to transfer web pages over the internet?",
+    options: ["FTP", "HTTP/HTTPS", "SMTP", "POP3"],
+    correct: 1,
+    explanation:
+      "HTTP (HyperText Transfer Protocol) is the standard for web communication.",
+  },
+  {
+    q: "What is a 'Database' in the context of a web server?",
+    options: [
+      "A place to store user data like names and passwords",
+      "The plastic case of the server",
+      "A type of internet speed",
+      "A web browser",
+    ],
+    correct: 0,
+    explanation: "Servers use databases to remember information for later use.",
+  },
+  // True and False
+  {
+    q: "True or False: A server is basically a computer that is always on and connected to the internet.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Servers are built to run 24/7 to provide services to clients.",
+  },
+  {
+    q: "True or False: Back-end development refers to the parts of a website the user sees.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "Back-end is the 'behind the scenes' logic; Front-end is what the user sees.",
+  },
+  {
+    q: "True or False: JavaScript can be used on both the Client and the Server.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "With tools like Node.js, JavaScript is now a powerful full-stack language.",
+  },
+  {
+    q: "True or False: An IP address is like a home address for a computer on the network.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "The IP address tells the internet where to send requested data.",
+  },
+  {
+    q: "True or False: CSS is used to make a website look beautiful with colors and fonts.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Cascading Style Sheets (CSS) handle the presentation and layout.",
+  },
+  // Essay
+  {
+    q: "What happens when you type 'google.com' into your browser?",
+    options: [
+      "The browser (client) sends a request to a Google server, which processes it and sends back the files needed to show the page.",
+    ],
+    correct: 0,
+    explanation: "",
+  },
+  {
+    q: "Why do we use 'Servers' instead of just keeping all data on our own computers?",
+    options: [
+      "Servers allow many different people to access the same information at the same time from anywhere in the world.",
+    ],
+    correct: 0,
+    explanation: "",
+  },
+];

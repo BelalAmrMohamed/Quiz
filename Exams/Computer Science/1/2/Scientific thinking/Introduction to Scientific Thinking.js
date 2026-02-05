@@ -1,0 +1,77 @@
+export const questions = [
+  // MCQs
+  {
+    q: "What is a 'Hypothesis'?",
+    options: ["A proven law of the universe", "An educated guess that can be tested", "A random thought", "A final conclusion"],
+    correct: 1,
+    explanation: "A hypothesis is a starting point for an investigation that you try to prove or disprove.",
+  },
+  {
+    q: "What is the first step in most versions of the Scientific Method?",
+    options: ["Drawing a conclusion", "Doing an experiment", "Observation", "Publishing a paper"],
+    correct: 2,
+    explanation: "Scientific thinking begins by noticing something interesting in the world.",
+  },
+  {
+    q: "Why do scientists repeat their experiments many times?",
+    options: ["Because they are bored", "To ensure the results are consistent and reliable", "To use up all the chemicals", "To get a higher salary"],
+    correct: 1,
+    explanation: "Repetition helps prove that the result wasn't just a one-time accident.",
+  },
+  {
+    q: "What does it mean to be 'Objective'?",
+    options: ["To be influenced by personal feelings", "To base decisions on facts and evidence", "To be the loudest person in the room", "To ignore the data"],
+    correct: 1,
+    explanation: "Objectivity is key to science; it removes personal bias from the results.",
+  },
+  {
+    q: "What is 'Peer Review'?",
+    options: ["When your friends like your social media post", "When other experts check your work for errors and logic", "When you grade your own paper", "When a computer types for you"],
+    correct: 1,
+    explanation: "Peer review acts as a quality control system for scientific discoveries.",
+  },
+  // True and False
+  {
+    q: "True or False: In science, a 'Theory' is just a random guess without any proof.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation: "In science, a theory is a well-supported explanation based on a large body of evidence.",
+  },
+  {
+    q: "True or False: Science is always changing as new evidence is discovered.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Self-correction is one of the greatest strengths of scientific thinking.",
+  },
+  {
+    q: "True or False: A scientist should ignore data if it contradicts their favorite hypothesis.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation: "Good scientists change their views based on what the data shows.",
+  },
+  {
+    q: "True or False: Logic and reasoning are essential tools for scientific thought.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Logic helps us connect observations to meaningful conclusions.",
+  },
+  {
+    q: "True or False: You can be a scientific thinker in your everyday life, not just in a lab.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "Using evidence and logic to solve daily problems is scientific thinking.",
+  },
+  // Essay
+  {
+    q: "Why is it important for an experiment to be 'Fair' (controlled)?",
+    options: ["A fair test ensures that you only change one thing at a time, so you know exactly what caused the result."],
+    correct: 0,
+    explanation: "",
+  },
+  {
+    q: "Give an example of a bias that might affect someone's thinking.",
+    options: ["Confirmation bias, where a person only looks for information that supports what they already believe."],
+    correct: 0,
+    explanation: "",
+  }
+];

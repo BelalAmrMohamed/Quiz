@@ -1,0 +1,94 @@
+export const questions = [
+  // MCQs
+  {
+    q: "What is the probability of an event that is absolutely certain to happen?",
+    options: ["0", "0.5", "1 (or 100%)", "-1"],
+    correct: 2,
+    explanation: "In probability, 0 means impossible and 1 means certain.",
+  },
+  {
+    q: "If you roll a standard 6-sided die, what is the chance of getting a '3'?",
+    options: ["1/2", "1/6", "1/3", "100%"],
+    correct: 1,
+    explanation: "There is one '3' out of six possible outcomes.",
+  },
+  {
+    q: "What is the 'Mean' of a set of numbers?",
+    options: [
+      "The middle number",
+      "The most frequent number",
+      "The average",
+      "The smallest number",
+    ],
+    correct: 2,
+    explanation:
+      "The Mean is calculated by adding all numbers and dividing by the count.",
+  },
+  {
+    q: "If you flip a coin twice, what are the chances of getting 'Heads' both times?",
+    options: ["50%", "25%", "75%", "10%"],
+    correct: 1,
+    explanation: "1/2 multiplied by 1/2 equals 1/4, or 25%.",
+  },
+  {
+    q: "In statistics, what is a 'Sample'?",
+    options: [
+      "The entire world",
+      "A small group chosen from a larger population",
+      "A type of calculator",
+      "A math error",
+    ],
+    correct: 1,
+    explanation: "A sample is a subset used to represent the whole group.",
+  },
+  // True and False
+  {
+    q: "True or False: A probability can be a negative number like -0.5.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation: "Probability is always between 0 and 1 (inclusive).",
+  },
+  {
+    q: "True or False: If you flip a coin and get 5 'Heads' in a row, the next flip is guaranteed to be 'Tails'.",
+    options: ["True", "False"],
+    correct: 1,
+    explanation:
+      "Each coin flip is an independent event; the odds remain 50/50.",
+  },
+  {
+    q: "True or False: Statistics helps us make predictions based on data.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "That is one of the main goals of statistical analysis.",
+  },
+  {
+    q: "True or False: The 'Median' is the middle value in a list of sorted numbers.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation: "The median splits the data into two equal halves.",
+  },
+  {
+    q: "True or False: Data visualization (like charts) is part of statistics.",
+    options: ["True", "False"],
+    correct: 0,
+    explanation:
+      "Charts help summarize and explain the meaning of statistical data.",
+  },
+  // Essay
+  {
+    q: "How can probability be useful in weather forecasting?",
+    options: [
+      "Meteorologists use past data to calculate the percentage chance (probability) of rain or snow for a specific day.",
+    ],
+    correct: 0,
+    explanation: "",
+  },
+  {
+    q: "Why is 'Statistics' important for Computer Science students?",
+    options: [
+      "It helps us analyze the performance of algorithms, understand user behavior, and is the foundation of Artificial Intelligence.",
+    ],
+    correct: 0,
+    explanation: "",
+  },
+];

@@ -322,6 +322,12 @@ export const gameEngine = {
     const user = this.getUserData();
     const { score, total, timeElapsed, examId, mode } = result;
 
+    // FIX: Ensure user data properties are initialized to prevent TypeError
+    if (!user.history) user.history = []; 
+    if (!user.badges) user.badges = [];
+    if (!user.bookmarks) user.bookmarks = {};
+    if (!user.categoryProgress) user.categoryProgress = {};
+
     // --- FIX: Define these variables AT THE START so they are available for badge logic ---
     const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
     const bookmarkCount = Object.keys(user.bookmarks || {}).length;
