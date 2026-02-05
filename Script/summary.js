@@ -13,6 +13,21 @@ if (!result) window.location.href = "index.html";
 
 const isEssayQuestion = (q) => q.options && q.options.length === 1;
 
+// === Helper: Render Question Image ===
+const renderQuestionImage = (imageUrl) => {
+  if (!imageUrl) return "";
+  return `
+    <div class="question-image-container">
+      <img 
+        src="${escapeHTML(imageUrl)}" 
+        alt="Question context image" 
+        class="question-image"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+  `;
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   const scoreHeader = document.getElementById("scoreHeader");
   const scoreDisplay = document.getElementById("scoreDisplay");
@@ -220,6 +235,7 @@ function renderReview(container, questions, userAnswers) {
             <span class="essay-badge">📝 Essay (Not Scored)</span>
           </div>
           <p class="q-text">${escapeHTML(q.q)}</p>
+          ${renderQuestionImage(q.image)}
           <div class="essay-comparison">
             <div class="essay-answer-box user-essay">
               <small>Your Answer:</small>
@@ -263,6 +279,7 @@ function renderReview(container, questions, userAnswers) {
             <span class="status-icon">${statusIcon}</span>
           </div>
           <p class="q-text">${qText}</p>
+          ${renderQuestionImage(q.image)}
           <div class="ans-comparison">
             <div class="ans-box your-ans">
               <small>Your Answer:</small>

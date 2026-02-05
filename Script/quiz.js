@@ -69,6 +69,21 @@ const isEssayQuestion = (q) => {
   return q.options && q.options.length === 1;
 };
 
+// === Helper: Render Question Image ===
+const renderQuestionImage = (imageUrl) => {
+  if (!imageUrl) return "";
+  return `
+    <div class="question-image-container">
+      <img 
+        src="${escapeHtml(imageUrl)}" 
+        alt="Question context image" 
+        class="question-image"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+  `;
+};
+
 // === Gamification Stats ===
 function updateGamificationStats() {
   const userData = gameEngine.getUserData();
@@ -589,6 +604,7 @@ function renderQuestion() {
       }</div>
       ${actionButtons}
     </div>
+    ${renderQuestionImage(q.image)}
     <h2 class="question-text">${escapeHtml(q.q)}</h2>
   `;
 
