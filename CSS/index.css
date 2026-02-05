@@ -14,14 +14,8 @@ html {
 }
 
 body {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Display",
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -96,9 +90,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   font-weight: 600;
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .menu-item:hover {
@@ -278,9 +270,7 @@ body {
   -webkit-backdrop-filter: blur(var(--blur-md));
   border-radius: 12px;
   border: 1px solid;
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   width: fit-content;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -382,12 +372,10 @@ HEADER BADGE – GAMIFIED WELCOME
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.6);
 
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.08),
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 
-  animation:
-    badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+  animation: badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     badgeFloat 6s ease-in-out infinite;
 
   will-change: transform, box-shadow;
@@ -896,4 +884,417 @@ ANIMATIONS
   background: rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   display: inline-block;
+}
+
+/* ============================================================================
+   ONBOARDING WIZARD - First-Time User Experience
+   ============================================================================ */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.onboarding-card {
+  max-width: 560px;
+  width: 92%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: var(--shadow-xl), 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-border-light);
+  position: relative;
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Progress Indicator */
+.onboarding-progress {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-dot.active {
+  background: var(--gradient-accent);
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+}
+
+.progress-dot.completed {
+  background: var(--gradient-success);
+}
+
+.progress-dot.completed::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+/* Header */
+.onboarding-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.onboarding-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.onboarding-header p {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Step container for animations */
+.onboarding-step {
+  animation: stepFadeIn 0.3s ease-out;
+}
+
+@keyframes stepFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Faculty Grid */
+.faculty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.faculty-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  border-radius: 16px;
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+  text-align: center;
+}
+
+.faculty-option:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.faculty-option.selected {
+  /* border-color: var(--color-accent);
+  background: var(--color-accent-light);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.2); */
+  background: var(--gradient-accent);
+  color: white;
+  border-color: transparent;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg), 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.faculty-option .faculty-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.faculty-option .faculty-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Year Pills */
+.year-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.year-pill {
+  padding: 16px 32px;
+  border-radius: 50px;
+  border: 2px solid var(--color-border);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+}
+
+.year-pill:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.year-pill.selected {
+  background: var(--gradient-accent);
+  color: white;
+  border-color: transparent;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md), 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+/* Term Toggle */
+.term-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.term-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  border: 2px solid var(--color-border);
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.term-btn:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.term-btn.selected {
+  background: var(--gradient-accent);
+  color: white;
+  border-color: transparent;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg), 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.term-btn .term-icon {
+  font-size: 1.75rem;
+}
+
+/* Navigation Buttons */
+.onboarding-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.onboarding-btn {
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.onboarding-btn.secondary {
+  background: transparent;
+  border: 2px solid var(--color-border);
+}
+
+.onboarding-btn.secondary:hover {
+  border-color: var(--color-accent);
+  transform: translateX(-4px);
+}
+
+.onboarding-btn.primary {
+  background: var(--gradient-accent);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.onboarding-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.onboarding-btn.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.onboarding-btn.finish {
+  background: var(--gradient-success);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.onboarding-btn.finish:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Skip link */
+.onboarding-skip {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  text-decoration: underline;
+}
+
+.onboarding-skip:hover {
+  opacity: 1;
+}
+
+/* Empty state for no options */
+.no-options-message {
+  text-align: center;
+  padding: 32px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .onboarding-card {
+    padding: 32px 24px;
+    width: 95%;
+  }
+
+  .onboarding-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .faculty-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .faculty-option {
+    padding: 20px 12px;
+  }
+
+  .faculty-option .faculty-icon {
+    font-size: 2rem;
+  }
+
+  .year-pill {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+
+  .term-btn {
+    padding: 16px 20px;
+    font-size: 1.1rem;
+  }
+
+  .onboarding-nav {
+    flex-direction: column;
+  }
+
+  .onboarding-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .onboarding-card {
+    padding: 28px 20px;
+  }
+
+  .faculty-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .faculty-option .faculty-name {
+    font-size: 0.85rem;
+  }
+
+  .year-pills {
+    gap: 8px;
+  }
+
+  .year-pill {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .term-toggle {
+    gap: 12px;
+  }
+
+  .term-btn {
+    padding: 14px 16px;
+  }
 }

@@ -289,6 +289,275 @@ window.closeProfileModal = function () {
 };
 
 // ============================================================================
+// FIRST-TIME USER EXPERIENCE (ONBOARDING WIZARD)
+// ============================================================================
+
+/**
+ * Faculty icons mapping for visual selection
+ */
+const facultyIcons = {
+  "Medicine": "🩺",
+  "Pharmacy": "💊",
+  "Dentistry": "🦷",
+  "Engineering": "⚙️",
+  "Science": "🔬",
+  "Arts": "🎨",
+  "Law": "⚖️",
+  "Commerce": "📊",
+  "Computer Science": "💻",
+  "Nursing": "🏥",
+  "Agriculture": "🌾",
+  "Veterinary": "🐾",
+  "Education": "📚",
+  "default": "📖"
+};
+
+/**
+ * Get icon for a faculty
+ */
+function getFacultyIcon(faculty) {
+  return facultyIcons[faculty] || facultyIcons.default;
+}
+
+/**
+ * Show the onboarding wizard for first-time users
+ */
+function showOnboardingWizard() {
+  const metadata = extractMetadata(categoryTree);
+  
+  // Wizard state
+  let currentStep = 1;
+  let selectedFaculty = null;
+  let selectedYear = null;
+  let selectedTerm = null;
+
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.className = "onboarding-overlay";
+  overlay.id = "onboardingWizard";
+
+  // Create card
+  const card = document.createElement("div");
+  card.className = "onboarding-card";
+
+  // Render function
+  function render() {
+    card.innerHTML = "";
+
+    // Skip button
+    const skipBtn = document.createElement("button");
+    skipBtn.className = "onboarding-skip";
+    skipBtn.textContent = "Skip for now";
+    skipBtn.onclick = () => closeOnboarding();
+    card.appendChild(skipBtn);
+
+    // Progress dots
+    const progress = document.createElement("div");
+    progress.className = "onboarding-progress";
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.createElement("div");
+      dot.className = "progress-dot";
+      if (i < currentStep) dot.classList.add("completed");
+      if (i === currentStep) dot.classList.add("active");
+      progress.appendChild(dot);
+    }
+    card.appendChild(progress);
+
+    // Step content
+    const stepContainer = document.createElement("div");
+    stepContainer.className = "onboarding-step";
+
+    if (currentStep === 1) {
+      renderFacultyStep(stepContainer);
+    } else if (currentStep === 2) {
+      renderYearStep(stepContainer);
+    } else if (currentStep === 3) {
+      renderTermStep(stepContainer);
+    }
+
+    card.appendChild(stepContainer);
+
+    // Navigation
+    const nav = document.createElement("div");
+    nav.className = "onboarding-nav";
+
+    if (currentStep > 1) {
+      const backBtn = document.createElement("button");
+      backBtn.className = "onboarding-btn secondary";
+      backBtn.textContent = "← Back";
+      backBtn.onclick = () => {
+        currentStep--;
+        render();
+      };
+      nav.appendChild(backBtn);
+    } else {
+      // Spacer
+      nav.appendChild(document.createElement("div"));
+    }
+
+    if (currentStep < 3) {
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "onboarding-btn primary";
+      nextBtn.textContent = "Next →";
+      nextBtn.disabled = (currentStep === 1 && !selectedFaculty) || 
+                         (currentStep === 2 && !selectedYear);
+      nextBtn.onclick = () => {
+        currentStep++;
+        render();
+      };
+      nav.appendChild(nextBtn);
+    } else {
+      const finishBtn = document.createElement("button");
+      finishBtn.className = "onboarding-btn finish";
+      finishBtn.textContent = "🎉 Get Started!";
+      finishBtn.disabled = !selectedTerm;
+      finishBtn.onclick = () => finishOnboarding();
+      nav.appendChild(finishBtn);
+    }
+
+    card.appendChild(nav);
+  }
+
+  function renderFacultyStep(container) {
+    const header = document.createElement("div");
+    header.className = "onboarding-header";
+    header.innerHTML = `
+      <h2>👋 Welcome to Quiz Master!</h2>
+      <p>Let's personalize your experience. What's your faculty?</p>
+    `;
+    container.appendChild(header);
+
+    const grid = document.createElement("div");
+    grid.className = "faculty-grid";
+
+    metadata.faculties.forEach(faculty => {
+      const option = document.createElement("button");
+      option.className = "faculty-option";
+      if (selectedFaculty === faculty) option.classList.add("selected");
+      option.innerHTML = `
+        <span class="faculty-icon">${getFacultyIcon(faculty)}</span>
+        <span class="faculty-name">${escapeHtml(faculty)}</span>
+      `;
+      option.onclick = () => {
+        selectedFaculty = faculty;
+        // Reset year and term when faculty changes
+        selectedYear = null;
+        selectedTerm = null;
+        render();
+      };
+      grid.appendChild(option);
+    });
+
+    container.appendChild(grid);
+  }
+
+  function renderYearStep(container) {
+    const header = document.createElement("div");
+    header.className = "onboarding-header";
+    header.innerHTML = `
+      <h2>📅 Select Your Year</h2>
+      <p>Which year are you currently in?</p>
+    `;
+    container.appendChild(header);
+
+    const availableYears = getAvailableYears(categoryTree, selectedFaculty);
+    
+    if (availableYears.length === 0) {
+      const noOptions = document.createElement("div");
+      noOptions.className = "no-options-message";
+      noOptions.textContent = "No years available for this faculty yet.";
+      container.appendChild(noOptions);
+      return;
+    }
+
+    const pills = document.createElement("div");
+    pills.className = "year-pills";
+
+    availableYears.forEach(year => {
+      const pill = document.createElement("button");
+      pill.className = "year-pill";
+      if (selectedYear === year) pill.classList.add("selected");
+      pill.textContent = `Year ${year}`;
+      pill.onclick = () => {
+        selectedYear = year;
+        // Reset term when year changes
+        selectedTerm = null;
+        render();
+      };
+      pills.appendChild(pill);
+    });
+
+    container.appendChild(pills);
+  }
+
+  function renderTermStep(container) {
+    const header = document.createElement("div");
+    header.className = "onboarding-header";
+    header.innerHTML = `
+      <h2>📚 Select Your Term</h2>
+      <p>Which term are you studying?</p>
+    `;
+    container.appendChild(header);
+
+    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
+    
+    if (availableTerms.length === 0) {
+      const noOptions = document.createElement("div");
+      noOptions.className = "no-options-message";
+      noOptions.textContent = "No terms available for this selection yet.";
+      container.appendChild(noOptions);
+      return;
+    }
+
+    const toggle = document.createElement("div");
+    toggle.className = "term-toggle";
+
+    availableTerms.forEach(term => {
+      const btn = document.createElement("button");
+      btn.className = "term-btn";
+      if (selectedTerm === term) btn.classList.add("selected");
+      btn.innerHTML = `
+        <span class="term-icon">${term === "1" ? "🍂" : "🌸"}</span>
+        <span>Term ${term}</span>
+      `;
+      btn.onclick = () => {
+        selectedTerm = term;
+        render();
+      };
+      toggle.appendChild(btn);
+    });
+
+    container.appendChild(toggle);
+  }
+
+  function closeOnboarding() {
+    overlay.remove();
+    renderRootCategories();
+  }
+
+  function finishOnboarding() {
+    // Save the selections
+    userProfile.saveInitialSetup({
+      faculty: selectedFaculty,
+      year: selectedYear,
+      term: selectedTerm
+    }, categoryTree);
+
+    // Update welcome message
+    updateWelcomeMessage();
+
+    // Close wizard and render courses
+    overlay.remove();
+    renderRootCategories();
+  }
+
+  // Initial render
+  render();
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+// ============================================================================
 // COURSE SUBSCRIPTION MANAGEMENT
 // ============================================================================
 
@@ -539,8 +808,14 @@ function getCategoriesLazy() {
   return categoriesCache;
 }
 
-// Initialize
-renderRootCategories();
+// Initialize - Check for first-time user
+if (userProfile.checkFirstVisit()) {
+  // First visit: show onboarding wizard
+  showOnboardingWizard();
+} else {
+  // Returning user: render courses directly
+  renderRootCategories();
+}
 
 function renderRootCategories() {
   navigationStack = [];

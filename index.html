@@ -136,10 +136,14 @@
                 <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
 
                 <div class="menu-divider"></div>
-                <button onclick="window.openProfileSettings()" class="menu-item">
+                <button
+                    onclick="window.openProfileSettings(); document.getElementById('sideMenu').classList.remove('open')"
+                    class="menu-item">
                     ⚙️ Profile Settings
                 </button>
-                <button onclick="window.openCourseManager()" class="menu-item">
+                <button
+                    onclick="window.openCourseManager(); document.getElementById('sideMenu').classList.remove('open')"
+                    class="menu-item">
                     📚 Manage Courses
                 </button>
                 <div class="menu-divider"></div>

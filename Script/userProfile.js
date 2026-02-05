@@ -208,6 +208,38 @@ export class UserProfileManager {
   }
 
   /**
+   * Check if this is the user's first visit (no academic info configured)
+   * Used to trigger the onboarding wizard
+   * @returns {boolean} true if first visit
+   */
+  checkFirstVisit() {
+    return (
+      this.profile.faculty === 'All' &&
+      this.profile.year === 'All' &&
+      this.profile.term === 'All'
+    );
+  }
+
+  /**
+   * Save initial setup from onboarding wizard
+   * @param {Object} data - { faculty, year, term }
+   * @param {Object} categoryTree - Category tree for auto-subscription
+   * @returns {Array} List of auto-subscribed course IDs
+   */
+  saveInitialSetup(data, categoryTree) {
+    const { faculty, year, term } = data;
+    
+    if (faculty) this.profile.faculty = faculty;
+    if (year) this.profile.year = year;
+    if (term) this.profile.term = term;
+    
+    this.saveProfile();
+    
+    // Auto-subscribe to matching courses
+    return this.initializeDefaultSubscriptions(categoryTree);
+  }
+
+  /**
    * Reset profile to defaults
    */
   reset() {
