@@ -2027,13 +2027,13 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     // ===========================
     // Checks if no user answers were provided (function called from main page)
     // ===========================
-    const isSummaryMode =
+    const isResultsMode =
       userAnswers &&
       (Array.isArray(userAnswers)
         ? userAnswers.length > 0
         : Object.keys(userAnswers).length > 0);
 
-    if (isSummaryMode) renderScorePage();
+    if (isResultsMode) renderScorePage();
     else addGameHeader();
 
     // ===========================
@@ -2152,7 +2152,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         isEssay,
       );
 
-      if (isSummaryMode) {
+      if (isResultsMode) {
         doc.setTextColor(...COLORS.textWhite);
         doc.setFontSize(SIZES.optionFont);
         doc.text(
@@ -2246,21 +2246,28 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         1.5,
         "F",
       );
-      doc.setFontSize(SIZES.labelFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
-      doc.text(
-        "YOUR ANSWER:",
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4,
-      );
-      doc.setFontSize(SIZES.optionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
-      doc.text(userText, MARGINS.left + SIZES.cardPadding + 4.5, currentY + 8, {
-        maxWidth: boxWidth - 6,
-      });
-      currentY += 17;
+      if (isResultsMode) {
+        doc.setFontSize(SIZES.labelFont);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...COLORS.primary);
+        doc.text(
+          "YOUR ANSWER:",
+          MARGINS.left + SIZES.cardPadding + 4.5,
+          currentY + 4,
+        );
+        doc.setFontSize(SIZES.optionFont);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...COLORS.textDark);
+        doc.text(
+          userText,
+          MARGINS.left + SIZES.cardPadding + 4.5,
+          currentY + 8,
+          {
+            maxWidth: boxWidth - 6,
+          },
+        );
+        currentY += 17;
+      }
 
       // Formal answer box
       doc.setFillColor(240, 253, 244);
@@ -2728,7 +2735,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
     };
 
     const scoreData = calculateScore();
-    const isSummaryMode =
+    const isResultsMode =
       userAnswers &&
       (Array.isArray(userAnswers)
         ? userAnswers.length > 0
@@ -2824,7 +2831,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
     // SCORE PAGE (if summary mode)
     // ===========================
 
-    if (isSummaryMode) {
+    if (isResultsMode) {
       // "QUIZ COMPLETE!" Banner
       children.push(
         new Paragraph({
@@ -2974,7 +2981,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
       ];
 
       // Add status badge if in summary mode
-      if (isSummaryMode) {
+      if (isResultsMode) {
         const { statusText, statusColor } = getQuestionStatus(
           question,
           userAns,
@@ -3041,55 +3048,57 @@ export async function exportToWord(config, questions, userAnswers = []) {
         const formalAnswer = sanitizeText(question.options[0]);
 
         // User Answer Box
-        cardChildren.push(
-          new Paragraph({
-            spacing: { before: 200, after: 100 },
-            children: [
-              new TextRun({
-                text: "YOUR ANSWER:",
-                bold: true,
-                size: 20,
-                color: COLORS.primary,
-              }),
-            ],
-          }),
-        );
+        if (isResultsMode) {
+          cardChildren.push(
+            new Paragraph({
+              spacing: { before: 200, after: 100 },
+              children: [
+                new TextRun({
+                  text: "YOUR ANSWER:",
+                  bold: true,
+                  size: 20,
+                  color: COLORS.primary,
+                }),
+              ],
+            }),
+          );
 
-        cardChildren.push(
-          new Paragraph({
-            spacing: { after: 200 },
-            children: [
-              new TextRun({
-                text: userText,
-                size: 20,
-                color: COLORS.textDark,
-              }),
-            ],
-            shading: { fill: "F5F7FA", type: ShadingType.CLEAR },
-            border: {
-              top: {
-                style: BorderStyle.SINGLE,
-                size: 3,
-                color: COLORS.textLight,
+          cardChildren.push(
+            new Paragraph({
+              spacing: { after: 200 },
+              children: [
+                new TextRun({
+                  text: userText,
+                  size: 20,
+                  color: COLORS.textDark,
+                }),
+              ],
+              shading: { fill: "F5F7FA", type: ShadingType.CLEAR },
+              border: {
+                top: {
+                  style: BorderStyle.SINGLE,
+                  size: 3,
+                  color: COLORS.textLight,
+                },
+                bottom: {
+                  style: BorderStyle.SINGLE,
+                  size: 3,
+                  color: COLORS.textLight,
+                },
+                left: {
+                  style: BorderStyle.SINGLE,
+                  size: 3,
+                  color: COLORS.textLight,
+                },
+                right: {
+                  style: BorderStyle.SINGLE,
+                  size: 3,
+                  color: COLORS.textLight,
+                },
               },
-              bottom: {
-                style: BorderStyle.SINGLE,
-                size: 3,
-                color: COLORS.textLight,
-              },
-              left: {
-                style: BorderStyle.SINGLE,
-                size: 3,
-                color: COLORS.textLight,
-              },
-              right: {
-                style: BorderStyle.SINGLE,
-                size: 3,
-                color: COLORS.textLight,
-              },
-            },
-          }),
-        );
+            }),
+          );
+        }
 
         // Formal Answer Box
         cardChildren.push(
@@ -3559,7 +3568,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
 `;
 
   // Determine if we are in "Summary Mode" (user answers provided)
-  const isSummaryMode =
+  const isResultsMode =
     userAnswers &&
     (Array.isArray(userAnswers)
       ? userAnswers.length > 0
@@ -3582,7 +3591,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
 
     if (isEssayQuestion(q)) {
       const userText = userAns || "Not answered";
-      if (isSummaryMode)
+      if (isResultsMode)
         htmlContent += `
         <div class="essay-box" style="border-left: 3px solid #3b82f6;">
             <strong style="color: #60a5fa; display:block; margin-bottom:5px;">Your Answer:</strong>
@@ -3608,7 +3617,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
         : `${userLetter}. ${q.options[userAns]}`;
       const userIcon = isSkipped ? "⚪" : isCorrect ? "✅" : "❌";
 
-      if (isSummaryMode)
+      if (isResultsMode)
         htmlContent += `<div class="user-answer ${userClass}">${userIcon} Your Answer: ${userAnswer}</div>`;
 
       const correctLetter = String.fromCharCode(65 + q.correct);
@@ -3656,7 +3665,7 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
   else questionType = "MCQ only";
 
   // Determine if we are in "Summary Mode" (user answers provided)
-  const isSummaryMode =
+  const isResultsMode =
     userAnswers &&
     (Array.isArray(userAnswers)
       ? userAnswers.length > 0
@@ -3680,7 +3689,7 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
 
     if (isEssayQuestion(q)) {
       // Only show user answer section if userAnswers was actually passed
-      if (isSummaryMode) {
+      if (isResultsMode) {
         const userText = userAns || "Not answered";
         markdown += `**Your Answer:**\n\n${userText}\n\n`;
       }
@@ -3695,7 +3704,7 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
       const isSkipped = userAns === undefined || userAns === null;
 
       // Only append "Your Answer" if we are in summary mode
-      if (isSummaryMode) {
+      if (isResultsMode) {
         const userLetter = isSkipped
           ? "Skipped"
           : String.fromCharCode(48 + userAns + 1);
