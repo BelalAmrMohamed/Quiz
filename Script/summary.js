@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     (exportMdBtn.onclick = () =>
       exportToMarkdown(config, questions, result.userAnswers));
   exportPdfBtn &&
-    (exportPdfBtn.onclick = () =>
-      exportToPdf(config, questions, result.userAnswers));
+    (exportPdfBtn.onclick = async () =>
+      await exportToPdf(config, questions, result.userAnswers));
   exportHtmlBtn &&
     (exportHtmlBtn.onclick = () =>
       exportToHtml(config, questions, result.userAnswers));

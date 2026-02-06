@@ -1,7 +1,93 @@
 const isEssayQuestion = (q) => q.options && q.options.length === 1;
 const currentName = localStorage.getItem("username") || "User";
 
-export function exportToQuiz(config, questions) {
+// Image Helpers
+const getDataUrl = (url) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      try {
+        resolve(canvas.toDataURL("image/jpeg"));
+      } catch (e) {
+        console.warn("Failed to convert image to data URL", e);
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      console.warn("Failed to load image for PDF export", url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+};
+
+const isLocalPath = (url) => {
+  if (!url) return false;
+  // Check for relative paths (./, ../, or no protocol)
+  if (url.startsWith("./") || url.startsWith("../") || url.startsWith("/")) {
+    return true;
+  }
+  // Check if it lacks a protocol (http://, https://, data:)
+  return !/^(https?:|data:)/i.test(url);
+};
+
+const convertImagesToBase64 = async (questions) => {
+  const processedQuestions = [];
+
+  for (const question of questions) {
+    const processedQuestion = { ...question };
+
+    if (question.image) {
+      // If it's a local path or needs conversion
+      if (isLocalPath(question.image)) {
+        console.log(`Converting local image to base64: ${question.image}`);
+        const base64 = await getDataUrl(question.image);
+        if (base64) {
+          processedQuestion.image = base64;
+        } else {
+          console.warn(`Failed to convert ${question.image}, keeping original`);
+          // Keep original - will show alt text if broken
+        }
+      }
+      // Remote URLs or already base64 - keep as is
+    }
+
+    processedQuestions.push(processedQuestion);
+  }
+
+  return processedQuestions;
+};
+
+const getConstrainedDimensions = (imgWidth, imgHeight, maxWidth, maxHeight) => {
+  const aspectRatio = imgWidth / imgHeight;
+
+  let width = imgWidth;
+  let height = imgHeight;
+
+  // Scale down if too wide
+  if (width > maxWidth) {
+    width = maxWidth;
+    height = width / aspectRatio;
+  }
+
+  // Scale down if too tall
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * aspectRatio;
+  }
+
+  return { width, height };
+};
+
+export async function exportToQuiz(config, questions) {
+  // Convert local images to base64
+  const processedQuestions = await convertImagesToBase64(questions);
   const quizHTML = `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -757,6 +843,18 @@ export function exportToQuiz(config, questions) {
       height: 45px;
     }
   }
+  /* Image Styles */
+  .question-image-container {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .question-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
   </style>
   </head>
   <body>
@@ -837,7 +935,7 @@ export function exportToQuiz(config, questions) {
   </div>
   
   <script>
-  const questions = ${JSON.stringify(questions)};
+  const questions = ${JSON.stringify(processedQuestions)};
   
   const quizApp = {
     userAnswers: new Array(questions.length).fill(null),
@@ -917,6 +1015,20 @@ export function exportToQuiz(config, questions) {
     isEssayQuestion(question) {
       return question.options && question.options.length === 1;
     },
+
+    renderQuestionImage(imageUrl) {
+      if (!imageUrl) return "";
+      return \`
+        <div class="question-image-container">
+          <img 
+            src="\${this.escapeHTML(imageUrl)}" 
+            alt="Question context image" 
+            class="question-image"
+            onerror="this.parentElement.style.display='none'"
+          />
+        </div>
+      \`;
+    },
   
     escapeHTML(str) {
       if (str == null) return "";
@@ -995,6 +1107,8 @@ export function exportToQuiz(config, questions) {
             <div class="question-num">Question \${i + 1}</div>
             <div class="question-badge \${badgeClass}">\${badgeText}</div>
           </div>
+          
+          \${this.renderQuestionImage(q.image)}
           <div class="question-text">\${this.escapeHTML(q.q)}</div>
           \${optionsHtml}
           \${explanationHtml}
@@ -1236,14 +1350,14 @@ export function exportToQuiz(config, questions) {
   URL.revokeObjectURL(url);
 }
 
-export function exportToPdf(config, questions, userAnswers) {
+export async function exportToPdf(config, questions, userAnswers = []) {
   try {
     // ===========================
     // VALIDATION
     // ===========================
     if (!config || !questions || !Array.isArray(questions)) {
       throw new Error(
-        "Invalid parameters: config and questions array required"
+        "Invalid parameters: config and questions array required",
       );
     }
 
@@ -1346,6 +1460,10 @@ export function exportToPdf(config, questions, userAnswers) {
     const pageHeight = doc.internal.pageSize.getHeight();
     const contentWidth = pageWidth - MARGINS.left - MARGINS.right;
 
+    // **CRITICAL: Maximum dimensions for images in PDF**
+    const MAX_IMAGE_HEIGHT = 60; // mm - prevents page overflow
+    const MAX_IMAGE_WIDTH = contentWidth - SIZES.cardPadding * 2 - 6;
+
     let currentY = MARGINS.top;
     let currentLevel = 1;
 
@@ -1392,7 +1510,7 @@ export function exportToPdf(config, questions, userAnswers) {
         pageHeight,
         pageWidth,
         pageHeight - 15,
-        "F"
+        "F",
       );
     };
 
@@ -1409,7 +1527,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.cardCornerRadius,
         SIZES.cardCornerRadius,
-        "F"
+        "F",
       );
 
       // Card background
@@ -1421,7 +1539,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.cardCornerRadius,
         SIZES.cardCornerRadius,
-        "F"
+        "F",
       );
 
       // Card border
@@ -1434,7 +1552,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.cardCornerRadius,
         SIZES.cardCornerRadius,
-        "S"
+        "S",
       );
     };
 
@@ -1465,7 +1583,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.buttonRadius,
         SIZES.buttonRadius,
-        "F"
+        "F",
       );
 
       // Button background
@@ -1477,7 +1595,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.buttonRadius,
         SIZES.buttonRadius,
-        "F"
+        "F",
       );
 
       // Button border
@@ -1490,7 +1608,7 @@ export function exportToPdf(config, questions, userAnswers) {
         height,
         SIZES.buttonRadius,
         SIZES.buttonRadius,
-        "S"
+        "S",
       );
 
       return textColor;
@@ -1687,7 +1805,7 @@ export function exportToPdf(config, questions, userAnswers) {
         12,
         2,
         2,
-        "F"
+        "F",
       );
       doc.setTextColor(...COLORS.textWhite);
       doc.setFontSize(SIZES.titleFont);
@@ -1707,7 +1825,7 @@ export function exportToPdf(config, questions, userAnswers) {
 
       // Inner circle
       doc.setFillColor(
-        ...(scoreData.isPassing ? COLORS.success : COLORS.warning)
+        ...(scoreData.isPassing ? COLORS.success : COLORS.warning),
       );
       doc.circle(pageWidth / 2, circleY, radius, "F");
 
@@ -1736,7 +1854,7 @@ export function exportToPdf(config, questions, userAnswers) {
         `Score: ${scoreData.correct} / ${scoreData.totalScorable}`,
         pageWidth / 2,
         currentY,
-        { align: "center" }
+        { align: "center" },
       );
       currentY += 5;
 
@@ -1746,7 +1864,7 @@ export function exportToPdf(config, questions, userAnswers) {
         `Correct: ${scoreData.correct}  Wrong: ${scoreData.wrong}  Skipped: ${scoreData.skipped}`,
         pageWidth / 2,
         currentY,
-        { align: "center" }
+        { align: "center" },
       );
 
       currentY = cardY + cardHeight + 10;
@@ -1758,7 +1876,7 @@ export function exportToPdf(config, questions, userAnswers) {
         progressY,
         contentWidth - 36,
         SIZES.progressBarHeight,
-        scoreData.percentage
+        scoreData.percentage,
       );
       currentY = progressY + SIZES.progressBarHeight + 3;
 
@@ -1777,7 +1895,7 @@ export function exportToPdf(config, questions, userAnswers) {
         MARGINS.left + 25,
         currentY,
         pageWidth - MARGINS.right - 25,
-        currentY
+        currentY,
       );
       currentY += 8;
 
@@ -1789,25 +1907,88 @@ export function exportToPdf(config, questions, userAnswers) {
       // currentY += 8;
     };
 
-    renderScorePage();
+    // ===========================
+    // Checks if no user ansewrs where provided (function called from main page)
+    // ===========================
+    const isSummaryMode =
+      userAnswers &&
+      (Array.isArray(userAnswers)
+        ? userAnswers.length > 0
+        : Object.keys(userAnswers).length > 0);
+
+    if (isSummaryMode) renderScorePage();
+    else addGameHeader();
 
     // ===========================
     // RENDER QUESTIONS (OPTIMIZED)
     // ===========================
 
-    const renderQuestion = (question, index) => {
+    const renderQuestion = async (question, index) => {
       const isEssay = isEssayQuestion(question);
       const userAns = userAnswers[index];
       const questionText = sanitizeText(question.q);
 
       // Calculate card height needed
       let cardContentHeight = 0;
+      let imgData = null;
+      let imgHeight = 0;
+      let imgWidth = 0;
+
+      // **ENHANCED: Render image with size constraints**
+      if (question.image) {
+        try {
+          let imageData = question.image;
+
+          // Convert to base64 if needed
+          if (!imageData.startsWith("data:")) {
+            imageData = await getDataUrl(imageData);
+          }
+
+          if (imageData) {
+            const img = new Image();
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = imageData;
+            });
+
+            // **Calculate constrained dimensions**
+            const { width: constrainedWidth, height: constrainedHeight } =
+              getConstrainedDimensions(
+                img.width,
+                img.height,
+                MAX_IMAGE_WIDTH,
+                MAX_IMAGE_HEIGHT,
+              );
+
+            // Convert pixels to mm (approximate: 1mm ≈ 3.78px at 96 DPI)
+            const imgWidthMM = constrainedWidth / 3.78;
+            const imgHeightMM = constrainedHeight / 3.78;
+
+            const imgX = MARGINS.left + (contentWidth - imgWidthMM) / 2;
+
+            doc.addImage(
+              imageData,
+              "JPEG",
+              imgX,
+              currentY,
+              imgWidthMM,
+              imgHeightMM,
+            );
+
+            currentY += imgHeightMM + 3;
+          }
+        } catch (err) {
+          console.warn("Failed to add image to PDF:", err);
+          // Skip image on error - graceful degradation
+        }
+      }
 
       // Question text height
       doc.setFontSize(SIZES.questionFont);
       const qLines = doc.splitTextToSize(
         questionText,
-        contentWidth - SIZES.cardPadding * 2 - 6
+        contentWidth - SIZES.cardPadding * 2 - 6,
       );
       const qHeight = qLines.length * 4.5;
       cardContentHeight += qHeight + 10; // Header + text
@@ -1828,7 +2009,7 @@ export function exportToPdf(config, questions, userAnswers) {
         doc.setFontSize(SIZES.optionFont);
         expLines = doc.splitTextToSize(
           expText,
-          contentWidth - SIZES.cardPadding * 2 - 6
+          contentWidth - SIZES.cardPadding * 2 - 6,
         );
         cardContentHeight += expLines.length * 3.8 + 8;
       }
@@ -1854,7 +2035,7 @@ export function exportToPdf(config, questions, userAnswers) {
         8,
         2,
         2,
-        "F"
+        "F",
       );
 
       // Quest number
@@ -1864,25 +2045,44 @@ export function exportToPdf(config, questions, userAnswers) {
       doc.text(
         `Question #${index + 1}`,
         MARGINS.left + SIZES.cardPadding + 2.5,
-        headerY + 5.5
+        headerY + 5.5,
       );
 
       // Status badge
       const { statusText, statusColor } = getQuestionStatus(
         question,
         userAns,
-        isEssay
-      );
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.optionFont);
-      doc.text(
-        statusText,
-        pageWidth - MARGINS.right - SIZES.cardPadding - 2.5,
-        headerY + 5.5,
-        { align: "right" }
+        isEssay,
       );
 
+      if (isSummaryMode) {
+        doc.setTextColor(...COLORS.textWhite);
+        doc.setFontSize(SIZES.optionFont);
+        doc.text(
+          statusText,
+          pageWidth - MARGINS.right - SIZES.cardPadding - 2.5,
+          headerY + 5.5,
+          { align: "right" },
+        );
+      }
       currentY = headerY + 15;
+
+      // Draw Image if exists
+      if (imgData) {
+        try {
+          doc.addImage(
+            imgData,
+            "JPEG",
+            MARGINS.left + SIZES.cardPadding + 3,
+            currentY,
+            imgWidth,
+            imgHeight,
+          );
+          currentY += imgHeight + 5; // Spacing after image
+        } catch (e) {
+          console.error("Failed to add image to PDF", e);
+        }
+      }
 
       // Question text
       doc.setFontSize(SIZES.questionFont);
@@ -1936,7 +2136,7 @@ export function exportToPdf(config, questions, userAnswers) {
         15,
         1.5,
         1.5,
-        "F"
+        "F",
       );
       doc.setFontSize(SIZES.labelFont);
       doc.setFont("helvetica", "bold");
@@ -1944,7 +2144,7 @@ export function exportToPdf(config, questions, userAnswers) {
       doc.text(
         "YOUR ANSWER:",
         MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4
+        currentY + 4,
       );
       doc.setFontSize(SIZES.optionFont);
       doc.setFont("helvetica", "normal");
@@ -1963,7 +2163,7 @@ export function exportToPdf(config, questions, userAnswers) {
         15,
         1.5,
         1.5,
-        "F"
+        "F",
       );
       doc.setFontSize(SIZES.labelFont);
       doc.setFont("helvetica", "bold");
@@ -1971,7 +2171,7 @@ export function exportToPdf(config, questions, userAnswers) {
       doc.text(
         "CORRECT ANSWER:",
         MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4
+        currentY + 4,
       );
       doc.setFontSize(SIZES.optionFont);
       doc.setFont("helvetica", "normal");
@@ -1982,7 +2182,7 @@ export function exportToPdf(config, questions, userAnswers) {
         currentY + 8,
         {
           maxWidth: boxWidth - 6,
-        }
+        },
       );
       currentY += 18;
     };
@@ -2005,7 +2205,7 @@ export function exportToPdf(config, questions, userAnswers) {
           buttonWidth,
           SIZES.buttonHeight,
           isCorrectAns,
-          isUserAns && !isCorrectAns
+          isUserAns && !isCorrectAns,
         );
 
         // Button label
@@ -2024,7 +2224,7 @@ export function exportToPdf(config, questions, userAnswers) {
           displayText,
           buttonX + SIZES.buttonPadding,
           buttonY + SIZES.buttonHeight / 2 + 1.2,
-          { maxWidth: buttonWidth - SIZES.buttonPadding * 2 }
+          { maxWidth: buttonWidth - SIZES.buttonPadding * 2 },
         );
 
         currentY += SIZES.buttonHeight + SIZES.optionSpacing;
@@ -2046,7 +2246,7 @@ export function exportToPdf(config, questions, userAnswers) {
         boxHeight,
         1.5,
         1.5,
-        "F"
+        "F",
       );
 
       // Border
@@ -2059,7 +2259,7 @@ export function exportToPdf(config, questions, userAnswers) {
         boxHeight,
         1.5,
         1.5,
-        "S"
+        "S",
       );
 
       // Label
@@ -2069,7 +2269,7 @@ export function exportToPdf(config, questions, userAnswers) {
       doc.text(
         "EXPLANATION:",
         MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4
+        currentY + 4,
       );
 
       // Explanation text
@@ -2078,16 +2278,17 @@ export function exportToPdf(config, questions, userAnswers) {
       doc.text(
         expLines,
         MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 7.5
+        currentY + 7.5,
       );
 
       currentY += boxHeight + 3;
     };
 
     // Render all questions
-    questions.forEach((question, index) => {
-      renderQuestion(question, index);
-    });
+    // Render all questions
+    for (const [index, question] of questions.entries()) {
+      await renderQuestion(question, index);
+    }
 
     // ===========================
     // FINAL CTA PAGE
@@ -2130,7 +2331,7 @@ export function exportToPdf(config, questions, userAnswers) {
         currentY,
         {
           align: "center",
-        }
+        },
       );
       currentY += 10;
 
@@ -2180,11 +2381,14 @@ export function exportToPdf(config, questions, userAnswers) {
   }
 }
 
-export function exportToHtml(config, questions, userAnswers) {
+export async function exportToHtml(config, questions, userAnswers = []) {
+  // Convert local images to base64
+  const processedQuestions = await convertImagesToBase64(questions);
+
   let hasMCQ = false,
     hasTrueFalse = false,
     hasEssay = false;
-  questions.forEach((q) => {
+  processedQuestions.forEach((q) => {
     if (isEssayQuestion(q)) hasEssay = true;
     else if (q.options.length === 2) hasTrueFalse = true;
     else hasMCQ = true;
@@ -2217,17 +2421,25 @@ export function exportToHtml(config, questions, userAnswers) {
         .correct-answer { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; font-weight: 600; margin-top: 15px; padding: 12px 15px; border-radius: 8px; }
         .explanation { margin-top: 15px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; color: #dbeafe; font-size: 0.95rem; }
         .essay-box { background: #2a2a2a; padding: 15px; border-radius: 8px; border-left: 3px solid #f59e0b; margin-top: 10px; }
+        .question-image { max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px; border: 1px solid #333; }
         .footer { text-align: center; margin-top: 50px; color: #888; font-size: 0.8rem; border-top: 1px solid #333; padding-top: 20px; }
     </style>
 </head>
 <body>
     <h1>${config.title || "Quiz Examination"}</h1>
     <div class="meta">Total Questions: ${
-      questions.length
+      processedQuestions.length
     } • Type: ${questionType} • Date: ${date}</div>
 `;
 
-  questions.forEach((q, index) => {
+  // Determine if we are in "Summary Mode" (user answers provided)
+  const isSummaryMode =
+    userAnswers &&
+    (Array.isArray(userAnswers)
+      ? userAnswers.length > 0
+      : Object.keys(userAnswers).length > 0);
+
+  processedQuestions.forEach((q, index) => {
     const userAns = userAnswers[index];
     const isSkipped = userAns === undefined || userAns === null;
     const isCorrect =
@@ -2239,16 +2451,19 @@ export function exportToHtml(config, questions, userAnswers) {
             <span>Question ${index + 1}</span>
             <span>${isEssayQuestion(q) ? "Essay" : "MCQ"}</span>
         </div>
+        ${q.image ? `<img src="${q.image}" class="question-image" alt="Question Image" onerror="this.alt='[Image not available]'; this.style.border='2px dashed #666';">` : ""}
         <div class="q-text">${q.q}</div>`;
 
     if (isEssayQuestion(q)) {
       const userText = userAns || "Not answered";
-      htmlContent += `
+      if (isSummaryMode)
+        htmlContent += `
         <div class="essay-box" style="border-left: 3px solid #3b82f6;">
             <strong style="color: #60a5fa; display:block; margin-bottom:5px;">Your Answer:</strong>
             ${userText}
-        </div>
-        <div class="essay-box">
+        </div>`;
+
+      htmlContent += `<div class="essay-box">
             <strong style="color: #f59e0b; display:block; margin-bottom:5px;">Formal Answer / Key Points:</strong>
             ${q.options[0]}
         </div>`;
@@ -2267,7 +2482,8 @@ export function exportToHtml(config, questions, userAnswers) {
         : `${userLetter}. ${q.options[userAns]}`;
       const userIcon = isSkipped ? "⚪" : isCorrect ? "✅" : "❌";
 
-      htmlContent += `<div class="user-answer ${userClass}">${userIcon} Your Answer: ${userAnswer}</div>`;
+      if (isSummaryMode)
+        htmlContent += `<div class="user-answer ${userClass}">${userIcon} Your Answer: ${userAnswer}</div>`;
 
       const correctLetter = String.fromCharCode(65 + q.correct);
       htmlContent += `<div class="correct-answer">✓ Correct Answer: ${correctLetter}. ${
@@ -2295,10 +2511,11 @@ export function exportToHtml(config, questions, userAnswers) {
   URL.revokeObjectURL(url);
 }
 
-export function exportToMarkdown(config, questions, userAnswers) {
+export function exportToMarkdown(config, questions, userAnswers = []) {
   let hasMCQ = false,
     hasTrueFalse = false,
     hasEssay = false;
+
   questions.forEach((q) => {
     if (isEssayQuestion(q)) hasEssay = true;
     else if (q.options.length === 2) hasTrueFalse = true;
@@ -2312,868 +2529,68 @@ export function exportToMarkdown(config, questions, userAnswers) {
   else if (hasTrueFalse) questionType = "True/False only";
   else questionType = "MCQ only";
 
+  // Determine if we are in "Summary Mode" (user answers provided)
+  const isSummaryMode =
+    userAnswers &&
+    (Array.isArray(userAnswers)
+      ? userAnswers.length > 0
+      : Object.keys(userAnswers).length > 0);
+
   let markdown = `# ${config.title || "Quiz"}\n**Number of questions:** ${
     questions.length
   }\n**Questions' type:** ${questionType}\n\n---\n\n`;
 
   questions.forEach((q, index) => {
     const userAns = userAnswers[index];
-    markdown += `### Question ${index + 1}\n${q.q}\n\n`;
+    let imageLink = "";
+
+    if (q.image) {
+      imageLink = !isLocalPath(q.image)
+        ? `![Question Image](${q.image})\n\n`
+        : `[![Image Can't be Displayed](https://i.postimg.cc/NMdJJNzY/no-image.jpg)](https://postimg.cc/dkTjD9FS)\n\n`;
+    }
+
+    markdown += `## Question ${index + 1}: ${q.q}\n${imageLink}\n\n`;
 
     if (isEssayQuestion(q)) {
-      const userText = userAns || "Not answered";
-      markdown += `**Your Answer:**\n\n${userText}\n\n**Formal Answer:**\n\n${q.options[0]}\n\n`;
+      // Only show user answer section if userAnswers was actually passed
+      if (isSummaryMode) {
+        const userText = userAns || "Not answered";
+        markdown += `**Your Answer:**\n\n${userText}\n\n`;
+      }
+      markdown += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
     } else {
       q.options.forEach((opt, i) => {
-        const letter = String.fromCharCode(65 + i);
+        const letter = String.fromCharCode(48 + i + 1);
         markdown += `${letter}. ${opt}\n`;
       });
       markdown += `\n`;
+
       const isSkipped = userAns === undefined || userAns === null;
-      const userLetter = isSkipped
-        ? "Skipped"
-        : String.fromCharCode(65 + userAns);
-      const userAnswer = isSkipped ? "Skipped" : q.options[userAns];
-      markdown += `**Your Answer:** ${userLetter}${
-        isSkipped ? "" : `. ${userAnswer}`
-      }\n\n`;
-      const correctLetter = String.fromCharCode(65 + q.correct);
+
+      // Only append "Your Answer" if we are in summary mode
+      if (isSummaryMode) {
+        const userLetter = isSkipped
+          ? "Skipped"
+          : String.fromCharCode(48 + userAns + 1);
+        const userAnswerText = isSkipped ? "Skipped" : q.options[userAns];
+
+        markdown += `**Your Answer:** ${userLetter}${
+          isSkipped ? "" : `. ${userAnswerText}`
+        }\n\n`;
+      }
+
+      const correctLetter = String.fromCharCode(48 + q.correct + 1);
       markdown += `**Correct Answer:** ${correctLetter}. ${
         q.options[q.correct]
       }\n\n`;
     }
 
-    if (q.explanation) markdown += `**Explanation:**\n${q.explanation}\n\n`;
+    if (q.explanation) markdown += `> **Explanation:**\n${q.explanation}\n\n`;
     markdown += `---\n\n`;
   });
 
   const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${config.title || "quiz_export"}.md`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-export function exportToPdfNoAns(config, questions) {
-  try {
-    // ===========================
-    // VALIDATION
-    // ===========================
-    if (!config || !questions || !Array.isArray(questions)) {
-      throw new Error(
-        "Invalid parameters: config and questions array required"
-      );
-    }
-
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      throw new Error("jsPDF library not loaded");
-    }
-
-    // ===========================
-    // INITIALIZATION
-    // ===========================
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-      compress: true,
-    });
-
-    doc.setFont("helvetica");
-
-    // ===========================
-    // GAMIFICATION COLORS
-    // ===========================
-    const COLORS = Object.freeze({
-      // Primary gamification palette
-      primary: [106, 90, 205], // Slate Blue
-      secondary: [255, 215, 0], // Gold
-      accent: [255, 105, 180], // Hot Pink
-
-      // Status colors
-      success: [46, 213, 115], // Bright Green
-      error: [255, 71, 87], // Bright Red
-      warning: [255, 168, 1], // Amber
-      info: [52, 172, 224], // Sky Blue
-
-      // UI colors
-      cardBg: [255, 255, 255], // White
-      cardBorder: [106, 90, 205], // Matches primary
-      pageBg: [248, 250, 252], // Light Gray
-
-      // Text colors
-      textDark: [30, 41, 59], // Dark Slate
-      textLight: [100, 116, 139], // Light Slate
-      textWhite: [255, 255, 255], // White
-
-      // Button colors
-      buttonCorrect: [16, 185, 129], // Emerald
-      buttonWrong: [239, 68, 68], // Red
-      buttonNeutral: [203, 213, 225], // Slate 300
-
-      // Special effects
-      progressBarBg: [226, 232, 240], // Light gray
-      progressBarFill: [255, 215, 0], // Gold
-      trophy: [255, 215, 0], // Gold
-    });
-
-    // ===========================
-    // OPTIMIZED SIZES (2 questions per page)
-    // ===========================
-    const SIZES = Object.freeze({
-      // Headers & footers
-      headerHeight: 18,
-      footerHeight: 12,
-      progressBarHeight: 6,
-
-      // Cards - REDUCED for 2 per page
-      cardPadding: 8,
-      cardMargin: 6,
-      cardCornerRadius: 3,
-      cardShadowOffset: 0.8,
-
-      // Typography
-      titleFont: 24,
-      headingFont: 16,
-      questionFont: 11,
-      optionFont: 10,
-      labelFont: 9,
-      footerFont: 8,
-
-      // Buttons
-      buttonHeight: 10,
-      buttonPadding: 3,
-      buttonRadius: 2,
-
-      // Spacing
-      sectionSpacing: 8,
-      questionSpacing: 12,
-      optionSpacing: 4,
-    });
-
-    const MARGINS = Object.freeze({
-      top: 22,
-      right: 12,
-      bottom: 18,
-      left: 12,
-    });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const contentWidth = pageWidth - MARGINS.left - MARGINS.right;
-
-    let currentY = MARGINS.top;
-    let currentLevel = 1;
-
-    // ===========================
-    // ENHANCED DECORATIVE HELPERS
-    // ===========================
-
-    /**
-     * Enhanced background with multiple patterns
-     */
-    const drawBackgroundPattern = () => {
-      // Base color
-      doc.setFillColor(...COLORS.pageBg);
-      doc.rect(0, 0, pageWidth, pageHeight, "F");
-
-      // Pattern 1: Diagonal lines
-      doc.setDrawColor(220, 220, 230);
-      doc.setLineWidth(0.15);
-      for (let i = -pageHeight; i < pageWidth + pageHeight; i += 12) {
-        doc.line(i, 0, i + pageHeight, pageHeight);
-      }
-
-      // Pattern 2: Dots pattern (sparse)
-      doc.setFillColor(215, 215, 225);
-      for (let x = 10; x < pageWidth; x += 15) {
-        for (let y = 10; y < pageHeight; y += 15) {
-          doc.circle(x, y, 0.3, "F");
-        }
-      }
-
-      // Pattern 3: Corner decorations
-      doc.setFillColor(230, 230, 240);
-      // Top-left corner decoration
-      doc.triangle(0, 0, 15, 0, 0, 15, "F");
-      // Top-right corner decoration
-      doc.triangle(pageWidth, 0, pageWidth - 15, 0, pageWidth, 15, "F");
-      // Bottom-left corner decoration
-      doc.triangle(0, pageHeight, 15, pageHeight, 0, pageHeight - 15, "F");
-      // Bottom-right corner decoration
-      doc.triangle(
-        pageWidth,
-        pageHeight,
-        pageWidth - 15,
-        pageHeight,
-        pageWidth,
-        pageHeight - 15,
-        "F"
-      );
-    };
-
-    /**
-     * Draws a card container with shadow and border
-     */
-    const drawCard = (x, y, width, height) => {
-      // Shadow
-      doc.setFillColor(200, 200, 210);
-      doc.roundedRect(
-        x + SIZES.cardShadowOffset,
-        y + SIZES.cardShadowOffset,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
-        "F"
-      );
-
-      // Card background
-      doc.setFillColor(...COLORS.cardBg);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
-        "F"
-      );
-
-      // Card border
-      doc.setDrawColor(...COLORS.cardBorder);
-      doc.setLineWidth(0.4);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
-        "S"
-      );
-    };
-
-    /**
-     * Draws a button-style option
-     */
-    const drawButton = (x, y, width, height, isCorrect) => {
-      let bgColor = COLORS.buttonNeutral;
-      let borderColor = COLORS.buttonNeutral;
-      let textColor = COLORS.textDark;
-
-      if (isCorrect) {
-        bgColor = COLORS.buttonCorrect;
-        borderColor = COLORS.buttonCorrect;
-        textColor = COLORS.textWhite;
-      }
-
-      // Button shadow
-      doc.setFillColor(180, 180, 190);
-      doc.roundedRect(
-        x + 0.4,
-        y + 0.4,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
-        "F"
-      );
-
-      // Button background
-      doc.setFillColor(...bgColor);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
-        "F"
-      );
-
-      // Button border
-      doc.setDrawColor(...borderColor);
-      doc.setLineWidth(0.6);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
-        "S"
-      );
-
-      return textColor;
-    };
-
-    /**
-     * Sanitizes text - SAFE ASCII only
-     */
-    const sanitizeText = (text) => {
-      if (!text) return "";
-      let cleaned = String(text).trim();
-      // Remove ALL non-standard characters to prevent encoding issues
-      cleaned = cleaned.replace(/[^\x20-\x7E\n\r\t]/g, "");
-      return cleaned.trim();
-    };
-
-    const isEssayQuestion = (q) => q.options && q.options.length === 1;
-
-    // ===========================
-    // HEADER & FOOTER
-    // ===========================
-
-    const addGameHeader = () => {
-      drawBackgroundPattern();
-
-      // Gradient-style header (simulated with solid color)
-      doc.setFillColor(...COLORS.primary);
-      doc.rect(0, 0, pageWidth, SIZES.headerHeight, "F");
-
-      // Decorative border
-      doc.setDrawColor(...COLORS.secondary);
-      doc.setLineWidth(1.5);
-      doc.line(0, SIZES.headerHeight - 1, pageWidth, SIZES.headerHeight - 1);
-
-      // Title - SAFE FONT
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.headingFont);
-      doc.setFont("helvetica", "bold");
-      const headerText = sanitizeText(config.title || "Quiz Quest");
-      doc.text(headerText, MARGINS.left, 11);
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-
-      const nameWidth = doc.getTextWidth(currentName);
-      const xPos = pageWidth - MARGINS.right - nameWidth;
-      doc.text(`${currentName}`, xPos, 11);
-
-      currentY = SIZES.headerHeight + 6;
-    };
-
-    const addGameFooter = (isLastPage = false) => {
-      const footerY = pageHeight - SIZES.footerHeight;
-
-      // Footer background
-      doc.setFillColor(240, 242, 245);
-      doc.rect(0, footerY - 2, pageWidth, SIZES.footerHeight + 2, "F");
-
-      // Decorative top border
-      doc.setDrawColor(...COLORS.secondary);
-      doc.setLineWidth(0.8);
-      doc.line(0, footerY - 2, pageWidth, footerY - 2);
-
-      // Page indicator (left)
-      doc.setFontSize(SIZES.footerFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
-      doc.text(`Page ${currentLevel}`, MARGINS.left, footerY + 4);
-
-      // Branding (right)
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textLight);
-      doc.text("Crafted by Belal Amr", pageWidth - MARGINS.right, footerY + 4, {
-        align: "right",
-      });
-
-      if (!isLastPage) {
-        // Progress dots (center)
-        const dotY = footerY + 3.5;
-        const dotSpacing = 3.5;
-        const totalDots = 5;
-        const startX = pageWidth / 2 - (totalDots * dotSpacing) / 2;
-
-        for (let i = 0; i < totalDots; i++) {
-          if (i < currentLevel) {
-            doc.setFillColor(...COLORS.primary);
-          } else {
-            doc.setFillColor(...COLORS.progressBarBg);
-          }
-          doc.circle(startX + i * dotSpacing, dotY, 0.7, "F");
-        }
-      }
-    };
-
-    const checkPageBreak = (requiredHeight) => {
-      if (
-        currentY + requiredHeight >
-        pageHeight - MARGINS.bottom - SIZES.footerHeight
-      ) {
-        addGameFooter();
-        doc.addPage();
-        currentLevel++;
-        addGameHeader();
-        return true;
-      }
-      return false;
-    };
-
-    addGameHeader();
-
-    // ===========================
-    // RENDER QUESTIONS (OPTIMIZED)
-    // ===========================
-
-    const renderQuestion = (question, index) => {
-      const isEssay = isEssayQuestion(question);
-      const questionText = sanitizeText(question.q);
-
-      // Calculate card height needed
-      let cardContentHeight = 0;
-
-      // Question text height
-      doc.setFontSize(SIZES.questionFont);
-      const qLines = doc.splitTextToSize(
-        questionText,
-        contentWidth - SIZES.cardPadding * 2 - 6
-      );
-      const qHeight = qLines.length * 4.5;
-      cardContentHeight += qHeight + 10; // Header + text
-
-      // Options height
-      if (isEssay) {
-        cardContentHeight += 38;
-      } else {
-        cardContentHeight +=
-          question.options.length * (SIZES.buttonHeight + SIZES.optionSpacing) +
-          6;
-      }
-
-      // Explanation height
-      let expLines = [];
-      if (question.explanation) {
-        const expText = sanitizeText(question.explanation);
-        doc.setFontSize(SIZES.optionFont);
-        expLines = doc.splitTextToSize(
-          expText,
-          contentWidth - SIZES.cardPadding * 2 - 6
-        );
-        cardContentHeight += expLines.length * 3.8 + 8;
-      }
-
-      const totalCardHeight = cardContentHeight + SIZES.cardPadding * 2;
-
-      // Check page break
-      checkPageBreak(totalCardHeight + SIZES.cardMargin);
-
-      // Draw quest card
-      const cardY = currentY;
-      drawCard(MARGINS.left, cardY, contentWidth, totalCardHeight);
-
-      // Card header
-      currentY = cardY + SIZES.cardPadding - 2;
-
-      const headerY = currentY;
-      doc.setFillColor(...COLORS.primary);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding,
-        headerY,
-        contentWidth - SIZES.cardPadding * 2,
-        8,
-        2,
-        2,
-        "F"
-      );
-
-      // Quest number
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "bold");
-      doc.text(
-        `Question #${index + 1}`,
-        MARGINS.left + SIZES.cardPadding + 2.5,
-        headerY + 5.5
-      );
-
-      currentY = headerY + 15;
-
-      // Question text
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
-      doc.text(qLines, MARGINS.left + SIZES.cardPadding + 3, currentY);
-      currentY += qHeight;
-
-      // Render options
-      if (isEssay) {
-        renderEssayAnswer(question);
-      } else {
-        renderMultipleChoiceOptions(question);
-      }
-
-      // Render explanation
-      if (expLines.length > 0) {
-        renderExplanation(expLines);
-      }
-
-      currentY = cardY + totalCardHeight + SIZES.cardMargin;
-    };
-
-    const renderEssayAnswer = (question) => {
-      const formalAnswer = sanitizeText(question.options[0]);
-      const boxWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-
-      // Calculate the height needed for the text
-      doc.setFontSize(SIZES.optionFont);
-      doc.setFont("helvetica", "normal");
-
-      const textLines = doc.splitTextToSize(formalAnswer, boxWidth - 6);
-      const lineHeight = SIZES.optionFont * 0.3527; // Convert pt to mm (approximate)
-      const textHeight = textLines.length * lineHeight;
-
-      // Calculate total box height: label (4) + text height + padding
-      const boxHeight = 4 + textHeight + 6; // 4 for label, 6 for bottom padding
-
-      // Formal answer box
-      doc.setFillColor(240, 253, 244);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        boxHeight, // Dynamic height
-        1.5,
-        1.5,
-        "F"
-      );
-
-      doc.setFontSize(SIZES.labelFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.success);
-      doc.text(
-        "CORRECT ANSWER:",
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4
-      );
-
-      doc.setFontSize(SIZES.optionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
-      doc.text(
-        formalAnswer,
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 8,
-        {
-          maxWidth: boxWidth - 6,
-        }
-      );
-
-      currentY += boxHeight + 3; // Dynamic increment with spacing
-    };
-
-    const renderMultipleChoiceOptions = (question) => {
-      const buttonWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-
-      question.options.forEach((opt, optIndex) => {
-        const isCorrectAns = optIndex === question.correct;
-        const sanitizedOption = sanitizeText(opt);
-
-        const buttonX = MARGINS.left + SIZES.cardPadding + 3;
-        const buttonY = currentY;
-
-        // Prepare text and calculate required height
-        const prefix = String.fromCharCode(65 + optIndex);
-        let marker = "";
-        if (isCorrectAns) marker = "> ";
-
-        const displayText = `${marker}${prefix}. ${sanitizedOption}`;
-
-        // Calculate dynamic height based on text content
-        doc.setFontSize(SIZES.optionFont);
-        doc.setFont("helvetica", isCorrectAns ? "bold" : "normal");
-
-        const textLines = doc.splitTextToSize(
-          displayText,
-          buttonWidth - SIZES.buttonPadding * 2
-        );
-        const lineHeight = SIZES.optionFont * 0.3527; // Convert pt to mm
-        const textHeight = textLines.length * lineHeight;
-
-        // Calculate button height: text height + vertical padding
-        const dynamicButtonHeight = Math.max(
-          SIZES.buttonHeight, // Minimum height
-          textHeight + 4 // Text height + padding (2mm top + 2mm bottom)
-        );
-
-        // Draw button with dynamic height
-        const textColor = drawButton(
-          buttonX,
-          buttonY,
-          buttonWidth,
-          dynamicButtonHeight, // Use dynamic height instead of fixed
-          isCorrectAns
-        );
-
-        // Button label (centered vertically)
-        doc.setFontSize(SIZES.optionFont);
-        doc.setFont("helvetica", isCorrectAns ? "bold" : "normal");
-        doc.setTextColor(...textColor);
-
-        doc.text(
-          displayText,
-          buttonX + SIZES.buttonPadding,
-          buttonY + dynamicButtonHeight / 2 + 1.2, // Center in dynamic height
-          { maxWidth: buttonWidth - SIZES.buttonPadding * 2 }
-        );
-
-        currentY += dynamicButtonHeight + SIZES.optionSpacing;
-      });
-
-      currentY += 3;
-    };
-
-    const renderExplanation = (expLines) => {
-      const boxWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-      const boxHeight = expLines.length * 3.8 + 8;
-
-      // Explanation box
-      doc.setFillColor(255, 251, 235);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        boxHeight,
-        1.5,
-        1.5,
-        "F"
-      );
-
-      // Border
-      doc.setDrawColor(...COLORS.warning);
-      doc.setLineWidth(0.4);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        boxHeight,
-        1.5,
-        1.5,
-        "S"
-      );
-
-      // Label
-      doc.setFontSize(SIZES.labelFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.warning);
-      doc.text(
-        "EXPLANATION:",
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 4
-      );
-
-      // Explanation text
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
-      doc.text(
-        expLines,
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        currentY + 7.5
-      );
-
-      currentY += boxHeight + 3;
-    };
-
-    // Render all questions
-    questions.forEach((question, index) => {
-      renderQuestion(question, index);
-    });
-
-    // ===========================
-    // FINAL CTA PAGE
-    // ===========================
-
-    const renderCTAPage = () => {
-      addGameFooter();
-      doc.addPage();
-      currentLevel++;
-      addGameHeader();
-
-      // Large CTA card
-      const cardHeight = 55;
-      const cardY = currentY + 18;
-      drawCard(MARGINS.left + 8, cardY, contentWidth - 16, cardHeight);
-
-      currentY = cardY + 12;
-
-      // Game icon text
-      doc.setFontSize(32);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
-      doc.text("End", pageWidth / 2, currentY, { align: "center" });
-      currentY += 14;
-
-      // CTA heading
-      doc.setFontSize(20);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
-      doc.text("READY FOR MORE?", pageWidth / 2, currentY, {
-        align: "center",
-      });
-      currentY += 8;
-
-      // CTA subtext
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textLight);
-      doc.text(
-        "Continue your journey with more challenges!",
-        pageWidth / 2,
-        currentY,
-        {
-          align: "center",
-        }
-      );
-      currentY += 10;
-
-      // Link button
-      const buttonWidth = contentWidth - 50;
-      const buttonX = MARGINS.left + 25;
-      const buttonY = currentY;
-
-      doc.setFillColor(...COLORS.primary);
-      doc.roundedRect(buttonX, buttonY, buttonWidth, 12, 2.5, 2.5, "F");
-
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "bold");
-      doc.text("PLAY MORE QUIZZES", pageWidth / 2, buttonY + 7.5, {
-        align: "center",
-      });
-
-      currentY += 25;
-
-      // URL
-      doc.setFontSize(SIZES.optionFont);
-      doc.setTextColor(...COLORS.info);
-      doc.setFont("helvetica", "bold");
-      doc.text("https://divquizzes.vercel.app/", pageWidth / 2, currentY, {
-        align: "center",
-      });
-
-      addGameFooter(true);
-    };
-
-    renderCTAPage();
-
-    // ===========================
-    // SAVE PDF
-    // ===========================
-    const filename = `${config.title}.pdf`;
-
-    doc.save(filename);
-    console.log(`Gamified PDF exported: ${filename}`);
-
-    return { success: true, filename };
-  } catch (error) {
-    console.error("PDF Export Error:", error);
-    alert(`Failed to export PDF: ${error.message}`);
-    return { success: false, error: error.message };
-  }
-}
-
-export function exportToHtmlNoAns(config, questions) {
-  let hasMCQ = false,
-    hasTF = false,
-    hasEssay = false;
-  questions.forEach((q) => {
-    if (isEssayQuestion(q)) hasEssay = true;
-    else if (q.options.length === 2) hasTF = true;
-    else hasMCQ = true;
-  });
-  let qt = "Multiple Choice";
-  if (hasEssay && !hasMCQ && !hasTF) qt = "Essay/Definitions";
-  else if (hasEssay) qt = "Mixed (MCQ, True/False, Essay)";
-  const date = new Date().toLocaleDateString();
-  let html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${
-    config.title || "Quiz Examination"
-  }</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.6;color:#e0e0e0;background:#121212}h1{color:#fff;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:30px;text-align:center}.meta{text-align:center;color:#888;margin-bottom:40px;font-style:italic}.question-card{background:#1e1e1e;border-radius:12px;padding:25px;margin-bottom:30px;box-shadow:0 4px 12px rgba(0,0,0,.3);border:1px solid #333}.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:.9rem;color:#aaa}.q-text{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:20px}.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.option{padding:10px 15px;margin-bottom:8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.95rem}.correct-answer{background:var(--correct-bg);color:var(--correct-text);border:1px solid #22c55e;font-weight:600;margin-top:15px;padding:12px 15px;border-radius:8px}.explanation{margin-top:15px;padding:15px;background:rgba(59,130,246,.1);border-left:3px solid var(--accent);color:#dbeafe;font-size:.95rem}.essay-box{background:#2a2a2a;padding:15px;border-radius:8px;border-left:3px solid #f59e0b;margin-top:10px}.footer{text-align:center;margin-top:50px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border);padding-top:20px}</style></head><body><h1>${
-    config.title || "Quiz Examination"
-  }</h1><div class="meta">Total Questions: ${
-    questions.length
-  } • Type: ${qt} • Date: ${date}</div>`;
-  questions.forEach((q, i) => {
-    html += `<div class="question-card"><div class="q-header"><span>Question ${
-      i + 1
-    }</span><span>${
-      isEssayQuestion(q) ? "Essay" : "MCQ"
-    }</span></div><div class="q-text">${q.q}</div>`;
-    if (isEssayQuestion(q))
-      html += `<div class="essay-box"><strong style="color:#f59e0b;display:block;margin-bottom:5px">Formal Answer / Key Points:</strong>${q.options[0]}</div>`;
-    else {
-      html += `<div class="options-list">`;
-      q.options.forEach((opt, j) => {
-        html += `<div class="option"><strong>${String.fromCharCode(
-          65 + j
-        )}.</strong> ${opt}</div>`;
-      });
-      html += `</div><div class="correct-answer">✓ Correct Answer: ${String.fromCharCode(
-        65 + q.correct
-      )}. ${q.options[q.correct]}</div>`;
-    }
-    if (q.explanation)
-      html += `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`;
-    html += `</div>`;
-  });
-  html += `<div class="footer">Generated by Quiz App</div></body></html>`;
-
-  // By AI
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${config.title || "quiz_export"}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-export function exportToMarkdownNoAns(config, questions) {
-  let hasMCQ = false,
-    hasTF = false,
-    hasEssay = false;
-  questions.forEach((q) => {
-    if (isEssayQuestion(q)) hasEssay = true;
-    else if (q.options.length === 2) hasTF = true;
-    else hasMCQ = true;
-  });
-  let qt =
-    hasEssay && !hasMCQ && !hasTF
-      ? "Essay/Definitions"
-      : hasEssay
-      ? "Mixed (MCQ, True/False, Essay)"
-      : hasMCQ && hasTF
-      ? "MCQ and True/False"
-      : hasTF
-      ? "True/False only"
-      : "MCQ only";
-  let md = `# ${config.title || "Quiz"}\n**Number of questions:** ${
-    questions.length
-  }\n**Questions' type:** ${qt}\n\n---\n\n`;
-  questions.forEach((q, i) => {
-    md += `### Question ${i + 1}\n${q.q}\n\n`;
-    if (isEssayQuestion(q)) md += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
-    else {
-      q.options.forEach((opt, j) => {
-        md += `${String.fromCharCode(65 + j)}. ${opt}\n`;
-      });
-      md += `\n**Correct Answer:** ${String.fromCharCode(65 + q.correct)}. ${
-        q.options[q.correct]
-      }\n\n`;
-    }
-    if (q.explanation) md += `**Explanation:**\n${q.explanation}\n\n`;
-    md += `---\n\n`;
-  });
-
-  // By AI
-  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

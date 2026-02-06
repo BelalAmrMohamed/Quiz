@@ -3,9 +3,9 @@ import { categoryTree } from "./examManifest.js";
 import { userProfile } from "./userProfile.js";
 import {
   exportToQuiz,
-  exportToPdfNoAns,
-  exportToHtmlNoAns,
-  exportToMarkdownNoAns,
+  exportToPdf,
+  exportToHtml,
+  exportToMarkdown,
 } from "./Export-Functions.js";
 import {
   extractMetadata,
@@ -56,7 +56,7 @@ function updateWelcomeMessage() {
   // Replace username with styled span
   const styledMessage = messageTemplate.replace(
     name,
-    `<span class="user-name">${name}</span>`
+    `<span class="user-name">${name}</span>`,
   );
 
   userNameBadge.innerHTML = styledMessage;
@@ -89,7 +89,7 @@ window.openProfileSettings = function () {
   const availableTerms = getAvailableTerms(
     categoryTree,
     profile.faculty,
-    profile.year
+    profile.year,
   );
 
   modalCard.innerHTML = `
@@ -120,7 +120,7 @@ window.openProfileSettings = function () {
                 (f) =>
                   `<option value="${escapeHtml(f)}" ${
                     f === profile.faculty ? "selected" : ""
-                  }>${escapeHtml(f)}</option>`
+                  }>${escapeHtml(f)}</option>`,
               )
               .join("")}
           </select>
@@ -135,7 +135,7 @@ window.openProfileSettings = function () {
                 (y) =>
                   `<option value="${escapeHtml(y)}" ${
                     y === profile.year ? "selected" : ""
-                  }>Year ${escapeHtml(y)}</option>`
+                  }>Year ${escapeHtml(y)}</option>`,
               )
               .join("")}
           </select>
@@ -150,7 +150,7 @@ window.openProfileSettings = function () {
                 (t) =>
                   `<option value="${escapeHtml(t)}" ${
                     t === profile.term ? "selected" : ""
-                  }>Term ${escapeHtml(t)}</option>`
+                  }>Term ${escapeHtml(t)}</option>`,
               )
               .join("")}
           </select>
@@ -206,7 +206,7 @@ function setupProfileDropdownCascade() {
       availableYears
         .map(
           (y) =>
-            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
+            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
         )
         .join("");
 
@@ -230,7 +230,7 @@ function setupProfileDropdownCascade() {
     const availableTerms = getAvailableTerms(
       categoryTree,
       selectedFaculty,
-      selectedYear
+      selectedYear,
     );
 
     const currentTerm = termSelect.value;
@@ -239,7 +239,7 @@ function setupProfileDropdownCascade() {
       availableTerms
         .map(
           (t) =>
-            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
+            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
         )
         .join("");
 
@@ -296,20 +296,20 @@ window.closeProfileModal = function () {
  * Faculty icons mapping for visual selection
  */
 const facultyIcons = {
-  "Medicine": "🩺",
-  "Pharmacy": "💊",
-  "Dentistry": "🦷",
-  "Engineering": "⚙️",
-  "Science": "🔬",
-  "Arts": "🎨",
-  "Law": "⚖️",
-  "Commerce": "📊",
+  Medicine: "🩺",
+  Pharmacy: "💊",
+  Dentistry: "🦷",
+  Engineering: "⚙️",
+  Science: "🔬",
+  Arts: "🎨",
+  Law: "⚖️",
+  Commerce: "📊",
   "Computer Science": "💻",
-  "Nursing": "🏥",
-  "Agriculture": "🌾",
-  "Veterinary": "🐾",
-  "Education": "📚",
-  "default": "📖"
+  Nursing: "🏥",
+  Agriculture: "🌾",
+  Veterinary: "🐾",
+  Education: "📚",
+  default: "📖",
 };
 
 /**
@@ -324,7 +324,7 @@ function getFacultyIcon(faculty) {
  */
 function showOnboardingWizard() {
   const metadata = extractMetadata(categoryTree);
-  
+
   // Wizard state
   let currentStep = 1;
   let selectedFaculty = null;
@@ -399,8 +399,9 @@ function showOnboardingWizard() {
       const nextBtn = document.createElement("button");
       nextBtn.className = "onboarding-btn primary";
       nextBtn.textContent = "Next →";
-      nextBtn.disabled = (currentStep === 1 && !selectedFaculty) || 
-                         (currentStep === 2 && !selectedYear);
+      nextBtn.disabled =
+        (currentStep === 1 && !selectedFaculty) ||
+        (currentStep === 2 && !selectedYear);
       nextBtn.onclick = () => {
         currentStep++;
         render();
@@ -430,7 +431,7 @@ function showOnboardingWizard() {
     const grid = document.createElement("div");
     grid.className = "faculty-grid";
 
-    metadata.faculties.forEach(faculty => {
+    metadata.faculties.forEach((faculty) => {
       const option = document.createElement("button");
       option.className = "faculty-option";
       if (selectedFaculty === faculty) option.classList.add("selected");
@@ -461,7 +462,7 @@ function showOnboardingWizard() {
     container.appendChild(header);
 
     const availableYears = getAvailableYears(categoryTree, selectedFaculty);
-    
+
     if (availableYears.length === 0) {
       const noOptions = document.createElement("div");
       noOptions.className = "no-options-message";
@@ -473,7 +474,7 @@ function showOnboardingWizard() {
     const pills = document.createElement("div");
     pills.className = "year-pills";
 
-    availableYears.forEach(year => {
+    availableYears.forEach((year) => {
       const pill = document.createElement("button");
       pill.className = "year-pill";
       if (selectedYear === year) pill.classList.add("selected");
@@ -499,8 +500,12 @@ function showOnboardingWizard() {
     `;
     container.appendChild(header);
 
-    const availableTerms = getAvailableTerms(categoryTree, selectedFaculty, selectedYear);
-    
+    const availableTerms = getAvailableTerms(
+      categoryTree,
+      selectedFaculty,
+      selectedYear,
+    );
+
     if (availableTerms.length === 0) {
       const noOptions = document.createElement("div");
       noOptions.className = "no-options-message";
@@ -512,7 +517,7 @@ function showOnboardingWizard() {
     const toggle = document.createElement("div");
     toggle.className = "term-toggle";
 
-    availableTerms.forEach(term => {
+    availableTerms.forEach((term) => {
       const btn = document.createElement("button");
       btn.className = "term-btn";
       if (selectedTerm === term) btn.classList.add("selected");
@@ -537,11 +542,14 @@ function showOnboardingWizard() {
 
   function finishOnboarding() {
     // Save the selections
-    userProfile.saveInitialSetup({
-      faculty: selectedFaculty,
-      year: selectedYear,
-      term: selectedTerm
-    }, categoryTree);
+    userProfile.saveInitialSetup(
+      {
+        faculty: selectedFaculty,
+        year: selectedYear,
+        term: selectedTerm,
+      },
+      categoryTree,
+    );
 
     // Update welcome message
     updateWelcomeMessage();
@@ -581,7 +589,7 @@ window.openCourseManager = function () {
   const availableTerms = getAvailableTerms(
     categoryTree,
     profile.faculty,
-    profile.year
+    profile.year,
   );
 
   modalCard.innerHTML = `
@@ -596,7 +604,7 @@ window.openCourseManager = function () {
             (f) =>
               `<option value="${escapeHtml(f)}" ${
                 f === profile.faculty ? "selected" : ""
-              }>${escapeHtml(f)}</option>`
+              }>${escapeHtml(f)}</option>`,
           )
           .join("")}
       </select>
@@ -608,7 +616,7 @@ window.openCourseManager = function () {
             (y) =>
               `<option value="${escapeHtml(y)}" ${
                 y === profile.year ? "selected" : ""
-              }>Year ${escapeHtml(y)}</option>`
+              }>Year ${escapeHtml(y)}</option>`,
           )
           .join("")}
       </select>
@@ -620,7 +628,7 @@ window.openCourseManager = function () {
             (t) =>
               `<option value="${escapeHtml(t)}" ${
                 t === profile.term ? "selected" : ""
-              }>Term ${escapeHtml(t)}</option>`
+              }>Term ${escapeHtml(t)}</option>`,
           )
           .join("")}
       </select>
@@ -678,7 +686,7 @@ function setupCourseManagerDropdownCascade() {
       availableYears
         .map(
           (y) =>
-            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`
+            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
         )
         .join("");
 
@@ -702,7 +710,7 @@ function setupCourseManagerDropdownCascade() {
     const availableTerms = getAvailableTerms(
       categoryTree,
       selectedFaculty,
-      selectedYear
+      selectedYear,
     );
 
     const currentTerm = termSelect.value;
@@ -711,7 +719,7 @@ function setupCourseManagerDropdownCascade() {
       availableTerms
         .map(
           (t) =>
-            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`
+            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
         )
         .join("");
 
@@ -762,8 +770,8 @@ function renderCourseManagerList() {
           <h4>${escapeHtml(course.name)}</h4>
           <p class="course-manager-meta">
             ${escapeHtml(course.faculty)} • Year ${escapeHtml(
-        course.year
-      )} • Term ${escapeHtml(course.term)}
+              course.year,
+            )} • Term ${escapeHtml(course.term)}
           </p>
         </div>
         <button 
@@ -918,7 +926,7 @@ function createCategoryCard(
   name,
   itemCount,
   isFolder = false,
-  courseData = null
+  courseData = null,
 ) {
   const card = document.createElement("div");
   card.className = "card category-card";
@@ -1030,13 +1038,13 @@ function createExamCard(exam) {
         exportToQuiz(config, questions);
         break;
       case "pdf":
-        exportToPdfNoAns(config, questions);
+        await exportToPdf(config, questions);
         break;
       case "html":
-        exportToHtmlNoAns(config, questions);
+        exportToHtml(config, questions);
         break;
       case "md":
-        exportToMarkdownNoAns(config, questions);
+        exportToMarkdown(config, questions);
         break;
     }
   };
@@ -1158,15 +1166,15 @@ function showModeSelection(examId, examTitle) {
     "🛡️",
     "Practice",
     "Has a timer, and you can check answers",
-    () => startQuiz(examId, "practice")
+    () => startQuiz(examId, "practice"),
   );
 
   const timedBtn = createModeButton("⏱️", "Timed", "30s per question", () =>
-    startQuiz(examId, "timed")
+    startQuiz(examId, "timed"),
   );
 
   const examBtn = createModeButton("📝", "Exam", "No checking answers!", () =>
-    startQuiz(examId, "exam")
+    startQuiz(examId, "exam"),
   );
 
   modeGrid.appendChild(practiceBtn);
@@ -1250,7 +1258,7 @@ document.addEventListener("DOMContentLoaded", () => {
     installBtn.addEventListener("click", async () => {
       if (!deferredPrompt) {
         alert(
-          "The app is not installable at this time. Please check your browser support or PWA setup."
+          "The app is not installable at this time. Please check your browser support or PWA setup.",
         );
         return;
       }
