@@ -1461,11 +1461,147 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     const contentWidth = pageWidth - MARGINS.left - MARGINS.right;
 
     // **CRITICAL: Maximum dimensions for images in PDF**
-    const MAX_IMAGE_HEIGHT = 60; // mm - prevents page overflow
+    const MAX_IMAGE_HEIGHT = 50; // mm - prevents page overflow
     const MAX_IMAGE_WIDTH = contentWidth - SIZES.cardPadding * 2 - 6;
 
     let currentY = MARGINS.top;
     let currentLevel = 1;
+    let currentName = config.name || "Player";
+
+    // ===========================
+    // IMAGE HANDLING UTILITIES
+    // ===========================
+
+    /**
+     * Convert image URL to base64 data URL
+     */
+    const getDataUrl = async (url) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = url;
+      });
+    };
+
+    /**
+     * Convert SVG to base64 PNG for jsPDF compatibility
+     */
+    const svgToDataUrl = async (svgString) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const blob = new Blob([svgString], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width || 800;
+          canvas.height = img.height || 600;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL("image/png"));
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Failed to convert SVG"));
+        };
+
+        img.src = url;
+      });
+    };
+
+    /**
+     * Get constrained dimensions that fit within max bounds while maintaining aspect ratio
+     * and filling the width when possible
+     */
+    const getConstrainedDimensions = (
+      imgWidth,
+      imgHeight,
+      maxWidth,
+      maxHeight,
+    ) => {
+      const aspectRatio = imgWidth / imgHeight;
+
+      // Start by filling the width
+      let width = maxWidth;
+      let height = width / aspectRatio;
+
+      // If height exceeds max, scale down to fit height instead
+      if (height > maxHeight) {
+        height = maxHeight;
+        width = height * aspectRatio;
+      }
+
+      return { width, height };
+    };
+
+    /**
+     * Process image and return constrained dimensions and data URL
+     */
+    const processImage = async (imageSource) => {
+      try {
+        let imageData = imageSource;
+
+        // Check if it's an SVG
+        const isSvg =
+          imageSource.includes("<svg") ||
+          imageSource.includes("data:image/svg+xml");
+
+        if (isSvg) {
+          // Handle SVG conversion
+          if (imageSource.startsWith("data:image/svg+xml")) {
+            const svgString = decodeURIComponent(imageSource.split(",")[1]);
+            imageData = await svgToDataUrl(svgString);
+          } else if (imageSource.includes("<svg")) {
+            imageData = await svgToDataUrl(imageSource);
+          }
+        } else if (!imageSource.startsWith("data:")) {
+          // Convert regular image URL to base64
+          imageData = await getDataUrl(imageSource);
+        }
+
+        // Load image to get dimensions
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageData;
+        });
+
+        // Calculate constrained dimensions in pixels
+        const { width: constrainedWidth, height: constrainedHeight } =
+          getConstrainedDimensions(
+            img.width,
+            img.height,
+            MAX_IMAGE_WIDTH * 3.78, // Convert mm to pixels (approx)
+            MAX_IMAGE_HEIGHT * 3.78,
+          );
+
+        // Convert back to mm for jsPDF
+        const widthMM = constrainedWidth / 3.78;
+        const heightMM = constrainedHeight / 3.78;
+
+        return {
+          data: imageData,
+          width: widthMM,
+          height: heightMM,
+          success: true,
+        };
+      } catch (err) {
+        console.warn("Failed to process image:", err);
+        return { success: false };
+      }
+    };
 
     // ===========================
     // ENHANCED DECORATIVE HELPERS
@@ -1898,17 +2034,10 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         currentY,
       );
       currentY += 8;
-
-      // // "Question Review" header
-      // doc.setFontSize(SIZES.headingFont);
-      // doc.setFont("helvetica", "bold");
-      // doc.setTextColor(...COLORS.primary);
-      // doc.text("QUEST LOG", MARGINS.left, currentY);
-      // currentY += 8;
     };
 
     // ===========================
-    // Checks if no user ansewrs where provided (function called from main page)
+    // Checks if no user answers were provided (function called from main page)
     // ===========================
     const isSummaryMode =
       userAnswers &&
@@ -1928,60 +2057,21 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       const userAns = userAnswers[index];
       const questionText = sanitizeText(question.q);
 
+      // Process image first to get dimensions
+      let imageInfo = null;
+      if (question.image) {
+        imageInfo = await processImage(question.image);
+      }
+
       // Calculate card height needed
       let cardContentHeight = 0;
-      let imgData = null;
-      let imgHeight = 0;
-      let imgWidth = 0;
 
-      // **ENHANCED: Render image with size constraints**
-      if (question.image) {
-        try {
-          let imageData = question.image;
+      // Header height
+      cardContentHeight += 15; // Card header with question number
 
-          // Convert to base64 if needed
-          if (!imageData.startsWith("data:")) {
-            imageData = await getDataUrl(imageData);
-          }
-
-          if (imageData) {
-            const img = new Image();
-            await new Promise((resolve, reject) => {
-              img.onload = resolve;
-              img.onerror = reject;
-              img.src = imageData;
-            });
-
-            // **Calculate constrained dimensions**
-            const { width: constrainedWidth, height: constrainedHeight } =
-              getConstrainedDimensions(
-                img.width,
-                img.height,
-                MAX_IMAGE_WIDTH,
-                MAX_IMAGE_HEIGHT,
-              );
-
-            // Convert pixels to mm (approximate: 1mm ≈ 3.78px at 96 DPI)
-            const imgWidthMM = constrainedWidth / 3.78;
-            const imgHeightMM = constrainedHeight / 3.78;
-
-            const imgX = MARGINS.left + (contentWidth - imgWidthMM) / 2;
-
-            doc.addImage(
-              imageData,
-              "JPEG",
-              imgX,
-              currentY,
-              imgWidthMM,
-              imgHeightMM,
-            );
-
-            currentY += imgHeightMM + 3;
-          }
-        } catch (err) {
-          console.warn("Failed to add image to PDF:", err);
-          // Skip image on error - graceful degradation
-        }
+      // Image height (if exists)
+      if (imageInfo && imageInfo.success) {
+        cardContentHeight += imageInfo.height + 5; // Image + spacing
       }
 
       // Question text height
@@ -1991,7 +2081,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         contentWidth - SIZES.cardPadding * 2 - 6,
       );
       const qHeight = qLines.length * 4.5;
-      cardContentHeight += qHeight + 10; // Header + text
+      cardContentHeight += qHeight + 5;
 
       // Options height
       if (isEssay) {
@@ -2016,11 +2106,30 @@ export async function exportToPdf(config, questions, userAnswers = []) {
 
       const totalCardHeight = cardContentHeight + SIZES.cardPadding * 2;
 
-      // Check page break
-      checkPageBreak(totalCardHeight + SIZES.cardMargin);
+      // **CRITICAL: Check if card is too tall for a single page**
+      const maxCardHeight =
+        pageHeight -
+        MARGINS.top -
+        MARGINS.bottom -
+        SIZES.footerHeight -
+        SIZES.headerHeight;
+
+      if (totalCardHeight > maxCardHeight) {
+        console.warn(
+          `Question ${index + 1} card exceeds page height. Consider reducing image size or content.`,
+        );
+        // Force page break before this card
+        if (currentY > MARGINS.top + SIZES.headerHeight) {
+          checkPageBreak(totalCardHeight);
+        }
+      } else {
+        // Normal page break check
+        checkPageBreak(totalCardHeight + SIZES.cardMargin);
+      }
 
       // Draw quest card
       const cardY = currentY;
+      const cardStartY = cardY; // Save card start position
       drawCard(MARGINS.left, cardY, contentWidth, totalCardHeight);
 
       // Card header
@@ -2067,20 +2176,31 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       }
       currentY = headerY + 15;
 
-      // Draw Image if exists
-      if (imgData) {
+      // **FIXED: Render image INSIDE card bounds**
+      if (imageInfo && imageInfo.success) {
+        // Center the image horizontally within the card
+        const imageX =
+          MARGINS.left +
+          SIZES.cardPadding +
+          3 +
+          (contentWidth - SIZES.cardPadding * 2 - 6 - imageInfo.width) / 2;
+
+        // Ensure we're rendering inside the card
+        const imageY = currentY;
+
         try {
           doc.addImage(
-            imgData,
-            "JPEG",
-            MARGINS.left + SIZES.cardPadding + 3,
-            currentY,
-            imgWidth,
-            imgHeight,
+            imageInfo.data,
+            "PNG", // Use PNG for all processed images (including converted SVGs)
+            imageX,
+            imageY,
+            imageInfo.width,
+            imageInfo.height,
           );
-          currentY += imgHeight + 5; // Spacing after image
+          currentY += imageInfo.height + 5;
         } catch (e) {
           console.error("Failed to add image to PDF", e);
+          // Continue without image
         }
       }
 
@@ -2089,7 +2209,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...COLORS.textDark);
       doc.text(qLines, MARGINS.left + SIZES.cardPadding + 3, currentY);
-      currentY += qHeight;
+      currentY += qHeight + 5;
 
       // Render options
       if (isEssay) {
@@ -2285,7 +2405,6 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     };
 
     // Render all questions
-    // Render all questions
     for (const [index, question] of questions.entries()) {
       await renderQuestion(question, index);
     }
@@ -2368,7 +2487,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     // ===========================
     // SAVE PDF
     // ===========================
-    const filename = `${config.title}.pdf`;
+    const filename = `${sanitizeText(config.title)}.pdf`;
 
     doc.save(filename);
     console.log(`Gamified PDF exported: ${filename}`);
