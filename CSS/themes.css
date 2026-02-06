@@ -880,3 +880,262 @@ DARK SLATE THEME
     transparent 100%
   );
 }
+
+/* ============================================================================
+   ONBOARDING WIZARD - First-Time User Experience
+   ============================================================================ */
+/* ==================== ONBOARDING: LIGHT THEME ==================== */
+[data-theme="light"] {
+  --onboarding-overlay-bg: rgba(0, 0, 0, 0.7);
+  --onboarding-card-bg: var(--color-surface);
+  --onboarding-card-border: var(--color-border-light);
+  --onboarding-card-shadow: var(--shadow-xl);
+  --onboarding-card-shadow-extra: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+
+  /* Progress dots */
+  --progress-dot-bg: var(--color-border);
+  --progress-dot-active-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+  --progress-dot-completed-bg: var(--gradient-success);
+
+  /* Header */
+  --onboarding-header-text: var(--gradient-accent);
+  --onboarding-header-desc: rgba(17, 24, 39, 0.8);
+
+  /* Faculty/Option cards */
+  --option-border: var(--color-border);
+  --option-border-hover: var(--color-primary);
+  --option-bg-hover: transparent;
+  --option-shadow-hover: var(--shadow-md);
+  --option-selected-bg: var(--gradient-accent);
+  --option-selected-text: #ffffff;
+  --option-selected-border: transparent;
+  --option-selected-shadow: var(--shadow-lg);
+  --option-selected-shadow-extra: 0 4px 14px rgba(99, 102, 241, 0.4);
+
+  /* Buttons */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: var(--color-border);
+  --btn-secondary-border-hover: var(--color-primary);
+  --btn-secondary-text: var(--color-text-primary);
+
+  --btn-primary-bg: var(--gradient-accent);
+  --btn-primary-text: #ffffff;
+  --btn-primary-shadow: var(--shadow-md);
+  --btn-primary-shadow-hover: var(--shadow-lg);
+
+  --btn-finish-bg: var(--gradient-success);
+  --btn-finish-text: #ffffff;
+
+  /* Skip link */
+  --skip-link-text: var(--color-text-secondary);
+  --skip-link-text-hover: var(--color-text-primary);
+
+  /* Divider */
+  --nav-border-top: var(--color-border-light);
+}
+
+/* ==================== ONBOARDING: DARK SLATE THEME ==================== */
+[data-theme="dark-slate"] {
+  --onboarding-overlay-bg: rgba(15, 23, 42, 0.85);
+  --onboarding-card-bg: var(--color-surface);
+  --onboarding-card-border: #475569;
+  --onboarding-card-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+  --onboarding-card-shadow-extra: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+
+  /* Progress dots */
+  --progress-dot-bg: #475569;
+  --progress-dot-active-shadow: 0 0 16px rgba(99, 102, 241, 0.6);
+  --progress-dot-completed-bg: var(--gradient-success);
+
+  /* Header */
+  --onboarding-header-text: var(--gradient-accent);
+  --onboarding-header-desc: rgba(248, 250, 252, 0.8);
+
+  /* Faculty/Option cards */
+  --option-border: #475569;
+  --option-border-hover: #6366f1;
+  --option-bg-hover: rgba(99, 102, 241, 0.05);
+  --option-shadow-hover:
+    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --option-selected-bg: var(--gradient-accent);
+  --option-selected-text: #ffffff;
+  --option-selected-border: transparent;
+  --option-selected-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --option-selected-shadow-extra: 0 4px 14px rgba(99, 102, 241, 0.5);
+
+  /* Buttons */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: #475569;
+  --btn-secondary-border-hover: #6366f1;
+  --btn-secondary-text: var(--color-text-primary);
+
+  --btn-primary-bg: var(--gradient-accent);
+  --btn-primary-text: #ffffff;
+  --btn-primary-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --btn-primary-shadow-hover:
+    0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+
+  --btn-finish-bg: var(--gradient-success);
+  --btn-finish-text: #ffffff;
+
+  /* Skip link */
+  --skip-link-text: #94a3b8;
+  --skip-link-text-hover: #f8fafc;
+
+  /* Divider */
+  --nav-border-top: #475569;
+}
+
+/* ==================== ONBOARDING: DARK (TRUE BLACK) THEME ==================== */
+[data-theme="dark"] {
+  --onboarding-overlay-bg: rgba(18, 18, 18, 0.9);
+  --onboarding-card-bg: #262626;
+  --onboarding-card-border: #404040;
+  --onboarding-card-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7);
+  --onboarding-card-shadow-extra: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+
+  /* Progress dots */
+  --progress-dot-bg: #404040;
+  --progress-dot-active-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+  --progress-dot-completed-bg: var(--gradient-success);
+
+  /* Header */
+  --onboarding-header-text: var(--gradient-accent);
+  --onboarding-header-desc: rgba(224, 224, 224, 0.8);
+
+  /* Faculty/Option cards */
+  --option-border: #404040;
+  --option-border-hover: #3b82f6;
+  --option-bg-hover: rgba(59, 130, 246, 0.08);
+  --option-shadow-hover:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(59, 130, 246, 0.2);
+  --option-selected-bg: var(--gradient-accent);
+  --option-selected-text: #ffffff;
+  --option-selected-border: transparent;
+  --option-selected-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+  --option-selected-shadow-extra: 0 4px 14px rgba(59, 130, 246, 0.4);
+
+  /* Buttons */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: #404040;
+  --btn-secondary-border-hover: #3b82f6;
+  --btn-secondary-text: var(--color-text-primary);
+
+  --btn-primary-bg: var(--gradient-accent);
+  --btn-primary-text: #ffffff;
+  --btn-primary-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --btn-primary-shadow-hover:
+    0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+
+  --btn-finish-bg: var(--gradient-success);
+  --btn-finish-text: #ffffff;
+
+  /* Skip link */
+  --skip-link-text: #a0a0a0;
+  --skip-link-text-hover: #e0e0e0;
+
+  /* Divider */
+  --nav-border-top: #404040;
+}
+
+/* ==================== APPLY ONBOARDING VARIABLES ==================== */
+.onboarding-overlay {
+  background: var(--onboarding-overlay-bg);
+}
+
+.onboarding-card {
+  background: var(--onboarding-card-bg);
+  border-color: var(--onboarding-card-border);
+  box-shadow:
+    var(--onboarding-card-shadow), var(--onboarding-card-shadow-extra);
+}
+
+.progress-dot {
+  background: var(--progress-dot-bg);
+}
+
+.progress-dot.active {
+  box-shadow: var(--progress-dot-active-shadow);
+}
+
+.progress-dot.completed {
+  background: var(--progress-dot-completed-bg);
+}
+
+.onboarding-header h2 {
+  background: var(--onboarding-header-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.onboarding-header p {
+  color: var(--onboarding-header-desc);
+}
+
+.faculty-option,
+.year-pill,
+.term-btn {
+  border-color: var(--option-border);
+}
+
+.faculty-option:hover,
+.year-pill:hover,
+.term-btn:hover {
+  border-color: var(--option-border-hover);
+  background: var(--option-bg-hover);
+  box-shadow: var(--option-shadow-hover);
+}
+
+.faculty-option.selected,
+.year-pill.selected,
+.term-btn.selected {
+  background: var(--option-selected-bg);
+  color: var(--option-selected-text);
+  border-color: var(--option-selected-border);
+  box-shadow:
+    var(--option-selected-shadow), var(--option-selected-shadow-extra);
+}
+
+.onboarding-btn.secondary {
+  background: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--btn-secondary-text);
+}
+
+.onboarding-btn.secondary:hover {
+  border-color: var(--btn-secondary-border-hover);
+}
+
+.onboarding-btn.primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: var(--btn-primary-shadow);
+}
+
+.onboarding-btn.primary:hover {
+  box-shadow: var(--btn-primary-shadow-hover);
+}
+
+.onboarding-btn.finish {
+  background: var(--btn-finish-bg);
+  color: var(--btn-finish-text);
+}
+
+.onboarding-skip {
+  color: var(--skip-link-text);
+}
+
+.onboarding-skip:hover {
+  color: var(--skip-link-text-hover);
+}
+
+.onboarding-nav {
+  border-top-color: var(--nav-border-top);
+}

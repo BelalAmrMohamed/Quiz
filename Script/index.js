@@ -4,6 +4,7 @@ import { userProfile } from "./userProfile.js";
 import {
   exportToQuiz,
   exportToPdf,
+  exportToWord,
   exportToHtml,
   exportToMarkdown,
 } from "./Export-Functions.js";
@@ -1035,13 +1036,16 @@ function createExamCard(exam) {
     }
     switch (format) {
       case "quiz":
-        exportToQuiz(config, questions);
+        await exportToQuiz(config, questions);
         break;
       case "pdf":
         await exportToPdf(config, questions);
         break;
+      case "docx":
+        await exportToWord(config, questions);
+        break;
       case "html":
-        exportToHtml(config, questions);
+        await exportToHtml(config, questions);
         break;
       case "md":
         exportToMarkdown(config, questions);
@@ -1067,6 +1071,7 @@ function createExamCard(exam) {
       ["💡", "Quiz (.html)", "quiz"],
       ["🌐", "HTML (.html)", "html"],
       ["📄", "PDF (.pdf)", "pdf"],
+      ["📖", "Word (.docx)", "docx"],
       ["📝", "Markdown (.md)", "md"],
     ];
     opts.forEach(([icon, label, format]) => {

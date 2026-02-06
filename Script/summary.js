@@ -3,6 +3,7 @@ import { examList } from "./examManifest.js";
 import {
   exportToQuiz,
   exportToPdf,
+  exportToWord,
   exportToHtml,
   exportToMarkdown,
 } from "./Export-Functions.js";
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const backBtn = document.getElementById("backHomeBtn");
   const exportMdBtn = document.getElementById("exportMdBtn");
   const exportPdfBtn = document.getElementById("exportPdfBtn");
+  const exportWordBtn = document.getElementById("exportWordBtn");
   const exportHtmlBtn = document.getElementById("exportHtmlBtn");
   const exportQuizBtn = document.getElementById("exportQuizBtn");
 
@@ -50,6 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   exportPdfBtn &&
     (exportPdfBtn.onclick = async () =>
       await exportToPdf(config, questions, result.userAnswers));
+  exportWordBtn &&
+    (exportWordBtn.onclick = async () =>
+      await exportToWord(config, questions, result.userAnswers));
   exportHtmlBtn &&
     (exportHtmlBtn.onclick = () =>
       exportToHtml(config, questions, result.userAnswers));
@@ -84,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     correct,
     wrong,
     skipped,
-    essayCount
+    essayCount,
   );
   renderReview(container, questions, result.userAnswers);
 
@@ -135,7 +140,7 @@ function renderHeader(
   correct,
   wrong,
   skipped,
-  essayCount
+  essayCount,
 ) {
   const percentage = total > 0 ? Math.round((data.score / total) * 100) : 0;
   const timeStr = `${Math.floor(data.timeElapsed / 60)}m ${
@@ -157,7 +162,7 @@ function renderHeader(
               <span class="badge-icon">${b.icon}</span>
               <span class="badge-name">${b.title}</span>
             </div>
-          `
+          `,
             )
             .join("")}
         </div>
@@ -264,8 +269,8 @@ function renderReview(container, questions, userAnswers) {
       const statusClass = isCorrect
         ? "correct"
         : isSkipped
-        ? "skipped"
-        : "wrong";
+          ? "skipped"
+          : "wrong";
       const statusIcon = isCorrect ? "✅" : isSkipped ? "⚪" : "❌";
       const qText = escapeHTML(q.q);
       const userText = isSkipped ? "Skipped" : escapeHTML(q.options[userAns]);
