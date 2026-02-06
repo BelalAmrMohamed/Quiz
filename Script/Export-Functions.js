@@ -2490,12 +2490,8 @@ export async function exportToPdf(config, questions, userAnswers = []) {
 
 export async function exportToWord(config, questions, userAnswers = []) {
   try {
-    // Load docx library if not already loaded
     await loadDocx();
 
-    if (!window.docx) {
-      throw new Error("docx library not loaded");
-    }
     // ===========================
     // VALIDATION
     // ===========================
@@ -2503,6 +2499,10 @@ export async function exportToWord(config, questions, userAnswers = []) {
       throw new Error(
         "Invalid parameters: config and questions array required",
       );
+    }
+
+    if (!window.docx) {
+      throw new Error("docx library not loaded");
     }
 
     const {
@@ -2524,6 +2524,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
       Header,
       Footer,
       PageNumber,
+      ExternalHyperlink,
       convertInchesToTwip,
     } = window.docx;
 
@@ -2555,16 +2556,21 @@ export async function exportToWord(config, questions, userAnswers = []) {
       progressBarFill: "FFD700", // Gold
     });
 
+    const currentName = config.name || "Player";
+    const documentTitle = sanitizeText(config.title || "Quiz Quest");
+
     // ===========================
     // UTILITY FUNCTIONS
     // ===========================
 
-    const sanitizeText = (text) => {
+    function sanitizeText(text) {
       if (!text) return "";
       return String(text).trim();
-    };
+    }
 
-    const isEssayQuestion = (q) => q.options && q.options.length === 1;
+    function isEssayQuestion(q) {
+      return q.options && q.options.length === 1;
+    }
 
     // ===========================
     // IMAGE PROCESSING
@@ -2729,66 +2735,90 @@ export async function exportToWord(config, questions, userAnswers = []) {
         : Object.keys(userAnswers).length > 0);
 
     // ===========================
+    // CREATE HEADER (Appears on every page)
+    // ===========================
+
+    const header = new Header({
+      children: [
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: {
+            top: { style: BorderStyle.NONE, size: 0 },
+            bottom: {
+              style: BorderStyle.SINGLE,
+              size: 12,
+              color: COLORS.secondary,
+            },
+            left: { style: BorderStyle.NONE, size: 0 },
+            right: { style: BorderStyle.NONE, size: 0 },
+            insideHorizontal: { style: BorderStyle.NONE, size: 0 },
+            insideVertical: { style: BorderStyle.NONE, size: 0 },
+          },
+          rows: [
+            new TableRow({
+              children: [
+                // LEFT: Title
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      alignment: AlignmentType.LEFT,
+                      children: [
+                        new TextRun({
+                          text: documentTitle,
+                          bold: true,
+                          size: 28,
+                          color: COLORS.primary,
+                        }),
+                      ],
+                    }),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.NONE, size: 0 },
+                    bottom: { style: BorderStyle.NONE, size: 0 },
+                    left: { style: BorderStyle.NONE, size: 0 },
+                    right: { style: BorderStyle.NONE, size: 0 },
+                  },
+                  width: { size: 50, type: WidthType.PERCENTAGE },
+                }),
+                // RIGHT: Username
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      alignment: AlignmentType.RIGHT,
+                      children: [
+                        new TextRun({
+                          text: `🏆 ${currentName}`,
+                          bold: true,
+                          size: 24,
+                          color: COLORS.secondary,
+                        }),
+                      ],
+                    }),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.NONE, size: 0 },
+                    bottom: { style: BorderStyle.NONE, size: 0 },
+                    left: { style: BorderStyle.NONE, size: 0 },
+                    right: { style: BorderStyle.NONE, size: 0 },
+                  },
+                  width: { size: 50, type: WidthType.PERCENTAGE },
+                }),
+              ],
+            }),
+          ],
+        }),
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [],
+        }),
+      ],
+    });
+
+    // ===========================
     // DOCUMENT SECTIONS
     // ===========================
 
-    const sections = [];
     const children = [];
-
-    // ===========================
-    // TITLE PAGE / HEADER
-    // ===========================
-
-    // Main Title
-    children.push(
-      new Paragraph({
-        text: sanitizeText(config.title || "Quiz Quest"),
-        heading: HeadingLevel.TITLE,
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 400, after: 200 },
-        style: "Title",
-        children: [
-          new TextRun({
-            text: sanitizeText(config.title || "Quiz Quest"),
-            bold: true,
-            size: 48,
-            color: COLORS.primary,
-          }),
-        ],
-      }),
-    );
-
-    // Player Name
-    children.push(
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 100, after: 200 },
-        children: [
-          new TextRun({
-            text: `Student: ${currentName}`,
-            bold: true,
-            size: 28,
-            color: COLORS.secondary,
-          }),
-        ],
-      }),
-    );
-
-    // Decorative Line
-    children.push(
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 100, after: 300 },
-        border: {
-          bottom: {
-            color: COLORS.secondary,
-            space: 1,
-            style: BorderStyle.SINGLE,
-            size: 24,
-          },
-        },
-      }),
-    );
 
     // ===========================
     // SCORE PAGE (if summary mode)
@@ -2799,7 +2829,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
       children.push(
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { before: 300, after: 200 },
+          spacing: { before: 100, after: 200 },
           children: [
             new TextRun({
               text: "🎯 QUIZ COMPLETE! 🎯",
@@ -3371,20 +3401,28 @@ export async function exportToWord(config, questions, userAnswers = []) {
 
     children.push(ctaTable);
 
+    // ===========================
+    // CLICKABLE HYPERLINK
+    // ===========================
+
     children.push(
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { before: 300 },
         children: [
-          new TextRun({
-            text: "https://divquizzes.vercel.app/",
-            bold: true,
-            size: 24,
-            color: COLORS.info,
-            underline: {
-              type: UnderlineType.SINGLE,
-              color: COLORS.info,
-            },
+          new ExternalHyperlink({
+            children: [
+              new TextRun({
+                text: "https://divquizzes.vercel.app/",
+                bold: true,
+                size: 24,
+                color: "0563C1", // Standard blue link color
+                underline: {
+                  type: UnderlineType.SINGLE,
+                },
+              }),
+            ],
+            link: "https://divquizzes.vercel.app/",
           }),
         ],
       }),
@@ -3424,12 +3462,15 @@ export async function exportToWord(config, questions, userAnswers = []) {
           properties: {
             page: {
               margin: {
-                top: convertInchesToTwip(0.75),
+                top: convertInchesToTwip(1.0),
                 right: convertInchesToTwip(0.75),
                 bottom: convertInchesToTwip(0.75),
                 left: convertInchesToTwip(0.75),
               },
             },
+          },
+          headers: {
+            default: header,
           },
           footers: {
             default: footer,
