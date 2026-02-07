@@ -14,8 +14,14 @@ html {
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "Segoe UI", Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -90,7 +96,9 @@ body {
   font-size: 1rem;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .menu-item:hover {
@@ -270,7 +278,9 @@ body {
   -webkit-backdrop-filter: blur(var(--blur-md));
   border-radius: 12px;
   border: 1px solid;
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   width: fit-content;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -372,10 +382,12 @@ HEADER BADGE – GAMIFIED WELCOME
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.6);
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 
-  animation: badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+  animation:
+    badgePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     badgeFloat 6s ease-in-out infinite;
 
   will-change: transform, box-shadow;
@@ -789,7 +801,7 @@ ANIMATIONS
   }
 
   .mode-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -919,7 +931,9 @@ ANIMATIONS
   overflow-y: auto;
   border-radius: 24px;
   padding: 40px 32px;
-  box-shadow: var(--shadow-xl), 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    var(--shadow-xl),
+    0 25px 50px -12px rgba(0, 0, 0, 0.4);
   border: 1px solid var(--color-border-light);
   position: relative;
   animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1049,7 +1063,9 @@ ANIMATIONS
   color: white;
   border-color: transparent;
   transform: scale(1.02);
-  box-shadow: var(--shadow-lg), 0 4px 14px rgba(99, 102, 241, 0.4);
+  box-shadow:
+    var(--shadow-lg),
+    0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
 .faculty-option .faculty-icon {
@@ -1094,7 +1110,9 @@ ANIMATIONS
   color: white;
   border-color: transparent;
   transform: scale(1.05);
-  box-shadow: var(--shadow-md), 0 4px 14px rgba(99, 102, 241, 0.4);
+  box-shadow:
+    var(--shadow-md),
+    0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
 /* Term Toggle */
@@ -1132,7 +1150,9 @@ ANIMATIONS
   color: white;
   border-color: transparent;
   transform: scale(1.02);
-  box-shadow: var(--shadow-lg), 0 4px 14px rgba(99, 102, 241, 0.4);
+  box-shadow:
+    var(--shadow-lg),
+    0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
 .term-btn .term-icon {
