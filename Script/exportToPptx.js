@@ -9,8 +9,6 @@
  * =====================================================
  *
  * IMPROVEMENTS:
- * - Fixed Slide Transitions (standardized syntax)
- * - Fixed Animations (trigger: 'click')
  * - Improved Text Padding (using `inset` instead of `margin`)
  * - Enhanced UI/UX (Modern color palette, background shapes, improved typography)
  * - visual polish for Header/Footer
@@ -20,7 +18,8 @@ let pptxgen;
 
 async function loadPptxGen() {
   if (!pptxgen) {
-    // This is the official "PptxGenJS" library being used, which doesn't support animtions nor transition [unfortunetally]
+    // This is the official "PptxGenJS" library being used, which doesn't support animtions nor transition [unfortunetally].
+    // The best library to use would be Syncfusion .NET PowerPoint library, but it's .Net, not great for performance here.
     // For feuture undates with animations and transitions, use this fork, which supports them:
     // const module = await import("https://esm.sh/@bapunhansdah/pptxgenjs");
     const module =
@@ -754,15 +753,26 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       align: "center",
     });
 
+    ctaSlide.addText("https://divquizzes.vercel.app/", {
+      x: 1,
+      y: 3.1,
+      w: 8,
+      h: 0.3,
+      fontSize: 18,
+      bold: true,
+      color: COLORS.info,
+      align: "center",
+      hyperlink: {
+        url: "https://divquizzes.vercel.app/",
+        tooltip: "Go to The quiz website again.",
+      },
+    });
+
     // ===========================
     // SAVE FILE
     // ===========================
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10);
-    const fileName = `${documentTitle.replace(
-      /[^a-z0-9]/gi,
-      "_",
-    )}_${dateStr}.pptx`;
+    const fileName = `${documentTitle}.pptx`;
 
     await pptx.writeFile({ fileName });
     return true;
