@@ -1,13 +1,16 @@
-// Script/index.js - Performance Optimized with Filtering & Subscriptions
+// Script/index.js
 import { categoryTree } from "./examManifest.js";
 import { userProfile } from "./userProfile.js";
-import {
-  exportToQuiz,
-  exportToPdf,
-  exportToWord,
-  exportToHtml,
-  exportToMarkdown,
-} from "./Export-Functions.js";
+
+// Download functions
+import { exportToQuiz } from "./exportToQuiz.js";
+import { exportToHtml } from "./exportToHtml.js";
+import { exportToPdf } from "./exportToPdf.js";
+import { exportToWord } from "./exportToWord.js";
+import { exportToPptx } from "./exportToPptx.js";
+import { exportToMarkdown } from "./exportToMarkdown.js";
+
+// Helper utilities
 import {
   extractMetadata,
   filterCourses,
@@ -1038,14 +1041,17 @@ function createExamCard(exam) {
       case "quiz":
         await exportToQuiz(config, questions);
         break;
+      case "html":
+        await exportToHtml(config, questions);
+        break;
       case "pdf":
         await exportToPdf(config, questions);
         break;
       case "docx":
         await exportToWord(config, questions);
         break;
-      case "html":
-        await exportToHtml(config, questions);
+      case "pptx":
+        await exportToPptx(config, questions);
         break;
       case "md":
         exportToMarkdown(config, questions);
@@ -1072,6 +1078,7 @@ function createExamCard(exam) {
       ["🌐", "HTML (.html)", "html"],
       ["📄", "PDF (.pdf)", "pdf"],
       ["📖", "Word (.docx)", "docx"],
+      ["🗂️", "PowerPoint (.pptx)", "pptx"],
       ["📝", "Markdown (.md)", "md"],
     ];
     opts.forEach(([icon, label, format]) => {

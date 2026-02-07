@@ -1,13 +1,15 @@
-// Website/Script/summary.js
+// Script/summary.js
 import { examList } from "./examManifest.js";
-import {
-  exportToQuiz,
-  exportToPdf,
-  exportToWord,
-  exportToHtml,
-  exportToMarkdown,
-} from "./Export-Functions.js";
 
+// Download functions
+import { exportToQuiz } from "./exportToQuiz.js";
+import { exportToHtml } from "./exportToHtml.js";
+import { exportToPdf } from "./exportToPdf.js";
+import { exportToWord } from "./exportToWord.js";
+import { exportToPptx } from "./exportToPptx.js";
+import { exportToMarkdown } from "./exportToMarkdown.js";
+
+// Helpers
 const currentName = localStorage.getItem("username") || "User";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
@@ -38,6 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const exportMdBtn = document.getElementById("exportMdBtn");
   const exportPdfBtn = document.getElementById("exportPdfBtn");
   const exportWordBtn = document.getElementById("exportWordBtn");
+  const exportPptxBtn = document.getElementById("exportPptxBtn");
   const exportHtmlBtn = document.getElementById("exportHtmlBtn");
   const exportQuizBtn = document.getElementById("exportQuizBtn");
 
@@ -55,6 +58,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   exportWordBtn &&
     (exportWordBtn.onclick = async () =>
       await exportToWord(config, questions, result.userAnswers));
+  exportPptxBtn &&
+    (exportPptxBtn.onclick = async () =>
+      await exportToPptx(config, questions, result.userAnswers));
   exportHtmlBtn &&
     (exportHtmlBtn.onclick = () =>
       exportToHtml(config, questions, result.userAnswers));
