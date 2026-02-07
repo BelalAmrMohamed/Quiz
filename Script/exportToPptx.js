@@ -151,7 +151,13 @@ export async function exportToPptx(config, questions, userAnswers = []) {
 
     const currentName = config.name || "Player";
     const documentTitle = sanitizeText(config.title || "Quiz Quest");
-    const isResultsMode = userAnswers && userAnswers.length > 0;
+
+    const isResultsMode =
+      userAnswers &&
+      (Array.isArray(userAnswers)
+        ? userAnswers.length > 0
+        : Object.keys(userAnswers).length > 0);
+
     const scoreData = isResultsMode ? calculateScore() : null;
 
     // ===========================
