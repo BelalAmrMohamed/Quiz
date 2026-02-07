@@ -781,6 +781,20 @@ ANIMATIONS
   .theme-btn-label {
     font-size: 0.7rem;
   }
+  .category-card {
+    padding: 15px;
+  }
+
+  .card p,
+  .category-card p,
+  .exam-card p {
+    margin-bottom: 5px;
+  }
+
+  .category-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 0px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -796,8 +810,20 @@ ANIMATIONS
     font-size: 1rem;
   }
 
+  .category-card {
+    padding: 15px;
+  }
+
+  .card p,
+  .category-card p,
+  .exam-card p {
+    margin-bottom: 5px;
+  }
+
   .category-card .icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    margin-bottom: 0px;
+    /* display: none; */
   }
 
   .mode-grid {
@@ -874,28 +900,6 @@ ANIMATIONS
   .course-meta-badge.term {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   }
-}
-
-/* Hover effects for interactivity */
-.category-card:hover .course-meta-badge {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-@media (prefers-color-scheme: dark) {
-  .category-card:hover .course-meta-badge {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  }
-}
-
-/* Add small icons/symbols */
-.course-meta-badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  display: inline-block;
 }
 
 /* ============================================================================

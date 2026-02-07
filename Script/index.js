@@ -773,9 +773,9 @@ function renderCourseManagerList() {
         <div class="course-manager-info">
           <h4>${escapeHtml(course.name)}</h4>
           <p class="course-manager-meta">
-            ${escapeHtml(course.faculty)} • Year ${escapeHtml(
+            ${escapeHtml(course.faculty)} | Year ${escapeHtml(
               course.year,
-            )} • Term ${escapeHtml(course.term)}
+            )} | Term ${escapeHtml(course.term)}
           </p>
         </div>
         <button 

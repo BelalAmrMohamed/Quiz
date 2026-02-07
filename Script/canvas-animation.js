@@ -1,4 +1,4 @@
-// canvas-animation.js - Modular Canvas Background Animation System
+// Script/canvas-animation.js - Modular Canvas Background Animation System
 // Integrates with theme system and provides performance optimization
 
 export class CanvasAnimationController {
@@ -145,7 +145,7 @@ export class CanvasAnimationController {
     this.particlesArray = [];
 
     // Adjust particle count based on screen size for performance
-    const numberOfParticles = Math.min((this.w * this.h) / 9000, 150);
+    const numberOfParticles = Math.min((this.w * this.h) / 6000, 700);
 
     for (let i = 0; i < numberOfParticles; i++) {
       this.particlesArray.push(this.createParticle());

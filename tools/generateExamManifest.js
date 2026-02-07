@@ -1,6 +1,6 @@
-/* The next line runs this file which generates Script/examManifest.js
-node tools/generateExamManifest.js
-*/
+// tools/generateExamManifest.js
+// The next line runs this file which generates ./Script/examManifest.js
+// >  node tools/generateExamManifest.js
 
 const fs = require("fs").promises;
 const path = require("path");
@@ -43,7 +43,7 @@ async function buildCategoryTree(examsDir) {
 
   /**
    * Recursively scan directories with metadata extraction
-   * 
+   *
    * Folder Structure:
    * Exams/
    *   {Faculty}/           <- Level 0: Metadata only
@@ -52,7 +52,7 @@ async function buildCategoryTree(examsDir) {
    *         {Course}/      <- Level 3: Root category (gets metadata)
    *           {Subfolder}/ <- Level 4+: Subcategories
    *             quiz.js
-   * 
+   *
    * @param {string} dir - Current directory path
    * @param {number} depth - Current recursion depth (0 = Faculty level)
    * @param {object} metadata - Accumulated metadata from parent levels
@@ -68,24 +68,21 @@ async function buildCategoryTree(examsDir) {
           // Level 1: Faculty (metadata only, don't create category)
           console.log(`  📁 Faculty: ${entry.name}`);
           await scanDir(fullPath, 1, { faculty: entry.name });
-          
         } else if (depth === 1) {
           // Level 2: Year (metadata only, don't create category)
           console.log(`    📅 Year: ${entry.name}`);
           await scanDir(fullPath, 2, { ...metadata, year: entry.name });
-          
         } else if (depth === 2) {
           // Level 3: Term (metadata only, don't create category)
           console.log(`      📆 Term: ${entry.name}`);
           await scanDir(fullPath, 3, { ...metadata, term: entry.name });
-          
         } else if (depth === 3) {
           // Level 4: Course Name (ROOT CATEGORY with metadata)
           const categoryKey = entry.name;
           const courseId = generateUniqueId();
-          
+
           console.log(`        📚 Course: ${entry.name} (ID: ${courseId})`);
-          
+
           tree[categoryKey] = {
             id: courseId,
             name: entry.name,
@@ -95,81 +92,86 @@ async function buildCategoryTree(examsDir) {
             path: [entry.name],
             parent: null,
             subcategories: [],
-            exams: []
+            exams: [],
           };
-          
+
           // Recurse into course folder with tracking metadata
           await scanDir(fullPath, 4, {
             ...metadata,
             courseName: entry.name,
             currentPath: [entry.name],
-            currentKey: categoryKey
+            currentKey: categoryKey,
           });
-          
         } else {
           // Level 5+: Subcategories within a course
           const newPath = [...metadata.currentPath, entry.name];
-          const categoryKey = newPath.join('/');
-          
+          const categoryKey = newPath.join("/");
+
           console.log(`          📂 Subcategory: ${categoryKey}`);
-          
+
           tree[categoryKey] = {
             name: entry.name,
             path: newPath,
             parent: metadata.currentKey,
             subcategories: [],
-            exams: []
+            exams: [],
           };
-          
+
           // Add to parent's subcategories list
           if (tree[metadata.currentKey]) {
-            if (!tree[metadata.currentKey].subcategories.includes(categoryKey)) {
+            if (
+              !tree[metadata.currentKey].subcategories.includes(categoryKey)
+            ) {
               tree[metadata.currentKey].subcategories.push(categoryKey);
             }
           }
-          
+
           // Recurse deeper with updated tracking
           await scanDir(fullPath, depth + 1, {
             ...metadata,
             currentPath: newPath,
-            currentKey: categoryKey
+            currentKey: categoryKey,
           });
         }
-        
-      } else if (entry.name.endsWith('.js')) {
+      } else if (entry.name.endsWith(".js")) {
         // Handle exam files (only if we're inside a course)
         if (depth >= 3 && metadata.currentKey) {
           const fileName = entry.name;
-          const baseId = fileName.replace(/\.js$/, '');
-          
+          const baseId = fileName.replace(/\.js$/, "");
+
           // Generate unique ID for this exam
           const examId = generateUniqueId();
           const title = titleCase(baseId);
-          
+
           // Calculate relative path from Script/ directory
-          const scriptDir = path.join(path.dirname(examsDir), 'Script');
-          let relPath = path.relative(scriptDir, fullPath)
+          const scriptDir = path.join(path.dirname(examsDir), "Script");
+          let relPath = path
+            .relative(scriptDir, fullPath)
             .split(path.sep)
-            .join('/');
-          if (!relPath.startsWith('.')) relPath = './' + relPath;
-          
+            .join("/");
+          if (!relPath.startsWith(".")) relPath = "./" + relPath;
+
           const exam = {
             id: examId,
             title,
             path: relPath,
-            category: metadata.currentKey
+            category: metadata.currentKey,
           };
-          
+
           console.log(`            📝 Exam: ${title} (ID: ${examId})`);
-          
+
           // Add exam to the current category
           if (tree[metadata.currentKey]) {
             tree[metadata.currentKey].exams.push(exam);
           } else {
-            console.warn(`WARNING: Category "${metadata.currentKey}" not found for exam "${title}"`);
+            console.warn(
+              `WARNING: Category "${metadata.currentKey}" not found for exam "${title}"`,
+            );
           }
         } else if (depth < 3) {
-          console.warn(`WARNING: Exam file "${entry.name}" found at depth ${depth} (outside course structure), skipping`);
+          console.warn(
+            `WARNING: Exam file "${entry.name}" found at depth ${depth} (outside course structure), skipping`,
+          );
         }
       }
     }
@@ -178,7 +180,7 @@ async function buildCategoryTree(examsDir) {
   console.log("\n🔍 Scanning exam directory structure...\n");
   await scanDir(examsDir);
   console.log("\n✅ Scan complete!\n");
-  
+
   return tree;
 }
 
@@ -206,7 +208,7 @@ async function generate() {
   allExams.forEach((exam) => {
     idCounts[exam.id] = (idCounts[exam.id] || 0) + 1;
   });
-  
+
   const duplicates = Object.entries(idCounts).filter(([_, count]) => count > 1);
   if (duplicates.length > 0) {
     console.error("❌ ERROR: Duplicate exam IDs found:");
@@ -223,8 +225,10 @@ async function generate() {
       categoryIdCounts[cat.id] = (categoryIdCounts[cat.id] || 0) + 1;
     }
   });
-  
-  const categoryDuplicates = Object.entries(categoryIdCounts).filter(([_, count]) => count > 1);
+
+  const categoryDuplicates = Object.entries(categoryIdCounts).filter(
+    ([_, count]) => count > 1,
+  );
   if (categoryDuplicates.length > 0) {
     console.error("❌ ERROR: Duplicate category IDs found:");
     categoryDuplicates.forEach(([id, count]) => {
@@ -235,7 +239,7 @@ async function generate() {
 
   // Write output file
   const outFile = path.join(scriptDir, "examManifest.js");
-  const header = `// Auto-generated by tools/generateExamManifest.js - do not edit by hand\n// Run: node tools/generateExamManifest.js\n// Generated at: ${formatDateTime()}\n\n`;
+  const header = `// Script/examManifest.js\n// Auto-generated by ./tools/generateExamManifest.js - do not edit by hand\n// Run: node tools/generateExamManifest.js\n// Last generated at: ${formatDateTime()}\n\n`;
   const body =
     "export const examList = " +
     JSON.stringify(allExams, null, 2) +
@@ -245,35 +249,39 @@ async function generate() {
     ";\n";
 
   await fs.writeFile(outFile, header + body, "utf8");
-  
+
   console.log("✅ Success!");
   console.log(`📄 Wrote: ${outFile}`);
-  console.log(`📊 Generated ${allExams.length} exams across ${Object.keys(categoryTree).length} categories\n`);
-  
+  console.log(
+    `📊 Generated ${allExams.length} exams across ${Object.keys(categoryTree).length} categories\n`,
+  );
+
   // Summary statistics
-  const rootCategories = Object.values(categoryTree).filter(cat => !cat.parent);
-  const subcategories = Object.values(categoryTree).filter(cat => cat.parent);
-  
+  const rootCategories = Object.values(categoryTree).filter(
+    (cat) => !cat.parent,
+  );
+  const subcategories = Object.values(categoryTree).filter((cat) => cat.parent);
+
   console.log("📈 Summary:");
   console.log(`   • Root Categories (Courses): ${rootCategories.length}`);
   console.log(`   • Subcategories: ${subcategories.length}`);
   console.log(`   • Total Exams: ${allExams.length}`);
-  
+
   // Metadata breakdown
   const faculties = new Set();
   const years = new Set();
   const terms = new Set();
-  
-  rootCategories.forEach(cat => {
+
+  rootCategories.forEach((cat) => {
     if (cat.faculty) faculties.add(cat.faculty);
     if (cat.year) years.add(cat.year);
     if (cat.term) terms.add(cat.term);
   });
-  
+
   console.log(`\n🏫 Metadata Coverage:`);
-  console.log(`   • Faculties: ${Array.from(faculties).sort().join(', ')}`);
-  console.log(`   • Years: ${Array.from(years).sort().join(', ')}`);
-  console.log(`   • Terms: ${Array.from(terms).sort().join(', ')}`);
+  console.log(`   • Faculties: ${Array.from(faculties).sort().join(", ")}`);
+  console.log(`   • Years: ${Array.from(years).sort().join(", ")}`);
+  console.log(`   • Terms: ${Array.from(terms).sort().join(", ")}`);
   console.log("Generated at: " + formatDateTime());
 }
 
