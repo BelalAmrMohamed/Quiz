@@ -1,7 +1,7 @@
 // Script/exportToPptx.js
 // Downloads the quiz as a PowerPoint file (.pptx)
 // Deals with the export from both main page and results/summary page
-// `pptxgen` library used, included in this file.
+// `PptxGenJS` library used, included in this file.
 
 /**
  * =====================================================
@@ -20,6 +20,9 @@ let pptxgen;
 
 async function loadPptxGen() {
   if (!pptxgen) {
+    // This is the official "PptxGenJS" library being used, which doesn't support animtions nor transition [unfortunetally]
+    // For feuture undates with animations and transitions, use this fork, which supports them:
+    // const module = await import("https://esm.sh/@bapunhansdah/pptxgenjs");
     const module =
       await import("https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/+esm");
     pptxgen = module.default;
@@ -240,8 +243,6 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     // ===========================
     const titleSlide = pptx.addSlide();
     addBackground(titleSlide);
-    // Standardize transition
-    titleSlide.transition = { type: "fade" };
 
     // Decorative shapes for Title Slide
     titleSlide.addShape(pptx.shapes.OVAL, {
@@ -271,16 +272,19 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       fontFace: "Segoe UI Black",
     });
 
-    titleSlide.addText(isResultsMode ? "Interactive Results Review" : "Quiz Preview", {
-      x: 1,
-      y: 2.8,
-      w: 8,
-      h: 0.5,
-      fontSize: 20,
-      color: COLORS.primary,
-      align: "center",
-      fontFace: "Segoe UI Semibold",
-    });
+    titleSlide.addText(
+      isResultsMode ? "Interactive Results Review" : "Quiz Preview",
+      {
+        x: 1,
+        y: 2.8,
+        w: 8,
+        h: 0.5,
+        fontSize: 20,
+        color: COLORS.primary,
+        align: "center",
+        fontFace: "Segoe UI Semibold",
+      },
+    );
 
     titleSlide.addText(`${questions.length} Questions`, {
       x: 1,
@@ -298,7 +302,6 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     if (isResultsMode && scoreData) {
       const summarySlide = pptx.addSlide();
       addBackground(summarySlide);
-      summarySlide.transition = { type: "fade" };
 
       addHeader(summarySlide);
       addFooter(summarySlide);
@@ -355,20 +358,61 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       // Stats Table
       const statsData = [
         [
-          { text: "Metric", options: { bold: true, fontSize: 12, fill: COLORS.primary, color: "FFFFFF" } },
-          { text: "Value", options: { bold: true, fontSize: 12, fill: COLORS.primary, color: "FFFFFF" } },
+          {
+            text: "Metric",
+            options: {
+              bold: true,
+              fontSize: 12,
+              fill: COLORS.primary,
+              color: "FFFFFF",
+            },
+          },
+          {
+            text: "Value",
+            options: {
+              bold: true,
+              fontSize: 12,
+              fill: COLORS.primary,
+              color: "FFFFFF",
+            },
+          },
         ],
         [
-          { text: "Correct Answers", options: { fontSize: 12, fill: "FFFFFF" } },
-          { text: `${scoreData.correct} / ${scoreData.totalScorable}`, options: { fontSize: 12, color: COLORS.success, bold: true, fill: "FFFFFF" } },
+          {
+            text: "Correct Answers",
+            options: { fontSize: 12, fill: "FFFFFF" },
+          },
+          {
+            text: `${scoreData.correct} / ${scoreData.totalScorable}`,
+            options: {
+              fontSize: 12,
+              color: COLORS.success,
+              bold: true,
+              fill: "FFFFFF",
+            },
+          },
         ],
         [
-          { text: "Incorrect Answers", options: { fontSize: 12, fill: COLORS.background } },
-          { text: String(scoreData.wrong), options: { fontSize: 12, color: COLORS.error, bold: true, fill: COLORS.background } },
+          {
+            text: "Incorrect Answers",
+            options: { fontSize: 12, fill: COLORS.background },
+          },
+          {
+            text: String(scoreData.wrong),
+            options: {
+              fontSize: 12,
+              color: COLORS.error,
+              bold: true,
+              fill: COLORS.background,
+            },
+          },
         ],
         [
           { text: "Skipped", options: { fontSize: 12, fill: "FFFFFF" } },
-          { text: String(scoreData.skipped), options: { fontSize: 12, color: COLORS.textMedium, fill: "FFFFFF" } },
+          {
+            text: String(scoreData.skipped),
+            options: { fontSize: 12, color: COLORS.textMedium, fill: "FFFFFF" },
+          },
         ],
       ];
 
@@ -389,7 +433,6 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     for (const [index, question] of questions.entries()) {
       const slide = pptx.addSlide();
       addBackground(slide);
-      slide.transition = { type: "fade" };
 
       addHeader(slide);
       addFooter(slide);
@@ -475,13 +518,13 @@ export async function exportToPptx(config, questions, userAnswers = []) {
             imgDims.width,
             imgDims.height,
             isWide ? USABLE_WIDTH * 0.4 : USABLE_WIDTH * 0.8,
-            MAX_IMAGE_HEIGHT
+            MAX_IMAGE_HEIGHT,
           );
 
           if (isWide && imgSize.width < USABLE_WIDTH * 0.5) {
             // Side-by-side: Text Left, Image Right
             const textWidth = USABLE_WIDTH - imgSize.width - 0.4;
-            
+
             slide.addText(questionText, {
               x: MARGIN,
               y: currentY,
@@ -526,7 +569,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
               valign: "top",
               wrap: true,
             });
-            
+
             currentY += 0.6;
           }
           imageProcessed = true;
@@ -554,14 +597,15 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       // OPTIONS / ANSWER AREA
       // ===========================
       const remainingHeight = SLIDE_HEIGHT - FOOTER_HEIGHT - currentY - MARGIN;
-      const hasExplanation = question.explanation && question.explanation.trim();
+      const hasExplanation =
+        question.explanation && question.explanation.trim();
       const explanationHeight = hasExplanation ? 0.8 : 0;
       const availableOptionsHeight = remainingHeight - explanationHeight;
 
       if (isEssay) {
         // Essay Layout
         const boxHeight = Math.min(availableOptionsHeight / 2.2, 0.8);
-        
+
         // Correct Answer (Hidden)
         slide.addText("CORRECT ANSWER:", {
           x: MARGIN,
@@ -571,10 +615,8 @@ export async function exportToPptx(config, questions, userAnswers = []) {
           fontSize: 11,
           bold: true,
           color: COLORS.success,
-          opacity: 0,
-          animation: { type: "appear", trigger: "click" } // Fixed animation
         });
-        
+
         slide.addText(sanitizeText(question.options[0]), {
           x: MARGIN,
           y: currentY + 0.3,
@@ -586,33 +628,39 @@ export async function exportToPptx(config, questions, userAnswers = []) {
           inset: 0.1, // Fixed padding
           wrap: true,
           valign: "top",
-          opacity: 0,
-          animation: { type: "appear", trigger: "click" }
         });
-        
+
         currentY += boxHeight + 0.4;
       } else {
         // Multiple Choice Layout
         const optionCount = question.options.length;
         const useTwoCols = optionCount > 3;
-        
-        const optionH = Math.min(availableOptionsHeight / (useTwoCols ? Math.ceil(optionCount/2) : optionCount) - 0.1, 0.5);
+
+        const optionH = Math.min(
+          availableOptionsHeight /
+            (useTwoCols ? Math.ceil(optionCount / 2) : optionCount) -
+            0.1,
+          0.5,
+        );
         const colWidth = useTwoCols ? (USABLE_WIDTH - 0.2) / 2 : USABLE_WIDTH;
-        
+
         question.options.forEach((opt, idx) => {
           const isCorrect = idx === question.correct;
           const isUserSel = hasUserAnswer && idx === userAnswers[index];
           const label = String.fromCharCode(65 + idx);
-          
+
           let r = Math.floor(idx / (useTwoCols ? 2 : 1));
           let c = idx % (useTwoCols ? 2 : 1);
-          
+
           let x = MARGIN + c * (colWidth + 0.2);
           let y = currentY + r * (optionH + 0.1);
-          
+
           // Base Option
           slide.addText(`${label}. ${sanitizeText(opt)}`, {
-            x: x, y: y, w: colWidth, h: optionH,
+            x: x,
+            y: y,
+            w: colWidth,
+            h: optionH,
             fontSize: 12,
             color: COLORS.textDark,
             fill: { color: COLORS.surface },
@@ -620,61 +668,58 @@ export async function exportToPptx(config, questions, userAnswers = []) {
             inset: 0.1, // Fixed padding
             valign: "middle",
             wrap: true,
-            opacity: 0,
-             animation: { type: "appear", trigger: "click" } // Fixed animation
           });
-          
+
           // Highlights (Correct/Wrong) - Overlay shapes
           if (isCorrect) {
             slide.addShape(pptx.shapes.RECTANGLE, {
-              x: x, y: y, w: colWidth, h: optionH,
+              x: x,
+              y: y,
+              w: colWidth,
+              h: optionH,
               fill: { color: COLORS.success, transparency: 80 },
               line: { color: COLORS.success, width: 2 },
-              opacity: 0,
-              animation: { type: "appear", trigger: "click" }
             });
           } else if (isUserSel && !isCorrect) {
-             slide.addShape(pptx.shapes.RECTANGLE, {
-              x: x, y: y, w: colWidth, h: optionH,
+            slide.addShape(pptx.shapes.RECTANGLE, {
+              x: x,
+              y: y,
+              w: colWidth,
+              h: optionH,
               fill: { color: COLORS.error, transparency: 80 },
               line: { color: COLORS.error, width: 2 },
-              opacity: 0,
-              animation: { type: "appear", trigger: "click" }
             });
           }
         });
-        
-        currentY += Math.ceil(optionCount / (useTwoCols ? 2 : 1)) * (optionH + 0.1) + 0.2;
+
+        currentY +=
+          Math.ceil(optionCount / (useTwoCols ? 2 : 1)) * (optionH + 0.1) + 0.2;
       }
-      
+
       // Explanation
       if (hasExplanation) {
-         slide.addText("EXPLANATION:", {
-           x: MARGIN,
-           y: currentY,
-           w: USABLE_WIDTH,
-           h: 0.3,
-           fontSize: 11,
-           bold: true,
-           color: COLORS.primary,
-           opacity: 0,
-           animation: { type: "appear", trigger: "click" }
-         });
-         
-         slide.addText(sanitizeText(question.explanation), {
-           x: MARGIN,
-           y: currentY + 0.3,
-           w: USABLE_WIDTH,
-           h: Math.min(SLIDE_HEIGHT - FOOTER_HEIGHT - currentY - 0.4, 0.8),
-           fontSize: 11,
-           color: COLORS.textMedium,
-           fill: { color: COLORS.explanationBg },
-           inset: 0.1, // Fixed padding
-           valign: "top",
-           wrap: true,
-           opacity: 0,
-           animation: { type: "appear", trigger: "click" }
-         });
+        slide.addText("EXPLANATION:", {
+          x: MARGIN,
+          y: currentY,
+          w: USABLE_WIDTH,
+          h: 0.3,
+          fontSize: 11,
+          bold: true,
+          color: COLORS.primary,
+        });
+
+        slide.addText(sanitizeText(question.explanation), {
+          x: MARGIN,
+          y: currentY + 0.3,
+          w: USABLE_WIDTH,
+          h: Math.min(SLIDE_HEIGHT - FOOTER_HEIGHT - currentY - 0.4, 0.8),
+          fontSize: 11,
+          color: COLORS.textMedium,
+          fill: { color: COLORS.explanationBg },
+          inset: 0.1, // Fixed padding
+          valign: "top",
+          wrap: true,
+        });
       }
     }
 
@@ -683,7 +728,6 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     // ===========================
     const ctaSlide = pptx.addSlide();
     ctaSlide.background = { color: COLORS.background };
-    ctaSlide.transition = { type: "fade", duration: 0.5 };
 
     addHeader(ctaSlide);
     addFooter(ctaSlide);
