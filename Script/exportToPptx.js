@@ -5,16 +5,15 @@
 
 /**
  * =====================================================
- * EXPORT TO PPTX - PROFESSIONAL QUIZ PRESENTATION (V2)
+ * EXPORT TO PPTX - PROFESSIONAL QUIZ PRESENTATION (V3)
  * =====================================================
  *
- * FIXED ISSUES:
- * - Dynamic layout engine with currentY tracking
- * - Proper click-sequence animations
- * - Slide transitions
- * - 2-column grid for many options
- * - Image aspect ratio preservation
- * - Auto-fit text to prevent overflow
+ * IMPROVEMENTS:
+ * - Fixed Slide Transitions (standardized syntax)
+ * - Fixed Animations (trigger: 'click')
+ * - Improved Text Padding (using `inset` instead of `margin`)
+ * - Enhanced UI/UX (Modern color palette, background shapes, improved typography)
+ * - visual polish for Header/Footer
  */
 
 let pptxgen;
@@ -53,28 +52,33 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     const SLIDE_WIDTH = 10;
     const SLIDE_HEIGHT = 5.625;
     const MARGIN = 0.4;
-    const HEADER_HEIGHT = 0.5;
-    const FOOTER_HEIGHT = 0.3;
+    const HEADER_HEIGHT = 0.8;
+    const FOOTER_HEIGHT = 0.4;
     const USABLE_HEIGHT =
       SLIDE_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT - MARGIN * 2;
     const USABLE_WIDTH = SLIDE_WIDTH - MARGIN * 2;
-    const MAX_IMAGE_HEIGHT = USABLE_HEIGHT * 0.3; // 30% max
+    const MAX_IMAGE_HEIGHT = USABLE_HEIGHT * 0.35;
 
+    // Modern Color Palette
     const COLORS = Object.freeze({
-      primary: "6A5ACD",
-      secondary: "FFD700",
-      success: "10B981",
-      error: "EF4444",
-      warning: "F59E0B",
-      info: "3B82F6",
-      background: "FFFFFF",
-      cardBg: "F8FAFC",
-      textDark: "1E293B",
-      textLight: "64748B",
-      border: "E2E8F0",
-      optionNeutral: "E2E8F0",
-      userWrong: "FEE2E2",
-      correctBg: "D1FAE5",
+      primary: "4F46E5", // Indigo 600
+      primaryLight: "818CF8", // Indigo 400
+      secondary: "F59E0B", // Amber 500
+      accent: "06B6D4", // Cyan 500
+      success: "10B981", // Emerald 500
+      error: "EF4444", // Red 500
+      warning: "F97316", // Orange 500
+      info: "3B82F6", // Blue 500
+      background: "F8FAFC", // Slate 50
+      surface: "FFFFFF", // White
+      textDark: "1E293B", // Slate 800
+      textMedium: "475569", // Slate 600
+      textLight: "94A3B8", // Slate 400
+      border: "CBD5E1", // Slate 300
+      optionNeutral: "F1F5F9", // Slate 100
+      userWrong: "FEE2E2", // Red 100
+      correctBg: "D1FAE5", // Emerald 100
+      explanationBg: "FFF7ED", // Orange 50
     });
 
     // ===========================
@@ -149,7 +153,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       return { width, height, aspectRatio };
     }
 
-    const currentName = config.name || "Player";
+    const currentName = localStorage.getItem("username") || "User";
     const documentTitle = sanitizeText(config.title || "Quiz Quest");
 
     const isResultsMode =
@@ -167,52 +171,65 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     pptx.title = documentTitle;
     pptx.subject = "Interactive Quiz Results";
     pptx.layout = "LAYOUT_16x9";
+    pptx.theme = { bodyFont: "Segoe UI" }; // Set default font
 
     // ===========================
-    // HELPER: ADD HEADER TO SLIDE
+    // SLIDE HELPERS
     // ===========================
-    function addHeader(slide) {
-      slide.addText(documentTitle, {
-        x: MARGIN,
-        y: 0.1,
-        w: USABLE_WIDTH / 2,
-        h: 0.4,
-        fontSize: 18,
-        bold: true,
-        color: COLORS.primary,
-        align: "left",
-      });
-
-      slide.addText(`🏆 ${currentName}`, {
-        x: MARGIN + USABLE_WIDTH / 2,
-        y: 0.1,
-        w: USABLE_WIDTH / 2,
-        h: 0.4,
-        fontSize: 14,
-        bold: true,
-        color: COLORS.secondary,
-        align: "right",
-      });
-
+    function addBackground(slide) {
+      slide.background = { color: COLORS.background };
+      // Add subtle side accent
       slide.addShape(pptx.shapes.RECTANGLE, {
         x: 0,
-        y: HEADER_HEIGHT,
-        w: SLIDE_WIDTH,
-        h: 0.02,
+        y: 0,
+        w: 0.15,
+        h: SLIDE_HEIGHT,
         fill: { color: COLORS.primary },
       });
     }
 
-    // ===========================
-    // HELPER: ADD FOOTER TO SLIDE
-    // ===========================
+    function addHeader(slide) {
+      // Title
+      slide.addText(documentTitle, {
+        x: MARGIN,
+        y: 0.15,
+        w: USABLE_WIDTH * 0.6,
+        h: 0.4,
+        fontSize: 16,
+        bold: true,
+        color: COLORS.primary,
+        align: "left",
+        fontFace: "Segoe UI Semibold",
+      });
+
+      // User Name / Subtitle
+      slide.addText(`User: ${currentName}`, {
+        x: MARGIN + USABLE_WIDTH * 0.6,
+        y: 0.15,
+        w: USABLE_WIDTH * 0.4,
+        h: 0.4,
+        fontSize: 12,
+        color: COLORS.textLight,
+        align: "right",
+      });
+
+      // Divider Line
+      slide.addShape(pptx.shapes.LINE, {
+        x: MARGIN,
+        y: 0.6,
+        w: USABLE_WIDTH,
+        h: 0,
+        line: { color: COLORS.border, width: 1 },
+      });
+    }
+
     function addFooter(slide) {
-      slide.addText("Crafted by Belal Amr", {
+      slide.addText("Generated by Quiz Quest", {
         x: MARGIN,
         y: SLIDE_HEIGHT - FOOTER_HEIGHT,
         w: USABLE_WIDTH,
         h: FOOTER_HEIGHT,
-        fontSize: 11,
+        fontSize: 9,
         color: COLORS.textLight,
         align: "center",
       });
@@ -222,40 +239,56 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     // TITLE SLIDE
     // ===========================
     const titleSlide = pptx.addSlide();
-    titleSlide.background = { color: COLORS.background };
-    titleSlide.transition = { type: "fade", duration: 0.5 };
+    addBackground(titleSlide);
+    // Standardize transition
+    titleSlide.transition = { type: "fade" };
 
-    addHeader(titleSlide);
-    addFooter(titleSlide);
+    // Decorative shapes for Title Slide
+    titleSlide.addShape(pptx.shapes.OVAL, {
+      x: SLIDE_WIDTH - 2.5,
+      y: -0.5,
+      w: 3,
+      h: 3,
+      fill: { color: COLORS.primaryLight, transparency: 80 },
+    });
+    titleSlide.addShape(pptx.shapes.OVAL, {
+      x: -0.5,
+      y: SLIDE_HEIGHT - 2,
+      w: 3,
+      h: 3,
+      fill: { color: COLORS.secondary, transparency: 80 },
+    });
 
-    titleSlide.addText("🎯 " + documentTitle, {
+    titleSlide.addText(documentTitle, {
       x: 1,
       y: 1.8,
       w: 8,
-      h: 0.8,
-      fontSize: 44,
+      h: 1,
+      fontSize: 40,
       bold: true,
-      color: COLORS.primary,
+      color: COLORS.textDark,
       align: "center",
+      fontFace: "Segoe UI Black",
     });
 
-    titleSlide.addText(isResultsMode ? "QUIZ RESULTS" : "QUIZ PREVIEW", {
+    titleSlide.addText(isResultsMode ? "Interactive Results Review" : "Quiz Preview", {
       x: 1,
       y: 2.8,
       w: 8,
       h: 0.5,
-      fontSize: 26,
-      color: COLORS.textLight,
+      fontSize: 20,
+      color: COLORS.primary,
       align: "center",
+      fontFace: "Segoe UI Semibold",
     });
 
     titleSlide.addText(`${questions.length} Questions`, {
       x: 1,
-      y: 3.5,
+      y: 3.4,
       w: 8,
       h: 0.4,
-      fontSize: 18,
-      color: COLORS.textLight,
+      fontSize: 14,
+      color: COLORS.textMedium,
       align: "center",
     });
 
@@ -264,98 +297,99 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     // ===========================
     if (isResultsMode && scoreData) {
       const summarySlide = pptx.addSlide();
-      summarySlide.background = { color: COLORS.background };
-      summarySlide.transition = { type: "fade", duration: 0.5 };
+      addBackground(summarySlide);
+      summarySlide.transition = { type: "fade" };
 
       addHeader(summarySlide);
       addFooter(summarySlide);
 
-      summarySlide.addText("🎯 QUIZ COMPLETE!", {
-        x: 1,
+      summarySlide.addText("PERFORMANCE SUMMARY", {
+        x: MARGIN,
         y: 0.9,
-        w: 8,
+        w: USABLE_WIDTH,
         h: 0.5,
-        fontSize: 32,
+        fontSize: 24,
         bold: true,
-        color: COLORS.primary,
+        color: COLORS.textDark,
         align: "center",
       });
 
+      // Score Circle
+      summarySlide.addShape(pptx.shapes.OVAL, {
+        x: SLIDE_WIDTH / 2 - 1.25,
+        y: 1.8,
+        w: 2.5,
+        h: 2.5,
+        fill: { color: COLORS.surface },
+        line: {
+          color: scoreData.isPassing ? COLORS.success : COLORS.warning,
+          width: 5,
+        },
+      });
+
       summarySlide.addText(`${scoreData.percentage}%`, {
-        x: 3.5,
-        y: 1.6,
-        w: 3,
-        h: 1,
-        fontSize: 72,
+        x: SLIDE_WIDTH / 2 - 1.25,
+        y: 1.8,
+        w: 2.5,
+        h: 2.5,
+        fontSize: 48,
+        bold: true,
+        color: COLORS.textDark,
+        align: "center",
+      });
+
+      const message = scoreData.isPassing
+        ? "Excellent Work!"
+        : "Development Needed";
+      summarySlide.addText(message, {
+        x: MARGIN,
+        y: 4.5,
+        w: USABLE_WIDTH,
+        h: 0.4,
+        fontSize: 18,
         bold: true,
         color: scoreData.isPassing ? COLORS.success : COLORS.warning,
         align: "center",
       });
 
-      const message = scoreData.isPassing
-        ? "🏆 LEGENDARY! 🏆"
-        : "💪 KEEP GRINDING! 💪";
-      summarySlide.addText(message, {
-        x: 1,
-        y: 2.8,
-        w: 8,
-        h: 0.5,
-        fontSize: 26,
-        bold: true,
-        color: COLORS.primary,
-        align: "center",
-      });
-
+      // Stats Table
       const statsData = [
         [
-          { text: "Score", options: { bold: true, fontSize: 16 } },
-          {
-            text: `${scoreData.correct} / ${scoreData.totalScorable}`,
-            options: { bold: true, fontSize: 16, color: COLORS.success },
-          },
+          { text: "Metric", options: { bold: true, fontSize: 12, fill: COLORS.primary, color: "FFFFFF" } },
+          { text: "Value", options: { bold: true, fontSize: 12, fill: COLORS.primary, color: "FFFFFF" } },
         ],
         [
-          { text: "Correct ✓", options: { fontSize: 14 } },
-          {
-            text: String(scoreData.correct),
-            options: { fontSize: 14, color: COLORS.success },
-          },
+          { text: "Correct Answers", options: { fontSize: 12, fill: "FFFFFF" } },
+          { text: `${scoreData.correct} / ${scoreData.totalScorable}`, options: { fontSize: 12, color: COLORS.success, bold: true, fill: "FFFFFF" } },
         ],
         [
-          { text: "Wrong ✗", options: { fontSize: 14 } },
-          {
-            text: String(scoreData.wrong),
-            options: { fontSize: 14, color: COLORS.error },
-          },
+          { text: "Incorrect Answers", options: { fontSize: 12, fill: COLORS.background } },
+          { text: String(scoreData.wrong), options: { fontSize: 12, color: COLORS.error, bold: true, fill: COLORS.background } },
         ],
         [
-          { text: "Skipped ⊝", options: { fontSize: 14 } },
-          {
-            text: String(scoreData.skipped),
-            options: { fontSize: 14, color: COLORS.textLight },
-          },
+          { text: "Skipped", options: { fontSize: 12, fill: "FFFFFF" } },
+          { text: String(scoreData.skipped), options: { fontSize: 12, color: COLORS.textMedium, fill: "FFFFFF" } },
         ],
       ];
 
       summarySlide.addTable(statsData, {
-        x: 2.5,
-        y: 3.6,
-        w: 5,
-        h: 0.8,
-        border: { pt: 2, color: COLORS.primary },
-        fill: { color: COLORS.cardBg },
-        align: "center",
+        x: SLIDE_WIDTH / 2 + 1.8,
+        y: 1.8,
+        w: 3,
+        h: 1.5,
+        border: { pt: 0, color: COLORS.border },
+        align: "left",
         valign: "middle",
       });
     }
 
     // ===========================
-    // QUESTION SLIDES WITH DYNAMIC LAYOUT
+    // QUESTION SLIDES
     // ===========================
     for (const [index, question] of questions.entries()) {
       const slide = pptx.addSlide();
-      slide.background = { color: COLORS.background };
-      slide.transition = { type: "fade", duration: 0.5 };
+      addBackground(slide);
+      slide.transition = { type: "fade" };
 
       addHeader(slide);
       addFooter(slide);
@@ -366,397 +400,281 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       const hasUserAnswer =
         isResultsMode && userAns !== undefined && userAns !== null;
 
-      // Dynamic Y tracking - starts after header
-      let currentY = HEADER_HEIGHT + MARGIN;
-      const contentStartY = currentY;
-      const maxContentY = SLIDE_HEIGHT - FOOTER_HEIGHT - MARGIN;
+      let currentY = 0.8; // Start after header
 
-      // ===========================
-      // QUESTION HEADER
-      // ===========================
-      let statusBadge = "";
+      // Status Badge
+      let statusText = "";
+      let statusBg = COLORS.background;
       let statusColor = COLORS.textLight;
 
       if (isResultsMode) {
         if (isEssay) {
-          statusBadge = " [ESSAY]";
-          statusColor = COLORS.warning;
+          statusText = "ESSAY";
+          statusBg = COLORS.warning;
+          statusColor = "FFFFFF";
         } else if (!hasUserAnswer) {
-          statusBadge = " [SKIPPED]";
-          statusColor = COLORS.textLight;
+          statusText = "SKIPPED";
+          statusBg = COLORS.textLight;
+          statusColor = "FFFFFF";
         } else if (userAns === question.correct) {
-          statusBadge = " [✓ CORRECT]";
-          statusColor = COLORS.success;
+          statusText = "CORRECT";
+          statusBg = COLORS.success;
+          statusColor = "FFFFFF";
         } else {
-          statusBadge = " [✗ WRONG]";
-          statusColor = COLORS.error;
+          statusText = "WRONG";
+          statusBg = COLORS.error;
+          statusColor = "FFFFFF";
         }
-      }
 
-      slide.addText(
-        [
-          {
-            text: `Question #${index + 1}`,
-            options: { fontSize: 22, bold: true, color: COLORS.primary },
-          },
-          {
-            text: statusBadge,
-            options: { fontSize: 18, bold: true, color: statusColor },
-          },
-        ],
-        {
+        // Add Badge
+        slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
           x: MARGIN,
           y: currentY,
-          w: USABLE_WIDTH,
-          h: 0.35,
-        },
-      );
+          w: 1.2,
+          h: 0.3,
+          r: 0.15,
+          fill: { color: statusBg },
+        });
+        slide.addText(statusText, {
+          x: MARGIN,
+          y: currentY,
+          w: 1.2,
+          h: 0.3,
+          fontSize: 10,
+          bold: true,
+          color: statusColor,
+          align: "center",
+        });
+      }
+
+      // Question Number
+      slide.addText(`Question ${index + 1}`, {
+        x: isResultsMode ? MARGIN + 1.3 : MARGIN,
+        y: currentY,
+        w: 4,
+        h: 0.3,
+        fontSize: 14,
+        bold: true,
+        color: COLORS.primary,
+      });
 
       currentY += 0.4;
 
       // ===========================
-      // IMAGE HANDLING WITH ASPECT RATIO
+      // IMAGE & TEXT LAYOUT
       // ===========================
       let imageProcessed = false;
-      let imageDimensions = null;
 
       if (question.image) {
         try {
           const imgDims = await getImageDimensions(question.image);
           const aspectRatio = imgDims.width / imgDims.height;
-          const isSquareOrWide = aspectRatio >= 1;
+          const isWide = aspectRatio >= 1.2;
 
-          // Calculate image size
           let imgSize = calculateImageSize(
             imgDims.width,
             imgDims.height,
-            USABLE_WIDTH * (isSquareOrWide ? 0.35 : 0.9),
-            MAX_IMAGE_HEIGHT,
+            isWide ? USABLE_WIDTH * 0.4 : USABLE_WIDTH * 0.8,
+            MAX_IMAGE_HEIGHT
           );
 
-          imageDimensions = imgSize;
-
-          // Decide layout: side-by-side for square/wide images, stacked for tall
-          if (isSquareOrWide && imgSize.width < USABLE_WIDTH * 0.4) {
-            // Side-by-side layout
-            slide.addImage({
-              path: question.image,
+          if (isWide && imgSize.width < USABLE_WIDTH * 0.5) {
+            // Side-by-side: Text Left, Image Right
+            const textWidth = USABLE_WIDTH - imgSize.width - 0.4;
+            
+            slide.addText(questionText, {
               x: MARGIN,
               y: currentY,
-              w: imgSize.width,
-              h: imgSize.height,
-            });
-
-            // Question text next to image
-            const textX = MARGIN + imgSize.width + 0.2;
-            const textW = USABLE_WIDTH - imgSize.width - 0.2;
-
-            slide.addText(questionText, {
-              x: textX,
-              y: currentY,
-              w: textW,
-              h: imgSize.height,
-              fontSize: 18,
+              w: textWidth,
+              h: 1, // Auto-expand
+              fontSize: 16,
               color: COLORS.textDark,
               bold: true,
               valign: "top",
               wrap: true,
             });
 
-            currentY += Math.max(imgSize.height, 0.6) + 0.2;
-          } else {
-            // Stacked layout
             slide.addImage({
               path: question.image,
-              x: MARGIN + (USABLE_WIDTH - imgSize.width) / 2,
+              x: MARGIN + textWidth + 0.2,
               y: currentY,
               w: imgSize.width,
               h: imgSize.height,
             });
 
-            currentY += imgSize.height + 0.15;
+            currentY += Math.max(imgSize.height, 0.8) + 0.2;
+          } else {
+            // Stacked: Image then Text
+            slide.addImage({
+              path: question.image,
+              x: (SLIDE_WIDTH - imgSize.width) / 2, // Center
+              y: currentY,
+              w: imgSize.width,
+              h: imgSize.height,
+            });
 
-            // Question text below image
+            currentY += imgSize.height + 0.2;
+
             slide.addText(questionText, {
               x: MARGIN,
               y: currentY,
               w: USABLE_WIDTH,
               h: 0.5,
-              fontSize: 18,
+              fontSize: 16,
               color: COLORS.textDark,
               bold: true,
               valign: "top",
               wrap: true,
             });
-
+            
             currentY += 0.6;
           }
-
           imageProcessed = true;
         } catch (err) {
           console.warn("Failed to load image:", err);
         }
       }
 
-      // If no image or image failed, add question text normally
       if (!imageProcessed) {
         slide.addText(questionText, {
           x: MARGIN,
           y: currentY,
           w: USABLE_WIDTH,
           h: 0.5,
-          fontSize: 18,
+          fontSize: 18, // Slightly larger if no image
           color: COLORS.textDark,
           bold: true,
           valign: "top",
           wrap: true,
         });
-
         currentY += 0.6;
       }
 
       // ===========================
-      // CALCULATE REMAINING SPACE
+      // OPTIONS / ANSWER AREA
       // ===========================
-      const remainingHeight = maxContentY - currentY;
-      const hasExplanation =
-        question.explanation && question.explanation.trim();
-      const explanationHeight = hasExplanation ? 0.6 : 0;
+      const remainingHeight = SLIDE_HEIGHT - FOOTER_HEIGHT - currentY - MARGIN;
+      const hasExplanation = question.explanation && question.explanation.trim();
+      const explanationHeight = hasExplanation ? 0.8 : 0;
+      const availableOptionsHeight = remainingHeight - explanationHeight;
 
-      // ===========================
-      // HANDLE ESSAY QUESTIONS
-      // ===========================
       if (isEssay) {
-        const correctAnswer = sanitizeText(question.options[0]);
-        const availableHeight = remainingHeight - explanationHeight;
-        let answerBoxHeight = Math.min(
-          availableHeight / (isResultsMode ? 2.2 : 1.2),
-          0.8,
-        );
-
-        // Adjust font size based on content length
-        let fontSize = 14;
-        if (correctAnswer.length > 200) fontSize = 12;
-        if (correctAnswer.length > 400) fontSize = 10;
-
-        // USER'S ANSWER (Results Mode)
-        if (isResultsMode) {
-          const userText =
-            typeof userAns === "string"
-              ? sanitizeText(userAns)
-              : "Not answered";
-
-          slide.addText("YOUR ANSWER:", {
-            x: MARGIN,
-            y: currentY,
-            w: USABLE_WIDTH,
-            h: 0.25,
-            fontSize: 13,
-            bold: true,
-            color: COLORS.primary,
-            opacity: 0,
-            animation: { type: "appear", trigger: "onclick" },
-          });
-
-          slide.addText(userText, {
-            x: MARGIN,
-            y: currentY + 0.25,
-            w: USABLE_WIDTH,
-            h: answerBoxHeight,
-            fontSize: fontSize,
-            color: COLORS.textDark,
-            fill: { color: "F5F7FA" },
-            margin: 0.1,
-            wrap: true,
-            valign: "top",
-            opacity: 0,
-            animation: { type: "appear", trigger: "onclick" },
-          });
-
-          currentY += answerBoxHeight + 0.35;
-        }
-
-        // CORRECT ANSWER
+        // Essay Layout
+        const boxHeight = Math.min(availableOptionsHeight / 2.2, 0.8);
+        
+        // Correct Answer (Hidden)
         slide.addText("CORRECT ANSWER:", {
           x: MARGIN,
           y: currentY,
           w: USABLE_WIDTH,
-          h: 0.25,
-          fontSize: 13,
+          h: 0.3,
+          fontSize: 11,
           bold: true,
           color: COLORS.success,
           opacity: 0,
-          animation: { type: "appear", trigger: "onclick" },
+          animation: { type: "appear", trigger: "click" } // Fixed animation
         });
-
-        slide.addText(correctAnswer, {
+        
+        slide.addText(sanitizeText(question.options[0]), {
           x: MARGIN,
-          y: currentY + 0.25,
+          y: currentY + 0.3,
           w: USABLE_WIDTH,
-          h: answerBoxHeight,
-          fontSize: fontSize,
+          h: boxHeight,
+          fontSize: 12,
           color: COLORS.textDark,
           fill: { color: COLORS.correctBg },
-          margin: 0.1,
+          inset: 0.1, // Fixed padding
           wrap: true,
           valign: "top",
           opacity: 0,
-          animation: { type: "appear", trigger: "onclick" },
+          animation: { type: "appear", trigger: "click" }
         });
-
-        currentY += answerBoxHeight + 0.35;
+        
+        currentY += boxHeight + 0.4;
       } else {
-        // ===========================
-        // HANDLE MULTIPLE CHOICE
-        // ===========================
+        // Multiple Choice Layout
         const optionCount = question.options.length;
-        const useTwoColumns = optionCount > 3;
-
-        const availableHeight = remainingHeight - explanationHeight - 0.1;
-        let optionHeight = 0.35;
-        let fontSize = 15;
-
-        // Calculate optimal option height and font size
-        if (useTwoColumns) {
-          const rowsNeeded = Math.ceil(optionCount / 2);
-          optionHeight = Math.min(availableHeight / rowsNeeded, 0.45);
-          if (optionHeight < 0.3) {
-            optionHeight = 0.3;
-            fontSize = 13;
-          }
-        } else {
-          optionHeight = Math.min(availableHeight / optionCount, 0.5);
-          if (optionHeight < 0.35) {
-            optionHeight = 0.35;
-            fontSize = 14;
-          }
-        }
-
-        const optionSpacing = 0.05;
-        const columnWidth = useTwoColumns
-          ? (USABLE_WIDTH - 0.3) / 2
-          : USABLE_WIDTH;
-
-        question.options.forEach((opt, optIndex) => {
-          const isUserChoice = hasUserAnswer && optIndex === userAns;
-          const isCorrect = optIndex === question.correct;
-          const prefix = String.fromCharCode(65 + optIndex);
-          const optionText = `${prefix}. ${sanitizeText(opt)}`;
-
-          // Calculate position
-          let xPos = MARGIN;
-          let yPos = currentY;
-
-          if (useTwoColumns) {
-            const row = Math.floor(optIndex / 2);
-            const col = optIndex % 2;
-            xPos = MARGIN + col * (columnWidth + 0.3);
-            yPos = currentY + row * (optionHeight + optionSpacing);
-          } else {
-            yPos = currentY + optIndex * (optionHeight + optionSpacing);
-          }
-
-          // Determine styling
-          let bgColor = COLORS.optionNeutral;
-          let textColor = COLORS.textDark;
-          let borderColor = COLORS.border;
-
-          // Base option (neutral) - appears first
-          slide.addText(optionText, {
-            x: xPos,
-            y: yPos,
-            w: columnWidth,
-            h: optionHeight,
-            fontSize: fontSize,
-            color: textColor,
-            fill: { color: bgColor },
-            align: "left",
+        const useTwoCols = optionCount > 3;
+        
+        const optionH = Math.min(availableOptionsHeight / (useTwoCols ? Math.ceil(optionCount/2) : optionCount) - 0.1, 0.5);
+        const colWidth = useTwoCols ? (USABLE_WIDTH - 0.2) / 2 : USABLE_WIDTH;
+        
+        question.options.forEach((opt, idx) => {
+          const isCorrect = idx === question.correct;
+          const isUserSel = hasUserAnswer && idx === userAnswers[index];
+          const label = String.fromCharCode(65 + idx);
+          
+          let r = Math.floor(idx / (useTwoCols ? 2 : 1));
+          let c = idx % (useTwoCols ? 2 : 1);
+          
+          let x = MARGIN + c * (colWidth + 0.2);
+          let y = currentY + r * (optionH + 0.1);
+          
+          // Base Option
+          slide.addText(`${label}. ${sanitizeText(opt)}`, {
+            x: x, y: y, w: colWidth, h: optionH,
+            fontSize: 12,
+            color: COLORS.textDark,
+            fill: { color: COLORS.surface },
+            line: { color: COLORS.border, width: 1 },
+            inset: 0.1, // Fixed padding
             valign: "middle",
-            margin: 0.08,
             wrap: true,
             opacity: 0,
-            animation: { type: "appear", trigger: "onclick" },
+             animation: { type: "appear", trigger: "click" } // Fixed animation
           });
-
-          // User's wrong answer highlight (if applicable)
-          if (isUserChoice && !isCorrect) {
-            slide.addShape(pptx.shapes.RECTANGLE, {
-              x: xPos,
-              y: yPos,
-              w: columnWidth,
-              h: optionHeight,
-              fill: { color: COLORS.userWrong, transparency: 30 },
-              line: { color: COLORS.error, width: 3 },
-              opacity: 0,
-              animation: { type: "appear", trigger: "onclick" },
-            });
-          }
-
-          // Correct answer highlight
+          
+          // Highlights (Correct/Wrong) - Overlay shapes
           if (isCorrect) {
             slide.addShape(pptx.shapes.RECTANGLE, {
-              x: xPos,
-              y: yPos,
-              w: columnWidth,
-              h: optionHeight,
-              fill: { color: COLORS.correctBg, transparency: 30 },
-              line: { color: COLORS.success, width: 3 },
+              x: x, y: y, w: colWidth, h: optionH,
+              fill: { color: COLORS.success, transparency: 80 },
+              line: { color: COLORS.success, width: 2 },
               opacity: 0,
-              animation: { type: "appear", trigger: "onclick" },
+              animation: { type: "appear", trigger: "click" }
+            });
+          } else if (isUserSel && !isCorrect) {
+             slide.addShape(pptx.shapes.RECTANGLE, {
+              x: x, y: y, w: colWidth, h: optionH,
+              fill: { color: COLORS.error, transparency: 80 },
+              line: { color: COLORS.error, width: 2 },
+              opacity: 0,
+              animation: { type: "appear", trigger: "click" }
             });
           }
         });
-
-        // Update currentY
-        if (useTwoColumns) {
-          const rowsUsed = Math.ceil(optionCount / 2);
-          currentY += rowsUsed * (optionHeight + optionSpacing) + 0.1;
-        } else {
-          currentY += optionCount * (optionHeight + optionSpacing) + 0.1;
-        }
+        
+        currentY += Math.ceil(optionCount / (useTwoCols ? 2 : 1)) * (optionH + 0.1) + 0.2;
       }
-
-      // ===========================
-      // EXPLANATION (if space allows)
-      // ===========================
+      
+      // Explanation
       if (hasExplanation) {
-        const expText = sanitizeText(question.explanation);
-        const remainingSpace = maxContentY - currentY;
-
-        if (remainingSpace > 0.4) {
-          let expFontSize = 13;
-          let expHeight = Math.min(remainingSpace - 0.05, 0.6);
-
-          if (expText.length > 200) expFontSize = 11;
-
-          slide.addText("💡 EXPLANATION:", {
-            x: MARGIN,
-            y: currentY,
-            w: USABLE_WIDTH,
-            h: 0.25,
-            fontSize: 12,
-            bold: true,
-            color: COLORS.warning,
-            opacity: 0,
-            animation: { type: "appear", trigger: "onclick" },
-          });
-
-          slide.addText(expText, {
-            x: MARGIN,
-            y: currentY + 0.25,
-            w: USABLE_WIDTH,
-            h: expHeight,
-            fontSize: expFontSize,
-            color: COLORS.textDark,
-            italic: true,
-            fill: { color: "FFFBEB" },
-            margin: 0.08,
-            wrap: true,
-            valign: "top",
-            opacity: 0,
-            animation: { type: "appear", trigger: "onclick" },
-          });
-        }
+         slide.addText("EXPLANATION:", {
+           x: MARGIN,
+           y: currentY,
+           w: USABLE_WIDTH,
+           h: 0.3,
+           fontSize: 11,
+           bold: true,
+           color: COLORS.primary,
+           opacity: 0,
+           animation: { type: "appear", trigger: "click" }
+         });
+         
+         slide.addText(sanitizeText(question.explanation), {
+           x: MARGIN,
+           y: currentY + 0.3,
+           w: USABLE_WIDTH,
+           h: Math.min(SLIDE_HEIGHT - FOOTER_HEIGHT - currentY - 0.4, 0.8),
+           fontSize: 11,
+           color: COLORS.textMedium,
+           fill: { color: COLORS.explanationBg },
+           inset: 0.1, // Fixed padding
+           valign: "top",
+           wrap: true,
+           opacity: 0,
+           animation: { type: "appear", trigger: "click" }
+         });
       }
     }
 
@@ -792,60 +710,20 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       align: "center",
     });
 
-    ctaSlide.addText("Continue your journey with more challenges!", {
-      x: 1,
-      y: 2.9,
-      w: 8,
-      h: 0.4,
-      fontSize: 17,
-      color: COLORS.textLight,
-      align: "center",
-    });
-
-    ctaSlide.addShape(pptx.shapes.RECTANGLE, {
-      x: 2.5,
-      y: 3.5,
-      w: 5,
-      h: 0.6,
-      fill: { color: COLORS.primary },
-      line: { color: COLORS.primary, width: 2 },
-    });
-
-    ctaSlide.addText("PLAY MORE QUIZZES", {
-      x: 2.5,
-      y: 3.6,
-      w: 5,
-      h: 0.4,
-      fontSize: 20,
-      bold: true,
-      color: COLORS.background,
-      align: "center",
-      hyperlink: { url: "https://divquizzes.vercel.app/" },
-    });
-
-    ctaSlide.addText("https://divquizzes.vercel.app/", {
-      x: 1,
-      y: 4.3,
-      w: 8,
-      h: 0.3,
-      fontSize: 15,
-      color: "0563C1",
-      underline: { style: "sng" },
-      align: "center",
-      hyperlink: { url: "https://divquizzes.vercel.app/" },
-    });
-
     // ===========================
-    // EXPORT
+    // SAVE FILE
     // ===========================
-    const filename = `${sanitizeText(config.title || "Quiz")}.pptx`;
-    await pptx.writeFile({ fileName: filename });
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const fileName = `${documentTitle.replace(
+      /[^a-z0-9]/gi,
+      "_",
+    )}_${dateStr}.pptx`;
 
-    console.log(`Professional PowerPoint exported: ${filename}`);
-    return { success: true, filename };
+    await pptx.writeFile({ fileName });
+    return true;
   } catch (error) {
-    console.error("PowerPoint Export Error:", error);
-    alert(`Failed to export PowerPoint: ${error.message}`);
-    return { success: false, error: error.message };
+    console.error("PPTX Export Error:", error);
+    throw error;
   }
 }
