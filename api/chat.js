@@ -5,6 +5,12 @@
  *
  * This function securely proxies requests to Google's Gemini API
  * without exposing the API key to the client.
+ * test conectivity with this in the browser console:
+ * fetch('/api/chat', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ prompt: 'Hello!' })
+   }).then(r => r.json()).then(console.log);
  */
 
 export default async function handler(req, res) {

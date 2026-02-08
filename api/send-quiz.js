@@ -24,10 +24,20 @@
 
 export default async function handler(req, res) {
   // CORS headers
-  const ALLOWED_ORIGIN = "https://divquizzes.vercel.app";
+  const ALLOWED_ORIGINS = [
+    "https://divquizzes.vercel.app",
+    "https://www.divquizzes.vercel.app",
+    "http://127.0.0.1:5500", // Common local server
+    "http://localhost:3000", // Common local dev
+    "http://localhost:5500"
+  ];
 
   const origin = req.headers.origin;
-  if (origin === ALLOWED_ORIGIN) {
+  
+  // Allow all Vercel preview deployments
+  const isVercelPreview = origin && origin.endsWith(".vercel.app");
+  
+  if (ALLOWED_ORIGINS.includes(origin) || isVercelPreview) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");

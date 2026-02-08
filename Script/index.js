@@ -830,8 +830,6 @@ if (userProfile.checkFirstVisit()) {
 }
 
 function renderRootCategories() {
-  renderUserQuizzes();
-
   navigationStack = [];
   updateBreadcrumb();
 
@@ -851,8 +849,22 @@ function renderRootCategories() {
 
   container.innerHTML = "";
   container.className = "grid-container";
-
+  
   const fragment = document.createDocumentFragment();
+
+  // 1. Add "Your Quizzes" Folder Card
+  try {
+    const userQuizzes = JSON.parse(localStorage.getItem("user_quizzes") || "[]");
+    const quizzesCard = createCategoryCard("Your Quizzes", userQuizzes.length, true);
+    // Custom icon
+    const iconDiv = quizzesCard.querySelector(".icon");
+    if (iconDiv) iconDiv.textContent = "✏️";
+    
+    quizzesCard.onclick = () => renderUserQuizzesView();
+    fragment.appendChild(quizzesCard);
+  } catch (e) {
+    console.error("Error creating User Quizzes card", e);
+  }
 
   // Show subscribed courses if any
   if (subscribedCourses.length > 0) {
@@ -888,79 +900,59 @@ function renderRootCategories() {
 }
 
 /**
- * Render user-created quizzes section
- * This displays quizzes saved in localStorage under 'user_quizzes' key
+ * Render user-created quizzes VIEW (Folder Content)
  */
-function renderUserQuizzes() {
+function renderUserQuizzesView() {
+  // Update Navigation Stack
+  navigationStack.push({ name: "Your Quizzes" });
+  updateBreadcrumb();
+
+  // Update Title & Clear Container
+  if (title) title.textContent = "Your Quizzes";
+  if (!container) return;
+
+  container.innerHTML = "";
+  container.className = "grid-container";
+
   try {
-    // Get user quizzes from localStorage
     const userQuizzes = JSON.parse(
       localStorage.getItem("user_quizzes") || "[]",
     );
 
-    // Create container for user quizzes
-    const userQuizzesSection = document.createElement("div");
-    userQuizzesSection.className = "user-quizzes-section";
-    userQuizzesSection.style.marginBottom = "40px";
-
-    // Section header
-    const sectionHeader = document.createElement("div");
-    sectionHeader.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    // 1. Create 'Create New Quiz' Button (Always visible at top)
+    const actionsBar = document.createElement("div");
+    actionsBar.style.cssText = `
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
     `;
-
-    const heading = document.createElement("h2");
-    heading.textContent = "✏️ Your Quizzes";
-    heading.style.cssText = `
-      margin: 0;
-      font-size: 1.5rem;
-      background: var(--gradient-accent);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    `;
-
+    
     const createBtn = document.createElement("a");
     createBtn.href = "create-quiz.html";
     createBtn.textContent = "➕ Create New Quiz";
+    createBtn.className = "btn btn-primary"; // Use class if available, or inline styles
     createBtn.style.cssText = `
-      padding: 10px 20px;
-      background: var(--gradient-success);
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: var(--shadow-md);
+        display: inline-block;
+        padding: 12px 24px;
+        background: var(--gradient-success);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.2s;
     `;
-    createBtn.onmouseover = () => {
-      createBtn.style.transform = "translateY(-2px)";
-      createBtn.style.boxShadow = "var(--shadow-lg)";
-    };
-    createBtn.onmouseout = () => {
-      createBtn.style.transform = "translateY(0)";
-      createBtn.style.boxShadow = "var(--shadow-md)";
-    };
+    createBtn.onmouseover = () => { createBtn.style.transform = "translateY(-2px)"; };
+    createBtn.onmouseout = () => { createBtn.style.transform = "translateY(0)"; };
 
-    sectionHeader.appendChild(heading);
-    sectionHeader.appendChild(createBtn);
-    userQuizzesSection.appendChild(sectionHeader);
+    actionsBar.appendChild(createBtn);
+    container.appendChild(actionsBar);
 
-    // Quiz cards container
-    const quizzesGrid = document.createElement("div");
-    quizzesGrid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    `;
-
+    // 2. Grid for Quizzes
     if (userQuizzes.length === 0) {
       // Empty state
       const emptyState = document.createElement("div");
-      emptyState.className = "card";
       emptyState.style.cssText = `
         grid-column: 1 / -1;
         text-align: center;
@@ -968,43 +960,24 @@ function renderUserQuizzes() {
         background: var(--color-surface);
         border-radius: 12px;
         box-shadow: var(--shadow-md);
+        color: var(--color-text-primary);
       `;
-
       emptyState.innerHTML = `
-        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📝</div>
-        <h3 style="margin: 0 0 10px 0; color: var(--color-text-primary);">No quizzes yet</h3>
-        <p style="color: var(--color-text-secondary); margin: 0 0 20px 0;">
-          Create your first quiz and it will appear here!
-        </p>
-        <a href="create-quiz.html" style="
-          display: inline-block;
-          padding: 12px 24px;
-          background: var(--gradient-accent);
-          color: white;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: 600;
-          box-shadow: var(--shadow-md);
-        ">
-          ✏️ Create Your First Quiz
-        </a>
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">�</div>
+        <h3 style="margin-bottom: 10px;">You haven't created any quizzes yet</h3>
+        <p style="color: var(--color-text-secondary);">Click the button above to get started!</p>
       `;
-
-      quizzesGrid.appendChild(emptyState);
+      container.appendChild(emptyState);
     } else {
-      // Display quiz cards
       userQuizzes.forEach((quiz, index) => {
         const quizCard = createUserQuizCard(quiz, index);
-        quizzesGrid.appendChild(quizCard);
+        container.appendChild(quizCard);
       });
     }
 
-    userQuizzesSection.appendChild(quizzesGrid);
-
-    // Insert at the top of content area
-    container.insertBefore(userQuizzesSection, container.firstChild);
   } catch (error) {
-    console.error("Error rendering user quizzes:", error);
+    console.error("Error rendering user quizzes view:", error);
+    container.innerHTML = `<p style="color:red">Error loading quizzes.</p>`;
   }
 }
 
@@ -1200,8 +1173,8 @@ function deleteUserQuiz(quizId, index) {
     userQuizzes.splice(index, 1);
     localStorage.setItem("user_quizzes", JSON.stringify(userQuizzes));
 
-    // Re-render the page
-    renderRootCategories();
+    // Re-render the folder view
+    renderUserQuizzesView();
   } catch (error) {
     console.error("Error deleting quiz:", error);
     alert("Error deleting quiz. Please try again.");
