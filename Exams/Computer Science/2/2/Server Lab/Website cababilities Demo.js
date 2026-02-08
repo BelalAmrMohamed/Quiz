@@ -23,14 +23,9 @@ export const questions = [
 
   // Question with relative path image
   {
-    q: "What does this component represent in computer architecture?",
+    q: "Is this component a CPU?",
     image: "./Exam-assets/dashboard-thumbnail.jpg",
-    options: [
-      "Hard Drive",
-      "Central Processing Unit (CPU)",
-      "RAM Module",
-      "Power Supply Unit",
-    ],
+    options: ["True", "False"],
     correct: 1,
     explanation:
       "The CPU is the brain of the computer, responsible for executing instructions.",
@@ -61,6 +56,8 @@ export const questions = [
     ],
     correct: 1,
   },
+
+  // Essay question with an image
   {
     q: "Which programming language is primarily used for server-side web development?",
     image: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg",
