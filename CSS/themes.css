@@ -1139,3 +1139,121 @@ DARK SLATE THEME
 .onboarding-nav {
   border-top-color: var(--nav-border-top);
 }
+
+/* ============================================================================
+   CREATE QUIZ PAGE - Theme-Specific Styles
+   ============================================================================ */
+
+/* ==================== CREATE QUIZ: LIGHT THEME ==================== */
+[data-theme="light"] {
+  /* Create Quiz specific variables */
+  --quiz-creator-bg: var(--color-background);
+  --quiz-card-bg: var(--color-surface);
+  --quiz-card-border: var(--color-border);
+  --quiz-input-bg: var(--color-background);
+  --quiz-option-bg: var(--color-background);
+  --quiz-option-correct-bg: var(--color-success-light);
+  --quiz-option-correct-border: var(--color-success);
+  --quiz-empty-icon-opacity: 0.4;
+}
+
+/* ==================== CREATE QUIZ: DARK SLATE THEME ==================== */
+[data-theme="dark-slate"] {
+  /* Create Quiz specific variables */
+  --quiz-creator-bg: var(--color-background);
+  --quiz-card-bg: var(--color-surface);
+  --quiz-card-border: var(--color-border);
+  --quiz-input-bg: var(--color-background);
+  --quiz-option-bg: var(--color-background);
+  --quiz-option-correct-bg: rgba(16, 185, 129, 0.15);
+  --quiz-option-correct-border: var(--color-success);
+  --quiz-empty-icon-opacity: 0.3;
+}
+
+/* ==================== CREATE QUIZ: DARK (TRUE BLACK) THEME ==================== */
+[data-theme="dark"] {
+  /* Create Quiz specific variables */
+  --quiz-creator-bg: var(--color-background);
+  --quiz-card-bg: var(--color-surface);
+  --quiz-card-border: var(--color-border);
+  --quiz-input-bg: var(--color-background-secondary);
+  --quiz-option-bg: var(--color-background-secondary);
+  --quiz-option-correct-bg: rgba(34, 197, 94, 0.15);
+  --quiz-option-correct-border: var(--color-success);
+  --quiz-empty-icon-opacity: 0.25;
+}
+
+/* ==================== APPLY CREATE QUIZ THEME VARIABLES ==================== */
+
+.quiz-creator {
+  background-color: var(--quiz-creator-bg);
+}
+
+.quiz-metadata,
+.questions-section,
+.action-bar {
+  background-color: var(--quiz-card-bg);
+  border-color: var(--quiz-card-border);
+}
+
+.question-card {
+  background-color: var(--quiz-card-bg);
+  border-color: var(--quiz-card-border);
+}
+
+.form-group input,
+.form-group textarea {
+  background-color: var(--quiz-input-bg);
+  border-color: var(--quiz-card-border);
+  color: var(--color-text-primary);
+}
+
+.option-item {
+  background-color: var(--quiz-option-bg);
+  border-color: var(--quiz-card-border);
+}
+
+.option-item.correct {
+  background-color: var(--quiz-option-correct-bg);
+  border-color: var(--quiz-option-correct-border);
+}
+
+.option-input {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.empty-icon {
+  opacity: var(--quiz-empty-icon-opacity);
+}
+
+.preview-question {
+  background-color: var(--quiz-option-bg);
+}
+
+.preview-options li {
+  background-color: var(--quiz-option-bg);
+  border-color: var(--quiz-card-border);
+}
+
+.preview-options li.correct {
+  background-color: var(--quiz-option-correct-bg);
+  border-color: var(--quiz-option-correct-border);
+}
+
+/* ==================== MENU ITEM ACTIVE STATE ==================== */
+.menu-item.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+[data-theme="dark-slate"] .menu-item.active {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+[data-theme="dark"] .menu-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}

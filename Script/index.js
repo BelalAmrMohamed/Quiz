@@ -830,6 +830,8 @@ if (userProfile.checkFirstVisit()) {
 }
 
 function renderRootCategories() {
+  renderUserQuizzes();
+
   navigationStack = [];
   updateBreadcrumb();
 
@@ -882,6 +884,327 @@ function renderRootCategories() {
         <p>Check back later for new content!</p>
       </div>
     `;
+  }
+}
+
+/**
+ * Render user-created quizzes section
+ * This displays quizzes saved in localStorage under 'user_quizzes' key
+ */
+function renderUserQuizzes() {
+  try {
+    // Get user quizzes from localStorage
+    const userQuizzes = JSON.parse(
+      localStorage.getItem("user_quizzes") || "[]",
+    );
+
+    // Create container for user quizzes
+    const userQuizzesSection = document.createElement("div");
+    userQuizzesSection.className = "user-quizzes-section";
+    userQuizzesSection.style.marginBottom = "40px";
+
+    // Section header
+    const sectionHeader = document.createElement("div");
+    sectionHeader.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    `;
+
+    const heading = document.createElement("h2");
+    heading.textContent = "✏️ Your Quizzes";
+    heading.style.cssText = `
+      margin: 0;
+      font-size: 1.5rem;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    `;
+
+    const createBtn = document.createElement("a");
+    createBtn.href = "create-quiz.html";
+    createBtn.textContent = "➕ Create New Quiz";
+    createBtn.style.cssText = `
+      padding: 10px 20px;
+      background: var(--gradient-success);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: var(--shadow-md);
+    `;
+    createBtn.onmouseover = () => {
+      createBtn.style.transform = "translateY(-2px)";
+      createBtn.style.boxShadow = "var(--shadow-lg)";
+    };
+    createBtn.onmouseout = () => {
+      createBtn.style.transform = "translateY(0)";
+      createBtn.style.boxShadow = "var(--shadow-md)";
+    };
+
+    sectionHeader.appendChild(heading);
+    sectionHeader.appendChild(createBtn);
+    userQuizzesSection.appendChild(sectionHeader);
+
+    // Quiz cards container
+    const quizzesGrid = document.createElement("div");
+    quizzesGrid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    `;
+
+    if (userQuizzes.length === 0) {
+      // Empty state
+      const emptyState = document.createElement("div");
+      emptyState.className = "card";
+      emptyState.style.cssText = `
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--color-surface);
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+      `;
+
+      emptyState.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📝</div>
+        <h3 style="margin: 0 0 10px 0; color: var(--color-text-primary);">No quizzes yet</h3>
+        <p style="color: var(--color-text-secondary); margin: 0 0 20px 0;">
+          Create your first quiz and it will appear here!
+        </p>
+        <a href="create-quiz.html" style="
+          display: inline-block;
+          padding: 12px 24px;
+          background: var(--gradient-accent);
+          color: white;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          box-shadow: var(--shadow-md);
+        ">
+          ✏️ Create Your First Quiz
+        </a>
+      `;
+
+      quizzesGrid.appendChild(emptyState);
+    } else {
+      // Display quiz cards
+      userQuizzes.forEach((quiz, index) => {
+        const quizCard = createUserQuizCard(quiz, index);
+        quizzesGrid.appendChild(quizCard);
+      });
+    }
+
+    userQuizzesSection.appendChild(quizzesGrid);
+
+    // Insert at the top of content area
+    container.insertBefore(userQuizzesSection, container.firstChild);
+  } catch (error) {
+    console.error("Error rendering user quizzes:", error);
+  }
+}
+
+/**
+ * Create a card for a user-created quiz
+ */
+function createUserQuizCard(quiz, index) {
+  const card = document.createElement("div");
+  card.className = "exam-card user-quiz-card";
+  card.style.cssText = `
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+  `;
+
+  // Gradient accent on top
+  const accentBar = document.createElement("div");
+  accentBar.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-accent);
+  `;
+  card.appendChild(accentBar);
+
+  // User badge
+  const badge = document.createElement("div");
+  badge.textContent = "👤 Your Quiz";
+  badge.style.cssText = `
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  `;
+  card.appendChild(badge);
+
+  // Quiz title
+  const title = document.createElement("h3");
+  title.textContent = quiz.title;
+  title.style.cssText = `
+    margin: 0 0 8px 0;
+    color: var(--color-text-primary);
+    font-size: 1.1rem;
+  `;
+  card.appendChild(title);
+
+  // Description
+  if (quiz.description) {
+    const desc = document.createElement("p");
+    desc.textContent = quiz.description;
+    desc.style.cssText = `
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      margin: 0 0 12px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    `;
+    card.appendChild(desc);
+  }
+
+  // Metadata
+  const metadata = document.createElement("div");
+  metadata.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border);
+  `;
+
+  const questionsCount = document.createElement("span");
+  questionsCount.textContent = `📝 ${quiz.questions.length} question${quiz.questions.length !== 1 ? "s" : ""}`;
+  questionsCount.style.cssText = `
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+  `;
+
+  const createdDate = document.createElement("span");
+  const date = new Date(quiz.createdAt);
+  createdDate.textContent = date.toLocaleDateString();
+  createdDate.style.cssText = `
+    color: var(--color-text-tertiary);
+    font-size: 0.85rem;
+  `;
+
+  metadata.appendChild(questionsCount);
+  metadata.appendChild(createdDate);
+  card.appendChild(metadata);
+
+  // Action buttons
+  const actions = document.createElement("div");
+  actions.style.cssText = `
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+  `;
+
+  const playBtn = document.createElement("button");
+  playBtn.textContent = "▶️ Play Quiz";
+  playBtn.className = "btn btn-primary";
+  playBtn.style.cssText = `
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+  `;
+  playBtn.onclick = (e) => {
+    e.stopPropagation();
+    playUserQuiz(quiz);
+  };
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "🗑️";
+  deleteBtn.style.cssText = `
+    padding: 10px 14px;
+    background: var(--color-error-light);
+    color: var(--color-error);
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  `;
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    deleteUserQuiz(quiz.id, index);
+  };
+
+  actions.appendChild(playBtn);
+  actions.appendChild(deleteBtn);
+  card.appendChild(actions);
+
+  // Hover effects
+  card.onmouseenter = () => {
+    card.style.transform = "translateY(-4px)";
+    card.style.boxShadow = "var(--shadow-lg)";
+  };
+  card.onmouseleave = () => {
+    card.style.transform = "translateY(0)";
+    card.style.boxShadow = "var(--shadow-md)";
+  };
+
+  return card;
+}
+
+/**
+ * Play a user-created quiz
+ */
+function playUserQuiz(quiz) {
+  // Store the quiz data temporarily for the quiz page to access
+  sessionStorage.setItem("active_user_quiz", JSON.stringify(quiz));
+
+  // Navigate to quiz page with special parameter
+  window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=practice&type=user`;
+}
+
+/**
+ * Delete a user-created quiz
+ */
+function deleteUserQuiz(quizId, index) {
+  if (
+    !confirm(
+      "Are you sure you want to delete this quiz? This cannot be undone.",
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const userQuizzes = JSON.parse(
+      localStorage.getItem("user_quizzes") || "[]",
+    );
+    userQuizzes.splice(index, 1);
+    localStorage.setItem("user_quizzes", JSON.stringify(userQuizzes));
+
+    // Re-render the page
+    renderRootCategories();
+  } catch (error) {
+    console.error("Error deleting quiz:", error);
+    alert("Error deleting quiz. Please try again.");
   }
 }
 

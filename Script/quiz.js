@@ -142,10 +142,153 @@ async function loadExamModule(config) {
 }
 
 // === Initialization ===
+// async function init() {
+//   const params = new URLSearchParams(window.location.search);
+//   examId = params.get("id");
+//   quizMode = params.get("mode") || "exam";
+//   const startAt = params.get("startAt");
+
+//   // Load saved view mode
+//   const savedView = localStorage.getItem("quiz_view_mode");
+//   if (savedView) viewMode = savedView;
+
+//   // Update view toggle button
+//   if (els.viewIcon && els.viewText) {
+//     if (viewMode === "grid") {
+//       els.viewIcon.textContent = "📋";
+//       els.viewText.textContent = "Switch to List View";
+//     } else {
+//       els.viewIcon.textContent = "🪟";
+//       els.viewText.textContent = "Switch to Grid View";
+//     }
+//   }
+
+//   const config = examList.find((e) => e.id === examId);
+
+//   if (!config) {
+//     alert("Exam not found!");
+//     window.location.href = "index.html";
+//     return;
+//   }
+
+//   try {
+//     // Use optimized loader with caching
+//     const module = await loadExamModule(config);
+//     questions = module.questions;
+
+//     const parts = config.path.replace(/\\/g, "/").split("/");
+//     const filename = parts[parts.length - 1] || "";
+//     const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
+//     const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
+//     metaData = { title, category: parts[parts.length - 2] || "" };
+
+//     if (els.title) {
+//       let modeLabel = "";
+//       if (quizMode === "practice") modeLabel = " (Practice)";
+//       if (quizMode === "timed") modeLabel = " (Timed)";
+//       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
+//     }
+
+//     if (quizMode === "timed") {
+//       timeRemaining = questions.length * 30;
+//     }
+
+//     if (startAt !== null) {
+//       currentIdx = parseInt(startAt);
+//     } else {
+//       const saved = localStorage.getItem(`quiz_state_${examId}`);
+//       if (saved && quizMode === "practice") {
+//         const state = JSON.parse(saved);
+//         if (confirm("Resume your previous session?")) {
+//           currentIdx = state.currentIdx || 0;
+//           userAnswers = state.userAnswers || {};
+//           lockedQuestions = state.lockedQuestions || {};
+//           timeElapsed = state.timeElapsed || 0;
+//         } else {
+//           localStorage.removeItem(`quiz_state_${examId}`);
+//         }
+//       }
+//     }
+
+//     updateGamificationStats();
+//     renderMenuNavigation();
+//     updateMenuActionButtons();
+//     renderQuestion();
+//     startTimer();
+
+//     // Global handlers
+//     window.handleSelect = (i) => handleSelect(i);
+//     window.handleEssayInput = () => handleEssayInput();
+//     window.checkAnswer = () => checkAnswer();
+//     window.toggleView = () => toggleView();
+//     window.toggleBookmark = () => {
+//       gameEngine.toggleBookmark(examId, currentIdx);
+//       renderQuestion();
+//       renderMenuNavigationDebounced();
+//       updateMenuActionButtons();
+//     };
+//     window.toggleFlag = () => {
+//       gameEngine.toggleFlag(examId, currentIdx);
+//       renderQuestion();
+//       renderMenuNavigationDebounced();
+//       updateMenuActionButtons();
+//     };
+//     window.toggleQuestionBookmark = (idx) => {
+//       gameEngine.toggleBookmark(examId, idx);
+//       renderMenuNavigationDebounced();
+//       if (idx === currentIdx) {
+//         renderQuestion();
+//         updateMenuActionButtons();
+//       }
+//     };
+//     window.toggleQuestionFlag = (idx) => {
+//       gameEngine.toggleFlag(examId, idx);
+//       renderMenuNavigationDebounced();
+//       if (idx === currentIdx) {
+//         renderQuestion();
+//         updateMenuActionButtons();
+//       }
+//     };
+//     window.jumpToQuestion = (idx) => {
+//       currentIdx = idx;
+//       saveStateDebounced();
+//       renderQuestion();
+//       renderMenuNavigationDebounced();
+//       updateMenuActionButtons();
+
+//       const questionCard = document.querySelector(".question-card");
+//       if (questionCard) {
+//         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+//       }
+//     };
+
+//     if (els.viewToggle) {
+//       els.viewToggle.addEventListener("click", toggleView);
+//     }
+
+//     document.addEventListener("keydown", (e) => {
+//       if (e.key === "Enter" && !e.shiftKey) {
+//         const activeElement = document.activeElement;
+//         if (activeElement && activeElement.tagName === "TEXTAREA") return;
+//         e.preventDefault();
+//         try {
+//           window.nextQuestion();
+//         } catch (err) {}
+//       }
+//     });
+//   } catch (err) {
+//     console.error("Initialization Error:", err);
+//     if (els.questionContainer) {
+//       els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data.</p>`;
+//     }
+//   }
+// }
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   examId = params.get("id");
   quizMode = params.get("mode") || "exam";
+  const quizType = params.get("type"); // Added per instructions
   const startAt = params.get("startAt");
 
   // Load saved view mode
@@ -163,25 +306,62 @@ async function init() {
     }
   }
 
-  const config = examList.find((e) => e.id === examId);
-
-  if (!config) {
-    alert("Exam not found!");
-    window.location.href = "index.html";
-    return;
-  }
-
   try {
-    // Use optimized loader with caching
-    const module = await loadExamModule(config);
-    questions = module.questions;
+    // -----------------------------------------------------------
+    // BRANCHING LOGIC: Check if this is a User Created Quiz or Standard Exam
+    // -----------------------------------------------------------
 
-    const parts = config.path.replace(/\\/g, "/").split("/");
-    const filename = parts[parts.length - 1] || "";
-    const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
-    const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
-    metaData = { title, category: parts[parts.length - 2] || "" };
+    if (quizType === "user") {
+      // === LOGIC FOR USER QUIZ ===
+      const userQuizData = sessionStorage.getItem("active_user_quiz");
 
+      if (!userQuizData) {
+        alert("Quiz not found!");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const userQuiz = JSON.parse(userQuizData);
+
+      // Map user questions to ensure correct format
+      questions = userQuiz.questions.map((q) => ({
+        q: q.q,
+        options: q.options,
+        correct: q.correct,
+        image: q.image || undefined,
+        explanation: q.explanation || undefined,
+      }));
+
+      metaData = {
+        title: userQuiz.title,
+        category: "Your Quiz",
+      };
+    } else {
+      // === LOGIC FOR STANDARD EXAM (Original Code) ===
+      const config = examList.find((e) => e.id === examId);
+
+      if (!config) {
+        alert("Exam not found!");
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Use optimized loader with caching
+      const module = await loadExamModule(config);
+      questions = module.questions;
+
+      const parts = config.path.replace(/\\/g, "/").split("/");
+      const filename = parts[parts.length - 1] || "";
+      const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
+      const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
+      metaData = { title, category: parts[parts.length - 2] || "" };
+    }
+
+    // -----------------------------------------------------------
+    // SHARED LOGIC: UI Updates & Game Initialization
+    // -----------------------------------------------------------
+
+    // Update Title UI
     if (els.title) {
       let modeLabel = "";
       if (quizMode === "practice") modeLabel = " (Practice)";
@@ -189,13 +369,16 @@ async function init() {
       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
     }
 
+    // Setup Timer
     if (quizMode === "timed") {
       timeRemaining = questions.length * 30;
     }
 
+    // Setup State Restoration
     if (startAt !== null) {
       currentIdx = parseInt(startAt);
     } else {
+      // Note: We use examId here. For user quizzes, ensure examId is unique or handles collision
       const saved = localStorage.getItem(`quiz_state_${examId}`);
       if (saved && quizMode === "practice") {
         const state = JSON.parse(saved);
@@ -210,6 +393,7 @@ async function init() {
       }
     }
 
+    // Initialize Game Engine
     updateGamificationStats();
     renderMenuNavigation();
     updateMenuActionButtons();
@@ -279,7 +463,7 @@ async function init() {
   } catch (err) {
     console.error("Initialization Error:", err);
     if (els.questionContainer) {
-      els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data.</p>`;
+      els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data. ${err.message}</p>`;
     }
   }
 }

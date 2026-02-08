@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Quiz - Quiz Platform</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- CRITICAL: Anti-flash script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
+            const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            document.documentElement.setAttribute("data-animations", savedAnimations ? "enabled" : "disabled");
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="CSS/themes.css">
+    <link rel="stylesheet" href="CSS/create-quiz.css">
+    <link rel="stylesheet" href="CSS/side-menu.css">
+
+    <!-- Theme Controller Script -->
+    <script type="module" src="Script/theme-controller.js"></script>
+
+    <!-- Canvas Animation Script -->
+    <script type="module" src="Script/canvas-animation.js"></script>
+</head>
+
+<body>
+    <!-- Hamburger Menu (matching index.html) -->
+    <div class="menu-container">
+        <button class="hamburger" id="menuBtn"
+            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-header">
+                <h3>Quick Access</h3>
+                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav>
+                <a href="index.html" class="menu-item">🏠 Home</a>
+                <a href="dashboard.html" class="menu-item">📊 Performance Dashboard</a>
+                <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
+
+                <div class="menu-divider"></div>
+
+                <a href="create-quiz.html" class="menu-item active">✏️ Create Quiz</a>
+
+                <div class="menu-divider"></div>
+                <!-- THEME CONTROLS -->
+                <div class="theme-controls-section">
+                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-selector-grid">
+                        <button class="theme-selector-btn" data-theme="light">
+                            <span class="theme-btn-icon">☀️</span>
+                            <span class="theme-btn-label">Light</span>
+                        </button>
+                        <button class="theme-selector-btn" data-theme="dark-slate">
+                            <span class="theme-btn-icon">🌙</span>
+                            <span class="theme-btn-label">Slate</span>
+                        </button>
+                        <button class="theme-selector-btn" data-theme="dark">
+                            <span class="theme-btn-icon">🌑</span>
+                            <span class="theme-btn-label">Dark</span>
+                        </button>
+                    </div>
+
+                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
+                        <div class="animation-toggle-label">
+                            <span class="animation-toggle-icon">✨</span>
+                            <span>Background Effects</span>
+                        </div>
+                        <div class="toggle-switch active animation-toggle-switch"></div>
+                    </div>
+
+                    <p class="theme-info-text">
+                        💡 Disable animations to improve performance
+                    </p>
+
+                    <div class="menu-divider"></div>
+                    <button class="menu-item install-app">📱 Install App</button>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div id="breadcrumb">
+            <a href="index.html" class="breadcrumb-text">← Back to Home</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>✏️ Create Your Own Quiz</h1>
+                <p>Design custom quizzes with multiple-choice questions, images, and explanations.</p>
+            </div>
+        </div>
+
+        <!-- Quiz Creator Form -->
+        <div class="quiz-creator">
+            <!-- Quiz Metadata -->
+            <div class="quiz-metadata card">
+                <h2>📋 Quiz Information</h2>
+                <div class="form-group">
+                    <label for="quizTitle">Quiz Title *</label>
+                    <input type="text" id="quizTitle" placeholder="e.g., World History Quiz" required>
+                </div>
+                <div class="form-group">
+                    <label for="quizDescription">Description (Optional)</label>
+                    <textarea id="quizDescription" rows="3" placeholder="Brief description of your quiz..."></textarea>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="questions-section">
+                <div class="section-header">
+                    <h2>❓ Questions</h2>
+                    <button class="btn btn-primary" onclick="addQuestion()">
+                        ➕ Add Question
+                    </button>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Questions will be dynamically added here -->
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📝</div>
+                    <h3>No questions yet</h3>
+                    <p>Click "Add Question" to start creating your quiz</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-bar card">
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="previewQuiz()">
+                        👁️ Preview
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveToLocalStorage()">
+                        💾 Save Draft
+                    </button>
+                    <button class="btn btn-success" onclick="exportQuiz()">
+                        📥 Export Quiz
+                    </button>
+                    <button class="btn btn-primary" onclick="submitQuiz()">
+                        📧 Submit to Platform
+                    </button>
+                    <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
+                        📱 Send via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="watermark">
+            Crafted by Belal Amr | <a target="_blank" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card preview-modal">
+            <div class="modal-header">
+                <h2>🔍 Quiz Preview</h2>
+                <button class="close-btn" onclick="closePreview()">✕</button>
+            </div>
+            <div id="previewContent" class="preview-content">
+                <!-- Preview will be rendered here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePreview()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="Script/create-quiz.js"></script>
+</body>
+
+</html>
