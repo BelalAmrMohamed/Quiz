@@ -1,8 +1,11 @@
-// Image Support Demo - Example questions with images
-// This file demonstrates the 3 supported scenarios:
+// Website Demo.js - Example questions with images and explanations
+// This file demonstrates the 3 supported image scenarios:
 // 1. Web URL image
 // 2. Relative path image
 // 3. No image (conditional rendering)
+// And 2 supported explanation scenarios
+// 1. Explanation
+// 2. No explanation
 
 export const questions = [
   // Question with Web URL image
