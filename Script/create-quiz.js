@@ -594,7 +594,7 @@ export const questions = ${JSON.stringify(exportQuestions, null, 2)};
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${sanitizeFilename(quizData.title)}.js`;
+  a.download = `${quizData.title}.js`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -607,7 +607,7 @@ export const questions = ${JSON.stringify(exportQuestions, null, 2)};
 // SUBMIT TO PLATFORM (Via API)
 // ============================================================================
 
-window.submitQuiz = async function () {
+window.saveLocally = function () {
   const errors = validateQuiz();
 
   if (errors.length > 0) {
@@ -621,67 +621,67 @@ window.submitQuiz = async function () {
   // Save to user_quizzes first
   const quizId = saveToUserQuizzes(quizData);
   showNotification("📤 Saved locally", "success");
-
-  if (!quizId) {
-    showNotification("❌ Error saving quiz", "error");
-    return;
-  }
-
-  try {
-    showNotification("📤 Submitting quiz...", "info");
-
-    // Prepare quiz data
-    const exportQuestions = quizData.questions.map((q) => {
-      const question = { q: q.q, options: q.options, correct: q.correct };
-      if (q.image && q.image.trim()) question.image = q.image;
-      if (q.explanation && q.explanation.trim())
-        question.explanation = q.explanation;
-      return question;
-    });
-
-    const quizSubmission = {
-      title: quizData.title,
-      description: quizData.description,
-      questions: exportQuestions,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Submit via API
-    const response = await fetch("/api/send-quiz", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(quizSubmission),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to submit quiz");
-    }
-
-    const result = await response.json();
-
-    showNotification("✅ Quiz submitted successfully!", "success");
-
-    // Clear draft
-    localStorage.removeItem("quiz_creator_draft");
-
-    // Reset form after a delay
-    setTimeout(() => {
-      if (confirm("Quiz submitted! Would you like to create another quiz?")) {
-        location.reload();
-      } else {
-        window.location.href = "index.html";
-      }
-    }, 2000);
-  } catch (error) {
-    console.error("Error submitting quiz:", error);
-    showNotification(
-      "Error submitting quiz to developer. Please try again.",
-      "error",
-    );
-  }
 };
+//   if (!quizId) {
+//     showNotification("❌ Error saving quiz", "error");
+//     return;
+//   }
+
+//   try {
+//     showNotification("📤 Submitting quiz...", "info");
+
+//     // Prepare quiz data
+//     const exportQuestions = quizData.questions.map((q) => {
+//       const question = { q: q.q, options: q.options, correct: q.correct };
+//       if (q.image && q.image.trim()) question.image = q.image;
+//       if (q.explanation && q.explanation.trim())
+//         question.explanation = q.explanation;
+//       return question;
+//     });
+
+//     const quizSubmission = {
+//       title: quizData.title,
+//       description: quizData.description,
+//       questions: exportQuestions,
+//       createdAt: new Date().toISOString(),
+//     };
+
+//     // Submit via API
+//     const response = await fetch("/api/send-quiz", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(quizSubmission),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to submit quiz");
+//     }
+
+//     const result = await response.json();
+
+//     showNotification("✅ Quiz submitted successfully!", "success");
+
+//     // Clear draft
+//     localStorage.removeItem("quiz_creator_draft");
+
+//     // Reset form after a delay
+//     setTimeout(() => {
+//       if (confirm("Quiz submitted! Would you like to create another quiz?")) {
+//         location.reload();
+//       } else {
+//         window.location.href = "index.html";
+//       }
+//     }, 2000);
+//   } catch (error) {
+//     console.error("Error submitting quiz:", error);
+//     showNotification(
+//       "Error submitting quiz to developer. Please try again.",
+//       "error",
+//     );
+//   }
+// };
 
 // ============================================================================
 // WHATSAPP INTEGRATION
@@ -745,16 +745,6 @@ ${fileContent}
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
-
-function sanitizeFilename(filename) {
-  return (
-    filename
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .substring(0, 50) || "quiz"
-  );
-}
 
 function showNotification(message, type = "info") {
   // 1. Get or Create Container

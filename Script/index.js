@@ -849,17 +849,23 @@ function renderRootCategories() {
 
   container.innerHTML = "";
   container.className = "grid-container";
-  
+
   const fragment = document.createDocumentFragment();
 
   // 1. Add "Your Quizzes" Folder Card
   try {
-    const userQuizzes = JSON.parse(localStorage.getItem("user_quizzes") || "[]");
-    const quizzesCard = createCategoryCard("Your Quizzes", userQuizzes.length, true);
+    const userQuizzes = JSON.parse(
+      localStorage.getItem("user_quizzes") || "[]",
+    );
+    const quizzesCard = createCategoryCard(
+      "Your Quizzes",
+      userQuizzes.length,
+      true,
+    );
     // Custom icon
     const iconDiv = quizzesCard.querySelector(".icon");
     if (iconDiv) iconDiv.textContent = "✏️";
-    
+
     quizzesCard.onclick = () => renderUserQuizzesView();
     fragment.appendChild(quizzesCard);
   } catch (e) {
@@ -927,7 +933,7 @@ function renderUserQuizzesView() {
         justify-content: flex-end;
         margin-bottom: 20px;
     `;
-    
+
     const createBtn = document.createElement("a");
     createBtn.href = "create-quiz.html";
     createBtn.textContent = "➕ Create New Quiz";
@@ -943,8 +949,12 @@ function renderUserQuizzesView() {
         box-shadow: var(--shadow-md);
         transition: transform 0.2s;
     `;
-    createBtn.onmouseover = () => { createBtn.style.transform = "translateY(-2px)"; };
-    createBtn.onmouseout = () => { createBtn.style.transform = "translateY(0)"; };
+    createBtn.onmouseover = () => {
+      createBtn.style.transform = "translateY(-2px)";
+    };
+    createBtn.onmouseout = () => {
+      createBtn.style.transform = "translateY(0)";
+    };
 
     actionsBar.appendChild(createBtn);
     container.appendChild(actionsBar);
@@ -974,7 +984,6 @@ function renderUserQuizzesView() {
         container.appendChild(quizCard);
       });
     }
-
   } catch (error) {
     console.error("Error rendering user quizzes view:", error);
     container.innerHTML = `<p style="color:red">Error loading quizzes.</p>`;
@@ -1126,7 +1135,27 @@ function createUserQuizCard(quiz, index) {
     deleteUserQuiz(quiz.id, index);
   };
 
+  const downloadBtn = document.createElement("button");
+  downloadBtn.textContent = "📥 Download";
+  downloadBtn.style.cssText = `
+    padding: 10px 14px;
+    background: var(--color-tertiary); /* Use a distinct color or variable */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    background-color: #64748b; /* Fallback/Specific color for download */
+  `;
+  downloadBtn.title = "Download Quiz";
+  downloadBtn.onclick = (e) => {
+    e.stopPropagation();
+    showUserQuizDownloadPopup(quiz);
+  };
+
   actions.appendChild(playBtn);
+  actions.appendChild(downloadBtn);
   actions.appendChild(deleteBtn);
   card.appendChild(actions);
 
@@ -1589,3 +1618,126 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("appinstalled", () => {
   console.log("PWA installed successfully");
 });
+
+/**
+ * Show download popup for user-created quizzes
+ * Reuses existing export functions
+ */
+function showUserQuizDownloadPopup(quiz) {
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.style.transform = "translateZ(0)";
+  modal.style.willChange = "opacity";
+
+  const modalCard = document.createElement("div");
+  modalCard.className = "modal-card";
+  modalCard.style.contain = "layout style paint";
+
+  const h2 = document.createElement("h2");
+  h2.textContent = quiz.title;
+
+  const p = document.createElement("p");
+  p.textContent = "Select download format:";
+
+  const grid = document.createElement("div");
+  grid.className = "mode-grid";
+
+  // Reusing the same options as standard exams
+  const opts = [
+    ["💡", "Quiz (.html)", "quiz"],
+    ["🌐", "HTML (.html)", "html"],
+    ["📄", "PDF (.pdf)", "pdf"],
+    ["📖", "Word (.docx)", "docx"],
+    ["🗂️", "PowerPoint (.pptx)", "pptx"],
+    ["📝", "Markdown (.md)", "md"],
+  ];
+
+  // Config object for export functions (mocking structure of standard exam config)
+  const config = {
+    id: quiz.id,
+    title: quiz.title,
+    description: quiz.description,
+    // path is null for user quizzes
+  };
+
+  const questions = quiz.questions;
+
+  const loadPdfLib = () =>
+    new Promise((resolve, reject) => {
+      if (window.jspdf && window.jspdf.jsPDF) {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("PDF library failed to load"));
+      document.head.appendChild(s);
+    });
+
+  const onDownloadOption = async (format) => {
+    modal.remove();
+
+    if (format === "pdf") {
+      try {
+        await loadPdfLib();
+      } catch {
+        alert("PDF library could not be loaded.");
+        return;
+      }
+    }
+
+    try {
+      switch (format) {
+        case "quiz":
+          await exportToQuiz(config, questions);
+          break;
+        case "html":
+          await exportToHtml(config, questions);
+          break;
+        case "pdf":
+          await exportToPdf(config, questions);
+          break;
+        case "docx":
+          await exportToWord(config, questions);
+          break;
+        case "pptx":
+          await exportToPptx(config, questions);
+          break;
+        case "md":
+          exportToMarkdown(config, questions);
+          break;
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Export failed. Please check console for details.");
+    }
+  };
+
+  opts.forEach(([icon, label, format]) => {
+    const b = document.createElement("button");
+    b.className = "mode-btn";
+    b.innerHTML = `<span class="icon">${icon}</span><strong>${label}</strong>`;
+    b.onclick = (ev) => {
+      ev.stopPropagation();
+      onDownloadOption(format);
+    };
+    grid.appendChild(b);
+  });
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "close-modal";
+  closeBtn.textContent = "Cancel";
+  closeBtn.onclick = () => modal.remove();
+
+  modalCard.appendChild(h2);
+  modalCard.appendChild(p);
+  modalCard.appendChild(grid);
+  modalCard.appendChild(closeBtn);
+  modal.appendChild(modalCard);
+
+  requestAnimationFrame(() => {
+    document.body.appendChild(modal);
+  });
+}
