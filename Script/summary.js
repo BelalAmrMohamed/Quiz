@@ -44,9 +44,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   const exportHtmlBtn = document.getElementById("exportHtmlBtn");
   const exportQuizBtn = document.getElementById("exportQuizBtn");
 
-  const config = examList.find((e) => e.id === result.examId);
-  const module = await import(config.path);
-  const questions = module.questions;
+  const config = examList.find((e) => e.id === result.examId) || {
+    id: result.examId,
+    title: result.examTitle || "User Quiz",
+    description: "Custom user-created quiz",
+    path: null,
+  };
+
+  let questions = [];
+  if (config.path) {
+    try {
+      const module = await import(config.path);
+      questions = module.questions;
+    } catch (e) {
+      console.error("Failed to load questions", e);
+    }
+  } else if (result.questions) {
+    questions = result.questions;
+  } else {
+     // Fallback: Try to find in user_quizzes
+      try {
+        const userQuizzes = JSON.parse(localStorage.getItem("user_quizzes") || "[]");
+        const found = userQuizzes.find(q => q.id === result.examId);
+        if(found){
+            questions = found.questions;
+            config.title = found.title;
+        }
+      } catch(e){
+        console.error("Error loading user quiz questions", e);
+      }
+  }
 
   backBtn && (backBtn.onclick = goHome);
   exportMdBtn &&

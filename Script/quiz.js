@@ -957,6 +957,8 @@ function finish(skipConfirm) {
 
   const rawResult = {
     examId,
+    examTitle: metaData.title, // Pass title for summary
+    questions: questions, // Pass questions to avoid reload issues
     score: correctCount,
     total: scorableQuestions,
     totalQuestions: questions.length,
