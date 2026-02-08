@@ -455,9 +455,10 @@ body {
 }
 
 .action-buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .action-buttons .btn {
@@ -691,7 +692,7 @@ body {
   }
 
   .action-buttons {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .action-buttons .btn {

@@ -1,5 +1,8 @@
 // Script/create-quiz.js - Enhanced Quiz Creator with Integrated Storage
 
+const phoneNumber = "201118482193"; // My number
+const emailAddress = "belalamrofficial@gmail.com"; // My email
+
 // ============================================================================
 // STATE MANAGEMENT
 // ============================================================================
@@ -622,66 +625,71 @@ window.saveLocally = function () {
   const quizId = saveToUserQuizzes(quizData);
   showNotification("📤 Saved locally", "success");
 };
-//   if (!quizId) {
-//     showNotification("❌ Error saving quiz", "error");
-//     return;
-//   }
 
-//   try {
-//     showNotification("📤 Submitting quiz...", "info");
+// ============================================================================
+// Email To developer
+// ============================================================================
 
-//     // Prepare quiz data
-//     const exportQuestions = quizData.questions.map((q) => {
-//       const question = { q: q.q, options: q.options, correct: q.correct };
-//       if (q.image && q.image.trim()) question.image = q.image;
-//       if (q.explanation && q.explanation.trim())
-//         question.explanation = q.explanation;
-//       return question;
-//     });
+window.emailQuizToDeveloper = function () {
+  const errors = validateQuiz();
 
-//     const quizSubmission = {
-//       title: quizData.title,
-//       description: quizData.description,
-//       questions: exportQuestions,
-//       createdAt: new Date().toISOString(),
-//     };
+  if (errors.length > 0) {
+    alert(
+      "Please fix the following errors before sending:\n\n" + errors.join("\n"),
+    );
+    return;
+  }
 
-//     // Submit via API
-//     const response = await fetch("/api/send-quiz", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(quizSubmission),
-//     });
+  try {
+    showNotification("📤 Sending quiz to developer...", "info");
 
-//     if (!response.ok) {
-//       throw new Error("Failed to submit quiz");
-//     }
+    // 1. Prepare quiz data
+    const exportQuestions = quizData.questions.map((q) => {
+      const question = { q: q.q };
+      
+      // Add image only if it exists
+      if (q.image && q.image.trim()) question.image = q.image;
+      
+      question.options = q.options;
+      question.correct = q.correct;
 
-//     const result = await response.json();
+      // Add explanation only if it exists
+      if (q.explanation && q.explanation.trim())
+        question.explanation = q.explanation;
+      
+      return question;
+    });
 
-//     showNotification("✅ Quiz submitted successfully!", "success");
+    const fileHeader = `// Automated mail - ${quizData.title}.js`;
 
-//     // Clear draft
-//     localStorage.removeItem("quiz_creator_draft");
+    // 2. Stringify the data first
+    let jsonString = JSON.stringify(exportQuestions, null, 2);
 
-//     // Reset form after a delay
-//     setTimeout(() => {
-//       if (confirm("Quiz submitted! Would you like to create another quiz?")) {
-//         location.reload();
-//       } else {
-//         window.location.href = "index.html";
-//       }
-//     }, 2000);
-//   } catch (error) {
-//     console.error("Error submitting quiz:", error);
-//     showNotification(
-//       "Error submitting quiz to developer. Please try again.",
-//       "error",
-//     );
-//   }
-// };
+    // 3. Regex to remove quotes from specific keys
+    // This finds "key": and replaces it with key:
+    // We target only your specific known keys to avoid breaking text inside the questions
+    const validKeys = ["q", "image", "options", "correct", "explanation"];
+    const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
+    
+    // Replace "q": with q:
+    const jsObjectString = jsonString.replace(keyRegex, "$1:");
+
+    // 4. Construct the final file content
+    const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
+
+    const encodedBody = encodeURIComponent(fileContent);
+    const mailtoLink = `mailto:${emailAddress}?subject=New Quiz Submission - ${quizData.title}&body=${encodedBody}`;
+    
+    window.location.href = mailtoLink;
+
+  } catch (error) {
+    console.error("Error submitting quiz:", error);
+    showNotification(
+      "Error submitting quiz to developer. Please try again.",
+      "error",
+    );
+  }
+};
 
 // ============================================================================
 // WHATSAPP INTEGRATION
@@ -714,26 +722,33 @@ window.sendToWhatsApp = function () {
     return question;
   });
 
-  // Generate file content
-  const fileContent = `// ${quizData.title}
-// ${quizData.description || ""}
+    const fileHeader = `// ${quizData.title}.js`;
 
-export const questions = ${JSON.stringify(exportQuestions, null, 2)};`;
+    let jsonString = JSON.stringify(exportQuestions, null, 2);
+
+    // 3. Regex to remove quotes from specific keys
+    // This finds "key": and replaces it with key:
+    // We target only your specific known keys to avoid breaking text inside the questions
+    const validKeys = ["q", "image", "options", "correct", "explanation"];
+    const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
+    
+    // Replace "q": with q:
+    const jsObjectString = jsonString.replace(keyRegex, "$1:");
+
+    // 4. Construct the final file content
+    const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
 
   // Create WhatsApp message
-  const message = `📝 *New Quiz Submission*
+  const message = `*New Quiz Submission*
 
-*Title:* ${quizData.title}
-*Description:* ${quizData.description || "N/A"}
-*Questions:* ${quizData.questions.length}
-*Created:* ${new Date().toLocaleString()}
+// *Title:* ${quizData.title}
+// *Description:* ${quizData.description || "N/A"}
+// *Questions:* ${quizData.questions.length}
+// *Created:* ${new Date().toLocaleString()}
 
---- QUIZ DATA ---
-${fileContent}
---- END ---`;
+${fileContent}`;
 
-  // WhatsApp URL (international format without +)
-  const phoneNumber = "201118482193"; // Your number
+  // WhatsApp URL
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   // Open WhatsApp
