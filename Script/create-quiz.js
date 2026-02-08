@@ -620,6 +620,7 @@ window.submitQuiz = async function () {
 
   // Save to user_quizzes first
   const quizId = saveToUserQuizzes(quizData);
+  showNotification("📤 Saved locally", "success");
 
   if (!quizId) {
     showNotification("❌ Error saving quiz", "error");
@@ -675,7 +676,10 @@ window.submitQuiz = async function () {
     }, 2000);
   } catch (error) {
     console.error("Error submitting quiz:", error);
-    showNotification("❌ Error submitting quiz. Please try again.", "error");
+    showNotification(
+      "Error submitting quiz to developer. Please try again.",
+      "error",
+    );
   }
 };
 
@@ -753,41 +757,40 @@ function sanitizeFilename(filename) {
 }
 
 function showNotification(message, type = "info") {
-  const notification = document.createElement("div");
-  notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px 24px;
-        background: ${type === "success" ? "var(--color-success)" : type === "error" ? "var(--color-error)" : "var(--color-primary)"};
-        color: white;
-        border-radius: 8px;
-        box-shadow: var(--shadow-lg);
-        z-index: 10000;
-        font-weight: 600;
-        animation: slideInRight 0.3s ease;
-        max-width: 300px;
-    `;
-  notification.textContent = message;
+  // 1. Get or Create Container
+  let container = document.querySelector(".notification-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "notification-container";
+    document.body.appendChild(container);
+  }
 
-  document.body.appendChild(notification);
+  // 2. Create Toast
+  const toast = document.createElement("div");
+  toast.className = `notification-toast ${type}`;
 
+  // Icon based on type
+  let icon = "ℹ️";
+  if (type === "success") icon = "✅";
+  if (type === "error") icon = "❌";
+  if (type === "warning") icon = "⚠️";
+
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-message">${escapeHtml(message)}</div>
+  `;
+
+  // 3. Append to Container (Newest at bottom)
+  container.appendChild(toast);
+
+  // 4. Auto Dismiss
+  // Handle rapid fire: each toast has its own timer
   setTimeout(() => {
-    notification.style.animation = "slideOutRight 0.3s ease";
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
+    toast.classList.add("hiding");
 
-// Add CSS animations
-const style = document.createElement("style");
-style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
+    // Remove from DOM after animation
+    toast.addEventListener("animationend", () => {
+      toast.remove();
+    });
+  }, 5000);
+}
