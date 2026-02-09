@@ -1,6 +1,7 @@
 // Script/quiz.js - Performance Optimized
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
+import  { confirmationNotification } from "./notifications.js";
 
 // === MEMORY CACHE for exam modules ===
 const examModuleCache = new Map();
@@ -141,149 +142,6 @@ async function loadExamModule(config) {
   return module;
 }
 
-// === Initialization ===
-// async function init() {
-//   const params = new URLSearchParams(window.location.search);
-//   examId = params.get("id");
-//   quizMode = params.get("mode") || "exam";
-//   const startAt = params.get("startAt");
-
-//   // Load saved view mode
-//   const savedView = localStorage.getItem("quiz_view_mode");
-//   if (savedView) viewMode = savedView;
-
-//   // Update view toggle button
-//   if (els.viewIcon && els.viewText) {
-//     if (viewMode === "grid") {
-//       els.viewIcon.textContent = "📋";
-//       els.viewText.textContent = "Switch to List View";
-//     } else {
-//       els.viewIcon.textContent = "🪟";
-//       els.viewText.textContent = "Switch to Grid View";
-//     }
-//   }
-
-//   const config = examList.find((e) => e.id === examId);
-
-//   if (!config) {
-//     alert("Exam not found!");
-//     window.location.href = "index.html";
-//     return;
-//   }
-
-//   try {
-//     // Use optimized loader with caching
-//     const module = await loadExamModule(config);
-//     questions = module.questions;
-
-//     const parts = config.path.replace(/\\/g, "/").split("/");
-//     const filename = parts[parts.length - 1] || "";
-//     const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
-//     const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
-//     metaData = { title, category: parts[parts.length - 2] || "" };
-
-//     if (els.title) {
-//       let modeLabel = "";
-//       if (quizMode === "practice") modeLabel = " (Practice)";
-//       if (quizMode === "timed") modeLabel = " (Timed)";
-//       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
-//     }
-
-//     if (quizMode === "timed") {
-//       timeRemaining = questions.length * 30;
-//     }
-
-//     if (startAt !== null) {
-//       currentIdx = parseInt(startAt);
-//     } else {
-//       const saved = localStorage.getItem(`quiz_state_${examId}`);
-//       if (saved && quizMode === "practice") {
-//         const state = JSON.parse(saved);
-//         if (confirm("Resume your previous session?")) {
-//           currentIdx = state.currentIdx || 0;
-//           userAnswers = state.userAnswers || {};
-//           lockedQuestions = state.lockedQuestions || {};
-//           timeElapsed = state.timeElapsed || 0;
-//         } else {
-//           localStorage.removeItem(`quiz_state_${examId}`);
-//         }
-//       }
-//     }
-
-//     updateGamificationStats();
-//     renderMenuNavigation();
-//     updateMenuActionButtons();
-//     renderQuestion();
-//     startTimer();
-
-//     // Global handlers
-//     window.handleSelect = (i) => handleSelect(i);
-//     window.handleEssayInput = () => handleEssayInput();
-//     window.checkAnswer = () => checkAnswer();
-//     window.toggleView = () => toggleView();
-//     window.toggleBookmark = () => {
-//       gameEngine.toggleBookmark(examId, currentIdx);
-//       renderQuestion();
-//       renderMenuNavigationDebounced();
-//       updateMenuActionButtons();
-//     };
-//     window.toggleFlag = () => {
-//       gameEngine.toggleFlag(examId, currentIdx);
-//       renderQuestion();
-//       renderMenuNavigationDebounced();
-//       updateMenuActionButtons();
-//     };
-//     window.toggleQuestionBookmark = (idx) => {
-//       gameEngine.toggleBookmark(examId, idx);
-//       renderMenuNavigationDebounced();
-//       if (idx === currentIdx) {
-//         renderQuestion();
-//         updateMenuActionButtons();
-//       }
-//     };
-//     window.toggleQuestionFlag = (idx) => {
-//       gameEngine.toggleFlag(examId, idx);
-//       renderMenuNavigationDebounced();
-//       if (idx === currentIdx) {
-//         renderQuestion();
-//         updateMenuActionButtons();
-//       }
-//     };
-//     window.jumpToQuestion = (idx) => {
-//       currentIdx = idx;
-//       saveStateDebounced();
-//       renderQuestion();
-//       renderMenuNavigationDebounced();
-//       updateMenuActionButtons();
-
-//       const questionCard = document.querySelector(".question-card");
-//       if (questionCard) {
-//         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
-//       }
-//     };
-
-//     if (els.viewToggle) {
-//       els.viewToggle.addEventListener("click", toggleView);
-//     }
-
-//     document.addEventListener("keydown", (e) => {
-//       if (e.key === "Enter" && !e.shiftKey) {
-//         const activeElement = document.activeElement;
-//         if (activeElement && activeElement.tagName === "TEXTAREA") return;
-//         e.preventDefault();
-//         try {
-//           window.nextQuestion();
-//         } catch (err) {}
-//       }
-//     });
-//   } catch (err) {
-//     console.error("Initialization Error:", err);
-//     if (els.questionContainer) {
-//       els.questionContainer.innerHTML = `<p style="color:red">Failed to load quiz data.</p>`;
-//     }
-//   }
-// }
-
 async function init() {
   const params = new URLSearchParams(window.location.search);
   examId = params.get("id");
@@ -382,7 +240,7 @@ async function init() {
       const saved = localStorage.getItem(`quiz_state_${examId}`);
       if (saved && quizMode === "practice") {
         const state = JSON.parse(saved);
-        if (confirm("Resume your previous session?")) {
+        if (await confirmationNotification("Resume your previous session?")) {
           currentIdx = state.currentIdx || 0;
           userAnswers = state.userAnswers || {};
           lockedQuestions = state.lockedQuestions || {};
@@ -908,9 +766,9 @@ const maybeAutoSubmit = () => {
 
   const answered = Object.keys(userAnswers).length;
   if (answered === questions.length && questions.length > 0) {
-    autoSubmitTimeout = setTimeout(() => {
+    autoSubmitTimeout = setTimeout(async () => {
       try {
-        if (confirm("You have answered all questions. Submit now?")) {
+        if (await confirmationNotification("You have answered all questions. Submit now?")) {
           finish(true);
         }
       } catch (e) {
@@ -931,13 +789,13 @@ function nav(dir) {
   updateMenuActionButtons();
 }
 
-function finish(skipConfirm) {
+async function finish(skipconfirmationNotification) {
   if (autoSubmitTimeout) {
     clearTimeout(autoSubmitTimeout);
     autoSubmitTimeout = null;
   }
 
-  if (!skipConfirm && !confirm("Are you sure you want to submit?")) return;
+  if (!skipconfirmationNotification && !await confirmationNotification("Are you sure you want to submit?")) return;
 
   stopTimer();
 
@@ -985,11 +843,11 @@ function finish(skipConfirm) {
   window.location.href = "summary.html";
 }
 
-function restart(skipConfirm) {
-  // 1. Confirm Intent
+async function restart(skipconfirmationNotification) {
+  // 1. confirmationNotification Intent
   if (
-    !skipConfirm &&
-    !confirm("Are you sure you want to restart? Progress will be lost.")
+    !skipconfirmationNotification &&
+    !await confirmationNotification("Are you sure you want to restart? Progress will be lost.")
   )
     return;
 
@@ -1046,8 +904,8 @@ function restart(skipConfirm) {
   window.scrollTo(0, 0);
 }
 
-function exit(skipConfirm) {
-  if (!skipConfirm && !confirm("Are you sure you want to exit?")) return;
+async function exit(skipconfirmationNotification) {
+  if (!skipconfirmationNotification && !await confirmationNotification("Are you sure you want to exit?")) return;
 
   localStorage.removeItem(`quiz_state_${examId}`);
 
