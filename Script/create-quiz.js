@@ -1,5 +1,7 @@
 // Script/create-quiz.js - Enhanced Quiz Creator with Integrated Storage
 
+import  {showNotification} from "./notifications.js";
+
 const phoneNumber = "201118482193"; // My number
 const emailAddress = "belalamrofficial@gmail.com"; // My email
 
@@ -784,46 +786,3 @@ ${fileContent}`;
 
   showNotification("📱 Opening WhatsApp...", "info");
 };
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function showNotification(message, type = "info") {
-  // 1. Get or Create Container
-  let container = document.querySelector(".notification-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.className = "notification-container";
-    document.body.appendChild(container);
-  }
-
-  // 2. Create Toast
-  const toast = document.createElement("div");
-  toast.className = `notification-toast ${type}`;
-
-  // Icon based on type
-  let icon = "ℹ️";
-  if (type === "success") icon = "✅";
-  if (type === "error") icon = "❌";
-  if (type === "warning") icon = "⚠️";
-
-  toast.innerHTML = `
-    <div class="toast-icon">${icon}</div>
-    <div class="toast-message">${escapeHtml(message)}</div>
-  `;
-
-  // 3. Append to Container (Newest at bottom)
-  container.appendChild(toast);
-
-  // 4. Auto Dismiss
-  // Handle rapid fire: each toast has its own timer
-  setTimeout(() => {
-    toast.classList.add("hiding");
-
-    // Remove from DOM after animation
-    toast.addEventListener("animationend", () => {
-      toast.remove();
-    });
-  }, 5000);
-}

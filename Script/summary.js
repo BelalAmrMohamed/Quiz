@@ -9,6 +9,9 @@ import { exportToWord } from "./exportToWord.js";
 import { exportToPptx } from "./exportToPptx.js";
 import { exportToMarkdown } from "./exportToMarkdown.js";
 
+// Notifications
+import  {showNotificationBadge} from "./notifications.js";
+
 // Helpers
 const currentName = localStorage.getItem("username") || "User";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
@@ -129,36 +132,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userName = localStorage.getItem("username") || "User";
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
-    setTimeout(() => showNotification(badge, userName), index * 500);
+    setTimeout(() => showNotificationBadge(badge, userName), index * 500);
   });
 });
-
-function showNotification(badge, displayName) {
-  const notification = document.createElement("div");
-  notification.className = "notification";
-  notification.innerHTML = `
-    <div class="notification-content">
-      <span class="notification-icon">${badge.icon}</span>
-      <div>
-        <strong>Congratulations, ${displayName}!</strong>
-        <p>You've earned the ${badge.title} badge!</p>
-      </div>
-      <button class="close-btn">×</button>
-    </div>
-  `;
-  document.getElementById("notification-container").appendChild(notification);
-  setTimeout(() => notification.classList.add("show"), 100);
-  const timeout = setTimeout(() => removeNotification(notification), 5000);
-  notification.querySelector(".close-btn").addEventListener("click", () => {
-    clearTimeout(timeout);
-    removeNotification(notification);
-  });
-}
-
-function removeNotification(notif) {
-  notif.classList.add("hide");
-  setTimeout(() => notif.remove(), 300);
-}
 
 function goHome() {
   window.location.href = "index.html";

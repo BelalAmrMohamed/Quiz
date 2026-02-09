@@ -10,7 +10,17 @@ const path = require("path");
 // Files/Folders to ignore
 const IGNORE_NAMES = [
   ".git",
+  ".vscode",
   "Exams",
+  "images",
+  "LICENSE",
+  "README.md",
+  "_config.yml",
+  "favicon.png",
+  "manifest.json",
+  "robots.txt",
+  "sitemap.xml",
+  "service-worker.js",
   "Context Map.txt",
   "google0c1df2c3df22a824.html",
 ];
