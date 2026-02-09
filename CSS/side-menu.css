@@ -75,6 +75,12 @@
   transform: translateX(4px);
 }
 
+.menu-item.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
 .close-menu {
   width: 32px;
   height: 32px;
@@ -230,6 +236,21 @@
 }
 
 @media (max-width: 768px) {
+  .menu-container {
+    top: 10px;
+    right: 10px;
+  }
+
+  .hamburger {
+    font-size: 1.5rem;
+    padding: 5px 7px;
+    border-radius: 7px;
+  }
+
+  .hamburger:hover {
+    transform: scale(1.2);
+  }
+
   .side-menu {
     width: 300px;
     right: -300px;

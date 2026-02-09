@@ -129,14 +129,13 @@ function renderQuestion(question) {
             </div>
             <div class="collapsible-content" id="content-image-${question.id}">
                 <div class="form-group">
-                    <label>Image URL or Path</label>
+                    <label>Image URL</label>
                     <input 
                         type="text" 
                         id="question-image-${question.id}" 
-                        placeholder="https://example.com/image.jpg or ./path/to/image.jpg"
+                        placeholder="https://example.com/image.jpg"
                         value="${escapeHtml(question.image || "")}"
                     />
-                    <small class="text-muted">Supports web URLs (https://) or relative paths (./images/)</small>
                 </div>
             </div>
         </div>
@@ -473,9 +472,47 @@ window.saveToLocalStorage = function (silent = false) {
   } catch (error) {
     console.error("Error saving to localStorage:", error);
     if (!silent) {
-      showNotification("❌ Error saving draft", "error");
+      showNotification("Error saving draft", "error");
     }
   }
+};
+
+/* Function for the `🔁 Reset Page` button 
+   Resets the page so the user can start making a new quiz */
+window.resetPage = function () {
+  if (
+    !confirm(
+      "Are you sure you want to clear the entire quiz? This action cannot be undone.",
+    )
+  ) {
+    return;
+  }
+
+  // 1. Reset State
+  quizData = {
+    title: "",
+    description: "",
+    questions: [],
+  };
+  questionIdCounter = 0;
+
+  // 2. Reset UI Fields
+  const titleInput = document.getElementById("quizTitle");
+  const descInput = document.getElementById("quizDescription");
+  const container = document.getElementById("questionsContainer");
+
+  if (titleInput) titleInput.value = "";
+  if (descInput) descInput.value = "";
+  if (container) container.innerHTML = "";
+
+  // 3. Update UI State
+  updateEmptyState();
+
+  // 4. Save/Clear Local Storage Draft
+  saveToLocalStorage(true);
+
+  // 5. Notify User
+  showNotification("🧹 Page reset successfully", "success");
 };
 
 function loadDraftFromLocalStorage() {
@@ -562,7 +599,7 @@ window.exportQuiz = function () {
   const quizId = saveToUserQuizzes(quizData);
 
   if (!quizId) {
-    showNotification("❌ Error saving quiz", "error");
+    showNotification("Error saving quiz", "error");
     return;
   }
 
@@ -646,17 +683,17 @@ window.emailQuizToDeveloper = function () {
     // 1. Prepare quiz data
     const exportQuestions = quizData.questions.map((q) => {
       const question = { q: q.q };
-      
+
       // Add image only if it exists
       if (q.image && q.image.trim()) question.image = q.image;
-      
+
       question.options = q.options;
       question.correct = q.correct;
 
       // Add explanation only if it exists
       if (q.explanation && q.explanation.trim())
         question.explanation = q.explanation;
-      
+
       return question;
     });
 
@@ -670,7 +707,7 @@ window.emailQuizToDeveloper = function () {
     // We target only your specific known keys to avoid breaking text inside the questions
     const validKeys = ["q", "image", "options", "correct", "explanation"];
     const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
-    
+
     // Replace "q": with q:
     const jsObjectString = jsonString.replace(keyRegex, "$1:");
 
@@ -679,9 +716,8 @@ window.emailQuizToDeveloper = function () {
 
     const encodedBody = encodeURIComponent(fileContent);
     const mailtoLink = `mailto:${emailAddress}?subject=New Quiz Submission - ${quizData.title}&body=${encodedBody}`;
-    
-    window.location.href = mailtoLink;
 
+    window.location.href = mailtoLink;
   } catch (error) {
     console.error("Error submitting quiz:", error);
     showNotification(
@@ -705,14 +741,6 @@ window.sendToWhatsApp = function () {
     return;
   }
 
-  // Save to user_quizzes
-  const quizId = saveToUserQuizzes(quizData);
-
-  if (!quizId) {
-    showNotification("❌ Error saving quiz", "error");
-    return;
-  }
-
   // Convert to export format
   const exportQuestions = quizData.questions.map((q) => {
     const question = { q: q.q, options: q.options, correct: q.correct };
@@ -722,21 +750,21 @@ window.sendToWhatsApp = function () {
     return question;
   });
 
-    const fileHeader = `// ${quizData.title}.js`;
+  const fileHeader = `// ${quizData.title}.js`;
 
-    let jsonString = JSON.stringify(exportQuestions, null, 2);
+  let jsonString = JSON.stringify(exportQuestions, null, 2);
 
-    // 3. Regex to remove quotes from specific keys
-    // This finds "key": and replaces it with key:
-    // We target only your specific known keys to avoid breaking text inside the questions
-    const validKeys = ["q", "image", "options", "correct", "explanation"];
-    const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
-    
-    // Replace "q": with q:
-    const jsObjectString = jsonString.replace(keyRegex, "$1:");
+  // 3. Regex to remove quotes from specific keys
+  // This finds "key": and replaces it with key:
+  // We target only your specific known keys to avoid breaking text inside the questions
+  const validKeys = ["q", "image", "options", "correct", "explanation"];
+  const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
 
-    // 4. Construct the final file content
-    const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
+  // Replace "q": with q:
+  const jsObjectString = jsonString.replace(keyRegex, "$1:");
+
+  // 4. Construct the final file content
+  const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
 
   // Create WhatsApp message
   const message = `*New Quiz Submission*

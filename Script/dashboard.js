@@ -2,6 +2,8 @@
 import { gameEngine, BADGES } from "./gameEngine.js";
 import { examList } from "./examManifest.js";
 
+
+
 function refreshUI() {
   const user = gameEngine.getUserData();
   renderStats(user);
@@ -9,6 +11,13 @@ function refreshUI() {
   renderBookmarks(user);
   renderBadges(user);
   renderLeaderboard(user);
+  
+  // Update username display
+  const nameDisplay = document.getElementById("userNameDisplay");
+  if (nameDisplay) {
+    const currentName = localStorage.getItem("username") || "User";
+    nameDisplay.textContent = currentName;
+  }
 }
 
 // Delete history entry
@@ -214,7 +223,7 @@ function renderLeaderboard(user) {
   const displayName = localStorage.getItem("username") || "User";
   const currentUser = {
     name: `${displayName} (You)`,
-    points: user.totalPoints,
+    points: user.totalPoints || 0,
     isUser: true,
   };
 

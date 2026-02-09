@@ -470,6 +470,20 @@ body {
   font-weight: 500;
 }
 
+/* Username */
+.change-username {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+
+  position: relative;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-right: 0;
+  margin-left: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   body {

@@ -657,7 +657,7 @@ body {
   }
 
   .container {
-    padding: 10px;
+    padding: 0px;
   }
 
   .header {
@@ -687,6 +687,26 @@ body {
     gap: 10px;
   }
 
+  .questions-section {
+    padding: 10px;
+  }
+
+  .question-card {
+    padding: 15px;
+  }
+
+  .option-input {
+    padding: 0px 0px;
+    /* padding-right: 10px; */
+    margin-right: 5px;
+  }
+
+  .option-item {
+    flex-wrap: wrap;
+    padding-left: 5px;
+    padding-right: 0px;
+  }
+
   .action-bar {
     bottom: 10px;
   }
@@ -697,10 +717,6 @@ body {
 
   .action-buttons .btn {
     min-width: 100%;
-  }
-
-  .option-item {
-    flex-wrap: wrap;
   }
 
   .modal-card {
@@ -770,7 +786,7 @@ body {
   gap: 12px;
   font-weight: 500;
   transform-origin: right center;
-  
+
   /* Animations */
   animation: toastSlideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform, opacity;
@@ -780,7 +796,11 @@ body {
 /* Toast Themes */
 .notification-toast.success {
   border-left-color: var(--color-success);
-  background: linear-gradient(to right, var(--color-surface), var(--color-success-light) 150%);
+  background: linear-gradient(
+    to right,
+    var(--color-surface),
+    var(--color-success-light) 150%
+  );
 }
 
 .notification-toast.success .toast-icon {
@@ -789,7 +809,11 @@ body {
 
 .notification-toast.error {
   border-left-color: var(--color-error);
-  background: linear-gradient(to right, var(--color-surface), var(--color-error-light) 150%);
+  background: linear-gradient(
+    to right,
+    var(--color-surface),
+    var(--color-error-light) 150%
+  );
 }
 
 .notification-toast.error .toast-icon {
@@ -798,7 +822,11 @@ body {
 
 .notification-toast.info {
   border-left-color: var(--color-primary);
-  background: linear-gradient(to right, var(--color-surface), var(--color-primary-light) 150%);
+  background: linear-gradient(
+    to right,
+    var(--color-surface),
+    var(--color-primary-light) 150%
+  );
 }
 
 .notification-toast.info .toast-icon {

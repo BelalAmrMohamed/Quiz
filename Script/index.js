@@ -1100,7 +1100,7 @@ function createUserQuizCard(quiz, index) {
   `;
 
   const playBtn = document.createElement("button");
-  playBtn.textContent = "▶️ Play Quiz";
+  playBtn.textContent = "Start Quiz";
   playBtn.className = "btn btn-primary";
   playBtn.style.cssText = `
     flex: 1;
@@ -1136,18 +1136,23 @@ function createUserQuizCard(quiz, index) {
   };
 
   const downloadBtn = document.createElement("button");
-  downloadBtn.textContent = "📥 Download";
+  downloadBtn.textContent = "Download";
+  playBtn.className = "btn btn-primary";
   downloadBtn.style.cssText = `
-    padding: 10px 14px;
-    background: var(--color-tertiary); /* Use a distinct color or variable */
+    flex: 1;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s;
-    background-color: #64748b; /* Fallback/Specific color for download */
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
   `;
+
+  downloadBtn.style.boxShadow = "";
+
   downloadBtn.title = "Download Quiz";
   downloadBtn.onclick = (e) => {
     e.stopPropagation();

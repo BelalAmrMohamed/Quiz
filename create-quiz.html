@@ -39,7 +39,6 @@
 </head>
 
 <body>
-    <!-- Hamburger Menu (matching index.html) -->
     <div class="menu-container">
         <button class="hamburger" id="menuBtn"
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
@@ -54,11 +53,7 @@
             </div>
             <nav>
                 <a href="index.html" class="menu-item">🏠 Home</a>
-                <a href="dashboard.html" class="menu-item">📊 Performance Dashboard</a>
-                <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
-
-                <div class="menu-divider"></div>
-
+                <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
                 <a href="create-quiz.html" class="menu-item active">✏️ Create Quiz</a>
 
                 <div class="menu-divider"></div>
@@ -164,8 +159,8 @@
                     <button class="btn btn-secondary" onclick="previewQuiz()">
                         👁️ Preview
                     </button>
-                    <button class="btn btn-secondary" onclick="saveToLocalStorage()">
-                        💾 Save Draft
+                    <button class="btn btn-secondary" onclick="resetPage()">
+                        🔁 Reset Page
                     </button>
                     <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
                         📧 Email to Developer

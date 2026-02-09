@@ -1242,12 +1242,6 @@ DARK SLATE THEME
 }
 
 /* ==================== MENU ITEM ACTIVE STATE ==================== */
-.menu-item.active {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-weight: 700;
-}
-
 [data-theme="dark-slate"] .menu-item.active {
   background: rgba(99, 102, 241, 0.2);
   color: #818cf8;
