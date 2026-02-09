@@ -20,6 +20,8 @@ import {
   getAvailableTerms,
 } from "./filterUtils.js";
 
+import { confirmationNotification } from "./notifications.js";
+
 const container = document.getElementById("contentArea");
 const title = document.getElementById("pageTitle");
 const breadcrumb = document.getElementById("breadcrumb");
@@ -1191,9 +1193,9 @@ function playUserQuiz(quiz) {
 /**
  * Delete a user-created quiz
  */
-function deleteUserQuiz(quizId, index) {
+async function deleteUserQuiz(quizId, index) {
   if (
-    !confirm(
+    !await confirmationNotification(
       "Are you sure you want to delete this quiz? This cannot be undone.",
     )
   ) {

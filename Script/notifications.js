@@ -1,6 +1,6 @@
 // Script/notifications.js
 // Import in a JS file:
-// import  { showNotification, showNotificationBadge, confirmationNotification} from "./notifications.js";
+// import { showNotification, showNotificationBadge, confirmationNotification } from "./notifications.js";
 // Include the CSS file in an HTML page:
 // <link rel="stylesheet" href="CSS/notificatinos.css">
 

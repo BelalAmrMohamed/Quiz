@@ -2,6 +2,7 @@
 import { gameEngine, BADGES } from "./gameEngine.js";
 import { examList } from "./examManifest.js";
 
+import { confirmationNotification } from "./notifications.js";
 
 
 function refreshUI() {
@@ -21,8 +22,8 @@ function refreshUI() {
 }
 
 // Delete history entry
-window.deleteHistory = function (index) {
-  if (!confirm("Are you sure you want to delete this quiz result?")) return;
+window.deleteHistory = async function (index) {
+  if (!await confirmationNotification("Are you sure you want to delete this quiz result?")) return;
 
   const user = gameEngine.getUserData();
   user.history.splice(index, 1);
@@ -33,8 +34,8 @@ window.deleteHistory = function (index) {
 };
 
 // Remove bookmark
-window.removeBookmark = function (key) {
-  if (!confirm("Remove this bookmark?")) return;
+window.removeBookmark = async function (key) {
+  if (!await confirmationNotification("Remove this bookmark?")) return;
 
   const user = gameEngine.getUserData();
   if (user.bookmarks && user.bookmarks[key]) {
