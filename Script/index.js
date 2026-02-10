@@ -24,7 +24,7 @@ import {
 import { confirmationNotification } from "./notifications.js";
 
 const container = document.getElementById("contentArea");
-const title = document.getElementById("pageTitle");
+const title = document.getElementById("Subjects-text");
 const breadcrumb = document.getElementById("breadcrumb");
 
 // ============================================================================
@@ -33,20 +33,19 @@ const breadcrumb = document.getElementById("breadcrumb");
 
 const userNameBadge = document.getElementById("user-name");
 
-// Gamified welcome message pool
+// Gamified welcome message pool — FIXED
 const welcomeMessages = [
-  (name) => `🏆 ${name}أهلاً بعودة البطل`,  
-  (name) => `🚀 ${name} لم تطل الغيبة، لنواصل الإنجاز يا`,
-  (name) => `🎮 ${name} التحدي يناديك، هل أنت مستعد يا`,    
-  (name) => `🔔 ${name}تم فتح تحدٍ جديد بانتظارك يا `,
-  (name) => `✨ ${name}رحلتك مستمرة يا`,
-  (name) => `🔥 ${name}شعلة الحماس لا تنطفئ! عُد للأجواء يا`,
-  (name) => `🧠 ${name}جرعة معرفة إضافية جاهزة من أجلك يا`,
-  (name) => `⚡ ${name}نقاط خبرة مضاعفة في الطريق! أهلاً بك يا `,
-  (name) => `📈 ${name}تقدمك ملحوظ.. استمر في التألق يا `,
-  (name) => `👑 ${name}الأسطورة يعود من جديد.. أهلاً بك يا `,
+  (name) => `🏆 أهلاً بعودة البطل يا ${name}`,
+  (name) => `🚀 لم تطل الغيبة، لنواصل الإنجاز يا ${name}`,
+  (name) => `🎮 التحدي يناديك، هل أنت مستعد يا ${name}`,
+  (name) => `🔔 تم فتح تحدٍ جديد بانتظارك يا ${name}`,
+  (name) => `✨ رحلتك مستمرة يا ${name}`,
+  (name) => `🔥 شعلة الحماس لا تنطفئ! عُد للأجواء يا ${name}`,
+  (name) => `🧠 جرعة معرفة إضافية جاهزة من أجلك يا ${name}`,
+  (name) => `⚡ نقاط خبرة مضاعفة في الطريق! أهلاً بك يا ${name}`,
+  (name) => `📈 تقدمك ملحوظ.. استمر في التألق يا ${name}`,
+  (name) => `👑 الأسطورة يعود من جديد.. أهلاً بك يا ${name}`,
 ];
-
     const opts = [
       ["./favicon.png", "Quiz (.html)", "quiz"],
       ["./images/HTML_Icon.png", "HTML (.html)", "html"],
@@ -861,12 +860,11 @@ function renderRootCategories() {
   // Get subscribed courses
   const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
 
-  const subject = document.getElementById("Subjects-text");
   // Title based on subscription status
   if (subscribedCourses.length > 0) {
-    subject.textContent = "المواد خاصتي";
+    title.textContent = "المواد خاصتي";
   } else {
-    subject.textContent = "جميع المواد";
+    title.textContent = "جميع المواد";
   }
 
   container.innerHTML = "";

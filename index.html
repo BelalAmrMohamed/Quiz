@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
@@ -7,17 +7,23 @@
     <title>منصة إمتحانات بصمجي</title>
     <link rel="icon" href="favicon.png" type="image/png">
 
-    <!-- meta tags -->
+    <!-- Meta tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="منصة تعليمية تحتوي على مكتبة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات.">
+    <meta name="theme-color" content="#0088cc">
+    <meta name="description"
+        content="منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات.">
     <meta name="author" content="Belal Amr Mohamed">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://basmagi-quiz.vercel.app/">
 
-    <!-- Open Graph Meta Tags -->
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="بصمجي كويز">
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://basmagi-quiz.vercel.app/">
     <meta property="og:title" content="منصة إمتحانات البصمجي: إختبر أدائك في الإمتحانات بجميع المستويات">
@@ -28,7 +34,7 @@
     <meta property="og:site_name" content="منصة إمتحانات البصمجي">
     <meta property="og:locale" content="ar_AR">
 
-    <!-- Twitter Meta Tags -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BelalAmrDev">
     <meta name="twitter:creator" content="@BelalAmrDev">
@@ -37,61 +43,41 @@
     <meta name="twitter:description" content="إختبر قدراتك في الإمتحانات النهائية">
     <meta name="twitter:image" content="https://basmagi-quiz.vercel.app/images/thumbnail.png">
 
-    <meta name="robots" content="index, follow">
-
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#0088cc">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Quiz Master">
-
-    <!-- PWA Manifest -->
+    <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="images/icon.png">
 
+    <!-- Structured Data -->
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Quiz",
-        "name": "College Quiz: All Subjects",
-        "about": "Study aid for college courses—test your knowledge with quizzes on All Subjects.",
-        "url": "https://basmagi-quiz.vercel.app/",
-        "typicalAgeRange": "18-",
-        "educationalAlignment": {
-        "@type": "AlignmentObject",
-        "alignmentType": "educationalSubject",
-        "targetName": "All Subjects"
-        }
+  {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    "name": "College Quiz: All Subjects",
+    "about": "Study aid for college courses—test your knowledge with quizzes on All Subjects.",
+    "url": "https://basmagi-quiz.vercel.app/",
+    "inLanguage": "ar",
+    "typicalAgeRange": "18-",
+    "educationalAlignment": {
+      "@type": "AlignmentObject",
+      "alignmentType": "educationalSubject",
+      "targetName": "All Subjects"
     }
-    </script>
+  }
+  </script>
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "name": "منصة إمتحانات بصمجي",
-        "item": "https://basmagi-quiz.vercel.app/"
-      },{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "إنشاء إمتحانات",
-        "item": "https://basmagi-quiz.vercel.app/create-quiz.html"
-      },{
-        "@type": "ListItem",
-        "position": 3,
-        "name": "اللائحة",
-        "item": "https://basmagi-quiz.vercel.app/dashboard.html"
-      }]
-    }
-    </script>
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "منصة إمتحانات بصمجي",   "item": "https://basmagi-quiz.vercel.app/" },
+      { "@type": "ListItem", "position": 2, "name": "إنشاء إمتحانات",          "item": "https://basmagi-quiz.vercel.app/create-quiz.html" },
+      { "@type": "ListItem", "position": 3, "name": "اللائحة",                  "item": "https://basmagi-quiz.vercel.app/dashboard.html" }
+    ]
+  }
+  </script>
 
-    <!-- CRITICAL: Anti-flash script -->
+    <!-- CRITICAL: Anti-flash theme script (must run before paint) -->
     <script>
         (function () {
             const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
@@ -101,10 +87,13 @@
         })();
     </script>
 
-    <!-- Fonts -->
+    <!-- Fonts: Inter (Latin) + Tajawal (Arabic) — both from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="CSS/themes.css">
@@ -113,44 +102,48 @@
     <link rel="stylesheet" href="CSS/notificatinos.css">
     <link rel="stylesheet" href="CSS/profile-styles.css">
 
-    <!-- Theme Controller Script -->
+    <!-- Controller Scripts -->
     <script type="module" src="Script/theme-controller.js"></script>
-
-    <!-- Canvas Animation Script - Only loads if user enabled animations -->
     <script type="module" src="Script/canvas-animation.js"></script>
 </head>
 
 <body>
+
     <div class="menu-container">
-        <button class="hamburger" id="menuBtn"
+        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu"
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
-        <div class="side-menu" id="sideMenu">
+
+        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية">
             <div class="menu-header">
                 <h3>القائمة</h3>
-                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="close-menu" aria-label="إغلاق القائمة"
+                    onclick="document.getElementById('sideMenu').classList.remove('open')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        aria-hidden="true">
                         <path d="M18 6L6 18M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
-            <nav>
+
+            <nav role="navigation" aria-label="روابط التنقل">
                 <a href="index.html" class="menu-item active">🏠 الصفحة الرئيسية</a>
                 <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
                 <a href="create-quiz.html" class="menu-item">✏️ إنشاء إمتحانات</a>
 
+                <div class="menu-divider" role="separator"></div>
 
-                <div class="menu-divider"></div>
                 <button
                     onclick="window.openProfileSettings(); document.getElementById('sideMenu').classList.remove('open')"
                     class="menu-item">
-                    الملف الشخصي ⚙️
+                    ⚙️ الملف الشخصي
                 </button>
                 <button
                     onclick="window.openCourseManager(); document.getElementById('sideMenu').classList.remove('open')"
                     class="menu-item">
-                    إضافة/حذف مواد 📚
+                    📚 إضافة/حذف مواد
                 </button>
-                <div class="menu-divider"></div>
+
+                <div class="menu-divider" role="separator"></div>
 
                 <!-- THEME CONTROLS -->
                 <div class="theme-controls-section">
@@ -158,67 +151,73 @@
                     <div class="theme-selector-grid">
                         <button class="theme-selector-btn" data-theme="light">
                             <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">المظهر الفاتح</span>
+                            <span class="theme-btn-label">الفاتح</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate">
                             <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">المظهر الأزرق</span>
+                            <span class="theme-btn-label">الأزرق</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark">
                             <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">المظهر الداكن</span>
+                            <span class="theme-btn-label">الداكن</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">الرسوم</div>
+                    <div class="animation-section-header">الرسوم المتحركة</div>
                     <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                         <div class="animation-toggle-label">
                             <span class="animation-toggle-icon">✨</span>
-                            <span>الرسوم المتحركة</span>
+                            <span>تفعيل الرسوم</span>
                         </div>
-                        <div class="toggle-switch active animation-toggle-switch"></div>
+                        <div class="toggle-switch active animation-toggle-switch" role="switch" aria-checked="true">
+                        </div>
                     </div>
 
-                    <p class="theme-info-text">
-                        عطّل الرسوم المتحركة لتحسين الأداء 💡
-                    </p>
+                    <p class="theme-info-text">عطّل الرسوم لتحسين الأداء 💡</p>
 
-                    <!-- This button should be connected to the browser's install message -->
-                    <div class="menu-divider"></div>
-                    <button class="menu-item install-app">تثبيت التطبيق 📱</button>
+                    <div class="menu-divider" role="separator"></div>
+                    <button class="menu-item install-app">📱 تثبيت التطبيق</button>
                 </div>
-                <!-- End of the theme controls -->
-
             </nav>
         </div>
     </div>
 
     <div class="container">
-        <!-- Breadcrumb -->
-        <div id="breadcrumb">
+
+        <div id="breadcrumb" class="rtl-arrow" role="navigation" aria-label="مسار التصفح">
             <span class="breadcrumb-text">الرجوع إلى المواد</span>
         </div>
 
-        <!-- Premium Header -->
-        <div class="header">
+        <header class="header" role="banner">
             <div class="header-content">
-                <div class="header-badge" id="user-name" onclick="changeUsername()"></div>
+
+                <!-- Personalised greeting pill (JS sets innerHTML) -->
+                <div class="header-badge" id="user-name" onclick="changeUsername()" aria-live="polite"></div>
+
+                <!-- Platform title -->
                 <h1 id="pageTitle">منصة إمتحانات بصمجي</h1>
-                <p>طور معرفتك من خلال الاختبارات التفاعلية المصممة لتحفيزك</p>
+
+                <!-- Value-proposition subtitle -->
+                <p>طوِّر معرفتك من خلال الاختبارات التفاعلية المصممة لتحفيزك على التميز</p>
+
                 <div id="Subjects-text">جميع المواد</div>
             </div>
-        </div>
+        </header>
 
-        <!-- Content Area -->
-        <div id="contentArea" class="loading">
-            <p>Preparing your learning experience...</p>
-        </div>
+        <main id="contentArea" class="loading" aria-live="polite" aria-busy="true">
+            <p>جارٍ تحضير تجربتك التعليمية...</p>
+        </main>
 
-        <!-- Premium Footer -->
-        <div class="watermark">Crafted by Belal Amr | <a target="_blank"
-                href="https://portfolio-of-belal.vercel.app/">Portfolio</a></div>
+        <footer class="watermark">
+            صُنع بعناية بواسطة بلال عمرو &nbsp;|&nbsp;
+            <a target="_blank" rel="noopener noreferrer" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
+        </footer>
+
     </div>
+
+    <!-- Main page script -->
     <script type="module" src="Script/index.js"></script>
+
 </body>
 
 </html>
