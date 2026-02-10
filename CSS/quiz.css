@@ -48,6 +48,8 @@ body {
   align-items: center;
   gap: 32px;
   flex: 1;
+
+  direction: ltr;
 }
 
 .hamburger-stats {
@@ -289,6 +291,10 @@ body {
 .header-title-section {
   flex: 1;
   min-width: 0;
+
+  /* Start from left, because most quiz titles are English */
+  text-align: left;
+  direction: ltr;
 }
 
 .header h1 {

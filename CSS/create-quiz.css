@@ -49,6 +49,9 @@ body {
   cursor: pointer;
   transition: transform 0.2s ease;
   width: fit-content;
+
+  margin-right: auto;
+  direction: ltr;
 }
 
 #breadcrumb:hover {
@@ -640,9 +643,11 @@ body {
 
 .watermark {
   text-align: center;
-  padding: 30px 20px;
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  margin-top: 80px;
+  padding-top: 40px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 0.9375rem;
+  font-weight: 500;
 }
 
 .watermark a {
@@ -653,6 +658,11 @@ body {
 
 .watermark a:hover {
   text-decoration: underline;
+}
+
+.watermark::before {
+  content: "✨ ";
+  font-size: 1.25rem;
 }
 
 /* ============================================================================

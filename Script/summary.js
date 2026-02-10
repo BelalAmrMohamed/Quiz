@@ -120,7 +120,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderHeader(
     scoreHeader,
     scoreDisplay,
-    // statsDisplay,
     result,
     totalScorable,
     correct,
@@ -144,7 +143,6 @@ function goHome() {
 function renderHeader(
   scoreHeader,
   scoreDisplay,
-  // statsDisplay,
   data,
   total,
   correct,

@@ -225,3 +225,4 @@ export const themeManager = {
 
 // Auto-initialize when script loads
 themeManager.init();
+window.themeManager = themeManager;

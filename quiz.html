@@ -65,6 +65,9 @@
 <body>
     <!-- The status bar at the top -->
     <div class="stats-bar" id="statsBar">
+        <button class="hamburger-stats" id="menuBtn"
+            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+
         <div class="stats-content">
             <div class="stat-item">
                 <span class="stat-icon">⭐</span>
@@ -79,9 +82,6 @@
                 <span class="stat-value" id="statStreak">0 day</span>
             </div>
         </div>
-
-        <button class="hamburger-stats" id="menuBtn"
-            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
     </div>
 
     <!-- The side menu -->
@@ -112,34 +112,34 @@
 
             <!-- NEW THEME CONTROLS -->
             <div class="theme-controls-section">
-                <div class="theme-section-header">مظهر المنصة</div>
-                <div class="theme-selector-grid">
-                    <button class="theme-selector-btn" data-theme="light">
-                        <span class="theme-btn-icon">☀️</span>
-                        <span class="theme-btn-label">المظهر الفاتح</span>
+                <div class="theme-section-header">
+                    <span>🏞️</span> الخلفية
+                </div>
+                <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
+                    <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                        <span class="theme-btn-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-btn-label">البيضاء</span>
                     </button>
-                    <button class="theme-selector-btn" data-theme="dark-slate">
-                        <span class="theme-btn-icon">🌙</span>
-                        <span class="theme-btn-label">المظهر الأزرق</span>
+                    <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
+                        <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-btn-label">الزرقاء</span>
                     </button>
-                    <button class="theme-selector-btn" data-theme="dark">
-                        <span class="theme-btn-icon">🌑</span>
-                        <span class="theme-btn-label">المظهر الداكن</span>
+                    <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                        <span class="theme-btn-icon" aria-hidden="true">🌑</span>
+                        <span class="theme-btn-label">السوداء</span>
                     </button>
                 </div>
 
-                <div class="animation-section-header">الرسوم</div>
-                <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
-                    <div class="animation-toggle-label">
-                        <span class="animation-toggle-icon">✨</span>
-                        <span>الرسوم المتحركة</span>
-                    </div>
-                    <div class="toggle-switch active animation-toggle-switch"></div>
+                <div class="animation-section-header">
+                    <span>✨</span> الرسوم المتحركة
                 </div>
-
-                <p class="theme-info-text">
-                    عطل الرسوم المتحركة لتحسين الأداء 💡
-                </p>
+                <label class="animation-toggle-container">
+                    <span class="animation-toggle-label">تفعيل الرسوم</span>
+                    <input type="checkbox" id="animationToggle" class="toggle-input" data-control="animations" checked
+                        aria-label="تفعيل الرسوم المتحركة">
+                    <span class="toggle-switch" aria-hidden="true"></span>
+                </label>
+                <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
             </div>
             <!-- End of the new theme cotrolls -->
 

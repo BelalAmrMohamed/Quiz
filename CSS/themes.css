@@ -230,35 +230,22 @@ body {
     border-color 0.3s ease;
 }
 
-/* Menu elements */
-.side-menu,
-.hamburger {
-  background: var(--color-surface);
-  border-color: var(--color-border);
+/* Solution for showing the side bar at the right, and the rest normally rtl */
+.side-menu nav {
+  direction: ltr; 
+}
+
+.side-menu nav > * {
+  direction: rtl; 
+}
+
+[data-theme="light"] .hamburger-icon{
   color: var(--color-text-primary);
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    color 0.3s ease;
 }
 
-.menu-item {
+[data-theme="dark-slate"] .hamburger-icon,
+[data-theme="dark"] .hamburger-icon {
   color: var(--color-text-primary);
-  transition: color 0.3s ease;
-}
-
-.menu-item:hover {
-  background: var(--color-primary-light);
-}
-
-/* Breadcrumb */
-#breadcrumb {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(var(--blur-md));
-  border-color: rgba(255, 255, 255, 0.8);
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
 }
 
 [data-theme="dark-slate"] #breadcrumb,
@@ -674,20 +661,20 @@ body {
 }
 
 /* Side menu scrollbar */
-.side-menu::-webkit-scrollbar {
+.side-menu nav::-webkit-scrollbar {
   width: 6px;
 }
 
-.side-menu::-webkit-scrollbar-track {
+.side-menu nav::-webkit-scrollbar-track {
   background: var(--color-background-secondary);
 }
 
-.side-menu::-webkit-scrollbar-thumb {
+.side-menu nav::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 3px;
 }
 
-.side-menu::-webkit-scrollbar-thumb:hover {
+.side-menu nav::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-tertiary);
 }
 

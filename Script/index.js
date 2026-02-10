@@ -968,6 +968,7 @@ function renderUserQuizzesView() {
         font-weight: 600;
         box-shadow: var(--shadow-md);
         transition: transform 0.2s;
+        margin-left: auto;
     `;
     createBtn.onmouseover = () => {
       createBtn.style.transform = "translateY(-2px)";

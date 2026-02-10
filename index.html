@@ -105,22 +105,34 @@
     <!-- Controller Scripts -->
     <script type="module" src="Script/theme-controller.js"></script>
     <script type="module" src="Script/canvas-animation.js"></script>
+
+
 </head>
 
 <body>
 
     <div class="menu-container">
-        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu"
-            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
+            <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+                <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-mid" x1="2" y1="11" x2="20" y2="11" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-bottom" x1="2" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+            </svg>
+        </button>
 
-        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية">
+        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
+
+        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
+            aria-hidden="true">
             <div class="menu-header">
                 <h3>القائمة</h3>
-                <button class="close-menu" aria-label="إغلاق القائمة"
-                    onclick="document.getElementById('sideMenu').classList.remove('open')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        aria-hidden="true">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
+                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -132,55 +144,48 @@
 
                 <div class="menu-divider" role="separator"></div>
 
-                <button
-                    onclick="window.openProfileSettings(); document.getElementById('sideMenu').classList.remove('open')"
-                    class="menu-item">
-                    ⚙️ الملف الشخصي
-                </button>
-                <button
-                    onclick="window.openCourseManager(); document.getElementById('sideMenu').classList.remove('open')"
-                    class="menu-item">
-                    📚 إضافة/حذف مواد
-                </button>
+                <button class="menu-item" data-action="openProfileSettings">⚙️ الملف الشخصي</button>
+                <button class="menu-item" data-action="openCourseManager">📚 إضافة/حذف مواد</button>
 
                 <div class="menu-divider" role="separator"></div>
 
-                <!-- THEME CONTROLS -->
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">المظهر</div>
-                    <div class="theme-selector-grid">
-                        <button class="theme-selector-btn" data-theme="light">
-                            <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">الفاتح</span>
+                    <div class="theme-section-header">
+                        <span>🏞️</span> الخلفية
+                    </div>
+                    <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">☀️</span>
+                            <span class="theme-btn-label">البيضاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark-slate">
-                            <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">الأزرق</span>
+                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark">
-                            <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">الداكن</span>
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">🌑</span>
+                            <span class="theme-btn-label">السوداء</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">الرسوم المتحركة</div>
-                    <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
-                        <div class="animation-toggle-label">
-                            <span class="animation-toggle-icon">✨</span>
-                            <span>تفعيل الرسوم</span>
-                        </div>
-                        <div class="toggle-switch active animation-toggle-switch" role="switch" aria-checked="true">
-                        </div>
+                    <div class="animation-section-header">
+                        <span>✨</span> الرسوم المتحركة
                     </div>
-
-                    <p class="theme-info-text">عطّل الرسوم لتحسين الأداء 💡</p>
+                    <label class="animation-toggle-container">
+                        <span class="animation-toggle-label">تفعيل الرسوم</span>
+                        <input type="checkbox" id="animationToggle" class="toggle-input" data-control="animations"
+                            checked aria-label="تفعيل الرسوم المتحركة">
+                        <span class="toggle-switch" aria-hidden="true"></span>
+                    </label>
+                    <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
 
                     <div class="menu-divider" role="separator"></div>
-                    <button class="menu-item install-app">📱 تثبيت التطبيق</button>
+                    <button class="menu-item install-app" data-action="installApp">📱 تثبيت التطبيق</button>
                 </div>
             </nav>
         </div>
     </div>
+
 
     <div class="container">
 
@@ -217,7 +222,7 @@
 
     <!-- Main page script -->
     <script type="module" src="Script/index.js"></script>
-
+    <script type="module" src="Script/side-menu.js"></script>
 </body>
 
 </html>

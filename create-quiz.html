@@ -41,61 +41,79 @@
 
 <body>
     <div class="menu-container">
-        <button class="hamburger" id="menuBtn"
-            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
-        <div class="side-menu" id="sideMenu">
+        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
+            <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+                <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-mid" x1="2" y1="11" x2="20" y2="11" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-bottom" x1="2" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+            </svg>
+        </button>
+
+        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
+
+        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
+            aria-hidden="true">
             <div class="menu-header">
                 <h3>القائمة</h3>
-                <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
+                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <nav>
+
+            <nav role="navigation" aria-label="روابط التنقل">
                 <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
                 <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
                 <a href="create-quiz.html" class="menu-item active">✏️ إنشاء إمتحانات</a>
 
-                <div class="menu-divider"></div>
-                <!-- THEME CONTROLS -->
+                <div class="menu-divider" role="separator"></div>
+
+                <button class="menu-item" data-action="openProfileSettings">⚙️ الملف الشخصي</button>
+                <button class="menu-item" data-action="openCourseManager">📚 إضافة/حذف مواد</button>
+
+                <div class="menu-divider" role="separator"></div>
+
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">المظهر</div>
-                    <div class="theme-selector-grid">
-                        <button class="theme-selector-btn" data-theme="light">
-                            <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">المظهر الفاتح</span>
+                    <div class="theme-section-header">
+                        <span>🏞️</span> الخلفية
+                    </div>
+                    <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">☀️</span>
+                            <span class="theme-btn-label">البيضاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark-slate">
-                            <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">المظهر الأزرق</span>
+                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark">
-                            <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">المظهر الداكن</span>
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true">🌑</span>
+                            <span class="theme-btn-label">السوداء</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">الرسومات</div>
-                    <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
-                        <div class="animation-toggle-label">
-                            <span class="animation-toggle-icon">✨</span>
-                            <span>الرسومات المتحركة</span>
-                        </div>
-                        <div class="toggle-switch active animation-toggle-switch"></div>
+                    <div class="animation-section-header">
+                        <span>✨</span> الرسوم المتحركة
                     </div>
+                    <label class="animation-toggle-container">
+                        <span class="animation-toggle-label">تفعيل الرسوم</span>
+                        <input type="checkbox" id="animationToggle" class="toggle-input" data-control="animations"
+                            checked aria-label="تفعيل الرسوم المتحركة">
+                        <span class="toggle-switch" aria-hidden="true"></span>
+                    </label>
+                    <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
 
-                    <p class="theme-info-text">
-                        عطّل الرسوم المتحركة لتحسين الأداء 💡
-                    </p>
-
-                    <div class="menu-divider"></div>
-                    <button class="menu-item install-app">تثبيت التطبيق 📱</button>
+                    <div class="menu-divider" role="separator"></div>
+                    <button class="menu-item install-app" data-action="installApp">📱 تثبيت التطبيق</button>
                 </div>
             </nav>
         </div>
     </div>
-
     <div class="container">
         <!-- Breadcrumb -->
         <div id="breadcrumb">
@@ -105,8 +123,8 @@
         <!-- Header -->
         <div class="header">
             <div class="header-content">
-                <h1>✏️ أنشئ اختبارك الخاص</h1>
-                <p>صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وتفسيرات.</p>
+                <h1>أنشئ اختبارك الخاص ✏️</h1>
+                <p>صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح.</p>
             </div>
         </div>
 
@@ -117,7 +135,7 @@
                 <h2>📋 معلومات عن الاختبار</h2>
                 <div class="form-group">
                     <label for="quizTitle">عنوان الاختبار *</label>
-                    <input type="text" id="quizTitle" placeholder="مثال: إمحتان لغة ال C++ عن المصفوفات" required>
+                    <input type="text" id="quizTitle" placeholder="مثال: إمتحان لغة ال ++C عن المصفوفات" required>
                 </div>
                 <div class="form-group">
                     <label for="quizDescription">وصف الإمتحان (إختياري)</label>
@@ -171,9 +189,9 @@
         </div>
 
         <!-- Footer -->
-        <div class="watermark">
-            Crafted by Belal Amr | <a target="_blank" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
-        </div>
+        <footer class="watermark">
+            صُنع بعناية بواسطة بلال عمرو &nbsp;|&nbsp;
+            <a target="_blank" rel="noopener noreferrer" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
     </div>
 
     <!-- Preview Modal -->
@@ -193,6 +211,7 @@
     </div>
 
     <script type="module" src="Script/create-quiz.js"></script>
+    <script type="module" src="Script/side-menu.js"></script>
 </body>
 
 </html>

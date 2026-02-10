@@ -92,9 +92,9 @@ function updateGamificationStats() {
   const userData = gameEngine.getUserData();
   const levelInfo = gameEngine.calculateLevel(userData.totalPoints);
 
-  if (els.statLevel) els.statLevel.textContent = `Lv ${levelInfo.level}`;
+  if (els.statLevel) els.statLevel.textContent = `Lv ${levelInfo.level || 0}`;
   if (els.statPoints)
-    els.statPoints.textContent = `${userData.totalPoints} pts`;
+    els.statPoints.textContent = `${userData.totalPoints || 0} pts`;
   if (els.statStreak) {
     const streak = userData.streaks?.currentDaily || 0;
     els.statStreak.textContent = `${streak} day${streak !== 1 ? "s" : ""}`;
