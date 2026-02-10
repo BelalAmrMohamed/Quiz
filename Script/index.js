@@ -20,6 +20,7 @@ import {
   getAvailableTerms,
 } from "./filterUtils.js";
 
+// Notifications
 import { confirmationNotification } from "./notifications.js";
 
 const container = document.getElementById("contentArea");

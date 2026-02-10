@@ -1,4 +1,6 @@
 // Script/gameEngine.js - Enhanced with Levels, Streaks, and More Badges
+import  { showNotification } from "./notifications.js";
+
 const STORAGE_KEY = "quiz_user_profile";
 
 // Initial State
@@ -589,11 +591,15 @@ export const gameEngine = {
 
     if (user.bookmarks && user.bookmarks[key]) {
       delete user.bookmarks[key];
+    
     } else {
       if (!user.bookmarks) user.bookmarks = {};
       user.bookmarks[key] = { note: "", timestamp: Date.now() };
+      
     }
     this.saveUserData(user);
+    if (!this.isBookmarked(examId, questionIdx)) showNotification(`Question ${questionIdx + 1} Removed from bookmarks.`);
+    else showNotification(`Question ${questionIdx + 1} added to bookmarks, Check in Dashboard.`, "success");
     return !!user.bookmarks[key];
   },
 
@@ -615,6 +621,9 @@ export const gameEngine = {
     }
 
     this.saveUserData(user);
+    if (!this.isFlagged(examId, questionIdx)) showNotification(`Question ${questionIdx + 1} Unflagged.`);
+    else showNotification(`Question ${questionIdx + 1} flagged for review.`, "success");
+
     return !!user.flags[key];
   },
 

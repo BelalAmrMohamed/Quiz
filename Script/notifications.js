@@ -4,23 +4,51 @@
 // Include the CSS file in an HTML page:
 // <link rel="stylesheet" href="CSS/notificatinos.css">
 
+// ==================
+// Notification Badge
+// ==================
 
-export function showNotificationBadge(badge, displayName) {
+export function showNotificationBadge(strongText, message = "", icon = "info") {
   const notification = document.createElement("div");
-  notification.className = "notification";
+  switch (icon){
+    case "info":
+      icon = "ℹ️";
+      notification.className = "notification info";
+      break;
+
+      case "success":
+      icon = "✅";
+      notification.className = "notification success";
+      break;
+
+      case "error":        
+      icon = "❌";
+      notification.className = "notification error";
+      break;
+
+      case "warning":
+      icon = "⚠️";
+      notification.className = "notification warning";
+      break;
+
+      default:
+      notification.className = "notification";
+
+  }  
   notification.innerHTML = `
     <div class="notification-content">
-      <span class="notification-icon">${badge.icon}</span>
+    
+    ${isURL(icon) ? `<img src="${icon}" alt="Context Icon" class="notification-image">` : `<span class="notification-icon">${icon}</span>`}      
       <div>
-        <strong>Congratulations, ${displayName}!</strong>
-        <p>You've earned the ${badge.title} badge!</p>
+        <strong>${strongText}!</strong>
+        <p>${message}</p>
       </div>
       <button class="close-btn">×</button>
     </div>
   `;
   document.getElementById("notification-container").appendChild(notification);
   setTimeout(() => notification.classList.add("show"), 100);
-  const timeout = setTimeout(() => removeNotificationBadge(notification), 5000);
+  const timeout = setTimeout(() => removeNotificationBadge(notification), 50000);
   notification.querySelector(".close-btn").addEventListener("click", () => {
     clearTimeout(timeout);
     removeNotificationBadge(notification);
@@ -32,6 +60,15 @@ function removeNotificationBadge(notif) {
   setTimeout(() => notif.remove(), 300);
 }
 
+function isURL(string) {
+  try {
+    const url = new URL(string);
+    // Optional: Ensure the protocol is http or https
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;  
+  }
+}
 /* ============================ 
     Smaller notifications
    ============================ */

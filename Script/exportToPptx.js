@@ -205,7 +205,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       });
 
       // User Name / Subtitle
-      slide.addText(`User: ${currentName}`, {
+      slide.addText(currentName, {
         x: MARGIN + USABLE_WIDTH * 0.6,
         y: 0.15,
         w: USABLE_WIDTH * 0.4,

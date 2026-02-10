@@ -1,6 +1,6 @@
 // Script/create-quiz.js - Enhanced Quiz Creator with Integrated Storage
 
-import  {showNotification} from "./notifications.js";
+import  { showNotification, confirmationNotification } from "./notifications.js";
 
 const phoneNumber = "201118482193"; // My number
 const emailAddress = "belalamrofficial@gmail.com"; // My email
@@ -66,8 +66,8 @@ window.addQuestion = function () {
   }, 100);
 };
 
-window.removeQuestion = function (questionId) {
-  if (!confirm("Are you sure you want to delete this question?")) {
+window.removeQuestion = async function (questionId) {
+  if (!await confirmationNotification("Are you sure you want to delete this question?")) {
     return;
   }
 
@@ -481,9 +481,9 @@ window.saveToLocalStorage = function (silent = false) {
 
 /* Function for the `🔁 Reset Page` button 
    Resets the page so the user can start making a new quiz */
-window.resetPage = function () {
+window.resetPage = async function () {
   if (
-    !confirm(
+    !await confirmationNotification(
       "Are you sure you want to clear the entire quiz? This action cannot be undone.",
     )
   ) {
