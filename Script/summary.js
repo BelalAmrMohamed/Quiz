@@ -37,7 +37,6 @@ const renderQuestionImage = (imageUrl) => {
 document.addEventListener("DOMContentLoaded", async () => {
   const scoreHeader = document.getElementById("scoreHeader");
   const scoreDisplay = document.getElementById("scoreDisplay");
-  const statsDisplay = document.getElementById("statsDisplay");
   const container = document.getElementById("reviewContainer");
   const backBtn = document.getElementById("backHomeBtn");
   const exportMdBtn = document.getElementById("exportMdBtn");
@@ -77,6 +76,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error loading user quiz questions", e);
       }
   }
+  // Update page title
+  document.title = `نتائج إمتحان ${config.title}`;
 
   backBtn && (backBtn.onclick = goHome);
   exportMdBtn &&
@@ -119,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderHeader(
     scoreHeader,
     scoreDisplay,
-    statsDisplay,
+    // statsDisplay,
     result,
     totalScorable,
     correct,
@@ -143,7 +144,7 @@ function goHome() {
 function renderHeader(
   scoreHeader,
   scoreDisplay,
-  statsDisplay,
+  // statsDisplay,
   data,
   total,
   correct,
@@ -162,7 +163,7 @@ function renderHeader(
   if (newBadges.length > 0) {
     badgeHTML = `
       <div class="new-badges-section">
-        <h3>🎉 Badges Unlocked!</h3>
+        <h3>🎉 شارات تم إكتسابها</h3>
         <div class="badge-grid">
           ${newBadges
             .map(
@@ -188,28 +189,23 @@ function renderHeader(
       <h2>${
         percentage >= 70
           ? `Great Job! ${currentName}`
-          : `Keep Practicing ${currentName}`
+          :  `استمر في المذاكرة يا ${currentName}`
       }</h2>
-      <div class="points-pill"><span>💎 +${points} Points</span></div>
-      <p>Score: ${data.score} / ${total}</p>
-      <p>Correct: ${correct} • Wrong: ${wrong} • Skipped: ${skipped}</p>
+      <div class="points-pill"><span>💎 +${points} نقطة</span></div>
+      <p>النتيجة: ${data.score} / ${total}</p>
+      <p>الصحيح: ${correct} • الخطأ: ${wrong} • تم تخطيه: ${skipped}</p>
       ${
         essayCount > 0
-          ? `<p class="essay-note">📝 ${essayCount} Essay Question${
-              essayCount > 1 ? "s" : ""
-            } (Not Counted in Score)</p>`
+          ? `<p class="essay-note">📝 ${essayCount === 1 ? "سؤال مقالي (لم يحتسب ضمن النتيجة)" : "أسئلة مقالية (لم تحتسب ضمن النتيجة)"}: ${essayCount} 
+            </p>`
           : ""
       }
-      <p>Time: ${timeStr}</p>
+      <p>الوقت: ${timeStr}</p>
       ${badgeHTML}
     </div>
   `;
 
   if (scoreDisplay) scoreDisplay.textContent = `${data.score} / ${total}`;
-  if (statsDisplay) {
-    statsDisplay.textContent = `Correct: ${correct}    Wrong: ${wrong}    Skipped: ${skipped}`;
-    if (essayCount > 0) statsDisplay.textContent += `    Essays: ${essayCount}`;
-  }
 }
 
 function escapeHTML(input) {

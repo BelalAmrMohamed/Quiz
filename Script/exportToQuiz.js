@@ -2273,7 +2273,7 @@ export async function exportToQuiz(config, questions) {
   showNotification(
       "Quiz downloaded successfully.",
       "You have it now!",
-      "https://divquizzes.vercel.app/favicon.png"
+      "./favicon.png"
   );
 
 }

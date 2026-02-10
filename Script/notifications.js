@@ -56,7 +56,7 @@ export function showNotification(title, message = "", type = "info") {
   toast.className = `notification glass-toast ${typeClass}`;
 
   // 4. Construct HTML (Visual Structure from Function 1, Safety from Function 2)
-  const iconHTML = isURL(icon) 
+  const iconHTML = isURL_orPath(icon) 
     ? `<img src="${icon}" alt="Icon" class="notification-image">` 
     : `<span class="notification-icon">${icon}</span>`;
 
@@ -107,15 +107,33 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Helper: URL Check (From Visual Source)
-function isURL(string) {
+// Helper: URL or relative path Check (From Visual Source)
+function isURL_orPath(string) {
+  // 1. Check if it is a valid Absolute URL (HTTP/HTTPS)
   try {
     const url = new URL(string);
+    // Only return true for http/https, excluding ftp, mailto, etc.
     return url.protocol === "http:" || url.protocol === "https:";
   } catch (_) {
-    return false;  
+    // 2. If Absolute check failed, check if it is a Relative Path
+    try {
+      // We use a dummy base to validate that the string is a syntactically valid path
+      const base = "http://example.com";
+      const url = new URL(string, base);
+      
+      // Verification logic:
+      // A. The origin must match the base (ensures the string didn't switch to a different protocol/domain)
+      // B. The string must contain a slash '/' or start with '.' (distinguishes paths from plain words like "hello")
+      const isRelative = url.origin === base;
+      const isPathLike = string.includes("/") || string.startsWith(".");
+
+      return isRelative && isPathLike;
+    } catch (_) {
+      return false;
+    }
   }
 }
+
 /* ============================
     Confirmation Modal
    ============================ */
@@ -135,8 +153,8 @@ export function confirmationNotification(message) {
       <div class="confirmation-content">
         <p class="confirmation-message">${escapeHtml(message)}</p>
         <div class="confirmation-actions">
-          <button class="confirmation-btn cancel">Cancel</button>
-          <button class="confirmation-btn confirm">Ok</button>
+          <button class="confirmation-btn cancel">لا</button>
+          <button class="confirmation-btn confirm">نعم</button>
         </div>
       </div>
     `;

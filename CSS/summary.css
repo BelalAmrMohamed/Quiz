@@ -81,6 +81,11 @@ body {
   gap: 40px;
 }
 
+.stats-text{
+  text-align: right;
+  direction: rtl;
+}
+
 .stats-text .essay-note {
   font-weight: 600;
   font-size: 0.9375rem;
@@ -144,13 +149,6 @@ body {
   margin-bottom: 32px;
 }
 
-.question-card h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  letter-spacing: -0.02em;
-}
-
 #scoreDisplay {
   font-size: 4rem;
   font-weight: 800;
@@ -161,6 +159,7 @@ body {
   margin: 24px 0;
   letter-spacing: -0.03em;
   line-height: 1;
+  text-align: center;
 }
 
 /* Stats Grid */
@@ -215,6 +214,9 @@ body {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-md);
+
+  display: block;
+  margin: 0 auto;
 }
 
 .nav-btn:hover {

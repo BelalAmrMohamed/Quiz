@@ -106,6 +106,6 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
   showNotification(
     "Markdown file downloaded.",
     "You have it now!",
-    "https://img.icons8.com/?size=100&id=21813&format=png&color=000000"
+    "./images/mardownIcon.png"
   );
 }

@@ -15,7 +15,7 @@
 
 export default async function handler(req, res) {
   // Get your production domain (update this!)
-  const ALLOWED_ORIGIN = "https://divquizzes.vercel.app";
+  const ALLOWED_ORIGIN = "https://basmagi-quiz.vercel.app";
 
   // Handle CORS
   const origin = req.headers.origin;

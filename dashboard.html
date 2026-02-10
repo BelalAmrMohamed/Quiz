@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Dashboard</title>
+    <title>اللائحة</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://divquizzes.vercel.app/">
-    <meta property="og:title" content="Quiz Dashboard: Track Your College Study Progress">
+    <meta property="og:url" content="https://basmagi-quiz.vercel.app/">
+    <meta property="og:title" content="اللائحة الخاصة بمنصة إمتحانات البصمجي">
     <meta property="og:description"
-        content="Access your personalized quiz dashboard for college courses. View study stats, recent quizzes, progress trackers, and start new exams to boost your learning. Ideal for students preparing for tests.">
-    <meta property="og:image" content="https://divquizzes.vercel.app/images/dashboard-thumbnail.jpg">
+        content="اللائحة: تتبع مستواك في التعلم عن طريق نظام متكامل، واحفظ الأسئلة التي تريدها، واحصل على تاريخ إمتحاناتك">
+    <meta property="og:image" content="https://basmagi-quiz.vercel.app/images/dashboard-thumbnail.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -55,7 +55,6 @@
 
     <!-- Canvas Animation Script - Only loads if user enabled animations -->
     <script type="module" src="Script/canvas-animation.js"></script>
-
 </head>
 
 <body>
@@ -64,7 +63,7 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>Quick Access</h3>
+                <h3>القائمة</h3>
                 <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"></path>
@@ -72,47 +71,47 @@
                 </button>
             </div>
             <nav>
-                <a href="index.html" class="menu-item">🏠 Home</a>
-                <a href="dashboard.html" class="menu-item active">📊 Dashboard</a>
-                <a href="create-quiz.html" class="menu-item">✏️ Create Quiz</a>
+                <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item active">📊 اللائحة</a>
+                <a href="create-quiz.html" class="menu-item">✏️ اعمل إمتحانات</a>
 
                 <div class="menu-divider"></div>
 
                 <button onclick="changeUsername()" class="menu-item">
-                    Change Username <span class="change-username" id="userNameDisplay"></span>
+                    تغيير الإسم <span class="change-username" id="userNameDisplay"></span>
                 </button>
 
                 <div class="menu-divider"></div>
 
                 <!-- NEW THEME CONTROLS -->
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-section-header">المظهر</div>
                     <div class="theme-selector-grid">
                         <button class="theme-selector-btn" data-theme="light">
                             <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">Light</span>
+                            <span class="theme-btn-label">المظهر الفاتح</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate">
                             <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">Slate</span>
+                            <span class="theme-btn-label">المظهر الأزرق</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark">
                             <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">Dark</span>
+                            <span class="theme-btn-label">المظهر الداكن</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-section-header">الرسوم</div>
                     <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                         <div class="animation-toggle-label">
                             <span class="animation-toggle-icon">✨</span>
-                            <span>Background Effects</span>
+                            <span>الرسوم المتحركة</span>
                         </div>
                         <div class="toggle-switch active animation-toggle-switch"></div>
                     </div>
 
                     <p class="theme-info-text">
-                        💡 Disable animations to improve performance
+                        عطل الرسوم المتحركة لتحسين الأداء 💡
                     </p>
                 </div>
                 <!-- End of the new theme cotrolls -->
@@ -122,12 +121,12 @@
 
     <div class="container">
         <div id="breadcrumb" class="show" onclick="window.location.href='index.html'">
-            <span class="breadcrumb-text">← Back to Home</span>
+            <span class="breadcrumb-text">← الرجوع إلى الصفحة الرئيسية</span>
         </div>
 
         <div class="header">
-            <h1>User Dashboard</h1>
-            <p>Track your progress and achievements</p>
+            <h1>لوحة تحكم المستخدم</h1>
+            <p>تتبع تقدمك وإنجازاتك</p>
         </div>
 
         <!-- Enhanced Stats Grid -->
@@ -135,28 +134,28 @@
             <div class="stat-card">
                 <div class="icon">💎</div>
                 <div class="info">
-                    <span class="label">Total Points</span>
+                    <span class="label">إجمالي النقاط</span>
                     <span class="value" id="totalPoints">0</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon">📚</div>
                 <div class="info">
-                    <span class="label">Quizzes Taken</span>
+                    <span class="label">إجمالي الإختبارات</span>
                     <span class="value" id="totalQuizzes">0</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon">🏆</div>
                 <div class="info">
-                    <span class="label">Badges Earned</span>
+                    <span class="label">الشارات المكتسبة</span>
                     <span class="value" id="totalBadges">0</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon">⭐</div>
                 <div class="info">
-                    <span class="label">Current Level</span>
+                    <span class="label">المستوى الحالي</span>
                     <span class="value" id="currentLevel">1</span>
                 </div>
             </div>
@@ -166,8 +165,8 @@
         <div class="level-progress-card">
             <div class="level-header">
                 <div class="level-info">
-                    <h3 id="levelTitle">Beginner</h3>
-                    <p id="levelSubtitle">Level 1 - Keep learning!</p>
+                    <h3 id="levelTitle">مبتدئ</h3>
+                    <p id="levelSubtitle">مستوى 1 - استمر في التعلم</p>
                 </div>
                 <div class="level-badge" id="levelBadge">
                     <span class="level-number">1</span>
@@ -178,47 +177,47 @@
             </div>
             <div class="progress-stats">
                 <span id="currentXP">0 XP</span>
-                <span id="nextLevelXP">100 XP to next level</span>
+                <span id="nextLevelXP">100 XP إلى المستوى التالي</span>
             </div>
         </div>
 
         <div class="dashboard-layout">
             <div class="main-content">
-                <h2>📜 Recent History</h2>
+                <h2>📜 التاريخ</h2>
                 <div id="historyList" class="history-list">
                 </div>
             </div>
 
             <div class="sidebar">
                 <div class="sidebar-card">
-                    <h3>🏅 Your Badges</h3>
+                    <h3>🏅 شاراتك</h3>
                     <div id="badgeContainer" class="badge-display-grid">
                     </div>
                 </div>
 
                 <div class="sidebar-card">
-                    <h3>🎯 Leaderboard</h3>
+                    <h3>🎯 المتصدرين</h3>
                     <div id="leaderboard" class="leaderboard-list">
                     </div>
                 </div>
 
                 <div class="sidebar-card">
-                    <h3>📊 Statistics</h3>
+                    <h3>📊 الإحصاءات</h3>
                     <div id="statsContainer" class="stats-container">
                         <div class="stat-row">
-                            <span>Accuracy Rate</span>
+                            <span>معدل الدقة</span>
                             <strong id="accuracyRate">0%</strong>
                         </div>
                         <div class="stat-row">
-                            <span>Perfect Scores</span>
+                            <span>نتائج كاملة</span>
                             <strong id="perfectScores">0</strong>
                         </div>
                         <div class="stat-row">
-                            <span>Current Streak</span>
+                            <span>أيام التدريب المتتالية</span>
                             <strong id="currentStreak">0 days</strong>
                         </div>
                         <div class="stat-row">
-                            <span>Best Streak</span>
+                            <span>أفضل عدد أيام متتالية</span>
                             <strong id="bestStreak">0 days</strong>
                         </div>
                     </div>

@@ -755,7 +755,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       align: "center",
     });
 
-    ctaSlide.addText("https://divquizzes.vercel.app/", {
+    ctaSlide.addText("https://basmagi-quiz.vercel.app/", {
       x: 1,
       y: 3.1,
       w: 8,
@@ -765,7 +765,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
       color: COLORS.info,
       align: "center",
       hyperlink: {
-        url: "https://divquizzes.vercel.app/",
+        url: "https://basmagi-quiz.vercel.app/",
         tooltip: "Go to The quiz website again.",
       },
     });
@@ -781,7 +781,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     showNotification(
       "PowerPoint file downloaded.",
       "You have it now!",
-      "https://static.vecteezy.com/system/resources/thumbnails/060/359/773/small/3d-icon-from-microsoft-powerpoint-suitable-for-presentation-media-template-design-brochures-promotional-media-and-advertising-free-png.png"
+      "./images/pptx_icon.png"
     );
 
     return true;

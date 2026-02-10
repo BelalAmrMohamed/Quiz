@@ -37,6 +37,11 @@
   flex-direction: column;
 }
 
+.side-menu * {
+  direction: rtl !important;
+  unicode-bidi: isolate; /* Keeps nested elements from spilling direction into each other */
+}
+
 .side-menu.open {
   right: 0;
 }
@@ -60,12 +65,13 @@
   text-decoration: none;
   border-radius: 8px;
   margin-bottom: 5px;
-  text-align: left;
+  text-align: right;
   background: none;
   border: none;
   font-size: 1rem;
   cursor: pointer;
   font-weight: 600;
+  direction: inherit;
   transition:
     background-color 0.2s ease,
     transform 0.2s ease;

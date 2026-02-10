@@ -136,7 +136,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
   showNotification(
     "HTML file Downloaded", 
     "You Have it now!", 
-    "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png"
+    "./images/HTML_Icon.png"
   );
 }
 

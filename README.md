@@ -4,7 +4,7 @@
 
 Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly web application designed to elevate your understanding, interactive quiz experience. This release marks the foundation of an educational tool tailored for aspiring web developers, students, and programming enthusiasts. Built with modern web technologies, it combines intuitive design with robust functionality to foster learning in a fun, progressive manner.
 
-**Live Demo:** [Quiz](https://divquizzes.vercel.app/)
+**Live Demo:** [Quiz](https://basmagi-quiz.vercel.app/)
 
 ## Table of contents
 
@@ -48,7 +48,7 @@ Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly
 ## Live Link
 
 Access the hosted version:
-[https://divquizzes.vercel.app/](https://divquizzes.vercel.app/)
+[https://basmagi-quiz.vercel.app/](https://basmagi-quiz.vercel.app/)
 
 **Customization:**
 

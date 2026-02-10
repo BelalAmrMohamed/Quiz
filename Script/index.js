@@ -35,17 +35,36 @@ const userNameBadge = document.getElementById("user-name");
 
 // Gamified welcome message pool
 const welcomeMessages = [
-  (name) => `🏆 Welcome back, Champion ${name}!`,
-  (name) => `🚀 Back already, ${name}? Let's continue the grind!`,
-  (name) => `🎮 Ready to play again, ${name}? Your next challenge awaits.`,
-  (name) => `🔔 New challenge unlocked, ${name}!`,
-  (name) => `✨ Your journey continues, ${name}…`,
-  (name) => `🔥 Streak active! Jump back in, ${name}!`,
-  (name) => `🧠 Knowledge power-up ready, ${name}!`,
-  (name) => `⚡ XP boost incoming! Welcome back, ${name}!`,
-  (name) => `📈 Progress detected. Keep going, ${name}!`,
-  (name) => `👑 The legend returns… Welcome back, ${name}!`,
+  (name) => `🏆 ${name}أهلاً بعودة البطل`,  
+  (name) => `🚀 ${name} لم تطل الغيبة، لنواصل الإنجاز يا`,
+  (name) => `🎮 ${name} التحدي يناديك، هل أنت مستعد يا`,    
+  (name) => `🔔 ${name}تم فتح تحدٍ جديد بانتظارك يا `,
+  (name) => `✨ ${name}رحلتك مستمرة يا`,
+  (name) => `🔥 ${name}شعلة الحماس لا تنطفئ! عُد للأجواء يا`,
+  (name) => `🧠 ${name}جرعة معرفة إضافية جاهزة من أجلك يا`,
+  (name) => `⚡ ${name}نقاط خبرة مضاعفة في الطريق! أهلاً بك يا `,
+  (name) => `📈 ${name}تقدمك ملحوظ.. استمر في التألق يا `,
+  (name) => `👑 ${name}الأسطورة يعود من جديد.. أهلاً بك يا `,
 ];
+
+    const opts = [
+      ["./favicon.png", "Quiz (.html)", "quiz"],
+      ["./images/HTML_Icon.png", "HTML (.html)", "html"],
+      ["./images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
+      ["./images/word_icon.png", "Word (.docx)", "docx"],
+      ["./images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
+      ["./images/mardownIcon.png", "Markdown (.md)", "md"],
+    ];
+
+// Change username
+window.changeUsername = function () {
+  const currentName = localStorage.getItem("username") || "User";
+  const newName = prompt("أدخل الإسم الجديد", currentName);
+  if (!newName || !newName.trim()) return;
+
+  localStorage.setItem("username", newName.trim());
+  updateWelcomeMessage();
+};
 
 // Pick a random welcome message
 function getRandomWelcomeMessage(name) {
@@ -56,8 +75,7 @@ function getRandomWelcomeMessage(name) {
 
 // Update welcome badge text
 function updateWelcomeMessage() {
-  const profile = userProfile.getProfile();
-  const name = profile.username;
+  const name = localStorage.getItem("username") || "User";
   const messageTemplate = getRandomWelcomeMessage(name);
 
   // Replace username with styled span
@@ -100,10 +118,10 @@ window.openProfileSettings = function () {
   );
 
   modalCard.innerHTML = `
-    <h2>⚙️ Profile Settings</h2>
+    <h2>⚙️ الملف الشخصي</h2>
     
     <div class="profile-section">
-      <label for="profileUsername">Display Name</label>
+      <label for="profileUsername">الإسم</label>
       <input 
         type="text" 
         id="profileUsername" 
@@ -114,12 +132,12 @@ window.openProfileSettings = function () {
     </div>
 
     <div class="profile-section">
-      <h3>Academic Information</h3>
-      <p class="profile-hint">This helps us show you relevant courses</p>
+      <h3>المعلومات الأكاديمية</h3>
+      <p class="profile-hint">يساعدنا على عرض المواد الخاصة بك</p>
       
       <div class="profile-grid">
         <div>
-          <label for="profileFaculty">Faculty</label>
+          <label for="profileFaculty">الكلية</label>
           <select id="profileFaculty" class="profile-select">
             <option value="All">All Faculties</option>
             ${metadata.faculties
@@ -134,7 +152,7 @@ window.openProfileSettings = function () {
         </div>
 
         <div>
-          <label for="profileYear">Year</label>
+          <label for="profileYear">العام</label>
           <select id="profileYear" class="profile-select">
             <option value="All">All Years</option>
             ${availableYears
@@ -142,14 +160,14 @@ window.openProfileSettings = function () {
                 (y) =>
                   `<option value="${escapeHtml(y)}" ${
                     y === profile.year ? "selected" : ""
-                  }>Year ${escapeHtml(y)}</option>`,
+                  }>العام ${escapeHtml(y)}</option>`,
               )
               .join("")}
           </select>
         </div>
 
         <div>
-          <label for="profileTerm">Term</label>
+          <label for="profileTerm">الترم</label>
           <select id="profileTerm" class="profile-select">
             <option value="All">All Terms</option>
             ${availableTerms
@@ -157,7 +175,7 @@ window.openProfileSettings = function () {
                 (t) =>
                   `<option value="${escapeHtml(t)}" ${
                     t === profile.term ? "selected" : ""
-                  }>Term ${escapeHtml(t)}</option>`,
+                  }>الترم ${escapeHtml(t)}</option>`,
               )
               .join("")}
           </select>
@@ -165,12 +183,12 @@ window.openProfileSettings = function () {
       </div>
     </div>
 
-    <div class="profile-actions">
-      <button class="profile-btn primary" onclick="window.saveProfileSettings()">
-        💾 Save Changes
-      </button>
+    <div class="profile-actions">      
       <button class="profile-btn secondary" onclick="window.closeProfileModal()">
-        Cancel
+        إلغاء
+      </button>
+      <button class="profile-btn primary" onclick="window.saveProfileSettings()">
+        💾 حفظ التغييرات
       </button>
     </div>
   `;
@@ -213,7 +231,7 @@ function setupProfileDropdownCascade() {
       availableYears
         .map(
           (y) =>
-            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
+            `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
         )
         .join("");
 
@@ -246,7 +264,7 @@ function setupProfileDropdownCascade() {
       availableTerms
         .map(
           (t) =>
-            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
+            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
         )
         .join("");
 
@@ -354,7 +372,7 @@ function showOnboardingWizard() {
     // Skip button
     const skipBtn = document.createElement("button");
     skipBtn.className = "onboarding-skip";
-    skipBtn.textContent = "Skip for now";
+    skipBtn.textContent = "تخطي الآن";
     skipBtn.onclick = () => closeOnboarding();
     card.appendChild(skipBtn);
 
@@ -391,7 +409,7 @@ function showOnboardingWizard() {
     if (currentStep > 1) {
       const backBtn = document.createElement("button");
       backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "← Back";
+      backBtn.textContent = "← السابق";
       backBtn.onclick = () => {
         currentStep--;
         render();
@@ -405,7 +423,7 @@ function showOnboardingWizard() {
     if (currentStep < 3) {
       const nextBtn = document.createElement("button");
       nextBtn.className = "onboarding-btn primary";
-      nextBtn.textContent = "Next →";
+      nextBtn.textContent = "التالي →";
       nextBtn.disabled =
         (currentStep === 1 && !selectedFaculty) ||
         (currentStep === 2 && !selectedYear);
@@ -417,7 +435,7 @@ function showOnboardingWizard() {
     } else {
       const finishBtn = document.createElement("button");
       finishBtn.className = "onboarding-btn finish";
-      finishBtn.textContent = "🎉 Get Started!";
+      finishBtn.textContent = "🎉 ابدأ الآن";
       finishBtn.disabled = !selectedTerm;
       finishBtn.onclick = () => finishOnboarding();
       nav.appendChild(finishBtn);
@@ -430,8 +448,8 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>👋 Welcome to Quiz Master!</h2>
-      <p>Let's personalize your experience. What's your faculty?</p>
+      <h2>👋 مرحباً بك في منصة إمتحانات بصمجي</h2>
+      <p>دعنا نحسن تجربتك. ما هي كليتك؟</p>
     `;
     container.appendChild(header);
 
@@ -463,8 +481,8 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>📅 Select Your Year</h2>
-      <p>Which year are you currently in?</p>
+      <h2>اختر العام الدراسي 📅</h2>
+      <p>في أي سنة دراسية أنت الآن؟</p>
     `;
     container.appendChild(header);
 
@@ -485,7 +503,7 @@ function showOnboardingWizard() {
       const pill = document.createElement("button");
       pill.className = "year-pill";
       if (selectedYear === year) pill.classList.add("selected");
-      pill.textContent = `Year ${year}`;
+      pill.textContent = `العام ${year}`;
       pill.onclick = () => {
         selectedYear = year;
         // Reset term when year changes
@@ -502,8 +520,8 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>📚 Select Your Term</h2>
-      <p>Which term are you studying?</p>
+      <h2>📚 اختر الترم</h2>
+      <p>في أي فصل دراسي تدرس؟</p>
     `;
     container.appendChild(header);
 
@@ -530,7 +548,7 @@ function showOnboardingWizard() {
       if (selectedTerm === term) btn.classList.add("selected");
       btn.innerHTML = `
         <span class="term-icon">${term === "1" ? "🍂" : "🌸"}</span>
-        <span>Term ${term}</span>
+        <span>الترم ${term}</span>
       `;
       btn.onclick = () => {
         selectedTerm = term;
@@ -600,8 +618,8 @@ window.openCourseManager = function () {
   );
 
   modalCard.innerHTML = `
-    <h2>📚 Manage Your Courses</h2>
-    <p class="course-manager-hint">Select courses you want to see on your dashboard</p>
+    <h2>📚 إدارة المواد خاصتك</h2>
+    <p class="course-manager-hint">حدد الدورات التي تريد رؤيتها</p>
 
     <div class="course-manager-filters">
       <select id="cmFaculty" class="course-filter-select">
@@ -623,7 +641,7 @@ window.openCourseManager = function () {
             (y) =>
               `<option value="${escapeHtml(y)}" ${
                 y === profile.year ? "selected" : ""
-              }>Year ${escapeHtml(y)}</option>`,
+              }>العام ${escapeHtml(y)}</option>`,
           )
           .join("")}
       </select>
@@ -635,7 +653,7 @@ window.openCourseManager = function () {
             (t) =>
               `<option value="${escapeHtml(t)}" ${
                 t === profile.term ? "selected" : ""
-              }>Term ${escapeHtml(t)}</option>`,
+              }>الترم ${escapeHtml(t)}</option>`,
           )
           .join("")}
       </select>
@@ -647,7 +665,7 @@ window.openCourseManager = function () {
 
     <div class="course-manager-actions">
       <button class="profile-btn primary" onclick="window.closeCourseManager()">
-        ✅ Done
+        ✅ تم
       </button>
     </div>
   `;
@@ -689,11 +707,11 @@ function setupCourseManagerDropdownCascade() {
 
     const currentYear = yearSelect.value;
     yearSelect.innerHTML =
-      '<option value="All">All Years</option>' +
+      '<option value="All">جميع الأعوام</option>' +
       availableYears
         .map(
           (y) =>
-            `<option value="${escapeHtml(y)}">Year ${escapeHtml(y)}</option>`,
+            `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
         )
         .join("");
 
@@ -726,7 +744,7 @@ function setupCourseManagerDropdownCascade() {
       availableTerms
         .map(
           (t) =>
-            `<option value="${escapeHtml(t)}">Term ${escapeHtml(t)}</option>`,
+            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
         )
         .join("");
 
@@ -776,9 +794,9 @@ function renderCourseManagerList() {
         <div class="course-manager-info">
           <h4>${escapeHtml(course.name)}</h4>
           <p class="course-manager-meta">
-            ${escapeHtml(course.faculty)} | Year ${escapeHtml(
+            ${escapeHtml(course.faculty)} | العام ${escapeHtml(
               course.year,
-            )} | Term ${escapeHtml(course.term)}
+            )} | الترم ${escapeHtml(course.term)}
           </p>
         </div>
         <button 
@@ -843,11 +861,12 @@ function renderRootCategories() {
   // Get subscribed courses
   const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
 
+  const subject = document.getElementById("Subjects-text");
   // Title based on subscription status
   if (subscribedCourses.length > 0) {
-    title.textContent = "My Courses";
+    subject.textContent = "المواد خاصتي";
   } else {
-    title.textContent = "All Courses";
+    subject.textContent = "جميع المواد";
   }
 
   container.innerHTML = "";
@@ -855,13 +874,13 @@ function renderRootCategories() {
 
   const fragment = document.createDocumentFragment();
 
-  // 1. Add "Your Quizzes" Folder Card
+  // 1. Add "إمتحاناتك" Folder Card
   try {
     const userQuizzes = JSON.parse(
       localStorage.getItem("user_quizzes") || "[]",
     );
     const quizzesCard = createCategoryCard(
-      "Your Quizzes",
+      "إمتحاناتك",
       userQuizzes.length,
       true,
     );
@@ -913,11 +932,11 @@ function renderRootCategories() {
  */
 function renderUserQuizzesView() {
   // Update Navigation Stack
-  navigationStack.push({ name: "Your Quizzes" });
+  navigationStack.push({ name: "إمتحاناتك" });
   updateBreadcrumb();
 
   // Update Title & Clear Container
-  if (title) title.textContent = "Your Quizzes";
+  if (title) title.textContent = "إمتحاناتك";
   if (!container) return;
 
   container.innerHTML = "";
@@ -939,7 +958,7 @@ function renderUserQuizzesView() {
 
     const createBtn = document.createElement("a");
     createBtn.href = "create-quiz.html";
-    createBtn.textContent = "➕ Create New Quiz";
+    createBtn.textContent = "➕ إنشاء اختبار جديد";
     createBtn.className = "btn btn-primary"; // Use class if available, or inline styles
     createBtn.style.cssText = `
         display: inline-block;
@@ -977,8 +996,8 @@ function renderUserQuizzesView() {
       `;
       emptyState.innerHTML = `
         <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">�</div>
-        <h3 style="margin-bottom: 10px;">You haven't created any quizzes yet</h3>
-        <p style="color: var(--color-text-secondary);">Click the button above to get started!</p>
+        <h3 style="margin-bottom: 10px;">لم تقم بإنشاء أي اختبارات حتى الآن</h3>
+        <p style="color: var(--color-text-secondary);">انقر على الزر الذي في الأعلى للبدء</p>
       `;
       container.appendChild(emptyState);
     } else {
@@ -1103,7 +1122,7 @@ function createUserQuizCard(quiz, index) {
   `;
 
   const playBtn = document.createElement("button");
-  playBtn.textContent = "Start Quiz";
+  playBtn.textContent = "إبدأ الإختبار";
   playBtn.className = "btn btn-primary";
   playBtn.style.cssText = `
     flex: 1;
@@ -1139,7 +1158,7 @@ function createUserQuizCard(quiz, index) {
   };
 
   const downloadBtn = document.createElement("button");
-  downloadBtn.textContent = "Download";
+  downloadBtn.textContent = "تحميل";
   playBtn.className = "btn btn-primary";
   downloadBtn.style.cssText = `
     flex: 1;
@@ -1212,6 +1231,17 @@ async function deleteUserQuiz(quizId, index) {
 
     // Re-render the folder view
     renderUserQuizzesView();
+    
+    // Failed to fix the `Back to إمتحاناتك` Bug
+    // The bug happens when the user deletes one of his quizzes
+    // The `Back to Courses` button at the top becomes `Back to إمتحاناتك`, 
+    // when pressed, the console logs this error:
+    /*
+    Uncaught TypeError: Cannot read properties of undefined (reading 'name')
+    at renderCategory (index.js:1230:32)
+    at breadcrumb.onclick (index.js:1494:7)
+    */
+    
   } catch (error) {
     console.error("Error deleting quiz:", error);
     alert("Error deleting quiz. Please try again.");
@@ -1269,7 +1299,7 @@ function createCategoryCard(
   card.className = "card category-card";
 
   const icon = isFolder ? "📁" : "📂";
-  const itemText = itemCount === 1 ? "item" : "items";
+  const itemText = itemCount === 1 ? "إمتحان" : "إمتحانات";
 
   const iconDiv = document.createElement("div");
   iconDiv.className = "icon";
@@ -1279,7 +1309,11 @@ function createCategoryCard(
   h3.textContent = name;
 
   const p = document.createElement("p");
-  p.textContent = `${itemCount} ${itemText}`;
+
+  p.textContent = 
+  itemCount === 1 ? `إمتحان واحد` 
+  : itemCount === 2 ? `إمتحانان` 
+  : `${itemCount} إمتحانات`;
 
   // Add course metadata if available
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
@@ -1293,11 +1327,11 @@ function createCategoryCard(
 
     const yearBadge = document.createElement("span");
     yearBadge.className = "course-meta-badge year";
-    yearBadge.textContent = `Year ${courseData.year}`;
+    yearBadge.textContent = `العام ${courseData.year}`;
 
     const termBadge = document.createElement("span");
     termBadge.className = "course-meta-badge term";
-    termBadge.textContent = `Term${courseData.term}`;
+    termBadge.textContent = `الترم${courseData.term}`;
 
     metaDiv.appendChild(facultyBadge);
     metaDiv.appendChild(yearBadge);
@@ -1327,7 +1361,7 @@ function createExamCard(exam) {
   btn.className = "start-btn";
   btn.style.flex = "1";
   btn.style.minWidth = "0";
-  btn.textContent = "Start";
+  btn.textContent = "إبدأ الإختبار";
   btn.onclick = (ev) => {
     ev.stopPropagation();
     showModeSelection(exam.id, exam.title || exam.id);
@@ -1403,30 +1437,26 @@ function createExamCard(exam) {
     const h2 = document.createElement("h2");
     h2.textContent = exam.title || exam.id;
     const p = document.createElement("p");
-    p.textContent = "Select download format:";
+    p.textContent = "اختر طريقة التنزيل";
     const grid = document.createElement("div");
     grid.className = "mode-grid";
-    const opts = [
-      ["💡", "Quiz (.html)", "quiz"],
-      ["🌐", "HTML (.html)", "html"],
-      ["📄", "PDF (.pdf)", "pdf"],
-      ["📖", "Word (.docx)", "docx"],
-      ["🗂️", "PowerPoint (.pptx)", "pptx"],
-      ["📝", "Markdown (.md)", "md"],
-    ];
+    
     opts.forEach(([icon, label, format]) => {
       const b = document.createElement("button");
       b.className = "mode-btn";
-      b.innerHTML = `<span class="icon">${icon}</span><strong>${label}</strong>`;
+      b.innerHTML = `<img src="${icon}" alt="Context Icon" class="icon"><strong>${label}</strong>`;
       b.onclick = (ev) => {
         ev.stopPropagation();
         onDownloadOption(format, modal);
       };
       grid.appendChild(b);
     });
+
+
+
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-modal";
-    closeBtn.textContent = "Cancel";
+    closeBtn.textContent = "إلغاء";
     closeBtn.onclick = () => modal.remove();
     modalCard.appendChild(h2);
     modalCard.appendChild(p);
@@ -1446,7 +1476,7 @@ function createExamCard(exam) {
     "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)";
   downloadBtn.style.color = "white";
   downloadBtn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.4)";
-  downloadBtn.textContent = "Download";
+  downloadBtn.textContent = "تحميل";
   downloadBtn.onclick = (ev) => {
     ev.stopPropagation();
     showDownloadPopup();
@@ -1477,11 +1507,11 @@ function updateBreadcrumb() {
   const breadcrumbText = breadcrumb.querySelector(".breadcrumb-text");
 
   if (navigationStack.length === 1) {
-    breadcrumbText.textContent = "Back to Courses";
+    breadcrumbText.textContent = "الرجوع إلى المواد";
     breadcrumb.onclick = renderRootCategories;
   } else {
     const parentName = navigationStack[navigationStack.length - 2].name;
-    breadcrumbText.textContent = `Back to ${parentName}`;
+    breadcrumbText.textContent = `الرجوع إلى ${parentName}`;
     breadcrumb.onclick = () => {
       navigationStack.pop();
       const parent = navigationStack[navigationStack.length - 1];
@@ -1502,23 +1532,23 @@ function showModeSelection(examId, examTitle) {
   h2.textContent = examTitle;
 
   const p = document.createElement("p");
-  p.textContent = "Select a study mode:";
+  p.textContent = "اختر وضع الإمتحان";
 
   const modeGrid = document.createElement("div");
   modeGrid.className = "mode-grid";
 
   const practiceBtn = createModeButton(
-    "🛡️",
+    "./images/quiz.png",
     "Practice",
-    "Has a timer, and you can check answers",
+    "يحتوي على مؤقت، ويمكنك رؤية إجابات الأسئلة بعد الحل",
     () => startQuiz(examId, "practice"),
   );
 
-  const timedBtn = createModeButton("⏱️", "Timed", "30s per question", () =>
+  const timedBtn = createModeButton("https://cdn-icons-png.freepik.com/512/3003/3003126.png", "Timed", "30 ثانية لكل سؤال", () =>
     startQuiz(examId, "timed"),
   );
 
-  const examBtn = createModeButton("📝", "Exam", "No checking answers!", () =>
+  const examBtn = createModeButton("https://cdn-icons-png.flaticon.com/512/3640/3640554.png", "Exam", "لا إجابات أثناء الإمتحان", () =>
     startQuiz(examId, "exam"),
   );
 
@@ -1528,7 +1558,7 @@ function showModeSelection(examId, examTitle) {
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";
-  closeBtn.textContent = "Cancel";
+  closeBtn.textContent = "إلغاء";
   closeBtn.onclick = () => modal.remove();
 
   modalCard.appendChild(h2);
@@ -1545,9 +1575,18 @@ function createModeButton(icon, title, description, onClick) {
   btn.className = "mode-btn";
   btn.onclick = onClick;
 
-  const iconSpan = document.createElement("span");
-  iconSpan.className = "icon";
-  iconSpan.textContent = icon;
+  let iconElement;
+  if (!isURL_orPath(icon)) {
+  iconElement = document.createElement("span");
+  iconElement.className = "icon";
+  iconElement.textContent = icon;
+  }
+  else{
+    iconElement = document.createElement("img");
+    iconElement.className = "icon";
+    iconElement.src = icon;
+    iconElement.alt = "Context icon";
+    }
 
   const strong = document.createElement("strong");
   strong.textContent = title;
@@ -1555,11 +1594,38 @@ function createModeButton(icon, title, description, onClick) {
   const small = document.createElement("small");
   small.textContent = description;
 
-  btn.appendChild(iconSpan);
+  btn.appendChild(iconElement);
   btn.appendChild(strong);
   btn.appendChild(small);
 
   return btn;
+}
+
+// Helper: URL or relative path Check (From Visual Source)
+function isURL_orPath(string) {
+  // 1. Check if it is a valid Absolute URL (HTTP/HTTPS)
+  try {
+    const url = new URL(string);
+    // Only return true for http/https, excluding ftp, mailto, etc.
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    // 2. If Absolute check failed, check if it is a Relative Path
+    try {
+      // We use a dummy base to validate that the string is a syntactically valid path
+      const base = "http://example.com";
+      const url = new URL(string, base);
+      
+      // Verification logic:
+      // A. The origin must match the base (ensures the string didn't switch to a different protocol/domain)
+      // B. The string must contain a slash '/' or start with '.' (distinguishes paths from plain words like "hello")
+      const isRelative = url.origin === base;
+      const isPathLike = string.includes("/") || string.startsWith(".");
+
+      return isRelative && isPathLike;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 function startQuiz(id, mode) {
@@ -1645,20 +1711,10 @@ function showUserQuizDownloadPopup(quiz) {
   h2.textContent = quiz.title;
 
   const p = document.createElement("p");
-  p.textContent = "Select download format:";
+  p.textContent = "اختر طريقة التنزيل";
 
   const grid = document.createElement("div");
   grid.className = "mode-grid";
-
-  // Reusing the same options as standard exams
-  const opts = [
-    ["💡", "Quiz (.html)", "quiz"],
-    ["🌐", "HTML (.html)", "html"],
-    ["📄", "PDF (.pdf)", "pdf"],
-    ["📖", "Word (.docx)", "docx"],
-    ["🗂️", "PowerPoint (.pptx)", "pptx"],
-    ["📝", "Markdown (.md)", "md"],
-  ];
 
   // Config object for export functions (mocking structure of standard exam config)
   const config = {
@@ -1726,7 +1782,7 @@ function showUserQuizDownloadPopup(quiz) {
   opts.forEach(([icon, label, format]) => {
     const b = document.createElement("button");
     b.className = "mode-btn";
-    b.innerHTML = `<span class="icon">${icon}</span><strong>${label}</strong>`;
+    b.innerHTML = `<img src="${icon}" alt="Context Icon" class="icon"><strong>${label}</strong>`;
     b.onclick = (ev) => {
       ev.stopPropagation();
       onDownloadOption(format);
@@ -1736,7 +1792,7 @@ function showUserQuizDownloadPopup(quiz) {
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";
-  closeBtn.textContent = "Cancel";
+  closeBtn.textContent = "إلغاء";
   closeBtn.onclick = () => modal.remove();
 
   modalCard.appendChild(h2);

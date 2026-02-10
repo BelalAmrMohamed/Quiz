@@ -4,19 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz In Progress</title>
+    <title>إمتحان</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://divquizzes.vercel.app/">
-    <meta property="og:title" content="Can You Score 10/10 on this Hard History Quiz?">
-    <meta property="og:description"
-        content="Only 5% of people can pass this test. Click here to see if you are a history buff!">
-    <meta property="og:image" content="https://divquizzes.vercel.app/images/quiz-thumbnail.jpeg">
+    <meta property="og:url" content="https://basmagi-quiz.vercel.app/">
+    <meta property="og:title" content="منصة إمتحانات البصمجي: إختبر أدائك في الإمتحانات بجميع المستويات">
+    <meta property="og:description" content="أقل من 5% من الناس تقدر تختم اغلب الإمتحانات، هل انت واحد منهم؟">
+    <meta property="og:image" content="https://basmagi-quiz.vercel.app/images/quiz-thumbnail.jpeg">
     <meta property="og:image:width" content="1024">
     <meta property="og:image:height" content="1024">
-    <meta property="og:site_name" content="Quiz by Belal Amr Mohamed">
+    <meta property="og:site_name" content="منصة إمتحانات البصمجي">
     <meta property="og:locale" content="en_US">
 
     <!-- PWA Meta Tags -->
@@ -58,7 +57,6 @@
 
     <!-- Canvas Animation Script - Only loads if user enabled animations -->
     <script type="module" src="Script/canvas-animation.js"></script>
-
 </head>
 
 <body>
@@ -86,7 +84,7 @@
     <!-- The side menu -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
-            <h3>Quick Access</h3>
+            <h3>القائمة</h3>
             <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 6L6 18M6 6l12 12"></path>
@@ -96,48 +94,48 @@
 
         <nav>
             <button id="finishBtn" class="menu-item action-btn" onclick="finishEarly()">
-                <span>✅</span> Complete Quiz
+                <span>✅</span> تسليم الآن
             </button>
 
             <button id="restartBtn" class="menu-item action-btn" onclick="restartQuiz()">
-                <span>🔁</span> Restart Quiz
+                <span>🔁</span> إعادة الإمتحان
             </button>
 
             <button id="exitBtn" class="menu-item action-btn" onclick="exitQuiz()">
-                <span>🔚</span> Exit Quiz
+                <span>🔚</span> الخروج
             </button>
 
             <div class="menu-divider"></div>
 
             <!-- NEW THEME CONTROLS -->
             <div class="theme-controls-section">
-                <div class="theme-section-header">Appearance</div>
+                <div class="theme-section-header">مظهر المنصة</div>
                 <div class="theme-selector-grid">
                     <button class="theme-selector-btn" data-theme="light">
                         <span class="theme-btn-icon">☀️</span>
-                        <span class="theme-btn-label">Light</span>
+                        <span class="theme-btn-label">المظهر الفاتح</span>
                     </button>
                     <button class="theme-selector-btn" data-theme="dark-slate">
                         <span class="theme-btn-icon">🌙</span>
-                        <span class="theme-btn-label">Slate</span>
+                        <span class="theme-btn-label">المظهر الأزرق</span>
                     </button>
                     <button class="theme-selector-btn" data-theme="dark">
                         <span class="theme-btn-icon">🌑</span>
-                        <span class="theme-btn-label">Dark</span>
+                        <span class="theme-btn-label">المظهر الداكن</span>
                     </button>
                 </div>
 
-                <div class="animation-section-header">Animations</div>
+                <div class="animation-section-header">الرسوم</div>
                 <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                     <div class="animation-toggle-label">
                         <span class="animation-toggle-icon">✨</span>
-                        <span>Background Effects</span>
+                        <span>الرسوم المتحركة</span>
                     </div>
                     <div class="toggle-switch active animation-toggle-switch"></div>
                 </div>
 
                 <p class="theme-info-text">
-                    💡 Disable animations to improve performance
+                    عطل الرسوم المتحركة لتحسين الأداء 💡
                 </p>
             </div>
             <!-- End of the new theme cotrolls -->
@@ -145,7 +143,7 @@
             <div class="menu-divider"></div>
 
             <button id="viewToggle" class="menu-item view-toggle-btn">
-                <span id="viewIcon">📋</span> <span id="viewText">Switch to List View</span>
+                <span id="viewIcon">📋</span> <span id="viewText">شكل القائمة</span>
             </button>
 
             <div class="menu-divider"></div>
@@ -158,12 +156,11 @@
 
             <!-- bookmark and flag buttons for the grid view only -->
             <button id="menuBookmarkBtn" class="menu-item action-btn" onclick="window.toggleBookmark()">
-                <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">Bookmark Question</span>
+                <span id="menuBookmarkIcon">☆</span> <span id="menuBookmarkText">حفظ في المفضلة</span>
             </button>
 
             <button id="menuFlagBtn" class="menu-item action-btn" onclick="window.toggleFlag()">
-                <span id="menuFlagIcon">🏳️</span> <span id="menuFlagText">Flag for
-                    Review</span>
+                <span id="menuFlagIcon">🏳️</span> <span id="menuFlagText">إضافة علامة للمراجعة</span>
             </button>
         </nav>
     </div>
@@ -173,7 +170,7 @@
         <div class="header">
             <div class="header-top">
                 <div class="header-title-section">
-                    <h1 id="quizTitle">Loading Quiz...</h1>
+                    <h1 id="quizTitle">...جاري التحميل</h1>
                     <div class="header-subtitle">
                         <div class="timer-badge" id="timerBadge">
                             <svg class="timer-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,8 +185,8 @@
 
             <div class="progress-section">
                 <div class="progress-header">
-                    <span class="progress-label">Progress</span>
                     <span class="progress-percentage" id="progressText">0% (0/0)</span>
+                    <span class="progress-label">:التقدم</span>
                 </div>
                 <div class="progress-container">
                     <div class="progress-fill" id="progressFill"></div>
@@ -199,16 +196,16 @@
 
         <!-- The questions get displayed here from the javascript -->
         <div id="questionContainer" class="loading">
-            <p>Preparing your quiz experience</p>
+            <p>جاري تحضير الإختبار</p>
         </div>
 
         <!-- navigation buttons at the bottom -->
         <div class="navigation">
             <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>
-                ← Previous
+                ← السابق
             </button>
             <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">
-                Next →
+                التالي →
             </button>
         </div>
     </div>

@@ -16,14 +16,16 @@ function refreshUI() {
   // Update username display
   const nameDisplay = document.getElementById("userNameDisplay");
   if (nameDisplay) {
-    const currentName = localStorage.getItem("username") || "User";
+    const currentName = localStorage.getItem("username") || "مستخدم";
     nameDisplay.textContent = currentName;
+    // Update page title
+    document.title = `لائحة ${currentName}`;
   }
 }
 
 // Delete history entry
 window.deleteHistory = async function (index) {
-  if (!await confirmationNotification("Are you sure you want to delete this quiz result?")) return;
+  if (!await confirmationNotification("هل أنت متأكد من حذف هذا الاختبار؟ ")) return;
 
   const user = gameEngine.getUserData();
   user.history.splice(index, 1);
@@ -35,7 +37,7 @@ window.deleteHistory = async function (index) {
 
 // Remove bookmark
 window.removeBookmark = async function (key) {
-  if (!await confirmationNotification("Remove this bookmark?")) return;
+  if (!await confirmationNotification("إزالة من المفضلة؟")) return;
 
   const user = gameEngine.getUserData();
   if (user.bookmarks && user.bookmarks[key]) {
@@ -50,7 +52,7 @@ window.removeBookmark = async function (key) {
 // Change username
 window.changeUsername = function () {
   const currentName = localStorage.getItem("username") || "User";
-  const newName = prompt("Enter your new display name:", currentName);
+  const newName = prompt("أدخل الإسم الجديد", currentName);
   if (!newName || !newName.trim()) return;
 
   localStorage.setItem("username", newName.trim());
@@ -114,12 +116,14 @@ function renderStats(user) {
     perfectScoresEl.textContent = perfectCount;
   }
 
-  document.getElementById("currentStreak").textContent = `${
-    user.streaks?.currentDaily || 0
-  } days`;
-  document.getElementById("bestStreak").textContent = `${
-    user.streaks?.longestStreak || 0
-  } days`;
+  // Both ways result in the same direction
+  document.getElementById("currentStreak").textContent = 
+  ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
+  ` ${user.streaks?.currentDaily || 0} `;
+
+  document.getElementById("bestStreak").textContent = 
+  ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
+  ` ${user.streaks?.longestStreak || 0} `;
 }
 
 function renderHistory(user) {
@@ -168,11 +172,11 @@ function renderBookmarks(user) {
   const keys = Object.keys(user.bookmarks || {});
 
   bookmarkSection.innerHTML = `
-    <h2 style="margin-top:40px;">⭐ Bookmarks</h2>
+    <h2 style="margin-top:40px;">⭐ الأسئلة المفضلة</h2>
     <div class="history-list">
       ${
         keys.length === 0
-          ? "<p>No bookmarks yet.</p>"
+          ? "<p>لم تقم بتفضيل أية أسئلة</p>"
           : keys
               .map((key) => {
                 const [examId, qIdx] = key.split("_");

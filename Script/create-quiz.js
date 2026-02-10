@@ -96,7 +96,7 @@ function renderQuestion(question) {
 
   questionCard.innerHTML = `
         <div class="question-header">
-            <span class="question-number">Question ${questionNumber}</span>
+            <span class="question-number">سؤال ${questionNumber}</span>
             <div class="question-actions">
                 <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="Delete Question">
                     🗑️
@@ -105,33 +105,33 @@ function renderQuestion(question) {
         </div>
         
         <div class="form-group">
-            <label>Question Text *</label>
+            <label>نصّ السؤال *</label>
             <textarea 
                 id="question-text-${question.id}" 
                 rows="3" 
-                placeholder="Enter your question here..."
+                placeholder="أدخل سؤالك هنا..."
                 required
             >${escapeHtml(question.q)}</textarea>
         </div>
         
         <div class="form-group">
-            <label>Answer Options *</label>
+            <label>الإختيارات (إختيار واحد = سؤال مقالي)</label>
             <div id="options-container-${question.id}" class="options-list">
                 ${renderOptions(question)}
             </div>
             <button class="add-option-btn" onclick="addOption(${question.id})">
-                ➕ Add Option
+                ➕ إضافة خيار
             </button>
         </div>
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
-                <h4>🖼️ Image (Optional)</h4>
+                <h4>🖼️ صورة (إختيارية)</h4>
                 <span class="collapsible-toggle" id="toggle-image-${question.id}">▼</span>
             </div>
             <div class="collapsible-content" id="content-image-${question.id}">
                 <div class="form-group">
-                    <label>Image URL</label>
+                    <label>رابط الصورة</label>
                     <input 
                         type="text" 
                         id="question-image-${question.id}" 
@@ -144,16 +144,16 @@ function renderQuestion(question) {
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
-                <h4>💡 Explanation (Optional)</h4>
+                <h4>💡 الشرح (إختياري)</h4>
                 <span class="collapsible-toggle" id="toggle-explanation-${question.id}">▼</span>
             </div>
             <div class="collapsible-content" id="content-explanation-${question.id}">
                 <div class="form-group">
-                    <label>Answer Explanation</label>
+                    <label>شرح الإجابة الصحيحة</label>
                     <textarea 
                         id="question-explanation-${question.id}" 
                         rows="3" 
-                        placeholder="Provide an explanation for the correct answer..."
+                        placeholder="قدم تفسيرًا للإجابة الصحيحة..."
                     >${escapeHtml(question.explanation || "")}</textarea>
                 </div>
             </div>
@@ -220,7 +220,7 @@ function renderOptions(question) {
                 type="text" 
                 class="option-input" 
                 value="${escapeHtml(option)}"
-                placeholder="Option ${index + 1}"
+                placeholder="إختيار ${index + 1}"
                 oninput="updateOption(${question.id}, ${index}, this.value)"
                 required
             />
@@ -661,7 +661,7 @@ window.saveLocally = function () {
 
   // Save to user_quizzes first
   const quizId = saveToUserQuizzes(quizData);
-  showNotification("Saved locally", "You can find it in \"Your Quizzes\"", "success");
+  showNotification("Saved locally", "You can find it in \"إمتحاناتك\"", "success");
 };
 
 // ============================================================================

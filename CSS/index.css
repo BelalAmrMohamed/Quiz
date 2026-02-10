@@ -257,6 +257,126 @@ ANIMATIONS
   }
 }
 
+/* ============================================================================
+#Subjects-text — Contextual Section Label
+============================================================================ */
+
+/* ============================================================================
+   #Subjects-text — Contextual Section Label
+   Placement: inside .header-content, below the subtitle <p>
+   Theme: Frosted-glass pill with gradient border ring + accent text
+   RTL: direction: rtl ensures icon flows after the text (left side in Arabic)
+   ============================================================================ */
+
+/* ── Base element ─────────────────────────────────────────────────────────── */
+#Subjects-text {
+  /* Layout */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  direction: rtl; /* Arabic RTL: icon ends up on the visual left */
+
+  /* Spacing */
+  margin-top: 28px;
+  padding: 9px 22px 9px 18px;
+  border-radius: 999px;
+
+  /* Typography */
+  font-size: 0.9375rem; /* 15px — matches .breadcrumb-text for scale harmony */
+  font-weight: 700;
+  letter-spacing: 0.25px;
+  line-height: 1;
+  color: var(--color-accent);
+
+  /* Frosted glass fill */
+  background: rgba(99, 102, 241, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Depth */
+  box-shadow:
+    0 4px 16px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+  /* Entrance animation (fires once on load / re-render) */
+  animation: subjectsReveal 0.5s 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+
+  /* Hover lift */
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s ease;
+}
+
+#Subjects-text:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 24px rgba(99, 102, 241, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* ── Gradient border ring ─────────────────────────────────────────────────── */
+/* Technique: set padding on the pseudo-element equal to border width,        */
+/* then mask out the content-box so only the ring is painted.                 */
+#Subjects-text::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--gradient-accent);
+
+  /* Punch a hole in the middle — only the ring shows */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Emoji icon (RTL: rendered on visual-left after the text) ─────────────── */
+#Subjects-text::after {
+  content: "📚";
+  font-size: 0.85rem;
+  line-height: 1;
+  /* Reset any inherited text effects that could apply to emoji */
+  -webkit-text-fill-color: initial;
+  color: initial;
+  opacity: 0.85;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Entrance keyframe ────────────────────────────────────────────────────── */
+@keyframes subjectsReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Dark-theme awareness ─────────────────────────────────────────────────── */
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  #Subjects-text {
+    font-size: 0.875rem;
+    padding: 8px 18px 8px 14px;
+    margin-top: 22px;
+  }
+}
+
+/* ============================================================================
+Container
+============================================================================ */
+
+
 /* Premium Grid */
 .grid-container {
   display: grid;
@@ -408,9 +528,13 @@ ANIMATIONS
   border-radius: 20px;
   max-width: 500px;
   width: 90%;
-  text-align: center;
+  text-align: center;  
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--color-border);
+}
+
+.modal-card p {
+  direction: rtl;
 }
 
 .mode-grid {
@@ -440,6 +564,11 @@ ANIMATIONS
 
 .mode-btn .icon {
   font-size: 2rem;
+
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .close-modal {

@@ -1,8 +1,10 @@
 // Script/quiz.js - Performance Optimized
 import { examList } from "./examManifest.js";
 import { gameEngine } from "./gameEngine.js";
-import  { confirmationNotification } from "./notifications.js";
+import  { showNotification, confirmationNotification } from "./notifications.js";
 
+showNotification( "الإمتحان بدأ", "أسأل الله لك التوفيق والسداد", "./images/صلى_على_النبي_2.png");
+// D:\Code projects\Websites\Quiz\images\صلى على النبي.jpg
 // === MEMORY CACHE for exam modules ===
 const examModuleCache = new Map();
 const MAX_CACHE_SIZE = 10; // Keep last 10 exams in memory
@@ -107,10 +109,10 @@ function toggleView() {
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
       els.viewIcon.textContent = "📋";
-      els.viewText.textContent = "Switch to List View";
+      els.viewText.textContent = "شكل القائمة";
     } else {
       els.viewIcon.textContent = "🪟";
-      els.viewText.textContent = "Switch to Grid View";
+      els.viewText.textContent = "شكل الأيقونات";
     }
   }
 
@@ -157,10 +159,10 @@ async function init() {
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
       els.viewIcon.textContent = "📋";
-      els.viewText.textContent = "Switch to List View";
+      els.viewText.textContent = "شكل القائمة";
     } else {
       els.viewIcon.textContent = "🪟";
-      els.viewText.textContent = "Switch to Grid View";
+      els.viewText.textContent = "شكل الأيقونات";
     }
   }
 
@@ -219,11 +221,14 @@ async function init() {
     // SHARED LOGIC: UI Updates & Game Initialization
     // -----------------------------------------------------------
 
+    // Update page title
+    document.title = `إمتحان ${metaData.title}`;
+
     // Update Title UI
     if (els.title) {
       let modeLabel = "";
-      if (quizMode === "practice") modeLabel = " (Practice)";
-      if (quizMode === "timed") modeLabel = " (Timed)";
+      if (quizMode === "practice") modeLabel = " (تدريب)";
+      if (quizMode === "timed") modeLabel = " (مؤقت)";
       els.title.textContent = (metaData.title || "Quiz") + modeLabel;
     }
 
@@ -240,7 +245,7 @@ async function init() {
       const saved = localStorage.getItem(`quiz_state_${examId}`);
       if (saved && quizMode === "practice") {
         const state = JSON.parse(saved);
-        if (await confirmationNotification("Resume your previous session?")) {
+        if (await confirmationNotification("استئناف الإمتحان؟")) {
           currentIdx = state.currentIdx || 0;
           userAnswers = state.userAnswers || {};
           lockedQuestions = state.lockedQuestions || {};
@@ -342,7 +347,7 @@ function renderMenuNavigation() {
   const flagCount = gameEngine.getFlaggedCount(examId);
   const flagInfo =
     flagCount > 0
-      ? `<span class="menu-flag-count">🚩 ${flagCount} flagged for review</span>`
+      ? `<span class="menu-flag-count">🚩 ذو علامة مرجعية:  ${flagCount}</span>`
       : "";
 
   if (viewMode === "grid") {
@@ -370,12 +375,12 @@ function renderGridView(navContainer, flagInfo) {
   // Single DOM update
   navContainer.innerHTML = `
     <div class="menu-nav-grid">
-      <div class="menu-nav-header">Question Navigator</div>
+      <div class="menu-nav-header">التنقل بين الأسئلة</div>
       <div class="menu-nav-legend">
-        <span><span class="legend-dot current"></span> Current</span>
-        <span><span class="legend-dot answered"></span> Answered</span>
-        <span><span class="legend-dot correct"></span> Correct</span>
-        <span><span class="legend-dot wrong"></span> Wrong</span>
+        <span><span class="legend-dot current"></span> الحالي</span>
+        <span><span class="legend-dot answered"></span> سؤالٌ مُجاب</span>
+        <span><span class="legend-dot correct"></span> صحيح</span>
+        <span><span class="legend-dot wrong"></span> خطأ</span>
         ${flagInfo}
         </div>
     </div>
@@ -443,12 +448,12 @@ function renderListView(navContainer, flagInfo) {
   // 2. Add Header and Legend as flat elements
   const headerDiv = document.createElement("div");
   headerDiv.innerHTML = `
-    <div class="menu-nav-header">QUESTION NAVIGATOR</div>
+    <div class="menu-nav-header">التنقل بين الأسئلة</div>
     <div class="menu-nav-legend">
-      <span><span class="legend-dot current"></span> Current</span>
-      <span><span class="legend-dot answered"></span> Answered</span>
-      <span><span class="legend-dot correct"></span> Correct</span>
-      <span><span class="legend-dot wrong"></span> Wrong</span>
+      <span><span class="legend-dot current"></span> الحالي</span>
+      <span><span class="legend-dot answered"></span> سؤالٌ مُجاب</span>
+      <span><span class="legend-dot correct"></span> صحيح</span>
+      <span><span class="legend-dot wrong"></span> خطأ</span>
      ${flagInfo || ""}     
      </div>
    
@@ -510,7 +515,7 @@ function createListItem(q, idx) {
       </span>
       <span class="menu-nav-icon flag-icon ${isFlagged ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
-            title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
+            title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
         ${isFlagged ? "🚩" : "🏳️"}
       </span>
     </div>
@@ -542,8 +547,8 @@ function updateMenuActionButtons() {
       if (bookmarkIcon) bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
       if (bookmarkText)
         bookmarkText.textContent = isBookmarked
-          ? "Remove Bookmark"
-          : "Bookmark Question";
+          ? "حذف من المفضلة"
+          : "حفظ في المفضلة";
 
       bookmarkBtn.classList.toggle("bookmarked", isBookmarked);
     }
@@ -560,7 +565,7 @@ function updateMenuActionButtons() {
       const isFlagged = gameEngine.isFlagged(examId, currentIdx);
       if (flagIcon) flagIcon.textContent = isFlagged ? "🚩" : "🏳️";
       if (flagText)
-        flagText.textContent = isFlagged ? "Remove Flag" : "Flag for Review";
+        flagText.textContent = isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة";
 
       flagBtn.classList.toggle("flagged", isFlagged);
     }
@@ -633,17 +638,19 @@ function renderQuestion() {
       </button>
       <button class="flag-btn ${isFlagged ? "active" : ""}" 
               onclick="window.toggleFlag()" 
-              title="${isFlagged ? "Remove Flag" : "Flag for Review"}">
+              title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
         ${isFlagged ? "🚩" : "🏳️"}
       </button>
     </div>
   `;
 
+/* 
+<div class="question-number">سؤال ${ + 1} من ${questions.length}</div>
+*/
+
   const questionHeaderHTML = `
     <div class="question-header">
-      <div class="question-number">Question ${currentIdx + 1} of ${
-        questions.length
-      }</div>
+      <div class="question-number">سؤال ${currentIdx + 1} من ${questions.length}</div>
       ${actionButtons}
     </div>
     ${renderQuestionImage(q.image)}
@@ -795,7 +802,7 @@ async function finish(skipconfirmationNotification) {
     autoSubmitTimeout = null;
   }
 
-  if (!skipconfirmationNotification && !await confirmationNotification("Are you sure you want to submit?")) return;
+  if (!skipconfirmationNotification && !await confirmationNotification("هل تريد أن تسلم؟")) return;
 
   stopTimer();
 
@@ -847,7 +854,7 @@ async function restart(skipconfirmationNotification) {
   // 1. confirmationNotification Intent
   if (
     !skipconfirmationNotification &&
-    !await confirmationNotification("Are you sure you want to restart? Progress will be lost.")
+    !await confirmationNotification("هل تريد إعادة الإمتحان؟ سيتم فقدان التقدم الحالي")
   )
     return;
 
@@ -905,7 +912,7 @@ async function restart(skipconfirmationNotification) {
 }
 
 async function exit(skipconfirmationNotification) {
-  if (!skipconfirmationNotification && !await confirmationNotification("Are you sure you want to exit?")) return;
+  if (!skipconfirmationNotification && !await confirmationNotification("هل أنت متأكد من الخروج؟")) return;
 
   localStorage.removeItem(`quiz_state_${examId}`);
 
@@ -944,8 +951,8 @@ function updateNav() {
     const totalLocked = Object.keys(lockedQuestions).length;
     els.finishBtn.innerHTML =
       totalLocked === questions.length && questions.length > 0
-        ? `<span>✅</span> Finish Exam`
-        : `<span>✅</span> Complete Quiz`;
+        ? `<span>✅</span> تسليم الإمتحان`
+        : `<span>✅</span> تسليم الآن`;
   }
 }
 

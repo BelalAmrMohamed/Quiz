@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- Title and Favicon -->
-    <title>Quizzes</title>
+    <title>منصة إمتحانات بصمجي</title>
     <link rel="icon" href="favicon.png" type="image/png">
 
     <!-- meta tags -->
@@ -13,29 +13,29 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="theme-color" content="#ffffff">
-    <meta name="description"
-        content="Test your knowledge with our free online quizzes! From general trivia and personality tests to deep dives into history and science. Challenge your friends now.">
+    <meta name="description" content="منصة تعليمية تحتوي على مكتبة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات.">
     <meta name="author" content="Belal Amr Mohamed">
-    <link rel="canonical" href="https://divquizzes.vercel.app/">
+    <link rel="canonical" href="https://basmagi-quiz.vercel.app/">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://divquizzes.vercel.app/">
-    <meta property="og:title" content="College Quizzes Hub: Practice Exams for Computer Science & Logic Courses">
-    <meta property="og:description"
-        content="Access free quizzes, oral exams, and practice questions for many college courses">
-    <meta property="og:image" content="https://divquizzes.vercel.app/images/thumbnail.png">
+    <meta property="og:url" content="https://basmagi-quiz.vercel.app/">
+    <meta property="og:title" content="منصة إمتحانات البصمجي: إختبر أدائك في الإمتحانات بجميع المستويات">
+    <meta property="og:description" content="منصة مجانية تحتوي على إمتحانات لجميع مواد كلية الحاسبات والمعلومات">
+    <meta property="og:image" content="https://basmagi-quiz.vercel.app/images/thumbnail.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="منصة إمتحانات البصمجي">
+    <meta property="og:locale" content="ar_AR">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BelalAmrDev">
     <meta name="twitter:creator" content="@BelalAmrDev">
-    <meta name="twitter:image:alt" content="Thumbnail for Hard History Quiz">
-    <meta name="twitter:title" content="Can You Score 10/10 on this Hard History Quiz?">
-    <meta name="twitter:description" content="Take the challenge now on Quiz.">
-    <meta name="twitter:image" content="https://divquizzes.vercel.app/images/thumbnail.png">
+    <meta name="twitter:image:alt" content="Thumbnail for Quizzes Platform">
+    <meta name="twitter:title" content="تقدر تختم أكثر من 10 إمتحانات؟">
+    <meta name="twitter:description" content="إختبر قدراتك في الإمتحانات النهائية">
+    <meta name="twitter:image" content="https://basmagi-quiz.vercel.app/images/thumbnail.png">
 
     <meta name="robots" content="index, follow">
 
@@ -58,7 +58,7 @@
         "@type": "Quiz",
         "name": "College Quiz: All Subjects",
         "about": "Study aid for college courses—test your knowledge with quizzes on All Subjects.",
-        "url": "https://divquizzes.vercel.app/",
+        "url": "https://basmagi-quiz.vercel.app/",
         "typicalAgeRange": "18-",
         "educationalAlignment": {
         "@type": "AlignmentObject",
@@ -75,18 +75,18 @@
       "itemListElement": [{
         "@type": "ListItem",
         "position": 1,
-        "name": "Quiz Master",
-        "item": "https://divquizzes.vercel.app/"
+        "name": "منصة إمتحانات بصمجي",
+        "item": "https://basmagi-quiz.vercel.app/"
       },{
         "@type": "ListItem",
         "position": 2,
-        "name": "Dashboard",
-        "item": "https://divquizzes.vercel.app/dashboard.html"
+        "name": "إنشاء إمتحانات",
+        "item": "https://basmagi-quiz.vercel.app/create-quiz.html"
       },{
         "@type": "ListItem",
         "position": 3,
-        "name": "Quiz Player",
-        "item": "https://divquizzes.vercel.app/quiz.html"
+        "name": "اللائحة",
+        "item": "https://basmagi-quiz.vercel.app/dashboard.html"
       }]
     }
     </script>
@@ -126,7 +126,7 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>Quick Access</h3>
+                <h3>القائمة</h3>
                 <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"></path>
@@ -134,58 +134,58 @@
                 </button>
             </div>
             <nav>
-                <a href="index.html" class="menu-item active">🏠 Home</a>
-                <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
-                <a href="create-quiz.html" class="menu-item">✏️ Create Quiz</a>
+                <a href="index.html" class="menu-item active">🏠 الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
+                <a href="create-quiz.html" class="menu-item">✏️ إنشاء إمتحانات</a>
 
 
                 <div class="menu-divider"></div>
                 <button
                     onclick="window.openProfileSettings(); document.getElementById('sideMenu').classList.remove('open')"
                     class="menu-item">
-                    ⚙️ Profile Settings
+                    الملف الشخصي ⚙️
                 </button>
                 <button
                     onclick="window.openCourseManager(); document.getElementById('sideMenu').classList.remove('open')"
                     class="menu-item">
-                    📚 Add/Remove Courses
+                    إضافة/حذف مواد 📚
                 </button>
                 <div class="menu-divider"></div>
 
                 <!-- THEME CONTROLS -->
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-section-header">المظهر</div>
                     <div class="theme-selector-grid">
                         <button class="theme-selector-btn" data-theme="light">
                             <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">Light</span>
+                            <span class="theme-btn-label">المظهر الفاتح</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate">
                             <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">Slate</span>
+                            <span class="theme-btn-label">المظهر الأزرق</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark">
                             <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">Dark</span>
+                            <span class="theme-btn-label">المظهر الداكن</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-section-header">الرسوم</div>
                     <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                         <div class="animation-toggle-label">
                             <span class="animation-toggle-icon">✨</span>
-                            <span>Background Effects</span>
+                            <span>الرسوم المتحركة</span>
                         </div>
                         <div class="toggle-switch active animation-toggle-switch"></div>
                     </div>
 
                     <p class="theme-info-text">
-                        💡 Disable animations to improve performance
+                        عطّل الرسوم المتحركة لتحسين الأداء 💡
                     </p>
 
                     <!-- This button should be connected to the browser's install message -->
                     <div class="menu-divider"></div>
-                    <button class="menu-item install-app">📱 Install App</button>
+                    <button class="menu-item install-app">تثبيت التطبيق 📱</button>
                 </div>
                 <!-- End of the theme controls -->
 
@@ -196,21 +196,22 @@
     <div class="container">
         <!-- Breadcrumb -->
         <div id="breadcrumb">
-            <span class="breadcrumb-text">Back to Categories</span>
+            <span class="breadcrumb-text">الرجوع إلى المواد</span>
         </div>
 
         <!-- Premium Header -->
         <div class="header">
             <div class="header-content">
-                <div class="header-badge" id="user-name"></div>
-                <h1 id="pageTitle">Loading...</h1>
-                <p>Elevate your knowledge with interactive quizzes designed to challenge and inspire.</p>
+                <div class="header-badge" id="user-name" onclick="changeUsername()"></div>
+                <h1 id="pageTitle">منصة إمتحانات بصمجي</h1>
+                <p>طور معرفتك من خلال الاختبارات التفاعلية المصممة لتحفيزك</p>
+                <div id="Subjects-text">جميع المواد</div>
             </div>
         </div>
 
         <!-- Content Area -->
         <div id="contentArea" class="loading">
-            <p>Preparing your learning experience</p>
+            <p>Preparing your learning experience...</p>
         </div>
 
         <!-- Premium Footer -->

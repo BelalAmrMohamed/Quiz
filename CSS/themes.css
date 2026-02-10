@@ -1251,3 +1251,15 @@ DARK SLATE THEME
   background: rgba(59, 130, 246, 0.2);
   color: #60a5fa;
 }
+
+/* ============================================================================
+#Subjects-text — Contextual Section Label
+============================================================================ */
+
+[data-theme="dark"] #Subjects-text,
+[data-theme="dark-slate"] #Subjects-text {
+  background: rgba(99, 102, 241, 0.12);
+  box-shadow:
+    0 4px 20px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}

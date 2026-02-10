@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Create Quiz - Quiz Platform</title>
+    <title>إنشاء إمتحانات</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
@@ -45,7 +45,7 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>Quick Access</h3>
+                <h3>القائمة</h3>
                 <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"></path>
@@ -53,44 +53,44 @@
                 </button>
             </div>
             <nav>
-                <a href="index.html" class="menu-item">🏠 Home</a>
-                <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
-                <a href="create-quiz.html" class="menu-item active">✏️ Create Quiz</a>
+                <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
+                <a href="create-quiz.html" class="menu-item active">✏️ إنشاء إمتحانات</a>
 
                 <div class="menu-divider"></div>
                 <!-- THEME CONTROLS -->
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-section-header">المظهر</div>
                     <div class="theme-selector-grid">
                         <button class="theme-selector-btn" data-theme="light">
                             <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">Light</span>
+                            <span class="theme-btn-label">المظهر الفاتح</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate">
                             <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">Slate</span>
+                            <span class="theme-btn-label">المظهر الأزرق</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark">
                             <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">Dark</span>
+                            <span class="theme-btn-label">المظهر الداكن</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-section-header">الرسومات</div>
                     <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                         <div class="animation-toggle-label">
                             <span class="animation-toggle-icon">✨</span>
-                            <span>Background Effects</span>
+                            <span>الرسومات المتحركة</span>
                         </div>
                         <div class="toggle-switch active animation-toggle-switch"></div>
                     </div>
 
                     <p class="theme-info-text">
-                        💡 Disable animations to improve performance
+                        عطّل الرسوم المتحركة لتحسين الأداء 💡
                     </p>
 
                     <div class="menu-divider"></div>
-                    <button class="menu-item install-app">📱 Install App</button>
+                    <button class="menu-item install-app">تثبيت التطبيق 📱</button>
                 </div>
             </nav>
         </div>
@@ -99,14 +99,14 @@
     <div class="container">
         <!-- Breadcrumb -->
         <div id="breadcrumb">
-            <a href="index.html" class="breadcrumb-text">← Back to Home</a>
+            <a href="index.html" class="breadcrumb-text">← الصفحة الرئيسية</a>
         </div>
 
         <!-- Header -->
         <div class="header">
             <div class="header-content">
-                <h1>✏️ Create Your Own Quiz</h1>
-                <p>Design custom quizzes with multiple-choice questions, images, and explanations.</p>
+                <h1>✏️ أنشئ اختبارك الخاص</h1>
+                <p>صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وتفسيرات.</p>
             </div>
         </div>
 
@@ -114,23 +114,23 @@
         <div class="quiz-creator">
             <!-- Quiz Metadata -->
             <div class="quiz-metadata card">
-                <h2>📋 Quiz Information</h2>
+                <h2>📋 معلومات عن الاختبار</h2>
                 <div class="form-group">
-                    <label for="quizTitle">Quiz Title *</label>
-                    <input type="text" id="quizTitle" placeholder="e.g., World History Quiz" required>
+                    <label for="quizTitle">عنوان الاختبار *</label>
+                    <input type="text" id="quizTitle" placeholder="مثال: إمحتان لغة ال C++ عن المصفوفات" required>
                 </div>
                 <div class="form-group">
-                    <label for="quizDescription">Description (Optional)</label>
-                    <textarea id="quizDescription" rows="3" placeholder="Brief description of your quiz..."></textarea>
+                    <label for="quizDescription">وصف الإمتحان (إختياري)</label>
+                    <textarea id="quizDescription" rows="3" placeholder="وصف موجز للإختبار"></textarea>
                 </div>
             </div>
 
             <!-- Questions Section -->
             <div class="questions-section">
                 <div class="section-header">
-                    <h2>❓ Questions</h2>
+                    <h2>❓ الأسئلة</h2>
                     <button class="btn btn-primary" onclick="addQuestion()">
-                        ➕ Add Question
+                        ➕ إضافة سؤال
                     </button>
                 </div>
 
@@ -140,8 +140,8 @@
 
                 <div class="empty-state" id="emptyState">
                     <div class="empty-icon">📝</div>
-                    <h3>No questions yet</h3>
-                    <p>Click "Add Question" to start creating your quiz</p>
+                    <h3>لا يوجد أسئلة</h3>
+                    <p>انقر على ”إضافة سؤال“ لبدء إنشاء الاختبار الخاص بك</p>
                 </div>
             </div>
 
@@ -149,22 +149,22 @@
             <div class="action-bar card">
                 <div class="action-buttons">
                     <button class="btn btn-success" onclick="exportQuiz()">
-                        📥 Export Quiz
+                        📥 تحميل الإمتحان
                     </button>
                     <button class="btn btn-primary" onclick="saveLocally()">
-                        ✅ Save Quiz
+                        ✅ حفظ
                     </button>
                     <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
-                        📱 Send via WhatsApp
+                        📱 إرسال عبر الواتساب
                     </button>
                     <button class="btn btn-secondary" onclick="previewQuiz()">
-                        👁️ Preview
+                        👁️ معاينة
                     </button>
                     <button class="btn btn-secondary" onclick="resetPage()">
-                        🔁 Reset Page
+                        🔁 إعادة ضبط الصفحة
                     </button>
                     <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
-                        📧 Email to Developer
+                        📧 إرسال إلى المطوّر
                     </button>
                 </div>
             </div>
@@ -180,14 +180,14 @@
     <div id="previewModal" class="modal-overlay" style="display: none;">
         <div class="modal-card preview-modal">
             <div class="modal-header">
-                <h2>🔍 Quiz Preview</h2>
+                <h2>🔍 معاينة الاختبار</h2>
                 <button class="close-btn" onclick="closePreview()">✕</button>
             </div>
             <div id="previewContent" class="preview-content">
                 <!-- Preview will be rendered here -->
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closePreview()">Close</button>
+                <button class="btn btn-secondary" onclick="closePreview()">إغلاق</button>
             </div>
         </div>
     </div>

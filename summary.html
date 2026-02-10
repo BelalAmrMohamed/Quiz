@@ -4,16 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Results</title>
+    <title>نتائج الإمتحان</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://divquizzes.vercel.app/dashboard.html">
-    <meta property="og:title" content="Quiz Results Summary">
-    <meta property="og:description"
-        content="Know the results of your quiz attempts with detailed performance summaries and insights.">
-    <meta property="og:image" content="https://divquizzes.vercel.app/images/summary-thumbnail.jpg">
+    <meta property="og:url" content="https://basmagi-quiz.vercel.app/dashboard.html">
+    <meta property="og:title" content="نتائج الإمتحان">
+    <meta property="og:description" content="اعرف نتائج إمتحاناتك ونزل الإجابات بطرق مختلفة">
+    <meta property="og:image" content="https://basmagi-quiz.vercel.app/images/summary-thumbnail.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -68,7 +67,7 @@
             onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
-                <h3>Quick Access</h3>
+                <h3>القائمة</h3>
                 <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"></path>
@@ -76,18 +75,18 @@
                 </button>
             </div>
             <nav>
-                <a href="index.html" class="menu-item">🏠 Home Page</a>
-                <a href="dashboard.html" class="menu-item">📊 Performance Dashboard</a>
-                <a href="dashboard.html#bookmarks-section" class="menu-item">⭐ Bookmarked Questions</a>
+                <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
+                <a href="create-quiz.html" class="menu-item">✏️ اعمل إمتحانات</a>
 
                 <div class="menu-divider"></div>
 
-                <div class="menu-section-title">Download Quiz</div>
+                <div class="menu-section-title">تنزيل الإمتحان</div>
                 <button id="exportQuizBtn" class="menu-item">💡 Quiz (.html)</button>
 
                 <div class="menu-divider"></div>
 
-                <div class="menu-section-title">Download your answers</div>
+                <div class="menu-section-title">تنزيل الإجابات</div>
                 <button id="exportHtmlBtn" class="menu-item">🌐 HTML (.html)</button>
                 <button id="exportPdfBtn" class="menu-item">📄 PDF (.pdf)</button>
                 <button id="exportWordBtn" class="menu-item">📖 Word (.docx)</button>
@@ -98,33 +97,33 @@
 
                 <!-- NEW THEME CONTROLS -->
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">Appearance</div>
+                    <div class="theme-section-header">المظهر</div>
                     <div class="theme-selector-grid">
                         <button class="theme-selector-btn" data-theme="light">
                             <span class="theme-btn-icon">☀️</span>
-                            <span class="theme-btn-label">Light</span>
+                            <span class="theme-btn-label">المظهر الفاتح</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate">
                             <span class="theme-btn-icon">🌙</span>
-                            <span class="theme-btn-label">Slate</span>
+                            <span class="theme-btn-label">المظهر الأزرق</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark">
                             <span class="theme-btn-icon">🌑</span>
-                            <span class="theme-btn-label">Dark</span>
+                            <span class="theme-btn-label">المظهر الداكن</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">Animations</div>
+                    <div class="animation-section-header">الرسومات</div>
                     <div class="animation-toggle-container" onclick="document.querySelector('.toggle-switch').click()">
                         <div class="animation-toggle-label">
                             <span class="animation-toggle-icon">✨</span>
-                            <span>Background Effects</span>
+                            <span>الرسوم المتحركة</span>
                         </div>
                         <div class="toggle-switch active animation-toggle-switch"></div>
                     </div>
 
                     <p class="theme-info-text">
-                        💡 Disable animations to improve performance
+                        عطل الرسوم المتحركة لتحسين الأداء 💡
                     </p>
                 </div>
                 <!-- End of the new theme cotrolls -->
@@ -136,7 +135,7 @@
     <div class="container">
         <!-- Premium Header -->
         <div class="header">
-            <h1>🎉 Quiz Complete!</h1>
+            <h1>🎉 اكتمل الاختبار</h1>
         </div>
 
         <!-- Score Header Card -->
@@ -146,27 +145,21 @@
 
         <!-- Score Details Card -->
         <div class="question-card">
-            <h2>Your Performance</h2>
             <div id="scoreDisplay">0/0</div>
-            <div id="statsDisplay">
-                <!-- Stats will be rendered here -->
-            </div>
-
-            <div class="action-buttons">
-                <button class="nav-btn primary" id="backHomeBtn">
-                    ← Back to Home
-                </button>
-            </div>
+            <button class="nav-btn primary" id="backHomeBtn">
+                ← الرجوع إلى الصفحة الرئيسية
+            </button>
         </div>
+    </div>
 
-        <!-- Review Section -->
-        <div id="reviewContainer">
-            <!-- Review cards will be rendered here -->
-        </div>
+    <!-- Review Section -->
+    <div id="reviewContainer">
+        <!-- Review cards will be rendered here -->
+    </div>
 
-        <!-- Premium Footer -->
-        <div class="watermark">Crafted by Belal Amr | <a target="_blank"
-                href="https://belalamrmohamed.github.io/portfolio/">Portfolio</a></div>
+    <!-- Premium Footer -->
+    <div class="watermark">Crafted by Belal Amr | <a target="_blank"
+            href="https://belalamrmohamed.github.io/portfolio/">Portfolio</a></div>
     </div>
 
     <div id="notification-container"></div>

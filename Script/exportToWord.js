@@ -942,7 +942,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
           new ExternalHyperlink({
             children: [
               new TextRun({
-                text: "https://divquizzes.vercel.app/",
+                text: "https://basmagi-quiz.vercel.app/",
                 bold: true,
                 size: 24,
                 color: "0563C1", // Standard blue link color
@@ -951,7 +951,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
                 },
               }),
             ],
-            link: "https://divquizzes.vercel.app/",
+            link: "https://basmagi-quiz.vercel.app/",
           }),
         ],
       }),
@@ -1031,7 +1031,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
     showNotification(
       "Word document downloaded.",
       "You have it now!",
-      "https://learn.kaceli.com/pluginfile.php/183/course/overviewfiles/word.png"
+      "./images/word_icon.png"
     );
 
     return { success: true, filename };

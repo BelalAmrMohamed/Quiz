@@ -1138,7 +1138,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       doc.setFontSize(18);
       doc.setTextColor(...COLORS.info);
       doc.setFont("helvetica", "bold");
-      doc.text("https://divquizzes.vercel.app/", pageWidth / 2, currentY, {
+      doc.text("https://basmagi-quiz.vercel.app/", pageWidth / 2, currentY, {
         align: "center",
       });
 
@@ -1158,7 +1158,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     showNotification(
       "PDF file downloaded.",
       "You have it now!",
-      "https://static.vecteezy.com/system/resources/thumbnails/023/234/824/small/pdf-icon-red-and-white-color-for-free-png.png"
+      "./images/PDF_Icon.png"
     );
 
     return { success: true, filename };

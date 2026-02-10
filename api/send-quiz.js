@@ -25,8 +25,8 @@
 export default async function handler(req, res) {
   // CORS headers
   const ALLOWED_ORIGINS = [
-    "https://divquizzes.vercel.app",
-    "https://www.divquizzes.vercel.app",
+    "https://basmagi-quiz.vercel.app",
+    "https://www.basmagi-quiz.vercel.app",
     "http://127.0.0.1:5500", // Common local server
     "http://localhost:3000", // Common local dev
     "http://localhost:5500"
