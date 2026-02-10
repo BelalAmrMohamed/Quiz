@@ -2,6 +2,7 @@
 // Downloads the quiz as markdown (.md)
 // Deals with the export from both main page and results/summary page
 // No libraries used
+import { showNotification } from "./notifications.js";
 
 const isEssayQuestion = (q) => q.options && q.options.length === 1;
 const isLocalPath = (url) => {
@@ -102,4 +103,9 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  showNotification(
+    "Markdown file downloaded.",
+    "You have it now!",
+    "https://img.icons8.com/?size=100&id=21813&format=png&color=000000"
+  );
 }

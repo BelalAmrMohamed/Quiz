@@ -469,12 +469,12 @@ window.saveToLocalStorage = function (silent = false) {
     localStorage.setItem("quiz_creator_draft", JSON.stringify(saveData));
 
     if (!silent) {
-      showNotification("✅ Draft saved successfully!", "success");
+      showNotification("Draft saved successfully!", "You can come back later.","success");
     }
   } catch (error) {
     console.error("Error saving to localStorage:", error);
     if (!silent) {
-      showNotification("Error saving draft", "error");
+      showNotification("Error saving draft", "", "error");
     }
   }
 };
@@ -514,7 +514,7 @@ window.resetPage = async function () {
   saveToLocalStorage(true);
 
   // 5. Notify User
-  showNotification("🧹 Page reset successfully", "success");
+  showNotification("Page reset successfully", "You can make another quiz now!", "🧹");
 };
 
 function loadDraftFromLocalStorage() {
@@ -545,7 +545,7 @@ function loadDraftFromLocalStorage() {
         });
 
         updateEmptyState();
-        showNotification("📂 Draft loaded", "info");
+        showNotification("Draft loaded", "You can continue now.", "success");
       }
     }
   } catch (error) {
@@ -597,11 +597,10 @@ window.exportQuiz = function () {
     return;
   }
 
-  // Save to user_quizzes
-  const quizId = saveToUserQuizzes(quizData);
+  const quizId = `user_quiz_${Date.now()}`;
 
   if (!quizId) {
-    showNotification("Error saving quiz", "error");
+    showNotification("Error saving quiz", "No quiz id.", "error");
     return;
   }
 
@@ -642,7 +641,7 @@ export const questions = ${JSON.stringify(exportQuestions, null, 2)};
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showNotification("✅ Quiz saved and exported!", "success");
+  showNotification("Quiz exported!", "Send it to the developer", "success");
 };
 
 // ============================================================================
@@ -662,7 +661,7 @@ window.saveLocally = function () {
 
   // Save to user_quizzes first
   const quizId = saveToUserQuizzes(quizData);
-  showNotification("📤 Saved locally", "success");
+  showNotification("Saved locally", "You can find it in \"Your Quizzes\"", "success");
 };
 
 // ============================================================================
@@ -680,7 +679,7 @@ window.emailQuizToDeveloper = function () {
   }
 
   try {
-    showNotification("📤 Sending quiz to developer...", "info");
+    showNotification("Sending quiz to developer...", "This will help upload it to everyone.","info");
 
     // 1. Prepare quiz data
     const exportQuestions = quizData.questions.map((q) => {
@@ -723,7 +722,8 @@ window.emailQuizToDeveloper = function () {
   } catch (error) {
     console.error("Error submitting quiz:", error);
     showNotification(
-      "Error submitting quiz to developer. Please try again.",
+      "Error submitting quiz to developer.",
+      `${error}`,
       "error",
     );
   }
@@ -784,5 +784,5 @@ ${fileContent}`;
   // Open WhatsApp
   window.open(whatsappUrl, "_blank");
 
-  showNotification("📱 Opening WhatsApp...", "info");
+  showNotification("Opening WhatsApp...", "+20 111 848 21 93","info");
 };

@@ -3,6 +3,8 @@
 // Deals with the export from both main page and results/summary page
 // `docx` library used, included in this file.
 
+import { showNotification } from "./notifications.js";
+
 const currentName = localStorage.getItem("username") || "User";
 let docx;
 
@@ -1025,6 +1027,12 @@ export async function exportToWord(config, questions, userAnswers = []) {
     URL.revokeObjectURL(url);
 
     console.log(`Gamified Word document exported: ${filename}`);
+
+    showNotification(
+      "Word document downloaded.",
+      "You have it now!",
+      "https://learn.kaceli.com/pluginfile.php/183/course/overviewfiles/word.png"
+    );
 
     return { success: true, filename };
   } catch (error) {

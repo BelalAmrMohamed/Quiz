@@ -4,114 +4,102 @@
 // Include the CSS file in an HTML page:
 // <link rel="stylesheet" href="CSS/notificatinos.css">
 
-// ==================
-// Notification Badge
-// ==================
+/* =========================================
+   Unified Notification System
+   Look: Glassmorphism (Gamified)
+   Logic: Stackable Toasts with Auto-Dismiss
+   ========================================= */
 
-export function showNotificationBadge(strongText, message = "", icon = "info") {
-  const notification = document.createElement("div");
-  switch (icon){
-    case "info":
-      icon = "ℹ️";
-      notification.className = "notification info";
-      break;
+export function showNotification(title, message = "", type = "info") {
+  // 1. Get or Create Container (Logic from Function 2)
+  let container = document.getElementById("notification-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "notification-container";
+    document.body.appendChild(container);
+  }
 
-      case "success":
+  // 2. Determine Icon and Class (Hybrid Logic)
+  let icon = type; // Default to passing string directly
+  let typeClass = "info";
+
+  switch (type) {
+    case "success":
       icon = "✅";
-      notification.className = "notification success";
+      typeClass = "success";
       break;
-
-      case "error":        
+    case "error":
       icon = "❌";
-      notification.className = "notification error";
+      typeClass = "error";
       break;
-
-      case "warning":
+    case "warning":
       icon = "⚠️";
-      notification.className = "notification warning";
+      typeClass = "warning";
       break;
+    case "info":
+    default:
+      icon = "ℹ️";
+      typeClass = "info";
+      break;
+  }
 
-      default:
-      notification.className = "notification";
+  // Check if the 'type' passed was actually a custom URL or Icon string override
+  // If the user passed a specific string instead of a type keyword, usage adaptation:
+  if (!["success", "error", "warning", "info"].includes(type)) {
+     icon = type; // The type argument is treated as the icon
+     typeClass = "default";
+  }
 
-  }  
-  notification.innerHTML = `
+  // 3. Create Notification Element
+  const toast = document.createElement("div");
+  // We apply 'toast-enter' animation immediately via CSS
+  toast.className = `notification glass-toast ${typeClass}`;
+
+  // 4. Construct HTML (Visual Structure from Function 1, Safety from Function 2)
+  const iconHTML = isURL(icon) 
+    ? `<img src="${icon}" alt="Icon" class="notification-image">` 
+    : `<span class="notification-icon">${icon}</span>`;
+
+  toast.innerHTML = `
     <div class="notification-content">
-    
-    ${isURL(icon) ? `<img src="${icon}" alt="Context Icon" class="notification-image">` : `<span class="notification-icon">${icon}</span>`}      
+      ${iconHTML}
       <div>
-        <strong>${strongText}!</strong>
-        <p>${message}</p>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(message)}</p>
       </div>
       <button class="close-btn">×</button>
     </div>
   `;
-  document.getElementById("notification-container").appendChild(notification);
-  setTimeout(() => notification.classList.add("show"), 100);
-  const timeout = setTimeout(() => removeNotificationBadge(notification), 50000);
-  notification.querySelector(".close-btn").addEventListener("click", () => {
-    clearTimeout(timeout);
-    removeNotificationBadge(notification);
+
+  // 5. Append to Container
+  // Prepend makes new ones appear at the top, Append at the bottom. 
+  // Based on your CSS (bottom-right), 'prepend' usually looks better so the stack pushes up.
+  container.prepend(toast); 
+
+  // 6. Lifecycle Management
+  
+  // A. Auto Dismiss Timer
+  const autoDismissTimeout = setTimeout(() => {
+    removeToast(toast);
+  }, 5000);
+
+  // B. Manual Close Button
+  const closeBtn = toast.querySelector(".close-btn");
+  closeBtn.addEventListener("click", () => {
+    clearTimeout(autoDismissTimeout); // Stop the auto-timer
+    removeToast(toast); // Remove immediately
   });
 }
 
-function removeNotificationBadge(notif) {
-  notif.classList.add("hide");
-  setTimeout(() => notif.remove(), 300);
+// Helper: Remove with Animation
+function removeToast(toast) {
+  toast.style.animation = "toastSlideOut 0.4s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)";
+  toast.addEventListener("animationend", () => {
+    toast.remove();
+  });
 }
 
-function isURL(string) {
-  try {
-    const url = new URL(string);
-    // Optional: Ensure the protocol is http or https
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch (_) {
-    return false;  
-  }
-}
-/* ============================ 
-    Smaller notifications
-   ============================ */
-
-export function showNotification(message, type = "info") {
-  // 1. Get or Create Container
-  let container = document.querySelector(".notification-container-small");
-  if (!container) {
-    container = document.createElement("div");
-    container.className = "notification-container-small";
-    document.body.appendChild(container);
-  }
-
-  // 2. Create Toast
-  const toast = document.createElement("div");
-  toast.className = `notification-toast ${type}`;
-
-  // Icon based on type
-  let icon = "ℹ️";
-  if (type === "success") icon = "✅";
-  if (type === "error") icon = "❌";
-  if (type === "warning") icon = "⚠️";
-
-  toast.innerHTML = `
-    <div class="toast-icon">${icon}</div>
-    <div class="toast-message">${escapeHtml(message)}</div>
-  `;
-
-  // 3. Append to Container (Newest at bottom)
-  container.appendChild(toast);
-
-  // 4. Auto Dismiss
-  // Handle rapid fire: each toast has its own timer
-  setTimeout(() => {
-    toast.classList.add("hiding");
-
-    // Remove from DOM after animation
-    toast.addEventListener("animationend", () => {
-      toast.remove();
-    });
-  }, 5000);
-}
-
+// Helper: Security (From Logic Source)
 function escapeHtml(text) {
   if (!text) return "";
   const div = document.createElement("div");
@@ -119,6 +107,15 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Helper: URL Check (From Visual Source)
+function isURL(string) {
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;  
+  }
+}
 /* ============================
     Confirmation Modal
    ============================ */

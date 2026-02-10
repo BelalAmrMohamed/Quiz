@@ -14,6 +14,8 @@
  * - visual polish for Header/Footer
  */
 
+import { showNotification } from "./notifications.js";
+
 let pptxgen;
 
 async function loadPptxGen() {
@@ -775,6 +777,13 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     const fileName = `${documentTitle}.pptx`;
 
     await pptx.writeFile({ fileName });
+
+    showNotification(
+      "PowerPoint file downloaded.",
+      "You have it now!",
+      "https://static.vecteezy.com/system/resources/thumbnails/060/359/773/small/3d-icon-from-microsoft-powerpoint-suitable-for-presentation-media-template-design-brochures-promotional-media-and-advertising-free-png.png"
+    );
+
     return true;
   } catch (error) {
     console.error("PPTX Export Error:", error);

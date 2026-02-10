@@ -4,235 +4,170 @@
    <link rel="stylesheet" href="CSS/notificatinos.css">
 */
 
-/* ==================
-   Notification Badge
-   ================== */
-   
+/* =========================
+   Container Configuration
+   ========================= */
 #notification-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 24px;
+  right: 24px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: column-reverse; /* Newest items at the bottom visually */
+  gap: 12px;
   z-index: 10000;
+  pointer-events: none; /* Click-through empty space */
 }
 
-.notification {
-  /* Glass Effect Settings */
-  background: rgba(255, 255, 255, 0.75); /* High opacity white for readability */
-  backdrop-filter: blur(12px);           /* The "frosted" blur */
-  -webkit-backdrop-filter: blur(12px);   /* Safari support */
-  border: 1px solid rgba(255, 255, 255, 0.4); /* Subtle glass border */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);  /* Soft shadow for depth */
+/* =========================
+   Glass Notification Base
+   ========================= */
+.notification.glass-toast {
+  pointer-events: auto; /* Re-enable clicks on the toast itself */
+  position: relative;
+  display: flex;
   
-  /* Layout & Animation */
+  /* Glassmorphism Look (From Visual Source) */
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  
+  /* Layout */
   border-radius: 12px;
   padding: 16px;
-  opacity: 0;
-  transform: translateX(100%);
+  min-width: 320px;
+  max-width: 400px;
+  color: #333;
+  
+  /* Animation Entry */
+  animation: toastSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   transition: all 0.3s ease;
-  max-width: 300px;
-  color: #333; /* Ensure text is dark enough to read on glass */
 }
 
-/* Dark Mode Support (Optional: If your body has a dark theme class) */
+/* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .notification {
-    background: rgba(30, 30, 30, 0.75);
+  .notification.glass-toast {
+    background: rgba(30, 30, 30, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
   }
 }
 
-.notification.show {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.notification.hide {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
+/* =========================
+   Inner Content Styling
+   ========================= */
 .notification-content {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  position: relative;
+  align-items: center; /* Center icon vertically with text */
+  gap: 16px;
+  width: 100%;
 }
 
 .notification-icon {
   font-size: 2rem;
+  line-height: 1;
 }
 
-.notification-content > div {
-  padding-right: 24px;
+.notification-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
-.notification-image{
-  max-width: 50px;
-  max-height: 50px;
-  object-fit: contain;
-  border-radius: 4px;
-  flex-shrink: 0;
+/* Typography */
+.notification-content div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1; /* Take up remaining space */
 }
 
+.notification-content strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.notification-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* =========================
+   Close Button
+   ========================= */
 .close-btn {
   position: absolute;
-  top: -10px;   /* Slight adjustment for better visual balance */
-  right: -10px; 
+  top: -8px;
+  right: -8px;
   
-  /* Glassy Button Style */
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  
   border-radius: 50%;
   width: 24px;
   height: 24px;
+  
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 1rem;
-  transition: background 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s, background 0.2s;
+  padding: 0;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-/* ==================== 
-    Small notifications
-   ==================== */
-   
-.notification-container-small {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  display: flex;
-  flex-direction: column; /* Stack top-down in DOM order */
-  gap: 12px;
-  z-index: 10000;
-  pointer-events: none; /* Allows clicks to pass through empty space */
+  transform: scale(1.1);
+  background: #fff;
 }
 
-/* Toast Item */
-.notification-toast {
-  pointer-events: auto;
-  min-width: 300px;
-  max-width: 400px;
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  border-left: 5px solid var(--color-primary);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 500;
-  transform-origin: right center;
-
-  /* Animations */
-  animation: toastSlideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform, opacity;
-  transition: all 0.3s ease;
+@media (prefers-color-scheme: dark) {
+  .close-btn {
+    background: rgba(50, 50, 50, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
 }
 
-/* Toast Themes */
-.notification-toast.success {
-  border-left-color: var(--color-success);
-  background: linear-gradient(
-    to right,
-    var(--color-surface),
-    var(--color-success-light) 150%
-  );
-}
+/* =========================
+   Type-Specific Accents
+   (Optional: Adds subtle border color)
+   ========================= */
+.notification.success { border-left: 4px solid #4caf50; }
+.notification.error { border-left: 4px solid #f44336; }
+.notification.warning { border-left: 4px solid #ff9800; }
+.notification.info { border-left: 4px solid #2196f3; }
 
-.notification-toast.success .toast-icon {
-  color: var(--color-success);
-}
-
-.notification-toast.error {
-  border-left-color: var(--color-error);
-  background: linear-gradient(
-    to right,
-    var(--color-surface),
-    var(--color-error-light) 150%
-  );
-}
-
-.notification-toast.error .toast-icon {
-  color: var(--color-error);
-}
-
-.notification-toast.info {
-  border-left-color: var(--color-primary);
-  background: linear-gradient(
-    to right,
-    var(--color-surface),
-    var(--color-primary-light) 150%
-  );
-}
-
-.notification-toast.info .toast-icon {
-  color: var(--color-primary);
-}
-
-/* Toast Icon */
-.toast-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-/* Hiding State (for removal) */
-.notification-toast.hiding {
-  animation: toastSlideOut 0.3s ease forwards;
-  max-height: 0;
-  margin: 0;
-  padding: 0;
-  opacity: 0;
-  border: none;
-}
-
-/* Animations */
+/* =========================
+   Animations
+   ========================= */
 @keyframes toastSlideIn {
   from {
-    transform: translateX(120%) scale(0.9);
+    transform: translateX(120%);
     opacity: 0;
   }
   to {
-    transform: translateX(0) scale(1);
+    transform: translateX(0);
     opacity: 1;
   }
 }
 
 @keyframes toastSlideOut {
-  0% {
+  from {
     transform: translateX(0);
     opacity: 1;
-    max-height: 100px;
   }
-  30% {
-    opacity: 0;
-  }
-  100% {
+  to {
     transform: translateX(120%);
     opacity: 0;
-    max-height: 0;
-    margin: 0;
-    padding: 0;
   }
 }
-
-/* Dark Mode Adjustments */
-[data-theme="dark-slate"] .notification-toast,
-[data-theme="dark"] .notification-toast {
-  border: 1px solid var(--color-border);
-  border-left-width: 5px;
-}
-
-
 /* ===========================
    Confirmation Modal Styles
    =========================== */

@@ -3,6 +3,8 @@
 // Deals with the export from both main page and results/summary page
 // No libraries used.
 
+import { showNotification } from "./notifications.js";
+
 export async function exportToQuiz(config, questions) {
   const processedQuestions = await convertImagesToBase64(questions);
 
@@ -2267,6 +2269,13 @@ export async function exportToQuiz(config, questions) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+
+  showNotification(
+      "Quiz downloaded successfully.",
+      "You have it now!",
+      "https://divquizzes.vercel.app/favicon.png"
+  );
+
 }
 
 function escapeHTML(str) {

@@ -10,7 +10,7 @@ import { exportToPptx } from "./exportToPptx.js";
 import { exportToMarkdown } from "./exportToMarkdown.js";
 
 // Notifications
-import  { showNotification ,showNotificationBadge } from "./notifications.js";
+import  { showNotification } from "./notifications.js";
 
 // Helpers
 const currentName = localStorage.getItem("username") || "User";
@@ -83,25 +83,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     (exportMdBtn.onclick = () =>
       exportToMarkdown(config, questions, result.userAnswers));
   exportPdfBtn &&
-    (exportPdfBtn.onclick = async () => {
-      await exportToPdf(config, questions, result.userAnswers)
-      showNotificationBadge(`PDF is being Downloaded.`, `Wait a moment...`, `https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1920px-PDF_file_icon.svg.png`);}
-  );
+    (exportPdfBtn.onclick = async () =>
+      await exportToPdf(config, questions, result.userAnswers));
   exportWordBtn &&
-    (exportWordBtn.onclick = async () => {
-      await exportToWord(config, questions, result.userAnswers);
-      showNotification(`Word document is being Downloaded...`);});
+    (exportWordBtn.onclick = async () =>
+      await exportToWord(config, questions, result.userAnswers));
   exportPptxBtn &&
-    (exportPptxBtn.onclick = async () => {
-      await exportToPptx(config, questions, result.userAnswers);
-      showNotification(`PowerPoint document is being Downloaded...`);});
+    (exportPptxBtn.onclick = async () =>
+      await exportToPptx(config, questions, result.userAnswers));
   exportHtmlBtn &&
-    (exportHtmlBtn.onclick = () => {
-      exportToHtml(config, questions, result.userAnswers);
-      showNotification(`HTML file is being Downloaded...`);});
+    (exportHtmlBtn.onclick = () =>
+      exportToHtml(config, questions, result.userAnswers));
   exportQuizBtn &&
-    (exportQuizBtn.onclick = () => { exportToQuiz(config, questions);
-      showNotification(`Quiz is being Downloaded...`);});
+    (exportQuizBtn.onclick = () => exportToQuiz(config, questions));
 
   const totalScorable = result.total;
   const totalQuestions = questions.length;
@@ -138,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userName = localStorage.getItem("username") || "User";
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
-    setTimeout(() => showNotificationBadge(`Congratulations, ${userName}`, `You've earned the ${badge.title} badge!`, "error"), index * 500);
+    setTimeout(() => showNotification(`Congratulations, ${userName}`, `You've earned the ${badge.title} badge!`, "info"), index * 500);
   });
 });
 

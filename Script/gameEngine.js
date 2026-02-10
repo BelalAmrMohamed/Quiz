@@ -598,8 +598,8 @@ export const gameEngine = {
       
     }
     this.saveUserData(user);
-    if (!this.isBookmarked(examId, questionIdx)) showNotification(`Question ${questionIdx + 1} Removed from bookmarks.`);
-    else showNotification(`Question ${questionIdx + 1} added to bookmarks, Check in Dashboard.`, "success");
+    if (!this.isBookmarked(examId, questionIdx)) showNotification(`Unbookmarked Question ${questionIdx + 1}`);
+    else showNotification(`Bookmarked Question ${questionIdx + 1}`, `Check in Dashboard.`, "success");
     return !!user.bookmarks[key];
   },
 
@@ -621,8 +621,8 @@ export const gameEngine = {
     }
 
     this.saveUserData(user);
-    if (!this.isFlagged(examId, questionIdx)) showNotification(`Question ${questionIdx + 1} Unflagged.`);
-    else showNotification(`Question ${questionIdx + 1} flagged for review.`, "success");
+    if (!this.isFlagged(examId, questionIdx)) showNotification(`Unflagged Question ${questionIdx + 1}`);
+    else showNotification(`Flagged Question ${questionIdx + 1}`, "You can review it later.", "success");
 
     return !!user.flags[key];
   },

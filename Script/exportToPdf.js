@@ -3,6 +3,8 @@
 // Deals with the export from both main page and results/summary page
 // `jsPDF` library used, included in the html. See => "summary.html"
 
+import { showNotification } from "./notifications.js";
+
 const currentName = localStorage.getItem("username") || "User";
 
 export async function exportToPdf(config, questions, userAnswers = []) {
@@ -1152,6 +1154,12 @@ export async function exportToPdf(config, questions, userAnswers = []) {
 
     doc.save(filename);
     console.log(`Gamified PDF exported: ${filename}`);
+
+    showNotification(
+      "PDF file downloaded.",
+      "You have it now!",
+      "https://static.vecteezy.com/system/resources/thumbnails/023/234/824/small/pdf-icon-red-and-white-color-for-free-png.png"
+    );
 
     return { success: true, filename };
   } catch (error) {

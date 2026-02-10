@@ -3,6 +3,8 @@
 // Deals with the export from both main page and results/summary page
 // No libraries used
 
+import { showNotification } from "./notifications.js";
+
 export async function exportToHtml(config, questions, userAnswers = []) {
   // Convert local images to base64
   const processedQuestions = await convertImagesToBase64(questions);
@@ -131,6 +133,11 @@ export async function exportToHtml(config, questions, userAnswers = []) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  showNotification(
+    "HTML file Downloaded", 
+    "You Have it now!", 
+    "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png"
+  );
 }
 
 const isEssayQuestion = (q) => q.options && q.options.length === 1;
