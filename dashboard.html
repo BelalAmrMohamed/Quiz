@@ -91,8 +91,9 @@
 
                 <div class="menu-divider" role="separator"></div>
 
-                <button class="menu-item" data-action="openProfileSettings">⚙️ الملف الشخصي</button>
-                <button class="menu-item" data-action="openCourseManager">📚 إضافة/حذف مواد</button>
+                <button onclick="changeUsername()" class="menu-item">
+                    تغيير الإسم: <span class="change-username" id="userNameDisplay"></span>
+                </button>
 
                 <div class="menu-divider" role="separator"></div>
 
@@ -134,7 +135,7 @@
     </div>
     <div class="container">
         <div id="breadcrumb" class="show" onclick="window.location.href='index.html'">
-            <span class="breadcrumb-text">← الرجوع إلى الصفحة الرئيسية</span>
+            <span class="breadcrumb-text">الرجوع إلى الصفحة الرئيسية</span>
         </div>
 
         <div class="header">
@@ -239,9 +240,15 @@
         </div>
 
         <!-- Premium Footer -->
-        <footer class="watermark">
-            صُنع بعناية بواسطة بلال عمرو &nbsp;|&nbsp;
-            <a target="_blank" rel="noopener noreferrer" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
+        <footer class="watermark" role="contentinfo">
+            <p>
+                صُنع بواسطة
+                <a href="https://portfolio-of-belal.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    aria-label="زيارة موقع بلال عمرو (يفتح في نافذة جديدة)">
+                    بلال عمرو
+                </a>
+            </p>
+        </footer>
     </div>
     <script type="module" src="Script/dashboard.js"></script>
     <script type="module" src="Script/side-menu.js"></script>

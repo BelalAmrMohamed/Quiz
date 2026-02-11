@@ -134,9 +134,9 @@ export async function exportToHtml(config, questions, userAnswers = []) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showNotification(
-    "HTML file Downloaded", 
-    "You Have it now!", 
-    "./images/HTML_Icon.png"
+    "HTML file Downloaded",
+    "You have it now",
+    "./images/HTML_Icon.png",
   );
 }
 

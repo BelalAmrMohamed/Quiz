@@ -1030,8 +1030,8 @@ export async function exportToWord(config, questions, userAnswers = []) {
 
     showNotification(
       "Word document downloaded.",
-      "You have it now!",
-      "./images/word_icon.png"
+      "You have it now",
+      "./images/word_icon.png",
     );
 
     return { success: true, filename };

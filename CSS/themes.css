@@ -99,6 +99,18 @@
   --transition-base: 0.3s ease;
   --transition-slow: 0.5s ease;
   --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-Index Hierarchy */
+  --z-below: -1;
+  --z-base: 1;
+  --z-above: 10;
+  --z-header: 1000;
+  --z-overlay: 4000;
+  --z-modal: 5000;
+  --z-tooltip: 6000;
+  --z-toast: 7000;
+  --z-notification: 10000;
+  --z-modal-top: 11000;
 }
 
 /* ==================== DARK SLATE THEME ==================== */

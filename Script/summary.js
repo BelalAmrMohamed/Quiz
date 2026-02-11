@@ -10,7 +10,7 @@ import { exportToPptx } from "./exportToPptx.js";
 import { exportToMarkdown } from "./exportToMarkdown.js";
 
 // Notifications
-import  { showNotification } from "./notifications.js";
+import { showNotification } from "./notifications.js";
 
 // Helpers
 const currentName = localStorage.getItem("username") || "User";
@@ -64,17 +64,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else if (result.questions) {
     questions = result.questions;
   } else {
-     // Fallback: Try to find in user_quizzes
-      try {
-        const userQuizzes = JSON.parse(localStorage.getItem("user_quizzes") || "[]");
-        const found = userQuizzes.find(q => q.id === result.examId);
-        if(found){
-            questions = found.questions;
-            config.title = found.title;
-        }
-      } catch(e){
-        console.error("Error loading user quiz questions", e);
+    // Fallback: Try to find in user_quizzes
+    try {
+      const userQuizzes = JSON.parse(
+        localStorage.getItem("user_quizzes") || "[]",
+      );
+      const found = userQuizzes.find((q) => q.id === result.examId);
+      if (found) {
+        questions = found.questions;
+        config.title = found.title;
       }
+    } catch (e) {
+      console.error("Error loading user quiz questions", e);
+    }
   }
   // Update page title
   document.title = `نتائج إمتحان ${config.title}`;
@@ -132,7 +134,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userName = localStorage.getItem("username") || "User";
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
-    setTimeout(() => showNotification(`Congratulations, ${userName}`, `You've earned the ${badge.title} badge!`, "info"), index * 500);
+    setTimeout(
+      () =>
+        showNotification(
+          `Congratulations, ${userName}`,
+          `You've earned the ${badge.title} badge`,
+          `${badge.icon}`,
+        ),
+      index * 500,
+    );
   });
 });
 
@@ -187,7 +197,7 @@ function renderHeader(
       <h2>${
         percentage >= 70
           ? `Great Job! ${currentName}`
-          :  `استمر في المذاكرة يا ${currentName}`
+          : `استمر في المذاكرة يا ${currentName}`
       }</h2>
       <div class="points-pill"><span>💎 +${points} نقطة</span></div>
       <p>النتيجة: ${data.score} / ${total}</p>

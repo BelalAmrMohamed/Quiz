@@ -4,7 +4,6 @@ import { examList } from "./examManifest.js";
 
 import { confirmationNotification } from "./notifications.js";
 
-
 function refreshUI() {
   const user = gameEngine.getUserData();
   renderStats(user);
@@ -12,7 +11,7 @@ function refreshUI() {
   renderBookmarks(user);
   renderBadges(user);
   renderLeaderboard(user);
-  
+
   // Update username display
   const nameDisplay = document.getElementById("userNameDisplay");
   if (nameDisplay) {
@@ -25,7 +24,8 @@ function refreshUI() {
 
 // Delete history entry
 window.deleteHistory = async function (index) {
-  if (!await confirmationNotification("هل أنت متأكد من حذف هذا الاختبار؟ ")) return;
+  if (!(await confirmationNotification("هل أنت متأكد من حذف هذا الاختبار؟ ")))
+    return;
 
   const user = gameEngine.getUserData();
   user.history.splice(index, 1);
@@ -37,7 +37,7 @@ window.deleteHistory = async function (index) {
 
 // Remove bookmark
 window.removeBookmark = async function (key) {
-  if (!await confirmationNotification("إزالة من المفضلة؟")) return;
+  if (!(await confirmationNotification("إزالة من المفضلة؟"))) return;
 
   const user = gameEngine.getUserData();
   if (user.bookmarks && user.bookmarks[key]) {
@@ -75,12 +75,12 @@ function renderStats(user) {
   document.getElementById("totalBadges").textContent = user.badges
     ? user.badges.length
     : 0;
-  document.getElementById("currentLevel").textContent = levelInfo.level;
+  document.getElementById("currentLevel").textContent = levelInfo.level | 0;
 
   // Level Details
   document.getElementById("levelTitle").textContent = levelInfo.title;
   document.getElementById("levelBadge").innerHTML =
-    `<span class="level-number">${levelInfo.level}</span>`;
+    `<span class="level-number">${levelInfo.level | 0}</span>`;
   document.getElementById("levelProgressBar").style.width = `${
     levelInfo.progressPercent || 0
   }%`;
@@ -117,13 +117,13 @@ function renderStats(user) {
   }
 
   // Both ways result in the same direction
-  document.getElementById("currentStreak").textContent = 
-  ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
-  ` ${user.streaks?.currentDaily || 0} `;
+  document.getElementById("currentStreak").textContent =
+    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
+    ` ${user.streaks?.currentDaily || 0} `;
 
-  document.getElementById("bestStreak").textContent = 
-  ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
-  ` ${user.streaks?.longestStreak || 0} `;
+  document.getElementById("bestStreak").textContent =
+    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
+    ` ${user.streaks?.longestStreak || 0} `;
 }
 
 function renderHistory(user) {

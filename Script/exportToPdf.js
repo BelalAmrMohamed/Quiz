@@ -7,8 +7,34 @@ import { showNotification } from "./notifications.js";
 
 const currentName = localStorage.getItem("username") || "User";
 
+const loadPdfLib = () =>
+  new Promise((resolve, reject) => {
+    if (window.jspdf && window.jspdf.jsPDF) {
+      resolve();
+      return;
+    }
+    const s = document.createElement("script");
+    s.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("PDF library failed to load"));
+    document.head.appendChild(s);
+  });
+
 export async function exportToPdf(config, questions, userAnswers = []) {
   try {
+    try {
+      await loadPdfLib();
+    } catch {
+      showNotification(
+        "PDF library could not be loaded.",
+        "Issue is From the website",
+        "error",
+      );
+      alert("PDF library could not be loaded.");
+      return;
+    }
+
     // ===========================
     // VALIDATION
     // ===========================
@@ -856,6 +882,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
           currentY += imageInfo.height + 5;
         } catch (e) {
           console.error("Failed to add image to PDF", e);
+          showNotification("Failed to add image to PDF", `${e}`, "error");
           // Continue without image
         }
       }
@@ -1157,14 +1184,15 @@ export async function exportToPdf(config, questions, userAnswers = []) {
 
     showNotification(
       "PDF file downloaded.",
-      "You have it now!",
-      "./images/PDF_Icon.png"
+      "You have it now",
+      "./images/PDF_Icon.png",
     );
 
     return { success: true, filename };
   } catch (error) {
     console.error("PDF Export Error:", error);
     alert(`Failed to export PDF: ${error.message}`);
+    showNotification("Failed to export PDF", `${error.message}`, "error");
     return { success: false, error: error.message };
   }
 }

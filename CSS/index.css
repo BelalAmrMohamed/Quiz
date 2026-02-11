@@ -36,7 +36,7 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 /* Breadcrumb */
@@ -68,8 +68,11 @@ body {
 
 #breadcrumb::before {
   content: "←";
+  display: inline-flex;
+  align-items: center;
   font-size: 1.25rem;
   font-weight: 600;
+  line-height: 1;
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -99,7 +102,7 @@ body {
   position: relative;
   overflow: hidden;
   background: var(--color-surface, #ffffff);
-  
+
   /* Performance */
   contain: layout style paint;
 }
@@ -111,12 +114,15 @@ body {
   left: 0;
   right: 0;
   height: 6px;
-  background: var(--gradient-accent, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  background: var(
+    --gradient-accent,
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  );
 }
 
 .header-content {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 .header h1 {
@@ -125,7 +131,10 @@ body {
   letter-spacing: -0.03em;
   margin-bottom: var(--space-md);
   line-height: var(--line-height-tight);
-  background: var(--gradient-accent, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  background: var(
+    --gradient-accent,
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -138,7 +147,6 @@ body {
   font-weight: 500;
   color: var(--color-text-secondary, rgba(0, 0, 0, 0.7));
 }
-
 
 /* ============================================================================
 HEADER BADGE – GAMIFIED WELCOME
@@ -167,7 +175,7 @@ HEADER BADGE – GAMIFIED WELCOME
   border: none;
   cursor: pointer;
   transition: all var(--transition-base);
-  
+
   /* Performance */
   will-change: transform;
 }
@@ -218,7 +226,7 @@ HEADER BADGE – GAMIFIED WELCOME
   pointer-events: none;
 }
 
-[data-animations="enabled"] .header-badge::after {
+.header-badge::after {
   animation: nameShimmer 5s ease-in-out infinite;
 }
 
@@ -325,7 +333,10 @@ ANIMATIONS
   inset: 0;
   border-radius: inherit;
   padding: 1.5px;
-  background: var(--gradient-accent, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  background: var(
+    --gradient-accent,
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -358,7 +369,6 @@ ANIMATIONS
   }
 }
 
-
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   #Subjects-text {
@@ -371,7 +381,6 @@ ANIMATIONS
 /* ============================================================================
 Container
 ============================================================================ */
-
 
 /* Premium Grid */
 .grid-container {
@@ -394,13 +403,14 @@ Container
   position: relative;
   overflow: hidden;
 
-text-align: center;
+  text-align: left;
+  height: fit-content;
+  align-self: start;
 }
 
 .card::before,
 .category-card::before,
 .exam-card::before {
-  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -518,7 +528,7 @@ text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: var(--z-modal);
 }
 
 .modal-card {
@@ -526,7 +536,7 @@ text-align: center;
   border-radius: 20px;
   max-width: 500px;
   width: 90%;
-  text-align: center;  
+  text-align: center;
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--color-border);
 }
@@ -588,6 +598,15 @@ text-align: center;
   border-top: 1px solid var(--color-border-light);
   font-size: 0.9375rem;
   font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.watermark p {
+  margin: 0;
 }
 
 .watermark a {
@@ -601,8 +620,10 @@ text-align: center;
 }
 
 .watermark::before {
-  content: "✨ ";
+  content: "✨";
   font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Loading State */
@@ -801,7 +822,7 @@ text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 4000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -1209,8 +1230,6 @@ text-align: center;
   }
 }
 
-
-
 /* ============================================================================
    CONTENT AREA & LOADING STATES
 ============================================================================ */
@@ -1257,13 +1276,21 @@ text-align: center;
   position: fixed;
   bottom: var(--space-lg);
   right: var(--space-lg);
-  background: #ef4444;
+  left: var(--space-lg);
+  max-width: 400px;
+  margin-left: auto;
+  background: var(--color-error, #ef4444);
   color: white;
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl, 0 20px 25px rgba(0, 0, 0, 0.3));
-  z-index: var(--z-tooltip);
-  animation: slideUp var(--transition-slow);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-notification);
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 #errorBoundary button {

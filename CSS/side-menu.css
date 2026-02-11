@@ -5,7 +5,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 3000;
+  z-index: var(--z-above);
 }
 
 .hamburger {
@@ -56,7 +56,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
-  z-index: 2999;
+  z-index: calc(var(--z-overlay) - 1);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -77,7 +77,7 @@
   background: var(--color-background, #fff);
   box-shadow: var(--shadow-lg);
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 3001;
+  z-index: var(--z-overlay);
   overflow: hidden;
   display: flex;
   flex-direction: column;

@@ -179,14 +179,13 @@
         }
     </script>
 
-    <!-- Security: Content Security Policy (recommended) -->
-
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+    <!-- Security: Content Security Policy (recommended) But it prevented the Downloading libraries like pptx and pdf -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
                    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; 
                    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
                    font-src 'self' https://fonts.gstatic.com; 
                    img-src 'self' data: https:; 
-                   connect-src 'self';">
+                   connect-src 'self';"> -->
 
 </head>
 
@@ -322,25 +321,24 @@
 
         <footer class="watermark" role="contentinfo">
             <p>
-                صُنع بعناية بواسطة
+                صُنع بواسطة
                 <a href="https://portfolio-of-belal.vercel.app/" target="_blank" rel="noopener noreferrer"
                     aria-label="زيارة موقع بلال عمرو (يفتح في نافذة جديدة)">
                     بلال عمرو
                 </a>
-                <!-- &nbsp;|&nbsp;
-                <a href="https://portfolio-of-belal.vercel.app/" target="_blank" rel="noopener noreferrer"
-                    aria-label="مشاهدة Portfolio (يفتح في نافذة جديدة)">
-                    Portfolio
-                </a> -->
             </p>
         </footer>
     </div>
 
+    <!-- Test it by typing this in the Browser console
+    setTimeout(() => { throw new Error("Testing the error boundary!"); }, 100);
+    -->
+    <!-- Temporary disable -->
     <!-- Error Boundary -->
-    <div id="errorBoundary" role="alert" aria-live="assertive" aria-atomic="true" style="display: none;">
+    <!-- <div id="errorBoundary" role="alert" aria-live="assertive" aria-atomic="true" style="display: none;">
         <p>حدث خطأ غير متوقع. يرجى تحديث الصفحة.</p>
         <button onclick="location.reload()" type="button">تحديث الصفحة</button>
-    </div>
+    </div> -->
 
     <!-- Scripts -->
     <script type="module" src="Script/theme-controller.js"></script>

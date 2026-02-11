@@ -2271,11 +2271,10 @@ export async function exportToQuiz(config, questions) {
   URL.revokeObjectURL(url);
 
   showNotification(
-      "Quiz downloaded successfully.",
-      "You have it now!",
-      "./favicon.png"
+    "Quiz downloaded successfully.",
+    "You have it now",
+    "./favicon.png",
   );
-
 }
 
 function escapeHTML(str) {

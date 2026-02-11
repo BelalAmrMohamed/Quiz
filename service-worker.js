@@ -1,29 +1,29 @@
 // Service Worker for Basmagi Quiz Platform
 // Provides offline support, caching, and performance improvements
 
-const CACHE_VERSION = 'basmagi-v2.1.0';
+const CACHE_VERSION = "basmagi-v2.1.2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
 // Files to cache immediately
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/quiz.html',
-  '/dashboard.html',
-  '/create-quiz.html',
-  '/CSS/themes.css',
-  '/CSS/index.css',
-  '/CSS/side-menu.css',
-  '/CSS/notificatinos.css',
-  '/CSS/profile-styles.css',
-  '/Script/index.js',
-  '/Script/theme-controller.js',
-  '/Script/canvas-animation.js',
-  '/Script/side-menu.js',
-  '/favicon.png',
-  '/manifest.json',
+  "/",
+  "/index.html",
+  "/quiz.html",
+  "/dashboard.html",
+  "/create-quiz.html",
+  "/CSS/themes.css",
+  "/CSS/index.css",
+  "/CSS/side-menu.css",
+  "/CSS/notificatinos.css",
+  "/CSS/profile-styles.css",
+  "/Script/index.js",
+  "/Script/theme-controller.js",
+  "/Script/canvas-animation.js",
+  "/Script/side-menu.js",
+  "/favicon.png",
+  "/manifest.json",
 ];
 
 // Maximum number of items in dynamic cache
@@ -36,7 +36,7 @@ const CACHE_SIZE_LIMIT = {
 async function limitCacheSize(cacheName, maxItems) {
   const cache = await caches.open(cacheName);
   const keys = await cache.keys();
-  
+
   if (keys.length > maxItems) {
     await cache.delete(keys[0]);
     limitCacheSize(cacheName, maxItems);
@@ -45,8 +45,10 @@ async function limitCacheSize(cacheName, maxItems) {
 
 // Helper: Check if request is for image
 function isImageRequest(request) {
-  return request.destination === 'image' || 
-         /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(new URL(request.url).pathname);
+  return (
+    request.destination === "image" ||
+    /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(new URL(request.url).pathname)
+  );
 }
 
 // Helper: Check if request is for external resource
@@ -55,67 +57,71 @@ function isExternalRequest(request) {
 }
 
 // Install Event - Cache static assets
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
-  
+self.addEventListener("install", (event) => {
+  console.log("[SW] Installing service worker...");
+
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches
+      .open(STATIC_CACHE)
       .then((cache) => {
-        console.log('[SW] Caching static assets');
+        console.log("[SW] Caching static assets");
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('[SW] Static assets cached');
+        console.log("[SW] Static assets cached");
         return self.skipWaiting();
       })
       .catch((error) => {
-        console.error('[SW] Failed to cache static assets:', error);
-      })
+        console.error("[SW] Failed to cache static assets:", error);
+      }),
   );
 });
 
 // Activate Event - Clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
-  
+self.addEventListener("activate", (event) => {
+  console.log("[SW] Activating service worker...");
+
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
             .filter((cacheName) => {
-              return cacheName.startsWith('basmagi-') && 
-                     cacheName !== STATIC_CACHE &&
-                     cacheName !== DYNAMIC_CACHE &&
-                     cacheName !== IMAGE_CACHE;
+              return (
+                cacheName.startsWith("basmagi-") &&
+                cacheName !== STATIC_CACHE &&
+                cacheName !== DYNAMIC_CACHE &&
+                cacheName !== IMAGE_CACHE
+              );
             })
             .map((cacheName) => {
-              console.log('[SW] Deleting old cache:', cacheName);
+              console.log("[SW] Deleting old cache:", cacheName);
               return caches.delete(cacheName);
-            })
+            }),
         );
       })
       .then(() => {
-        console.log('[SW] Service worker activated');
+        console.log("[SW] Service worker activated");
         return self.clients.claim();
-      })
+      }),
   );
 });
 
 // Fetch Event - Network-first with cache fallback strategy
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
-  
+
   // Skip non-GET requests
-  if (request.method !== 'GET') {
+  if (request.method !== "GET") {
     return;
   }
-  
+
   // Skip Chrome extensions
-  if (request.url.startsWith('chrome-extension://')) {
+  if (request.url.startsWith("chrome-extension://")) {
     return;
   }
-  
+
   // Handle different types of requests with appropriate strategies
   if (isImageRequest(request)) {
     // Cache-first strategy for images
@@ -123,17 +129,16 @@ self.addEventListener('fetch', (event) => {
   } else if (isExternalRequest(request)) {
     // Network-only for external resources (CDNs, fonts, etc.)
     event.respondWith(
-      fetch(request)
-        .catch(() => {
-          // Return offline page or fallback
-          return new Response('Offline - External resource unavailable', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: new Headers({
-              'Content-Type': 'text/plain',
-            }),
-          });
-        })
+      fetch(request).catch(() => {
+        // Return offline page or fallback
+        return new Response("Offline - External resource unavailable", {
+          status: 503,
+          statusText: "Service Unavailable",
+          headers: new Headers({
+            "Content-Type": "text/plain",
+          }),
+        });
+      }),
     );
   } else {
     // Network-first with cache fallback for HTML/CSS/JS
@@ -146,42 +151,44 @@ async function networkFirstStrategy(request, cacheName) {
   try {
     // Try network first
     const networkResponse = await fetch(request);
-    
+
     // Clone response before caching
     const responseToCache = networkResponse.clone();
-    
+
     // Cache successful responses
     if (networkResponse.ok) {
       const cache = await caches.open(cacheName);
       await cache.put(request, responseToCache);
-      
+
       // Limit cache size
       limitCacheSize(cacheName, CACHE_SIZE_LIMIT[cacheName]);
     }
-    
+
     return networkResponse;
   } catch (error) {
     // Network failed, try cache
-    console.log('[SW] Network failed, trying cache:', request.url);
-    
+    console.log("[SW] Network failed, trying cache:", request.url);
+
     const cachedResponse = await caches.match(request);
-    
+
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Return offline page for HTML requests
-    if (request.headers.get('accept').includes('text/html')) {
-      return caches.match('/offline.html') || 
-             new Response(getOfflineHTML(), {
-               headers: { 'Content-Type': 'text/html; charset=utf-8' },
-             });
+    if (request.headers.get("accept").includes("text/html")) {
+      return (
+        caches.match("/offline.html") ||
+        new Response(getOfflineHTML(), {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        })
+      );
     }
-    
+
     // Return error for other requests
-    return new Response('Offline', {
+    return new Response("Offline", {
       status: 503,
-      statusText: 'Service Unavailable',
+      statusText: "Service Unavailable",
     });
   }
 }
@@ -190,39 +197,39 @@ async function networkFirstStrategy(request, cacheName) {
 async function cacheFirstStrategy(request, cacheName) {
   // Try cache first
   const cachedResponse = await caches.match(request);
-  
+
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   // Cache miss, fetch from network
   try {
     const networkResponse = await fetch(request);
-    
+
     // Cache the response
     if (networkResponse.ok) {
       const cache = await caches.open(cacheName);
       cache.put(request, networkResponse.clone());
-      
+
       // Limit cache size
       limitCacheSize(cacheName, CACHE_SIZE_LIMIT[cacheName]);
     }
-    
+
     return networkResponse;
   } catch (error) {
-    console.error('[SW] Failed to fetch resource:', request.url, error);
-    
+    console.error("[SW] Failed to fetch resource:", request.url, error);
+
     // Return placeholder image for failed image requests
     if (isImageRequest(request)) {
       return new Response(
         '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f0f0f0" width="200" height="200"/><text x="50%" y="50%" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="14">Image Offline</text></svg>',
-        { headers: { 'Content-Type': 'image/svg+xml' } }
+        { headers: { "Content-Type": "image/svg+xml" } },
       );
     }
-    
-    return new Response('Resource unavailable offline', {
+
+    return new Response("Resource unavailable offline", {
       status: 503,
-      statusText: 'Service Unavailable',
+      statusText: "Service Unavailable",
     });
   }
 }
@@ -298,10 +305,10 @@ function getOfflineHTML() {
 }
 
 // Background Sync for offline actions
-self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync:', event.tag);
-  
-  if (event.tag === 'sync-quiz-results') {
+self.addEventListener("sync", (event) => {
+  console.log("[SW] Background sync:", event.tag);
+
+  if (event.tag === "sync-quiz-results") {
     event.waitUntil(syncQuizResults());
   }
 });
@@ -310,26 +317,26 @@ async function syncQuizResults() {
   try {
     // Get pending quiz results from IndexedDB
     // This is a placeholder - implement actual sync logic
-    console.log('[SW] Syncing quiz results...');
-    
+    console.log("[SW] Syncing quiz results...");
+
     // Send results to server
     // await fetch('/api/sync-results', {...});
-    
-    console.log('[SW] Quiz results synced');
+
+    console.log("[SW] Quiz results synced");
   } catch (error) {
-    console.error('[SW] Failed to sync quiz results:', error);
+    console.error("[SW] Failed to sync quiz results:", error);
     throw error;
   }
 }
 
 // Push Notifications
-self.addEventListener('push', (event) => {
-  console.log('[SW] Push notification received');
-  
+self.addEventListener("push", (event) => {
+  console.log("[SW] Push notification received");
+
   const options = {
-    body: event.data ? event.data.text() : 'لديك إشعار جديد',
-    icon: '/images/icon-192.png',
-    badge: '/images/badge-72.png',
+    body: event.data ? event.data.text() : "لديك إشعار جديد",
+    icon: "/images/icon-192.png",
+    badge: "/images/badge-72.png",
     vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
@@ -337,70 +344,68 @@ self.addEventListener('push', (event) => {
     },
     actions: [
       {
-        action: 'explore',
-        title: 'عرض',
-        icon: '/images/checkmark.png',
+        action: "explore",
+        title: "عرض",
+        icon: "/images/checkmark.png",
       },
       {
-        action: 'close',
-        title: 'إغلاق',
-        icon: '/images/close.png',
+        action: "close",
+        title: "إغلاق",
+        icon: "/images/close.png",
       },
     ],
   };
-  
+
   event.waitUntil(
-    self.registration.showNotification('منصة إمتحانات بصمجي', options)
+    self.registration.showNotification("منصة إمتحانات بصمجي", options),
   );
 });
 
 // Notification Click
-self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event.action);
-  
+self.addEventListener("notificationclick", (event) => {
+  console.log("[SW] Notification clicked:", event.action);
+
   event.notification.close();
-  
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+
+  if (event.action === "explore") {
+    event.waitUntil(clients.openWindow("/"));
   }
 });
 
 // Message handler for communication with the main thread
-self.addEventListener('message', (event) => {
-  console.log('[SW] Message received:', event.data);
-  
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+self.addEventListener("message", (event) => {
+  console.log("[SW] Message received:", event.data);
+
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+
+  if (event.data && event.data.type === "CLEAR_CACHE") {
     event.waitUntil(
       caches.keys().then((cacheNames) => {
         return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
+          cacheNames.map((cacheName) => caches.delete(cacheName)),
         );
-      })
+      }),
     );
   }
 });
 
 // Periodic Background Sync (if supported)
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'update-quiz-content') {
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "update-quiz-content") {
     event.waitUntil(updateQuizContent());
   }
 });
 
 async function updateQuizContent() {
   try {
-    console.log('[SW] Updating quiz content...');
+    console.log("[SW] Updating quiz content...");
     // Fetch and cache updated quiz content
     // This is a placeholder for actual implementation
   } catch (error) {
-    console.error('[SW] Failed to update quiz content:', error);
+    console.error("[SW] Failed to update quiz content:", error);
   }
 }
 
-console.log('[SW] Service worker script loaded');
+console.log("[SW] Service worker script loaded");

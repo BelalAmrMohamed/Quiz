@@ -105,7 +105,7 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
   URL.revokeObjectURL(url);
   showNotification(
     "Markdown file downloaded.",
-    "You have it now!",
-    "./images/mardownIcon.png"
+    "You have it now",
+    "./images/mardownIcon.png",
   );
 }

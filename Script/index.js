@@ -28,6 +28,21 @@ const title = document.getElementById("Subjects-text");
 const breadcrumb = document.getElementById("breadcrumb");
 
 // ============================================================================
+// Check if the user is online, if not tell them so.
+// ============================================================================
+
+const isOnline = navigator.onLine;
+
+// 2. Your specific usage
+if (!isOnline) {
+  showNotification(
+    "منصة إمتحانات بصمجي",
+    `You are offline. Website loaded from Cache`,
+    "info",
+  );
+}
+
+// ============================================================================
 // USER PERSONALIZATION & GAMIFIED WELCOME SYSTEM
 // ============================================================================
 
@@ -46,14 +61,14 @@ const welcomeMessages = [
   (name) => `📈 تقدمك ملحوظ.. استمر في التألق يا ${name}`,
   (name) => `👑 الأسطورة يعود من جديد.. أهلاً بك يا ${name}`,
 ];
-    const opts = [
-      ["./favicon.png", "Quiz (.html)", "quiz"],
-      ["./images/HTML_Icon.png", "HTML (.html)", "html"],
-      ["./images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
-      ["./images/word_icon.png", "Word (.docx)", "docx"],
-      ["./images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
-      ["./images/mardownIcon.png", "Markdown (.md)", "md"],
-    ];
+const opts = [
+  ["./favicon.png", "Quiz (.html)", "quiz"],
+  ["./images/HTML_Icon.png", "HTML (.html)", "html"],
+  ["./images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
+  ["./images/word_icon.png", "Word (.docx)", "docx"],
+  ["./images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
+  ["./images/mardownIcon.png", "Markdown (.md)", "md"],
+];
 
 // Change username
 window.changeUsername = function () {
@@ -89,9 +104,10 @@ function updateWelcomeMessage() {
 // Initial load
 updateWelcomeMessage();
 showNotification(
-  "منصة إمتحانات بصمجي", 
-  `السلام عليكم يا ${localStorage.getItem("username") || "User"}`, 
-  "./images/السلام عليكم.png");
+  "منصة إمتحانات بصمجي",
+  `السلام عليكم يا ${localStorage.getItem("username") || "User"}`,
+  "./images/السلام عليكم.png",
+);
 
 // ============================================================================
 // PROFILE MANAGEMENT MODAL
@@ -429,7 +445,7 @@ function showOnboardingWizard() {
       finishBtn.onclick = () => finishOnboarding();
       nav.appendChild(finishBtn);
     }
-    
+
     if (currentStep > 1) {
       const backBtn = document.createElement("button");
       backBtn.className = "onboarding-btn secondary";
@@ -443,8 +459,6 @@ function showOnboardingWizard() {
       // Spacer
       nav.appendChild(document.createElement("div"));
     }
-
-    
 
     card.appendChild(nav);
   }
@@ -1220,9 +1234,9 @@ function playUserQuiz(quiz) {
  */
 async function deleteUserQuiz(quizId, index) {
   if (
-    !await confirmationNotification(
+    !(await confirmationNotification(
       "Are you sure you want to delete this quiz? This cannot be undone.",
-    )
+    ))
   ) {
     return;
   }
@@ -1237,7 +1251,6 @@ async function deleteUserQuiz(quizId, index) {
     // Re-render the folder view ([Fixed])
     renderRootCategories();
     renderUserQuizzesView();
-        
   } catch (error) {
     console.error("Error deleting quiz:", error);
     alert("Error deleting quiz. Please try again.");
@@ -1306,10 +1319,12 @@ function createCategoryCard(
 
   const p = document.createElement("p");
 
-  p.textContent = 
-  itemCount === 1 ? `إمتحان واحد` 
-  : itemCount === 2 ? `إمتحانان` 
-  : `${itemCount} إمتحانات`;
+  p.textContent =
+    itemCount === 1
+      ? `إمتحان واحد`
+      : itemCount === 2
+        ? `إمتحانان`
+        : `${itemCount} إمتحانات`;
 
   // Add course metadata if available
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
@@ -1363,20 +1378,6 @@ function createExamCard(exam) {
     showModeSelection(exam.id, exam.title || exam.id);
   };
 
-  const loadPdfLib = () =>
-    new Promise((resolve, reject) => {
-      if (window.jspdf && window.jspdf.jsPDF) {
-        resolve();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("PDF library failed to load"));
-      document.head.appendChild(s);
-    });
-
   const onDownloadOption = async (format, modalEl) => {
     modalEl.remove();
     const config = {
@@ -1392,14 +1393,6 @@ function createExamCard(exam) {
       return;
     }
     const questions = mod.questions;
-    if (format === "pdf") {
-      try {
-        await loadPdfLib();
-      } catch {
-        alert("PDF library could not be loaded.");
-        return;
-      }
-    }
     switch (format) {
       case "quiz":
         await exportToQuiz(config, questions);
@@ -1436,7 +1429,7 @@ function createExamCard(exam) {
     p.textContent = "اختر طريقة التنزيل";
     const grid = document.createElement("div");
     grid.className = "mode-grid";
-    
+
     opts.forEach(([icon, label, format]) => {
       const b = document.createElement("button");
       b.className = "mode-btn";
@@ -1447,8 +1440,6 @@ function createExamCard(exam) {
       };
       grid.appendChild(b);
     });
-
-
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-modal";
@@ -1540,12 +1531,18 @@ function showModeSelection(examId, examTitle) {
     () => startQuiz(examId, "practice"),
   );
 
-  const timedBtn = createModeButton("https://cdn-icons-png.freepik.com/512/3003/3003126.png", "Timed", "30 ثانية لكل سؤال", () =>
-    startQuiz(examId, "timed"),
+  const timedBtn = createModeButton(
+    "./images/timer.png",
+    "Timed",
+    "30 ثانية لكل سؤال",
+    () => startQuiz(examId, "timed"),
   );
 
-  const examBtn = createModeButton("https://cdn-icons-png.flaticon.com/512/3640/3640554.png", "Exam", "لا إجابات أثناء الإمتحان", () =>
-    startQuiz(examId, "exam"),
+  const examBtn = createModeButton(
+    "./images/exam.png",
+    "Exam",
+    "لا إجابات أثناء الإمتحان",
+    () => startQuiz(examId, "exam"),
   );
 
   modeGrid.appendChild(practiceBtn);
@@ -1573,16 +1570,15 @@ function createModeButton(icon, title, description, onClick) {
 
   let iconElement;
   if (!isURL_orPath(icon)) {
-  iconElement = document.createElement("span");
-  iconElement.className = "icon";
-  iconElement.textContent = icon;
-  }
-  else{
+    iconElement = document.createElement("span");
+    iconElement.className = "icon";
+    iconElement.textContent = icon;
+  } else {
     iconElement = document.createElement("img");
     iconElement.className = "icon";
     iconElement.src = icon;
     iconElement.alt = "Context icon";
-    }
+  }
 
   const strong = document.createElement("strong");
   strong.textContent = title;
@@ -1610,7 +1606,7 @@ function isURL_orPath(string) {
       // We use a dummy base to validate that the string is a syntactically valid path
       const base = "http://example.com";
       const url = new URL(string, base);
-      
+
       // Verification logic:
       // A. The origin must match the base (ensures the string didn't switch to a different protocol/domain)
       // B. The string must contain a slash '/' or start with '.' (distinguishes paths from plain words like "hello")
@@ -1722,31 +1718,8 @@ function showUserQuizDownloadPopup(quiz) {
 
   const questions = quiz.questions;
 
-  const loadPdfLib = () =>
-    new Promise((resolve, reject) => {
-      if (window.jspdf && window.jspdf.jsPDF) {
-        resolve();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("PDF library failed to load"));
-      document.head.appendChild(s);
-    });
-
   const onDownloadOption = async (format) => {
     modal.remove();
-
-    if (format === "pdf") {
-      try {
-        await loadPdfLib();
-      } catch {
-        alert("PDF library could not be loaded.");
-        return;
-      }
-    }
 
     try {
       switch (format) {
