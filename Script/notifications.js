@@ -46,8 +46,8 @@ export function showNotification(title, message = "", type = "info") {
   // Check if the 'type' passed was actually a custom URL or Icon string override
   // If the user passed a specific string instead of a type keyword, usage adaptation:
   if (!["success", "error", "warning", "info"].includes(type)) {
-     icon = type; // The type argument is treated as the icon
-     typeClass = "default";
+    icon = type; // The type argument is treated as the icon
+    typeClass = "default";
   }
 
   // 3. Create Notification Element
@@ -56,8 +56,8 @@ export function showNotification(title, message = "", type = "info") {
   toast.className = `notification glass-toast ${typeClass}`;
 
   // 4. Construct HTML (Visual Structure from Function 1, Safety from Function 2)
-  const iconHTML = isURL_orPath(icon) 
-    ? `<img src="${icon}" alt="Icon" class="notification-image">` 
+  const iconHTML = isURL_orPath(icon)
+    ? `<img src="${icon}" alt="Icon" class="notification-image">`
     : `<span class="notification-icon">${icon}</span>`;
 
   toast.innerHTML = `
@@ -72,12 +72,12 @@ export function showNotification(title, message = "", type = "info") {
   `;
 
   // 5. Append to Container
-  // Prepend makes new ones appear at the top, Append at the bottom. 
+  // Prepend makes new ones appear at the top, Append at the bottom.
   // Based on your CSS (bottom-right), 'prepend' usually looks better so the stack pushes up.
-  container.prepend(toast); 
+  container.prepend(toast);
 
   // 6. Lifecycle Management
-  
+
   // A. Auto Dismiss Timer
   const autoDismissTimeout = setTimeout(() => {
     removeToast(toast);
@@ -93,7 +93,8 @@ export function showNotification(title, message = "", type = "info") {
 
 // Helper: Remove with Animation
 function removeToast(toast) {
-  toast.style.animation = "toastSlideOut 0.4s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)";
+  toast.style.animation =
+    "toastSlideOut 0.4s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)";
   toast.addEventListener("animationend", () => {
     toast.remove();
   });
@@ -120,7 +121,7 @@ function isURL_orPath(string) {
       // We use a dummy base to validate that the string is a syntactically valid path
       const base = "http://example.com";
       const url = new URL(string, base);
-      
+
       // Verification logic:
       // A. The origin must match the base (ensures the string didn't switch to a different protocol/domain)
       // B. The string must contain a slash '/' or start with '.' (distinguishes paths from plain words like "hello")
@@ -143,18 +144,18 @@ export function confirmationNotification(message) {
     // 1. Create Overlay
     const overlay = document.createElement("div");
     overlay.className = "confirmation-overlay";
-    
+
     // 2. Create Modal
     const modal = document.createElement("div");
     modal.className = "confirmation-modal";
-    
+
     // 3. Content
     modal.innerHTML = `
       <div class="confirmation-content">
         <p class="confirmation-message">${escapeHtml(message)}</p>
         <div class="confirmation-actions">
-          <button class="confirmation-btn cancel">لا</button>
           <button class="confirmation-btn confirm">نعم</button>
+          <button class="confirmation-btn cancel">لا</button>
         </div>
       </div>
     `;
@@ -179,11 +180,14 @@ export function confirmationNotification(message) {
       window.removeEventListener("keydown", handleKeydown);
       overlay.classList.remove("show");
       modal.classList.remove("show");
-      
+
       // Wait for animation to finish
       setTimeout(() => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-        if (previousActiveElement && document.body.contains(previousActiveElement)) {
+        if (
+          previousActiveElement &&
+          document.body.contains(previousActiveElement)
+        ) {
           previousActiveElement.focus();
         }
       }, 300);
@@ -227,10 +231,10 @@ export function confirmationNotification(message) {
     confirmBtn.addEventListener("click", handleConfirm);
     cancelBtn.addEventListener("click", handleCancel);
     window.addEventListener("keydown", handleKeydown);
-    
+
     // Click outside treats as cancel
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) handleCancel();
     });
   });
-} 
+}
