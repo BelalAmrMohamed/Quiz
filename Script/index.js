@@ -409,24 +409,10 @@ function showOnboardingWizard() {
     const nav = document.createElement("div");
     nav.className = "onboarding-nav";
 
-    if (currentStep > 1) {
-      const backBtn = document.createElement("button");
-      backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "← السابق";
-      backBtn.onclick = () => {
-        currentStep--;
-        render();
-      };
-      nav.appendChild(backBtn);
-    } else {
-      // Spacer
-      nav.appendChild(document.createElement("div"));
-    }
-
     if (currentStep < 3) {
       const nextBtn = document.createElement("button");
       nextBtn.className = "onboarding-btn primary";
-      nextBtn.textContent = "التالي →";
+      nextBtn.textContent = "→ التالي";
       nextBtn.disabled =
         (currentStep === 1 && !selectedFaculty) ||
         (currentStep === 2 && !selectedYear);
@@ -443,6 +429,22 @@ function showOnboardingWizard() {
       finishBtn.onclick = () => finishOnboarding();
       nav.appendChild(finishBtn);
     }
+    
+    if (currentStep > 1) {
+      const backBtn = document.createElement("button");
+      backBtn.className = "onboarding-btn secondary";
+      backBtn.textContent = "السابق ←";
+      backBtn.onclick = () => {
+        currentStep--;
+        render();
+      };
+      nav.appendChild(backBtn);
+    } else {
+      // Spacer
+      nav.appendChild(document.createElement("div"));
+    }
+
+    
 
     card.appendChild(nav);
   }
