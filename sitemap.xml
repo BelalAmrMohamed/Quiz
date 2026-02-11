@@ -5,5 +5,11 @@
     <lastmod>2026-01-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>  
+  </url>
+  <url>
+    <loc>https://basmagi-quiz.vercel.app/create-quiz.html</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
 </urlset>

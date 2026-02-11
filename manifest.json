@@ -1,23 +1,23 @@
 {
-  "id": "/Quiz/",
-  "name": "Quiz Master",
-  "short_name": "Quiz Master",
-  "description": "A premium college quiz platform for Computers and AI Faculty students. Practice exams and track performance.",
-  "start_url": "/Quiz/",
-  "scope": "/Quiz/",
+  "id": "/",
+  "name": "منصة إمتحانات بصمجي",
+  "short_name": "إمتحانات بصمجي",
+  "description": "منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "minimal-ui"],
-  "background_color": "#000000",
+  "background_color": "#0a0a0d",
   "theme_color": "#0088cc",
   "orientation": "portrait-primary",
   "categories": ["education", "productivity"],
-  "dir": "ltr",
-  "lang": "en-US",
+  "dir": "rtl",
+  "lang": "ar",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "favicon.png",
       "sizes": "16x16 32x32 48x48",
-      "type": "image/x-icon",
+      "type": "image/png",
       "purpose": "any"
     },
     {
@@ -45,28 +45,35 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Quiz Master Dashboard on Desktop"
+      "label": "لوحة تحكم منصة بصمجي"
     },
     {
       "src": "images/screenshot-mobile.png",
       "sizes": "1080x1920",
       "type": "image/png",
-      "label": "Interactive Quiz Player on Mobile"
+      "label": "واجهة الإمتحانات التفاعلية"
     }
   ],
   "shortcuts": [
     {
-      "name": "Performance Dashboard",
-      "short_name": "Stats",
-      "description": "View your quiz progress and earned badges",
-      "url": "/Quiz/dashboard.html",
+      "name": "إنشاء إمتحانات",
+      "short_name": "إنشاء إمتحانات",
+      "description": "صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح",
+      "url": "/create-quiz.html",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "اللائحة",
+      "short_name": "اللائحة",
+      "description": "عرض تقدمك في الإمتحانات والأوسمة التي حصلت عليها",
+      "url": "/dashboard.html",
       "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "protocol_handlers": [
     {
       "protocol": "web+quiz",
-      "url": "/Quiz/index.html?quiz=%s"
+      "url": "/index.html?quiz=%s"
     }
   ]
 }
