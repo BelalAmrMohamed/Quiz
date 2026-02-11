@@ -21,7 +21,7 @@ import {
 } from "./filterUtils.js";
 
 // Notifications
-import { confirmationNotification } from "./notifications.js";
+import { showNotification, confirmationNotification } from "./notifications.js";
 
 const container = document.getElementById("contentArea");
 const title = document.getElementById("Subjects-text");
@@ -88,6 +88,10 @@ function updateWelcomeMessage() {
 
 // Initial load
 updateWelcomeMessage();
+showNotification(
+  "منصة إمتحانات بصمجي", 
+  `السلام عليكم يا ${localStorage.getItem("username") || "User"}`, 
+  "./images/السلام عليكم.png");
 
 // ============================================================================
 // PROFILE MANAGEMENT MODAL
@@ -1228,19 +1232,10 @@ async function deleteUserQuiz(quizId, index) {
     userQuizzes.splice(index, 1);
     localStorage.setItem("user_quizzes", JSON.stringify(userQuizzes));
 
-    // Re-render the folder view
+    // Re-render the folder view ([Fixed])
+    renderRootCategories();
     renderUserQuizzesView();
-    
-    // Failed to fix the `Back to إمتحاناتك` Bug
-    // The bug happens when the user deletes one of his quizzes
-    // The `Back to Courses` button at the top becomes `Back to إمتحاناتك`, 
-    // when pressed, the console logs this error:
-    /*
-    Uncaught TypeError: Cannot read properties of undefined (reading 'name')
-    at renderCategory (index.js:1230:32)
-    at breadcrumb.onclick (index.js:1494:7)
-    */
-    
+        
   } catch (error) {
     console.error("Error deleting quiz:", error);
     alert("Error deleting quiz. Please try again.");
