@@ -4,6 +4,7 @@
 
 const fs = require("fs").promises;
 const path = require("path");
+const crypto = require("crypto");
 
 async function walk(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -22,22 +23,27 @@ function titleCase(name) {
 
 async function buildCategoryTree(examsDir) {
   const tree = {};
-  const usedIds = new Set();
 
-  function generateUniqueId() {
+  function generateUniqueId(targetPath) {
     const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     const idLength = 8;
-    let id;
 
-    // Generate random IDs until we find one that hasn't been used
-    do {
-      id = "";
-      for (let i = 0; i < idLength; i++) {
-        id += charset.charAt(Math.floor(Math.random() * charset.length));
-      }
-    } while (usedIds.has(id));
+    // Ensure relative path from project root to ensure consistency across environments
+    const projectRoot = path.resolve(examsDir, "..");
+    const relativePath = path
+      .relative(projectRoot, targetPath)
+      .split(path.sep)
+      .join("/");
 
-    usedIds.add(id);
+    // Generate hash from the file path
+    const hash = crypto.createHash("sha256").update(relativePath).digest();
+
+    let id = "";
+    // Generate deterministic ID based on the hash
+    for (let i = 0; i < idLength; i++) {
+      id += charset[hash[i] % charset.length];
+    }
+
     return id;
   }
 
@@ -46,12 +52,12 @@ async function buildCategoryTree(examsDir) {
    *
    * Folder Structure:
    * Exams/
-   *   {Faculty}/           <- Level 0: Metadata only
-   *     {Year}/            <- Level 1: Metadata only
-   *       {Term}/          <- Level 2: Metadata only
-   *         {Course}/      <- Level 3: Root category (gets metadata)
-   *           {Subfolder}/ <- Level 4+: Subcategories
-   *             quiz.js
+   * {Faculty}/           <- Level 0: Metadata only
+   * {Year}/            <- Level 1: Metadata only
+   * {Term}/          <- Level 2: Metadata only
+   * {Course}/      <- Level 3: Root category (gets metadata)
+   * {Subfolder}/ <- Level 4+: Subcategories
+   * quiz.js
    *
    * @param {string} dir - Current directory path
    * @param {number} depth - Current recursion depth (0 = Faculty level)
@@ -79,7 +85,7 @@ async function buildCategoryTree(examsDir) {
         } else if (depth === 3) {
           // Level 4: Course Name (ROOT CATEGORY with metadata)
           const categoryKey = entry.name;
-          const courseId = generateUniqueId();
+          const courseId = generateUniqueId(fullPath);
 
           console.log(`        📚 Course: ${entry.name} (ID: ${courseId})`);
 
@@ -140,7 +146,7 @@ async function buildCategoryTree(examsDir) {
           const baseId = fileName.replace(/\.js$/, "");
 
           // Generate unique ID for this exam
-          const examId = generateUniqueId();
+          const examId = generateUniqueId(fullPath);
           const title = titleCase(baseId);
 
           // Calculate relative path from Script/ directory
@@ -308,5 +314,5 @@ function formatDateTime() {
   hours = hours ? hours : 12; // the hour '0' should be '12'
 
   // Combine into the requested format
-  return `${year}/${month}/${day}   |   ${hours}:${minutes} ${ampm}`;
+  return `${year}/${month}/${day} | ${hours}:${minutes} ${ampm}`;
 }
