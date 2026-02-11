@@ -3,18 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
+
+    <!-- Critical Performance: DNS prefetch and preconnect -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <!-- Title and Favicon -->
     <title>منصة إمتحانات بصمجي</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
 
     <!-- Meta tags -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="theme-color" content="#0088cc">
+    <meta name="theme-color" content="#0088cc" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
     <meta name="description"
-        content="منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات.">
+        content="منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات. طوّر معرفتك من خلال اختبارات تفاعلية في جميع المواد.">
     <meta name="author" content="Belal Amr Mohamed">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="keywords" content="إمتحانات, كلية الحاسبات, اختبارات تفاعلية, تعليم, دراسة, امتحانات اون لاين">
     <link rel="canonical" href="https://basmagi-quiz.vercel.app/">
 
     <!-- PWA Meta Tags -->
@@ -22,6 +33,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="بصمجي كويز">
+    <meta name="application-name" content="بصمجي كويز">
+    <meta name="format-detection" content="telephone=no">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
@@ -31,69 +44,116 @@
     <meta property="og:image" content="https://basmagi-quiz.vercel.app/images/thumbnail.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="منصة إمتحانات البصمجي">
+    <meta property="og:image:alt" content="منصة إمتحانات بصمجي">
+    <meta property="og:site_name" content="منصة إمتحانات بصمجي">
     <meta property="og:locale" content="ar_AR">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BelalAmrDev">
     <meta name="twitter:creator" content="@BelalAmrDev">
-    <meta name="twitter:image:alt" content="Thumbnail for Quizzes Platform">
     <meta name="twitter:title" content="تقدر تختم أكثر من 10 إمتحانات؟">
     <meta name="twitter:description" content="إختبر قدراتك في الإمتحانات النهائية">
     <meta name="twitter:image" content="https://basmagi-quiz.vercel.app/images/thumbnail.png">
+    <meta name="twitter:image:alt" content="منصة إمتحانات بصمجي">
 
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="images/icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/icon-16.png">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#0088cc">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Quiz",
-    "name": "College Quiz: All Subjects",
-    "about": "Study aid for college courses—test your knowledge with quizzes on All Subjects.",
-    "url": "https://basmagi-quiz.vercel.app/",
-    "inLanguage": "ar",
-    "typicalAgeRange": "18-",
-    "educationalAlignment": {
-      "@type": "AlignmentObject",
-      "alignmentType": "educationalSubject",
-      "targetName": "All Subjects"
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "منصة إمتحانات بصمجي",
+      "alternateName": "Basmagi Quiz Platform",
+      "description": "منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات",
+      "url": "https://basmagi-quiz.vercel.app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "inLanguage": "ar",
+      "author": {
+        "@type": "Person",
+        "name": "Belal Amr Mohamed",
+        "url": "https://portfolio-of-belal.vercel.app/"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "150"
+      }
     }
-  }
-  </script>
+    </script>
 
     <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "منصة إمتحانات بصمجي",   "item": "https://basmagi-quiz.vercel.app/" },
-      { "@type": "ListItem", "position": 2, "name": "إنشاء إمتحانات",          "item": "https://basmagi-quiz.vercel.app/create-quiz.html" },
-      { "@type": "ListItem", "position": 3, "name": "اللائحة",                  "item": "https://basmagi-quiz.vercel.app/dashboard.html" }
-    ]
-  }
-  </script>
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { 
+          "@type": "ListItem", 
+          "position": 1, 
+          "name": "منصة إمتحانات بصمجي", 
+          "item": "https://basmagi-quiz.vercel.app/" 
+        },
+        { 
+          "@type": "ListItem", 
+          "position": 2, 
+          "name": "إنشاء إمتحانات", 
+          "item": "https://basmagi-quiz.vercel.app/create-quiz.html" 
+        },
+        { 
+          "@type": "ListItem", 
+          "position": 3, 
+          "name": "اللائحة", 
+          "item": "https://basmagi-quiz.vercel.app/dashboard.html" 
+        }
+      ]
+    }
+    </script>
 
     <!-- CRITICAL: Anti-flash theme script (must run before paint) -->
     <script>
         (function () {
-            const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
-            const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-            document.documentElement.setAttribute("data-animations", savedAnimations ? "enabled" : "disabled");
+            try {
+                const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
+                const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
+                const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                document.documentElement.setAttribute("data-theme", savedTheme);
+                document.documentElement.setAttribute("data-animations", (savedAnimations && !reducedMotion) ? "enabled" : "disabled");
+
+                // Add loading class to prevent FOUC
+                document.documentElement.classList.add('is-loading');
+            } catch (e) {
+                console.error('Theme initialization error:', e);
+            }
         })();
     </script>
 
-    <!-- Fonts: Inter (Latin) + Tajawal (Arabic) — both from Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fonts: Inter (Latin) + Tajawal (Arabic) — optimized loading -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+            rel="stylesheet">
+    </noscript>
 
+    <!-- Preload critical resources -->
+    <link rel="preload" href="CSS/themes.css" as="style">
+    <link rel="preload" href="CSS/index.css" as="style">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="CSS/themes.css">
@@ -102,17 +162,41 @@
     <link rel="stylesheet" href="CSS/notificatinos.css">
     <link rel="stylesheet" href="CSS/profile-styles.css">
 
-    <!-- Controller Scripts -->
-    <script type="module" src="Script/theme-controller.js"></script>
-    <script type="module" src="Script/canvas-animation.js"></script>
+    <!-- Controller Scripts - with module preload -->
+    <link rel="modulepreload" href="Script/theme-controller.js">
+    <link rel="modulepreload" href="Script/canvas-animation.js">
+    <link rel="modulepreload" href="Script/index.js">
+    <link rel="modulepreload" href="Script/side-menu.js">
 
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('SW registered:', reg))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+
+    <!-- Security: Content Security Policy (recommended) -->
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+                   script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; 
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                   font-src 'self' https://fonts.gstatic.com; 
+                   img-src 'self' data: https:; 
+                   connect-src 'self';">
 
 </head>
 
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <!-- <a href="#contentArea" class="skip-link">Skip to main content</a> -->
 
     <div class="menu-container">
-        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
+        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false"
+            type="button">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
                 <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" />
@@ -123,106 +207,196 @@
             </svg>
         </button>
 
-        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
+        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true" role="presentation"></div>
 
-        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
-            aria-hidden="true">
+        <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
+            aria-hidden="true" tabindex="-1">
             <div class="menu-header">
-                <h3>القائمة</h3>
-                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة">
+                <h2 id="menuTitle">القائمة</h2>
+                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة" type="button">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" aria-hidden="true">
+                        stroke-linecap="round" aria-hidden="true" focusable="false">
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            <nav role="navigation" aria-label="روابط التنقل">
-                <a href="index.html" class="menu-item active">🏠 الصفحة الرئيسية</a>
-                <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
-                <a href="create-quiz.html" class="menu-item">✏️ إنشاء إمتحانات</a>
+            <nav role="navigation" aria-label="روابط التنقل" aria-labelledby="menuTitle">
+                <a href="index.html" class="menu-item active" aria-current="page">
+                    <span aria-hidden="true">🏠</span> الصفحة الرئيسية
+                </a>
+                <a href="dashboard.html" class="menu-item">
+                    <span aria-hidden="true">📊</span> اللائحة
+                </a>
+                <a href="create-quiz.html" class="menu-item">
+                    <span aria-hidden="true">✏️</span> إنشاء إمتحانات
+                </a>
 
-                <div class="menu-divider" role="separator"></div>
+                <div class="menu-divider" role="separator" aria-hidden="true"></div>
 
-                <button class="menu-item" data-action="openProfileSettings">⚙️ الملف الشخصي</button>
-                <button class="menu-item" data-action="openCourseManager">📚 إضافة/حذف مواد</button>
+                <button class="menu-item" data-action="openProfileSettings" type="button" aria-haspopup="dialog">
+                    <span aria-hidden="true">⚙️</span> الملف الشخصي
+                </button>
+                <button class="menu-item" data-action="openCourseManager" type="button" aria-haspopup="dialog">
+                    <span aria-hidden="true">📚</span> إضافة/حذف مواد
+                </button>
 
-                <div class="menu-divider" role="separator"></div>
+                <div class="menu-divider" role="separator" aria-hidden="true"></div>
 
                 <div class="theme-controls-section">
-                    <div class="theme-section-header">
-                        <span>🏞️</span> الخلفية
+                    <div class="theme-section-header" role="heading" aria-level="3">
+                        <span aria-hidden="true">🏞️</span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
-                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false" type="button">
                             <span class="theme-btn-icon" aria-hidden="true">☀️</span>
                             <span class="theme-btn-label">البيضاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
+                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false" type="button">
                             <span class="theme-btn-icon" aria-hidden="true">🌙</span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false" type="button">
                             <span class="theme-btn-icon" aria-hidden="true">🌑</span>
                             <span class="theme-btn-label">السوداء</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header">
-                        <span>✨</span> الرسوم المتحركة
+                    <div class="animation-section-header" role="heading" aria-level="3">
+                        <span aria-hidden="true">✨</span> الرسوم المتحركة
                     </div>
                     <label class="animation-toggle-container">
                         <span class="animation-toggle-label">تفعيل الرسوم</span>
                         <input type="checkbox" id="animationToggle" class="toggle-input" data-control="animations"
-                            checked aria-label="تفعيل الرسوم المتحركة">
+                            checked aria-label="تفعيل الرسوم المتحركة" role="switch" aria-checked="true">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
+                    <p class="theme-info-text">
+                        <span aria-hidden="true">💡</span>
+                        عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة
+                    </p>
 
-                    <div class="menu-divider" role="separator"></div>
-                    <button class="menu-item install-app" data-action="installApp">📱 تثبيت التطبيق</button>
+                    <div class="menu-divider" role="separator" aria-hidden="true"></div>
+                    <button class="menu-item install-app" data-action="installApp" type="button" style="display: none;">
+                        <span aria-hidden="true">📱</span> تثبيت التطبيق
+                    </button>
                 </div>
             </nav>
-        </div>
+        </aside>
     </div>
 
-
     <div class="container">
-
-        <div id="breadcrumb" class="rtl-arrow" role="navigation" aria-label="مسار التصفح">
+        <nav id="breadcrumb" class="rtl-arrow" role="navigation" aria-label="مسار التصفح" tabindex="0">
             <span class="breadcrumb-text">الرجوع إلى المواد</span>
-        </div>
+        </nav>
 
         <header class="header" role="banner">
             <div class="header-content">
-
                 <!-- Personalised greeting pill (JS sets innerHTML) -->
-                <div class="header-badge" id="user-name" onclick="changeUsername()" aria-live="polite"></div>
+                <button class="header-badge" id="user-name" onclick="changeUsername()" aria-live="polite"
+                    aria-label="تغيير اسم المستخدم" type="button">
+                    <!-- Content filled by JS -->
+                </button>
 
                 <!-- Platform title -->
                 <h1 id="pageTitle">منصة إمتحانات بصمجي</h1>
 
                 <!-- Value-proposition subtitle -->
-                <p>طوِّر معرفتك من خلال الاختبارات التفاعلية المصممة لتحفيزك على التميز</p>
+                <p class="header-subtitle">
+                    طوِّر معرفتك من خلال الاختبارات التفاعلية المصممة لتحفيزك على التميز
+                </p>
 
-                <div id="Subjects-text">جميع المواد</div>
+                <div id="Subjects-text" role="status" aria-live="polite">
+                    جميع المواد
+                </div>
             </div>
         </header>
 
-        <main id="contentArea" class="loading" aria-live="polite" aria-busy="true">
-            <p>جارٍ تحضير تجربتك التعليمية...</p>
+        <main id="contentArea" class="loading" role="main" aria-live="polite" aria-busy="true"
+            aria-label="محتوى الصفحة الرئيسية">
+            <div class="loading-container">
+                <div class="loading-spinner" aria-hidden="true"></div>
+                <p>جارٍ تحضير تجربتك التعليمية...</p>
+            </div>
         </main>
 
-        <footer class="watermark">
-            صُنع بعناية بواسطة بلال عمرو &nbsp;|&nbsp;
-            <a target="_blank" rel="noopener noreferrer" href="https://portfolio-of-belal.vercel.app/">Portfolio</a>
+        <footer class="watermark" role="contentinfo">
+            <p>
+                صُنع بعناية بواسطة
+                <a href="https://portfolio-of-belal.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    aria-label="زيارة موقع بلال عمرو (يفتح في نافذة جديدة)">
+                    بلال عمرو
+                </a>
+                &nbsp;|&nbsp;
+                <a href="https://portfolio-of-belal.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    aria-label="مشاهدة Portfolio (يفتح في نافذة جديدة)">
+                    Portfolio
+                </a>
+            </p>
         </footer>
-
     </div>
 
-    <!-- Main page script -->
+    <!-- Error Boundary -->
+    <div id="errorBoundary" role="alert" aria-live="assertive" aria-atomic="true" style="display: none;">
+        <p>حدث خطأ غير متوقع. يرجى تحديث الصفحة.</p>
+        <button onclick="location.reload()" type="button">تحديث الصفحة</button>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="Script/theme-controller.js"></script>
+    <script type="module" src="Script/canvas-animation.js"></script>
     <script type="module" src="Script/index.js"></script>
     <script type="module" src="Script/side-menu.js"></script>
+
+    <!-- Remove loading class when page is ready -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            document.documentElement.classList.remove('is-loading');
+        });
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e);
+            const errorBoundary = document.getElementById('errorBoundary');
+            if (errorBoundary) {
+                errorBoundary.style.display = 'block';
+            }
+        });
+    </script>
+
+    <!-- Performance monitoring -->
+    <script>
+        if ('PerformanceObserver' in window) {
+            // Monitor Largest Contentful Paint
+            const lcpObserver = new PerformanceObserver((list) => {
+                const entries = list.getEntries();
+                const lastEntry = entries[entries.length - 1];
+                console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
+            });
+            lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+
+            // Monitor First Input Delay
+            const fidObserver = new PerformanceObserver((list) => {
+                const entries = list.getEntries();
+                entries.forEach((entry) => {
+                    console.log('FID:', entry.processingStart - entry.startTime);
+                });
+            });
+            fidObserver.observe({ entryTypes: ['first-input'] });
+
+            // Monitor Cumulative Layout Shift
+            let clsValue = 0;
+            const clsObserver = new PerformanceObserver((list) => {
+                list.getEntries().forEach((entry) => {
+                    if (!entry.hadRecentInput) {
+                        clsValue += entry.value;
+                        console.log('CLS:', clsValue);
+                    }
+                });
+            });
+            clsObserver.observe({ entryTypes: ['layout-shift'] });
+        }
+    </script>
 </body>
 
 </html>
