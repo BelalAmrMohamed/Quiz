@@ -9,9 +9,7 @@ email: "belalamrofficial@gmail.com"
 # ------------------------------------
 # URL SETTINGS (Fixed)
 # ------------------------------------
-# ⚠️ FIX: URL must NOT include the folder name ("/Quiz")
 url: "https://https://basmagi-quiz.vercel.app"
-# The folder name goes here
 baseurl: "/"
 
 # ------------------------------------
@@ -23,14 +21,12 @@ include:
   - robots.txt
   - sitemap.xml
   - Exams
-# Removed: _redirects, .htaccess (These do not exist in your file list)
 
 exclude:
   - tools
   - README.md
   - LICENSE
   - .gitignore
-# Removed: Gemfile, node_modules (These do not exist in your file list)
 
 # ------------------------------------
 # PLUGINS
