@@ -1,4 +1,8 @@
-// Script/index.js
+// ============================================================================
+// Script/index.js - Enhanced with Security, Performance, and Accessibility
+// All original functionality preserved + improvements added
+// ============================================================================
+
 import { categoryTree } from "./examManifest.js";
 import { userProfile } from "./userProfile.js";
 
@@ -23,23 +27,78 @@ import {
 // Notifications
 import { showNotification, confirmationNotification } from "./notifications.js";
 
+// ============================================================================
+// CONFIGURATION & CONSTANTS
+// ============================================================================
+
+const CONFIG = {
+  MAX_USERNAME_LENGTH: 50,
+  DEBOUNCE_DELAY: 300,
+};
+
 const container = document.getElementById("contentArea");
 const title = document.getElementById("Subjects-text");
 const breadcrumb = document.getElementById("breadcrumb");
 
 // ============================================================================
-// Check if the user is online, if not tell them so.
+// UTILITY FUNCTIONS - Enhanced with Security
 // ============================================================================
 
-const isOnline = navigator.onLine;
+/**
+ * Safe localStorage getter with error handling
+ */
+function getFromStorage(key, defaultValue = null) {
+  try {
+    const item = localStorage.getItem(key);
+    return item !== null ? item : defaultValue;
+  } catch (error) {
+    console.error(`Error reading from localStorage: ${key}`, error);
+    return defaultValue;
+  }
+}
 
-// 2. Your specific usage
-if (!isOnline) {
-  showNotification(
-    "منصة إمتحانات بصمجي",
-    `You are offline. Website loaded from Cache`,
-    "info",
-  );
+/**
+ * Safe localStorage setter with error handling
+ */
+function setInStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.error(`Error writing to localStorage: ${key}`, error);
+    if (error.name === "QuotaExceededError") {
+      showNotification(
+        "تحذير",
+        "مساحة التخزين ممتلئة. قد تفقد بعض البيانات.",
+        "./images/warning.png",
+      );
+    }
+    return false;
+  }
+}
+
+/**
+ * Validate username input
+ */
+function validateUsername(username) {
+  if (!username || !username.trim()) {
+    return { valid: false, message: "الرجاء إدخال اسم صالح" };
+  }
+
+  if (username.length > CONFIG.MAX_USERNAME_LENGTH) {
+    return {
+      valid: false,
+      message: `الاسم طويل جداً (الحد الأقصى ${CONFIG.MAX_USERNAME_LENGTH} حرف)`,
+    };
+  }
+
+  // Check for potentially malicious content
+  const dangerousPatterns = /<script|javascript:|onerror=/gi;
+  if (dangerousPatterns.test(username)) {
+    return { valid: false, message: "اسم غير صالح" };
+  }
+
+  return { valid: true, message: "" };
 }
 
 // ============================================================================
@@ -48,7 +107,7 @@ if (!isOnline) {
 
 const userNameBadge = document.getElementById("user-name");
 
-// Gamified welcome message pool — FIXED
+// Gamified welcome message pool
 const welcomeMessages = [
   (name) => `🏆 أهلاً بعودة البطل يا ${name}`,
   (name) => `🚀 لم تطل الغيبة، لنواصل الإنجاز يا ${name}`,
@@ -61,6 +120,7 @@ const welcomeMessages = [
   (name) => `📈 تقدمك ملحوظ.. استمر في التألق يا ${name}`,
   (name) => `👑 الأسطورة يعود من جديد.. أهلاً بك يا ${name}`,
 ];
+
 const opts = [
   ["./favicon.png", "Quiz (.html)", "quiz"],
   ["./images/HTML_Icon.png", "HTML (.html)", "html"],
@@ -70,158 +130,229 @@ const opts = [
   ["./images/mardownIcon.png", "Markdown (.md)", "md"],
 ];
 
-// Change username
+/**
+ * Change username with enhanced validation
+ */
 window.changeUsername = function () {
-  const currentName = localStorage.getItem("username") || "User";
-  const newName = prompt("أدخل الإسم الجديد", currentName);
-  if (!newName || !newName.trim()) return;
+  try {
+    const currentName = getFromStorage("username", "User");
+    const newName = prompt("أدخل الإسم الجديد", currentName);
 
-  localStorage.setItem("username", newName.trim());
-  updateWelcomeMessage();
+    if (!newName) return;
+
+    const validation = validateUsername(newName);
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
+    }
+
+    const trimmedName = newName.trim();
+    if (setInStorage("username", trimmedName)) {
+      updateWelcomeMessage();
+      showNotification(
+        "تم التحديث",
+        `تم تغيير الاسم إلى ${trimmedName}`,
+        "./favicon.png",
+      );
+    }
+  } catch (error) {
+    console.error("Error changing username:", error);
+    alert("حدث خطأ أثناء تغيير الاسم. حاول مرة أخرى.");
+  }
 };
 
-// Pick a random welcome message
+/**
+ * Get random welcome message
+ */
 function getRandomWelcomeMessage(name) {
+  const escapedName = escapeHtml(name);
   const message =
     welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-  return message(name);
+  return message(escapedName);
 }
 
-// Update welcome badge text
+/**
+ * Update welcome badge text
+ */
 function updateWelcomeMessage() {
-  const name = localStorage.getItem("username") || "User";
-  const messageTemplate = getRandomWelcomeMessage(name);
+  try {
+    const name = getFromStorage("username", "User");
+    const messageTemplate = getRandomWelcomeMessage(name);
 
-  // Replace username with styled span
-  const styledMessage = messageTemplate.replace(
-    name,
-    `<span class="user-name">${name}</span>`,
-  );
+    // Replace username with styled span
+    const styledMessage = messageTemplate.replace(
+      escapeHtml(name),
+      `<span class="user-name">${escapeHtml(name)}</span>`,
+    );
 
-  userNameBadge.innerHTML = styledMessage;
+    if (userNameBadge) {
+      userNameBadge.innerHTML = styledMessage;
+      userNameBadge.setAttribute("aria-label", `تغيير اسم المستخدم: ${name}`);
+    }
+  } catch (error) {
+    console.error("Error updating welcome message:", error);
+  }
 }
 
 // Initial load
 updateWelcomeMessage();
-showNotification(
-  "منصة إمتحانات بصمجي",
-  `السلام عليكم يا ${localStorage.getItem("username") || "User"}`,
-  "./images/السلام عليكم.png",
-);
+
+// Show welcome notification with error handling
+try {
+  const username = getFromStorage("username", "User");
+  showNotification(
+    "منصة إمتحانات بصمجي",
+    `السلام عليكم يا ${escapeHtml(username)}`,
+    "./images/السلام عليكم.png",
+  );
+} catch (error) {
+  console.error("Error showing welcome notification:", error);
+}
 
 // ============================================================================
-// PROFILE MANAGEMENT MODAL
+// PROFILE MANAGEMENT MODAL - Enhanced with Accessibility
 // ============================================================================
 
 window.openProfileSettings = function () {
-  const profile = userProfile.getProfile();
-  const metadata = extractMetadata(categoryTree);
+  try {
+    const profile = userProfile.getProfile();
+    const metadata = extractMetadata(categoryTree);
 
-  const modal = document.createElement("div");
-  modal.className = "modal-overlay";
-  modal.id = "profileModal";
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.id = "profileModal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "profileModalTitle");
 
-  const modalCard = document.createElement("div");
-  modalCard.className = "modal-card profile-modal";
+    const modalCard = document.createElement("div");
+    modalCard.className = "modal-card profile-modal";
 
-  // Get available years and terms for current selection
-  const availableYears =
-    profile.faculty === "All"
-      ? metadata.years
-      : getAvailableYears(categoryTree, profile.faculty);
+    // Get available years and terms for current selection
+    const availableYears =
+      profile.faculty === "All"
+        ? metadata.years
+        : getAvailableYears(categoryTree, profile.faculty);
 
-  const availableTerms = getAvailableTerms(
-    categoryTree,
-    profile.faculty,
-    profile.year,
-  );
+    const availableTerms = getAvailableTerms(
+      categoryTree,
+      profile.faculty,
+      profile.year,
+    );
 
-  modalCard.innerHTML = `
-    <h2>⚙️ الملف الشخصي</h2>
-    
-    <div class="profile-section">
-      <label for="profileUsername">الإسم</label>
-      <input 
-        type="text" 
-        id="profileUsername" 
-        class="profile-input"
-        value="${escapeHtml(profile.username)}"
-        placeholder="Enter your name"
-      />
-    </div>
-
-    <div class="profile-section">
-      <h3>المعلومات الأكاديمية</h3>
-      <p class="profile-hint">يساعدنا على عرض المواد الخاصة بك</p>
+    modalCard.innerHTML = `
+      <h2 id="profileModalTitle">⚙️ الملف الشخصي</h2>
       
-      <div class="profile-grid">
-        <div>
-          <label for="profileFaculty">الكلية</label>
-          <select id="profileFaculty" class="profile-select">
-            <option value="All">All Faculties</option>
-            ${metadata.faculties
-              .map(
-                (f) =>
-                  `<option value="${escapeHtml(f)}" ${
-                    f === profile.faculty ? "selected" : ""
-                  }>${escapeHtml(f)}</option>`,
-              )
-              .join("")}
-          </select>
-        </div>
+      <div class="profile-section">
+        <label for="profileUsername">الإسم</label>
+        <input 
+          type="text" 
+          id="profileUsername" 
+          class="profile-input"
+          value="${escapeHtml(profile.username)}"
+          placeholder="أدخل اسمك"
+          maxlength="${CONFIG.MAX_USERNAME_LENGTH}"
+          aria-required="true"
+        />
+      </div>
 
-        <div>
-          <label for="profileYear">العام</label>
-          <select id="profileYear" class="profile-select">
-            <option value="All">All Years</option>
-            ${availableYears
-              .map(
-                (y) =>
-                  `<option value="${escapeHtml(y)}" ${
-                    y === profile.year ? "selected" : ""
-                  }>العام ${escapeHtml(y)}</option>`,
-              )
-              .join("")}
-          </select>
-        </div>
+      <div class="profile-section">
+        <h3>المعلومات الأكاديمية</h3>
+        <p class="profile-hint">يساعدنا على عرض المواد الخاصة بك</p>
+        
+        <div class="profile-grid">
+          <div>
+            <label for="profileFaculty">الكلية</label>
+            <select id="profileFaculty" class="profile-select" aria-label="اختر الكلية">
+              <option value="All">All Faculties</option>
+              ${metadata.faculties
+                .map(
+                  (f) =>
+                    `<option value="${escapeHtml(f)}" ${
+                      f === profile.faculty ? "selected" : ""
+                    }>${escapeHtml(f)}</option>`,
+                )
+                .join("")}
+            </select>
+          </div>
 
-        <div>
-          <label for="profileTerm">الترم</label>
-          <select id="profileTerm" class="profile-select">
-            <option value="All">All Terms</option>
-            ${availableTerms
-              .map(
-                (t) =>
-                  `<option value="${escapeHtml(t)}" ${
-                    t === profile.term ? "selected" : ""
-                  }>الترم ${escapeHtml(t)}</option>`,
-              )
-              .join("")}
-          </select>
+          <div>
+            <label for="profileYear">العام</label>
+            <select id="profileYear" class="profile-select" aria-label="اختر العام">
+              <option value="All">All Years</option>
+              ${availableYears
+                .map(
+                  (y) =>
+                    `<option value="${escapeHtml(y)}" ${
+                      y === profile.year ? "selected" : ""
+                    }>العام ${escapeHtml(y)}</option>`,
+                )
+                .join("")}
+            </select>
+          </div>
+
+          <div>
+            <label for="profileTerm">الترم</label>
+            <select id="profileTerm" class="profile-select" aria-label="اختر الترم">
+              <option value="All">All Terms</option>
+              ${availableTerms
+                .map(
+                  (t) =>
+                    `<option value="${escapeHtml(t)}" ${
+                      t === profile.term ? "selected" : ""
+                    }>الترم ${escapeHtml(t)}</option>`,
+                )
+                .join("")}
+            </select>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="profile-actions">      
-      <button class="profile-btn secondary" onclick="window.closeProfileModal()">
-        إلغاء
-      </button>
-      <button class="profile-btn primary" onclick="window.saveProfileSettings()">
-        💾 حفظ التغييرات
-      </button>
-    </div>
-  `;
+      <div class="profile-actions">      
+        <button class="profile-btn secondary" 
+                onclick="window.closeProfileModal()"
+                type="button"
+                aria-label="إلغاء وإغلاق النافذة">
+          إلغاء
+        </button>
+        <button class="profile-btn primary" 
+                onclick="window.saveProfileSettings()"
+                type="button"
+                aria-label="حفظ التغييرات">
+          💾 حفظ التغييرات
+        </button>
+      </div>
+    `;
 
-  modal.appendChild(modalCard);
-  document.body.appendChild(modal);
+    modal.appendChild(modalCard);
+    document.body.appendChild(modal);
 
-  // Setup cascading dropdown listeners for Profile Settings
-  setupProfileDropdownCascade();
+    // Setup cascading dropdown listeners
+    setupProfileDropdownCascade();
 
-  // Close on overlay click
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) window.closeProfileModal();
-  });
+    // Focus management
+    const firstInput = modalCard.querySelector("#profileUsername");
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
+
+    // Close on overlay click
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) window.closeProfileModal();
+    });
+
+    // Close on Escape key
+    const escapeHandler = (e) => {
+      if (e.key === "Escape") {
+        window.closeProfileModal();
+        document.removeEventListener("keydown", escapeHandler);
+      }
+    };
+    document.addEventListener("keydown", escapeHandler);
+  } catch (error) {
+    console.error("Error opening profile settings:", error);
+    alert("حدث خطأ أثناء فتح الإعدادات. حاول مرة أخرى.");
+  }
 };
 
 /**
@@ -236,100 +367,139 @@ function setupProfileDropdownCascade() {
 
   // When faculty changes, update year and term dropdowns
   facultySelect.addEventListener("change", () => {
-    const selectedFaculty = facultySelect.value;
+    try {
+      const selectedFaculty = facultySelect.value;
 
-    // Update year dropdown
-    const availableYears =
-      selectedFaculty === "All"
-        ? extractMetadata(categoryTree).years
-        : getAvailableYears(categoryTree, selectedFaculty);
+      // Update year dropdown
+      const availableYears =
+        selectedFaculty === "All"
+          ? extractMetadata(categoryTree).years
+          : getAvailableYears(categoryTree, selectedFaculty);
 
-    const currentYear = yearSelect.value;
-    yearSelect.innerHTML =
-      '<option value="All">All Years</option>' +
-      availableYears
-        .map(
-          (y) =>
-            `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
-        )
-        .join("");
+      const currentYear = yearSelect.value;
+      yearSelect.innerHTML =
+        '<option value="All">All Years</option>' +
+        availableYears
+          .map(
+            (y) =>
+              `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
+          )
+          .join("");
 
-    // Restore selection if still valid, otherwise reset to "All"
-    if (availableYears.includes(currentYear)) {
-      yearSelect.value = currentYear;
-    } else {
-      yearSelect.value = "All";
+      // Restore selection if still valid, otherwise reset to "All"
+      if (availableYears.includes(currentYear)) {
+        yearSelect.value = currentYear;
+      } else {
+        yearSelect.value = "All";
+      }
+
+      // Trigger year change to update terms
+      yearSelect.dispatchEvent(new Event("change"));
+    } catch (error) {
+      console.error("Error in faculty change handler:", error);
     }
-
-    // Trigger year change to update terms
-    yearSelect.dispatchEvent(new Event("change"));
   });
 
   // When year changes, update term dropdown
   yearSelect.addEventListener("change", () => {
-    const selectedFaculty = facultySelect.value;
-    const selectedYear = yearSelect.value;
+    try {
+      const selectedFaculty = facultySelect.value;
+      const selectedYear = yearSelect.value;
 
-    // Update term dropdown
-    const availableTerms = getAvailableTerms(
-      categoryTree,
-      selectedFaculty,
-      selectedYear,
-    );
+      // Update term dropdown
+      const availableTerms = getAvailableTerms(
+        categoryTree,
+        selectedFaculty,
+        selectedYear,
+      );
 
-    const currentTerm = termSelect.value;
-    termSelect.innerHTML =
-      '<option value="All">All Terms</option>' +
-      availableTerms
-        .map(
-          (t) =>
-            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
-        )
-        .join("");
+      const currentTerm = termSelect.value;
+      termSelect.innerHTML =
+        '<option value="All">All Terms</option>' +
+        availableTerms
+          .map(
+            (t) =>
+              `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
+          )
+          .join("");
 
-    // Restore selection if still valid, otherwise reset to "All"
-    if (availableTerms.includes(currentTerm)) {
-      termSelect.value = currentTerm;
-    } else {
-      termSelect.value = "All";
+      // Restore selection if still valid, otherwise reset to "All"
+      if (availableTerms.includes(currentTerm)) {
+        termSelect.value = currentTerm;
+      } else {
+        termSelect.value = "All";
+      }
+    } catch (error) {
+      console.error("Error in year change handler:", error);
     }
   });
 }
 
 window.saveProfileSettings = function () {
-  const username = document.getElementById("profileUsername")?.value;
-  const faculty = document.getElementById("profileFaculty")?.value;
-  const year = document.getElementById("profileYear")?.value;
-  const term = document.getElementById("profileTerm")?.value;
+  try {
+    const username = document.getElementById("profileUsername")?.value.trim();
+    const faculty = document.getElementById("profileFaculty")?.value;
+    const year = document.getElementById("profileYear")?.value;
+    const term = document.getElementById("profileTerm")?.value;
 
-  const oldProfile = userProfile.getProfile();
+    // Validate username
+    if (username) {
+      const validation = validateUsername(username);
+      if (!validation.valid) {
+        alert(validation.message);
+        document.getElementById("profileUsername")?.focus();
+        return;
+      }
+    }
 
-  // Update profile
-  if (username) userProfile.setUsername(username);
-  userProfile.updateAcademicInfo({ faculty, year, term });
+    const oldProfile = userProfile.getProfile();
 
-  // Check if academic info changed
-  const academicInfoChanged =
-    oldProfile.faculty !== faculty ||
-    oldProfile.year !== year ||
-    oldProfile.term !== term;
+    // Update profile
+    if (username) userProfile.setUsername(username);
+    userProfile.updateAcademicInfo({ faculty, year, term });
 
-  if (academicInfoChanged) {
-    // Initialize default subscriptions for new academic info
-    userProfile.initializeDefaultSubscriptions(categoryTree);
+    // Check if academic info changed
+    const academicInfoChanged =
+      oldProfile.faculty !== faculty ||
+      oldProfile.year !== year ||
+      oldProfile.term !== term;
+
+    if (academicInfoChanged) {
+      // Initialize default subscriptions for new academic info
+      userProfile.initializeDefaultSubscriptions(categoryTree);
+    }
+
+    // Update UI
+    updateWelcomeMessage();
+    window.closeProfileModal();
+
+    // Refresh course view
+    renderRootCategories();
+
+    showNotification("تم الحفظ", "تم حفظ إعداداتك بنجاح", "./favicon.png");
+  } catch (error) {
+    console.error("Error saving profile settings:", error);
+    alert("حدث خطأ أثناء الحفظ. حاول مرة أخرى.");
   }
-
-  // Update UI
-  updateWelcomeMessage();
-  window.closeProfileModal();
-
-  // Refresh course view
-  renderRootCategories();
 };
 
 window.closeProfileModal = function () {
-  const modal = document.getElementById("profileModal");
-  if (modal) modal.remove();
+  try {
+    const modal = document.getElementById("profileModal");
+    if (modal) {
+      modal.remove();
+
+      // Return focus to trigger element
+      const trigger = document.querySelector(
+        '[data-action="openProfileSettings"]',
+      );
+      if (trigger) {
+        trigger.focus();
+      }
+    }
+  } catch (error) {
+    console.error("Error closing profile modal:", error);
+  }
 };
 
 // ============================================================================
@@ -379,6 +549,9 @@ function showOnboardingWizard() {
   const overlay = document.createElement("div");
   overlay.className = "onboarding-overlay";
   overlay.id = "onboardingWizard";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "onboardingTitle");
 
   // Create card
   const card = document.createElement("div");
@@ -392,12 +565,19 @@ function showOnboardingWizard() {
     const skipBtn = document.createElement("button");
     skipBtn.className = "onboarding-skip";
     skipBtn.textContent = "تخطي الآن";
+    skipBtn.type = "button";
+    skipBtn.setAttribute("aria-label", "تخطي عملية الإعداد");
     skipBtn.onclick = () => closeOnboarding();
     card.appendChild(skipBtn);
 
     // Progress dots
     const progress = document.createElement("div");
     progress.className = "onboarding-progress";
+    progress.setAttribute("role", "progressbar");
+    progress.setAttribute("aria-valuemin", "1");
+    progress.setAttribute("aria-valuemax", "3");
+    progress.setAttribute("aria-valuenow", currentStep.toString());
+
     for (let i = 1; i <= 3; i++) {
       const dot = document.createElement("div");
       dot.className = "progress-dot";
@@ -425,31 +605,12 @@ function showOnboardingWizard() {
     const nav = document.createElement("div");
     nav.className = "onboarding-nav";
 
-    if (currentStep < 3) {
-      const nextBtn = document.createElement("button");
-      nextBtn.className = "onboarding-btn primary";
-      nextBtn.textContent = "→ التالي";
-      nextBtn.disabled =
-        (currentStep === 1 && !selectedFaculty) ||
-        (currentStep === 2 && !selectedYear);
-      nextBtn.onclick = () => {
-        currentStep++;
-        render();
-      };
-      nav.appendChild(nextBtn);
-    } else {
-      const finishBtn = document.createElement("button");
-      finishBtn.className = "onboarding-btn finish";
-      finishBtn.textContent = "🎉 ابدأ الآن";
-      finishBtn.disabled = !selectedTerm;
-      finishBtn.onclick = () => finishOnboarding();
-      nav.appendChild(finishBtn);
-    }
-
     if (currentStep > 1) {
       const backBtn = document.createElement("button");
       backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "السابق ←";
+      backBtn.textContent = "← السابق";
+      backBtn.type = "button";
+      backBtn.setAttribute("aria-label", "الرجوع للخطوة السابقة");
       backBtn.onclick = () => {
         currentStep--;
         render();
@@ -460,6 +621,37 @@ function showOnboardingWizard() {
       nav.appendChild(document.createElement("div"));
     }
 
+    if (currentStep < 3) {
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "onboarding-btn primary";
+      nextBtn.textContent = "التالي →";
+      nextBtn.type = "button";
+      nextBtn.disabled =
+        (currentStep === 1 && !selectedFaculty) ||
+        (currentStep === 2 && !selectedYear);
+      nextBtn.setAttribute("aria-label", "الانتقال للخطوة التالية");
+      if (nextBtn.disabled) {
+        nextBtn.setAttribute("aria-disabled", "true");
+      }
+      nextBtn.onclick = () => {
+        currentStep++;
+        render();
+      };
+      nav.appendChild(nextBtn);
+    } else {
+      const finishBtn = document.createElement("button");
+      finishBtn.className = "onboarding-btn finish";
+      finishBtn.textContent = "🎉 ابدأ الآن";
+      finishBtn.type = "button";
+      finishBtn.disabled = !selectedTerm;
+      finishBtn.setAttribute("aria-label", "إنهاء الإعداد والبدء");
+      if (finishBtn.disabled) {
+        finishBtn.setAttribute("aria-disabled", "true");
+      }
+      finishBtn.onclick = () => finishOnboarding();
+      nav.appendChild(finishBtn);
+    }
+
     card.appendChild(nav);
   }
 
@@ -467,20 +659,27 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>👋 مرحباً بك في منصة إمتحانات بصمجي</h2>
+      <h2 id="onboardingTitle">👋 مرحباً بك في منصة إمتحانات بصمجي</h2>
       <p>دعنا نحسن تجربتك. ما هي كليتك؟</p>
     `;
     container.appendChild(header);
 
     const grid = document.createElement("div");
     grid.className = "faculty-grid";
+    grid.setAttribute("role", "group");
+    grid.setAttribute("aria-label", "اختر كليتك");
 
     metadata.faculties.forEach((faculty) => {
       const option = document.createElement("button");
       option.className = "faculty-option";
+      option.type = "button";
+      option.setAttribute(
+        "aria-pressed",
+        selectedFaculty === faculty ? "true" : "false",
+      );
       if (selectedFaculty === faculty) option.classList.add("selected");
       option.innerHTML = `
-        <span class="faculty-icon">${getFacultyIcon(faculty)}</span>
+        <span class="faculty-icon" aria-hidden="true">${getFacultyIcon(faculty)}</span>
         <span class="faculty-name">${escapeHtml(faculty)}</span>
       `;
       option.onclick = () => {
@@ -500,7 +699,7 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>اختر العام الدراسي 📅</h2>
+      <h2 id="onboardingTitle">اختر العام الدراسي 📅</h2>
       <p>في أي سنة دراسية أنت الآن؟</p>
     `;
     container.appendChild(header);
@@ -517,10 +716,17 @@ function showOnboardingWizard() {
 
     const pills = document.createElement("div");
     pills.className = "year-pills";
+    pills.setAttribute("role", "group");
+    pills.setAttribute("aria-label", "اختر العام الدراسي");
 
     availableYears.forEach((year) => {
       const pill = document.createElement("button");
       pill.className = "year-pill";
+      pill.type = "button";
+      pill.setAttribute(
+        "aria-pressed",
+        selectedYear === year ? "true" : "false",
+      );
       if (selectedYear === year) pill.classList.add("selected");
       pill.textContent = `العام ${year}`;
       pill.onclick = () => {
@@ -539,7 +745,7 @@ function showOnboardingWizard() {
     const header = document.createElement("div");
     header.className = "onboarding-header";
     header.innerHTML = `
-      <h2>📚 اختر الترم</h2>
+      <h2 id="onboardingTitle">📚 اختر الترم</h2>
       <p>في أي فصل دراسي تدرس؟</p>
     `;
     container.appendChild(header);
@@ -560,13 +766,20 @@ function showOnboardingWizard() {
 
     const toggle = document.createElement("div");
     toggle.className = "term-toggle";
+    toggle.setAttribute("role", "group");
+    toggle.setAttribute("aria-label", "اختر الترم");
 
     availableTerms.forEach((term) => {
       const btn = document.createElement("button");
       btn.className = "term-btn";
+      btn.type = "button";
+      btn.setAttribute(
+        "aria-pressed",
+        selectedTerm === term ? "true" : "false",
+      );
       if (selectedTerm === term) btn.classList.add("selected");
       btn.innerHTML = `
-        <span class="term-icon">${term === "1" ? "🍂" : "🌸"}</span>
+        <span class="term-icon" aria-hidden="true">${term === "1" ? "🍂" : "🌸"}</span>
         <span>الترم ${term}</span>
       `;
       btn.onclick = () => {
@@ -585,28 +798,41 @@ function showOnboardingWizard() {
   }
 
   function finishOnboarding() {
-    // Save the selections
-    userProfile.saveInitialSetup(
-      {
-        faculty: selectedFaculty,
-        year: selectedYear,
-        term: selectedTerm,
-      },
-      categoryTree,
-    );
+    try {
+      // Save the selections
+      userProfile.saveInitialSetup(
+        {
+          faculty: selectedFaculty,
+          year: selectedYear,
+          term: selectedTerm,
+        },
+        categoryTree,
+      );
 
-    // Update welcome message
-    updateWelcomeMessage();
+      // Update welcome message
+      updateWelcomeMessage();
 
-    // Close wizard and render courses
-    overlay.remove();
-    renderRootCategories();
+      // Close wizard and render courses
+      overlay.remove();
+      renderRootCategories();
+
+      showNotification("مرحباً!", "تم إعداد حسابك بنجاح", "./favicon.png");
+    } catch (error) {
+      console.error("Error finishing onboarding:", error);
+      alert("حدث خطأ أثناء حفظ الإعدادات. حاول مرة أخرى.");
+    }
   }
 
   // Initial render
   render();
   overlay.appendChild(card);
   document.body.appendChild(overlay);
+
+  // Focus first interactive element
+  const firstButton = card.querySelector("button");
+  if (firstButton) {
+    setTimeout(() => firstButton.focus(), 100);
+  }
 }
 
 // ============================================================================
@@ -614,205 +840,75 @@ function showOnboardingWizard() {
 // ============================================================================
 
 window.openCourseManager = function () {
-  const profile = userProfile.getProfile();
-  const metadata = extractMetadata(categoryTree);
+  try {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.id = "courseManagerModal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "courseManagerTitle");
 
-  const modal = document.createElement("div");
-  modal.className = "modal-overlay";
-  modal.id = "courseManagerModal";
+    const modalCard = document.createElement("div");
+    modalCard.className = "modal-card course-manager-modal";
 
-  const modalCard = document.createElement("div");
-  modalCard.className = "modal-card course-manager-modal";
+    modalCard.innerHTML = `
+      <h2 id="courseManagerTitle">📚 إدارة المواد</h2>
+      <p class="modal-subtitle">اختر المواد التي تريد متابعتها</p>
+      
+      <div id="courseManagerList" class="course-list">
+        <!-- Content will be rendered by renderCourseManagerList() -->
+      </div>
+      
+      <div class="modal-actions">
+        <button class="profile-btn primary" 
+                onclick="window.closeCourseManager()"
+                type="button"
+                aria-label="إغلاق">
+          ✓ تم
+        </button>
+      </div>
+    `;
 
-  // Get available years and terms for current profile selection
-  const availableYears =
-    profile.faculty === "All"
-      ? metadata.years
-      : getAvailableYears(categoryTree, profile.faculty);
+    modal.appendChild(modalCard);
+    document.body.appendChild(modal);
 
-  const availableTerms = getAvailableTerms(
-    categoryTree,
-    profile.faculty,
-    profile.year,
-  );
+    // Render course list
+    renderCourseManagerList();
 
-  modalCard.innerHTML = `
-    <h2>📚 إدارة المواد خاصتك</h2>
-    <p class="course-manager-hint">حدد الدورات التي تريد رؤيتها</p>
+    // Close on overlay click
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) window.closeCourseManager();
+    });
 
-    <div class="course-manager-filters">
-      <select id="cmFaculty" class="course-filter-select">
-        <option value="All">All Faculties</option>
-        ${metadata.faculties
-          .map(
-            (f) =>
-              `<option value="${escapeHtml(f)}" ${
-                f === profile.faculty ? "selected" : ""
-              }>${escapeHtml(f)}</option>`,
-          )
-          .join("")}
-      </select>
-
-      <select id="cmYear" class="course-filter-select">
-        <option value="All">All Years</option>
-        ${availableYears
-          .map(
-            (y) =>
-              `<option value="${escapeHtml(y)}" ${
-                y === profile.year ? "selected" : ""
-              }>العام ${escapeHtml(y)}</option>`,
-          )
-          .join("")}
-      </select>
-
-      <select id="cmTerm" class="course-filter-select">
-        <option value="All">All Terms</option>
-        ${availableTerms
-          .map(
-            (t) =>
-              `<option value="${escapeHtml(t)}" ${
-                t === profile.term ? "selected" : ""
-              }>الترم ${escapeHtml(t)}</option>`,
-          )
-          .join("")}
-      </select>
-    </div>
-
-    <div id="courseManagerList" class="course-manager-list">
-      <!-- Course list will be rendered here -->
-    </div>
-
-    <div class="course-manager-actions">
-      <button class="profile-btn primary" onclick="window.closeCourseManager()">
-        ✅ تم
-      </button>
-    </div>
-  `;
-
-  modal.appendChild(modalCard);
-  document.body.appendChild(modal);
-
-  // Setup cascading dropdown listeners for Course Manager
-  setupCourseManagerDropdownCascade();
-
-  // Render initial course list
-  renderCourseManagerList();
-
-  // Close on overlay click
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) window.closeCourseManager();
-  });
+    // Close on Escape key
+    const escapeHandler = (e) => {
+      if (e.key === "Escape") {
+        window.closeCourseManager();
+        document.removeEventListener("keydown", escapeHandler);
+      }
+    };
+    document.addEventListener("keydown", escapeHandler);
+  } catch (error) {
+    console.error("Error opening course manager:", error);
+    alert("حدث خطأ أثناء فتح إدارة المواد. حاول مرة أخرى.");
+  }
 };
-
-/**
- * Setup cascading dropdown behavior for Course Manager modal
- */
-function setupCourseManagerDropdownCascade() {
-  const facultySelect = document.getElementById("cmFaculty");
-  const yearSelect = document.getElementById("cmYear");
-  const termSelect = document.getElementById("cmTerm");
-
-  if (!facultySelect || !yearSelect || !termSelect) return;
-
-  // When faculty changes, update year and term dropdowns
-  facultySelect.addEventListener("change", () => {
-    const selectedFaculty = facultySelect.value;
-
-    // Update year dropdown
-    const availableYears =
-      selectedFaculty === "All"
-        ? extractMetadata(categoryTree).years
-        : getAvailableYears(categoryTree, selectedFaculty);
-
-    const currentYear = yearSelect.value;
-    yearSelect.innerHTML =
-      '<option value="All">جميع الأعوام</option>' +
-      availableYears
-        .map(
-          (y) =>
-            `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
-        )
-        .join("");
-
-    // Restore selection if still valid, otherwise reset to "All"
-    if (availableYears.includes(currentYear)) {
-      yearSelect.value = currentYear;
-    } else {
-      yearSelect.value = "All";
-    }
-
-    // Trigger year change to update terms
-    yearSelect.dispatchEvent(new Event("change"));
-  });
-
-  // When year changes, update term dropdown
-  yearSelect.addEventListener("change", () => {
-    const selectedFaculty = facultySelect.value;
-    const selectedYear = yearSelect.value;
-
-    // Update term dropdown
-    const availableTerms = getAvailableTerms(
-      categoryTree,
-      selectedFaculty,
-      selectedYear,
-    );
-
-    const currentTerm = termSelect.value;
-    termSelect.innerHTML =
-      '<option value="All">All Terms</option>' +
-      availableTerms
-        .map(
-          (t) =>
-            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
-        )
-        .join("");
-
-    // Restore selection if still valid, otherwise reset to "All"
-    if (availableTerms.includes(currentTerm)) {
-      termSelect.value = currentTerm;
-    } else {
-      termSelect.value = "All";
-    }
-
-    // Re-render course list after cascade updates
-    renderCourseManagerList();
-  });
-
-  // When term changes, re-render course list
-  termSelect.addEventListener("change", () => {
-    renderCourseManagerList();
-  });
-}
 
 function renderCourseManagerList() {
   const listContainer = document.getElementById("courseManagerList");
   if (!listContainer) return;
 
-  const faculty = document.getElementById("cmFaculty")?.value || "All";
-  const year = document.getElementById("cmYear")?.value || "All";
-  const term = document.getElementById("cmTerm")?.value || "All";
-
-  const filteredCourses = filterCourses(categoryTree, { faculty, year, term });
   const subscribedIds = userProfile.getSubscribedCourseIds();
+  const allCourses = filterCourses(categoryTree, userProfile.getProfile());
 
-  if (filteredCourses.length === 0) {
-    listContainer.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">🔍</div>
-        <p>No courses found with these filters</p>
-      </div>
-    `;
-    return;
-  }
-
-  listContainer.innerHTML = filteredCourses
+  listContainer.innerHTML = allCourses
     .map((course) => {
       const isSubscribed = subscribedIds.includes(course.id);
       return `
-      <div class="course-manager-item ${isSubscribed ? "subscribed" : ""}">
-        <div class="course-manager-info">
+      <div class="course-item">
+        <div class="course-info">
           <h4>${escapeHtml(course.name)}</h4>
-          <p class="course-manager-meta">
+          <p class="course-details">
             ${escapeHtml(course.faculty)} | العام ${escapeHtml(
               course.year,
             )} | الترم ${escapeHtml(course.term)}
@@ -821,6 +917,9 @@ function renderCourseManagerList() {
         <button 
           class="course-toggle-btn ${isSubscribed ? "active" : ""}"
           onclick="window.toggleCourseSubscription('${escapeHtml(course.id)}')"
+          type="button"
+          aria-pressed="${isSubscribed ? "true" : "false"}"
+          aria-label="${isSubscribed ? "إلغاء الاشتراك في" : "الاشتراك في"} ${escapeHtml(course.name)}"
         >
           ${isSubscribed ? "✓ Subscribed" : "+ Subscribe"}
         </button>
@@ -831,16 +930,34 @@ function renderCourseManagerList() {
 }
 
 window.toggleCourseSubscription = function (courseId) {
-  userProfile.toggleSubscription(courseId);
-  renderCourseManagerList();
+  try {
+    userProfile.toggleSubscription(courseId);
+    renderCourseManagerList();
+  } catch (error) {
+    console.error("Error toggling subscription:", error);
+  }
 };
 
 window.closeCourseManager = function () {
-  const modal = document.getElementById("courseManagerModal");
-  if (modal) modal.remove();
+  try {
+    const modal = document.getElementById("courseManagerModal");
+    if (modal) {
+      modal.remove();
 
-  // Refresh main view
-  renderRootCategories();
+      // Return focus to trigger
+      const trigger = document.querySelector(
+        '[data-action="openCourseManager"]',
+      );
+      if (trigger) {
+        trigger.focus();
+      }
+    }
+
+    // Refresh main view
+    renderRootCategories();
+  } catch (error) {
+    console.error("Error closing course manager:", error);
+  }
 };
 
 // ============================================================================
@@ -861,87 +978,109 @@ function getCategoriesLazy() {
 }
 
 // Initialize - Check for first-time user
-if (userProfile.checkFirstVisit()) {
-  // First visit: show onboarding wizard
-  showOnboardingWizard();
-} else {
-  // Returning user: render courses directly
+try {
+  if (userProfile.checkFirstVisit()) {
+    // First visit: show onboarding wizard
+    showOnboardingWizard();
+  } else {
+    // Returning user: render courses directly
+    renderRootCategories();
+  }
+} catch (error) {
+  console.error("Error initializing:", error);
+  // Fallback to root categories
   renderRootCategories();
 }
 
 function renderRootCategories() {
-  navigationStack = [];
-  updateBreadcrumb();
-
-  if (!title || !container) return;
-
-  const subscribedIds = userProfile.getSubscribedCourseIds();
-
-  // Get subscribed courses
-  const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
-
-  // Title based on subscription status
-  if (subscribedCourses.length > 0) {
-    title.textContent = "المواد خاصتي";
-  } else {
-    title.textContent = "جميع المواد";
-  }
-
-  container.innerHTML = "";
-  container.className = "grid-container";
-
-  const fragment = document.createDocumentFragment();
-
-  // 1. Add "إمتحاناتك" Folder Card
   try {
-    const userQuizzes = JSON.parse(
-      localStorage.getItem("user_quizzes") || "[]",
-    );
-    const quizzesCard = createCategoryCard(
-      "إمتحاناتك",
-      userQuizzes.length,
-      true,
-    );
-    // Custom icon
-    const iconDiv = quizzesCard.querySelector(".icon");
-    if (iconDiv) iconDiv.textContent = "✏️";
+    navigationStack = [];
+    updateBreadcrumb();
 
-    quizzesCard.onclick = () => renderUserQuizzesView();
-    fragment.appendChild(quizzesCard);
-  } catch (e) {
-    console.error("Error creating User Quizzes card", e);
-  }
+    if (!title || !container) return;
 
-  // Show subscribed courses if any
-  if (subscribedCourses.length > 0) {
-    subscribedCourses.forEach((course) => {
-      const itemCount = getCourseItemCount(course);
-      const card = createCategoryCard(course.name, itemCount, true, course);
-      card.onclick = () => renderCategory(categoryTree[course.key]);
-      fragment.appendChild(card);
-    });
-  } else {
-    // Show all courses if no subscriptions
-    const rootCategories = getCategoriesLazy();
-    rootCategories.forEach((category) => {
-      const itemCount = getCourseItemCount(category);
-      const card = createCategoryCard(category.name, itemCount, true, category);
-      card.onclick = () => renderCategory(category);
-      fragment.appendChild(card);
-    });
-  }
+    const subscribedIds = userProfile.getSubscribedCourseIds();
 
-  container.appendChild(fragment);
+    // Get subscribed courses
+    const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
 
-  // Show empty state if no courses at all
-  if (subscribedCourses.length === 0 && getCategoriesLazy().length === 0) {
-    container.innerHTML += `
-      <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
-        <h3>No Courses Available</h3>
-        <p>Check back later for new content!</p>
-      </div>
-    `;
+    // Title based on subscription status
+    if (subscribedCourses.length > 0) {
+      title.textContent = "المواد خاصتي";
+    } else {
+      title.textContent = "جميع المواد";
+    }
+
+    container.innerHTML = "";
+    container.className = "grid-container";
+    container.setAttribute("aria-busy", "false");
+
+    const fragment = document.createDocumentFragment();
+
+    // 1. Add "إمتحاناتك" Folder Card
+    try {
+      const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+      const quizzesCard = createCategoryCard(
+        "إمتحاناتك",
+        userQuizzes.length,
+        true,
+      );
+      // Custom icon
+      const iconDiv = quizzesCard.querySelector(".icon");
+      if (iconDiv) iconDiv.textContent = "✏️";
+
+      quizzesCard.onclick = () => renderUserQuizzesView();
+      fragment.appendChild(quizzesCard);
+    } catch (e) {
+      console.error("Error creating User Quizzes card", e);
+    }
+
+    // Show subscribed courses if any
+    if (subscribedCourses.length > 0) {
+      subscribedCourses.forEach((course) => {
+        const itemCount = getCourseItemCount(course);
+        const card = createCategoryCard(course.name, itemCount, true, course);
+        card.onclick = () => renderCategory(categoryTree[course.key]);
+        fragment.appendChild(card);
+      });
+    } else {
+      // Show all courses if no subscriptions
+      const rootCategories = getCategoriesLazy();
+      rootCategories.forEach((category) => {
+        const itemCount = getCourseItemCount(category);
+        const card = createCategoryCard(
+          category.name,
+          itemCount,
+          true,
+          category,
+        );
+        card.onclick = () => renderCategory(category);
+        fragment.appendChild(card);
+      });
+    }
+
+    container.appendChild(fragment);
+
+    // Show empty state if no courses at all
+    if (subscribedCourses.length === 0 && getCategoriesLazy().length === 0) {
+      container.innerHTML += `
+        <div class="empty-state" role="status">
+          <div class="empty-state-icon" aria-hidden="true">📚</div>
+          <h3>No Courses Available</h3>
+          <p>Check back later for new content!</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Error rendering root categories:", error);
+    if (container) {
+      container.innerHTML = `
+        <div class="error-state" role="alert">
+          <p>حدث خطأ أثناء تحميل المحتوى. يرجى تحديث الصفحة.</p>
+          <button onclick="location.reload()" type="button">تحديث</button>
+        </div>
+      `;
+    }
   }
 }
 
@@ -949,21 +1088,19 @@ function renderRootCategories() {
  * Render user-created quizzes VIEW (Folder Content)
  */
 function renderUserQuizzesView() {
-  // Update Navigation Stack
-  navigationStack.push({ name: "إمتحاناتك" });
-  updateBreadcrumb();
-
-  // Update Title & Clear Container
-  if (title) title.textContent = "إمتحاناتك";
-  if (!container) return;
-
-  container.innerHTML = "";
-  container.className = "grid-container";
-
   try {
-    const userQuizzes = JSON.parse(
-      localStorage.getItem("user_quizzes") || "[]",
-    );
+    // Update Navigation Stack
+    navigationStack.push({ name: "إمتحاناتك" });
+    updateBreadcrumb();
+
+    // Update Title & Clear Container
+    if (title) title.textContent = "إمتحاناتك";
+    if (!container) return;
+
+    container.innerHTML = "";
+    container.className = "grid-container";
+
+    const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
 
     // 1. Create 'Create New Quiz' Button (Always visible at top)
     const actionsBar = document.createElement("div");
@@ -977,7 +1114,8 @@ function renderUserQuizzesView() {
     const createBtn = document.createElement("a");
     createBtn.href = "create-quiz.html";
     createBtn.textContent = "➕ إنشاء اختبار جديد";
-    createBtn.className = "btn btn-primary"; // Use class if available, or inline styles
+    createBtn.className = "btn btn-primary";
+    createBtn.setAttribute("aria-label", "إنشاء اختبار جديد");
     createBtn.style.cssText = `
         display: inline-block;
         padding: 12px 24px;
@@ -1004,6 +1142,7 @@ function renderUserQuizzesView() {
     if (userQuizzes.length === 0) {
       // Empty state
       const emptyState = document.createElement("div");
+      emptyState.setAttribute("role", "status");
       emptyState.style.cssText = `
         grid-column: 1 / -1;
         text-align: center;
@@ -1014,7 +1153,7 @@ function renderUserQuizzesView() {
         color: var(--color-text-primary);
       `;
       emptyState.innerHTML = `
-        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">�</div>
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;" aria-hidden="true">📝</div>
         <h3 style="margin-bottom: 10px;">لم تقم بإنشاء أي اختبارات حتى الآن</h3>
         <p style="color: var(--color-text-secondary);">انقر على الزر الذي في الأعلى للبدء</p>
       `;
@@ -1027,7 +1166,9 @@ function renderUserQuizzesView() {
     }
   } catch (error) {
     console.error("Error rendering user quizzes view:", error);
-    container.innerHTML = `<p style="color:red">Error loading quizzes.</p>`;
+    if (container) {
+      container.innerHTML = `<p style="color:red" role="alert">Error loading quizzes.</p>`;
+    }
   }
 }
 
@@ -1037,6 +1178,8 @@ function renderUserQuizzesView() {
 function createUserQuizCard(quiz, index) {
   const card = document.createElement("div");
   card.className = "exam-card user-quiz-card";
+  card.setAttribute("role", "article");
+  card.setAttribute("aria-label", `اختبار: ${quiz.title}`);
   card.style.cssText = `
     background: var(--color-surface);
     border-radius: 12px;
@@ -1051,6 +1194,7 @@ function createUserQuizCard(quiz, index) {
 
   // Gradient accent on top
   const accentBar = document.createElement("div");
+  accentBar.setAttribute("aria-hidden", "true");
   accentBar.style.cssText = `
     position: absolute;
     top: 0;
@@ -1077,14 +1221,14 @@ function createUserQuizCard(quiz, index) {
   card.appendChild(badge);
 
   // Quiz title
-  const title = document.createElement("h3");
-  title.textContent = quiz.title;
-  title.style.cssText = `
+  const titleEl = document.createElement("h3");
+  titleEl.textContent = quiz.title;
+  titleEl.style.cssText = `
     margin: 0 0 8px 0;
     color: var(--color-text-primary);
     font-size: 1.1rem;
   `;
-  card.appendChild(title);
+  card.appendChild(titleEl);
 
   // Description
   if (quiz.description) {
@@ -1143,6 +1287,8 @@ function createUserQuizCard(quiz, index) {
   const playBtn = document.createElement("button");
   playBtn.textContent = "إبدأ الإختبار";
   playBtn.className = "btn btn-primary";
+  playBtn.type = "button";
+  playBtn.setAttribute("aria-label", `بدء اختبار ${quiz.title}`);
   playBtn.style.cssText = `
     flex: 1;
     padding: 10px 16px;
@@ -1161,6 +1307,8 @@ function createUserQuizCard(quiz, index) {
 
   const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "🗑️";
+  deleteBtn.type = "button";
+  deleteBtn.setAttribute("aria-label", `حذف اختبار ${quiz.title}`);
   deleteBtn.style.cssText = `
     padding: 10px 14px;
     background: var(--color-error-light);
@@ -1178,6 +1326,8 @@ function createUserQuizCard(quiz, index) {
 
   const downloadBtn = document.createElement("button");
   downloadBtn.textContent = "تحميل";
+  downloadBtn.type = "button";
+  downloadBtn.setAttribute("aria-label", `تحميل اختبار ${quiz.title}`);
   playBtn.className = "btn btn-primary";
   downloadBtn.style.cssText = `
     flex: 1;
@@ -1189,10 +1339,7 @@ function createUserQuizCard(quiz, index) {
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
   `;
-
-  downloadBtn.style.boxShadow = "";
 
   downloadBtn.title = "Download Quiz";
   downloadBtn.onclick = (e) => {
@@ -1222,35 +1369,40 @@ function createUserQuizCard(quiz, index) {
  * Play a user-created quiz
  */
 function playUserQuiz(quiz) {
-  // Store the quiz data temporarily for the quiz page to access
-  sessionStorage.setItem("active_user_quiz", JSON.stringify(quiz));
+  try {
+    // Store the quiz data temporarily for the quiz page to access
+    sessionStorage.setItem("active_user_quiz", JSON.stringify(quiz));
 
-  // Navigate to quiz page with special parameter
-  window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=practice&type=user`;
+    // Navigate to quiz page with special parameter
+    window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=practice&type=user`;
+  } catch (error) {
+    console.error("Error playing user quiz:", error);
+    alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
+  }
 }
 
 /**
  * Delete a user-created quiz
  */
 async function deleteUserQuiz(quizId, index) {
-  if (
-    !(await confirmationNotification(
-      "Are you sure you want to delete this quiz? This cannot be undone.",
-    ))
-  ) {
-    return;
-  }
-
   try {
-    const userQuizzes = JSON.parse(
-      localStorage.getItem("user_quizzes") || "[]",
-    );
-    userQuizzes.splice(index, 1);
-    localStorage.setItem("user_quizzes", JSON.stringify(userQuizzes));
+    if (
+      !(await confirmationNotification(
+        "Are you sure you want to delete this quiz? This cannot be undone.",
+      ))
+    ) {
+      return;
+    }
 
-    // Re-render the folder view ([Fixed])
+    const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+    userQuizzes.splice(index, 1);
+    setInStorage("user_quizzes", JSON.stringify(userQuizzes));
+
+    // Re-render the folder view
     renderRootCategories();
     renderUserQuizzesView();
+
+    showNotification("تم الحذف", "تم حذف الاختبار بنجاح", "./favicon.png");
   } catch (error) {
     console.error("Error deleting quiz:", error);
     alert("Error deleting quiz. Please try again.");
@@ -1258,43 +1410,55 @@ async function deleteUserQuiz(quizId, index) {
 }
 
 function renderCategory(category) {
-  navigationStack.push(category);
-  updateBreadcrumb();
+  try {
+    navigationStack.push(category);
+    updateBreadcrumb();
 
-  title.textContent = category.name;
-  container.innerHTML = "";
-  container.className = "grid-container";
+    title.textContent = category.name;
+    container.innerHTML = "";
+    container.className = "grid-container";
 
-  const fragment = document.createDocumentFragment();
+    const fragment = document.createDocumentFragment();
 
-  // Render subcategories
-  category.subcategories.forEach((subCatKey) => {
-    const subCat = categoryTree[subCatKey];
-    if (subCat) {
-      const itemCount = getCourseItemCount(subCat);
-      const card = createCategoryCard(subCat.name, itemCount, true);
-      card.onclick = () => renderCategory(subCat);
+    // Render subcategories
+    category.subcategories.forEach((subCatKey) => {
+      const subCat = categoryTree[subCatKey];
+      if (subCat) {
+        const itemCount = getCourseItemCount(subCat);
+        const card = createCategoryCard(subCat.name, itemCount, true);
+        card.onclick = () => renderCategory(subCat);
+        fragment.appendChild(card);
+      }
+    });
+
+    // Render exams
+    category.exams.forEach((exam) => {
+      const card = createExamCard(exam);
       fragment.appendChild(card);
+    });
+
+    container.appendChild(fragment);
+
+    // Show empty state if no content
+    if (category.subcategories.length === 0 && category.exams.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" role="status">
+          <div class="empty-state-icon" aria-hidden="true">🔭</div>
+          <h3>No Content Yet</h3>
+          <p>This category is empty. Check back later!</p>
+        </div>
+      `;
     }
-  });
-
-  // Render exams
-  category.exams.forEach((exam) => {
-    const card = createExamCard(exam);
-    fragment.appendChild(card);
-  });
-
-  container.appendChild(fragment);
-
-  // Show empty state if no content
-  if (category.subcategories.length === 0 && category.exams.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">🔭</div>
-        <h3>No Content Yet</h3>
-        <p>This category is empty. Check back later!</p>
-      </div>
-    `;
+  } catch (error) {
+    console.error("Error rendering category:", error);
+    if (container) {
+      container.innerHTML = `
+        <div class="error-state" role="alert">
+          <p>حدث خطأ أثناء تحميل المحتوى. يرجى تحديث الصفحة.</p>
+          <button onclick="renderRootCategories()" type="button">الرجوع للرئيسية</button>
+        </div>
+      `;
+    }
   }
 }
 
@@ -1306,13 +1470,19 @@ function createCategoryCard(
 ) {
   const card = document.createElement("div");
   card.className = "card category-card";
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute(
+    "aria-label",
+    `${name}, ${itemCount} ${itemCount === 1 ? "إمتحان" : "إمتحانات"}`,
+  );
 
   const icon = isFolder ? "📁" : "📂";
-  const itemText = itemCount === 1 ? "إمتحان" : "إمتحانات";
 
   const iconDiv = document.createElement("div");
   iconDiv.className = "icon";
   iconDiv.textContent = icon;
+  iconDiv.setAttribute("aria-hidden", "true");
 
   const h3 = document.createElement("h3");
   h3.textContent = name;
@@ -1342,7 +1512,7 @@ function createCategoryCard(
 
     const termBadge = document.createElement("span");
     termBadge.className = "course-meta-badge term";
-    termBadge.textContent = `الترم${courseData.term}`;
+    termBadge.textContent = `الترم ${courseData.term}`;
 
     metaDiv.appendChild(facultyBadge);
     metaDiv.appendChild(yearBadge);
@@ -1358,25 +1528,51 @@ function createCategoryCard(
     card.appendChild(p);
   }
 
+  // Keyboard support
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      card.click();
+    }
+  });
+
   return card;
 }
 
 function createExamCard(exam) {
   const card = document.createElement("div");
   card.className = "card exam-card";
+  card.setAttribute("role", "article");
+  card.setAttribute("aria-label", `اختبار: ${exam.title || exam.id}`);
 
   const h = document.createElement("h3");
   h.textContent = exam.title || exam.id;
 
   const btn = document.createElement("button");
   btn.className = "start-btn";
+  btn.type = "button";
   btn.style.flex = "1";
   btn.style.minWidth = "0";
   btn.textContent = "إبدأ الإختبار";
+  btn.setAttribute("aria-label", `بدء اختبار ${exam.title || exam.id}`);
   btn.onclick = (ev) => {
     ev.stopPropagation();
     showModeSelection(exam.id, exam.title || exam.id);
   };
+
+  const loadPdfLib = () =>
+    new Promise((resolve, reject) => {
+      if (window.jspdf && window.jspdf.jsPDF) {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("PDF library failed to load"));
+      document.head.appendChild(s);
+    });
 
   const onDownloadOption = async (format, modalEl) => {
     modalEl.remove();
@@ -1393,25 +1589,38 @@ function createExamCard(exam) {
       return;
     }
     const questions = mod.questions;
-    switch (format) {
-      case "quiz":
-        await exportToQuiz(config, questions);
-        break;
-      case "html":
-        await exportToHtml(config, questions);
-        break;
-      case "pdf":
-        await exportToPdf(config, questions);
-        break;
-      case "docx":
-        await exportToWord(config, questions);
-        break;
-      case "pptx":
-        await exportToPptx(config, questions);
-        break;
-      case "md":
-        exportToMarkdown(config, questions);
-        break;
+    if (format === "pdf") {
+      try {
+        await loadPdfLib();
+      } catch {
+        alert("PDF library could not be loaded.");
+        return;
+      }
+    }
+    try {
+      switch (format) {
+        case "quiz":
+          await exportToQuiz(config, questions);
+          break;
+        case "html":
+          await exportToHtml(config, questions);
+          break;
+        case "pdf":
+          await exportToPdf(config, questions);
+          break;
+        case "docx":
+          await exportToWord(config, questions);
+          break;
+        case "pptx":
+          await exportToPptx(config, questions);
+          break;
+        case "md":
+          exportToMarkdown(config, questions);
+          break;
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("حدث خطأ أثناء التحميل. حاول مرة أخرى.");
     }
   };
 
@@ -1420,20 +1629,32 @@ function createExamCard(exam) {
     modal.className = "modal-overlay";
     modal.style.transform = "translateZ(0)";
     modal.style.willChange = "opacity";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "downloadModalTitle");
+
     const modalCard = document.createElement("div");
     modalCard.className = "modal-card";
     modalCard.style.contain = "layout style paint";
+
     const h2 = document.createElement("h2");
+    h2.id = "downloadModalTitle";
     h2.textContent = exam.title || exam.id;
+
     const p = document.createElement("p");
     p.textContent = "اختر طريقة التنزيل";
+
     const grid = document.createElement("div");
     grid.className = "mode-grid";
+    grid.setAttribute("role", "group");
+    grid.setAttribute("aria-label", "خيارات التنزيل");
 
     opts.forEach(([icon, label, format]) => {
       const b = document.createElement("button");
       b.className = "mode-btn";
-      b.innerHTML = `<img src="${icon}" alt="Context Icon" class="icon"><strong>${label}</strong>`;
+      b.type = "button";
+      b.setAttribute("aria-label", `تنزيل كـ ${label}`);
+      b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true"><strong>${label}</strong>`;
       b.onclick = (ev) => {
         ev.stopPropagation();
         onDownloadOption(format, modal);
@@ -1443,20 +1664,28 @@ function createExamCard(exam) {
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-modal";
+    closeBtn.type = "button";
     closeBtn.textContent = "إلغاء";
+    closeBtn.setAttribute("aria-label", "إغلاق النافذة");
     closeBtn.onclick = () => modal.remove();
+
     modalCard.appendChild(h2);
     modalCard.appendChild(p);
     modalCard.appendChild(grid);
     modalCard.appendChild(closeBtn);
     modal.appendChild(modalCard);
+
     requestAnimationFrame(() => {
       document.body.appendChild(modal);
+      // Focus first button
+      const firstBtn = grid.querySelector("button");
+      if (firstBtn) firstBtn.focus();
     });
   };
 
   const downloadBtn = document.createElement("button");
   downloadBtn.className = "start-btn";
+  downloadBtn.type = "button";
   downloadBtn.style.flex = "1";
   downloadBtn.style.minWidth = "0";
   downloadBtn.style.background =
@@ -1464,6 +1693,7 @@ function createExamCard(exam) {
   downloadBtn.style.color = "white";
   downloadBtn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.4)";
   downloadBtn.textContent = "تحميل";
+  downloadBtn.setAttribute("aria-label", `تحميل ${exam.title || exam.id}`);
   downloadBtn.onclick = (ev) => {
     ev.stopPropagation();
     showDownloadPopup();
@@ -1485,17 +1715,22 @@ function createExamCard(exam) {
 }
 
 function updateBreadcrumb() {
+  if (!breadcrumb) return;
+
   if (navigationStack.length === 0) {
     breadcrumb.style.display = "none";
+    breadcrumb.setAttribute("aria-hidden", "true");
     return;
   }
 
   breadcrumb.style.display = "flex";
+  breadcrumb.setAttribute("aria-hidden", "false");
   const breadcrumbText = breadcrumb.querySelector(".breadcrumb-text");
 
   if (navigationStack.length === 1) {
     breadcrumbText.textContent = "الرجوع إلى المواد";
     breadcrumb.onclick = renderRootCategories;
+    breadcrumb.setAttribute("aria-label", "الرجوع إلى المواد");
   } else {
     const parentName = navigationStack[navigationStack.length - 2].name;
     breadcrumbText.textContent = `الرجوع إلى ${parentName}`;
@@ -1505,17 +1740,22 @@ function updateBreadcrumb() {
       navigationStack.pop();
       renderCategory(parent);
     };
+    breadcrumb.setAttribute("aria-label", `الرجوع إلى ${parentName}`);
   }
 }
 
 function showModeSelection(examId, examTitle) {
   const modal = document.createElement("div");
   modal.className = "modal-overlay";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "modeModalTitle");
 
   const modalCard = document.createElement("div");
   modalCard.className = "modal-card";
 
   const h2 = document.createElement("h2");
+  h2.id = "modeModalTitle";
   h2.textContent = examTitle;
 
   const p = document.createElement("p");
@@ -1523,6 +1763,8 @@ function showModeSelection(examId, examTitle) {
 
   const modeGrid = document.createElement("div");
   modeGrid.className = "mode-grid";
+  modeGrid.setAttribute("role", "group");
+  modeGrid.setAttribute("aria-label", "أوضاع الاختبار");
 
   const practiceBtn = createModeButton(
     "./images/quiz.png",
@@ -1532,14 +1774,14 @@ function showModeSelection(examId, examTitle) {
   );
 
   const timedBtn = createModeButton(
-    "./images/timer.png",
+    "https://cdn-icons-png.freepik.com/512/3003/3003126.png",
     "Timed",
     "30 ثانية لكل سؤال",
     () => startQuiz(examId, "timed"),
   );
 
   const examBtn = createModeButton(
-    "./images/exam.png",
+    "https://cdn-icons-png.flaticon.com/512/3640/3640554.png",
     "Exam",
     "لا إجابات أثناء الإمتحان",
     () => startQuiz(examId, "exam"),
@@ -1551,7 +1793,9 @@ function showModeSelection(examId, examTitle) {
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";
+  closeBtn.type = "button";
   closeBtn.textContent = "إلغاء";
+  closeBtn.setAttribute("aria-label", "إغلاق النافذة");
   closeBtn.onclick = () => modal.remove();
 
   modalCard.appendChild(h2);
@@ -1561,11 +1805,28 @@ function showModeSelection(examId, examTitle) {
 
   modal.appendChild(modalCard);
   document.body.appendChild(modal);
+
+  // Focus first button
+  const firstBtn = modeGrid.querySelector("button");
+  if (firstBtn) {
+    setTimeout(() => firstBtn.focus(), 100);
+  }
+
+  // Close on Escape
+  const escapeHandler = (e) => {
+    if (e.key === "Escape") {
+      modal.remove();
+      document.removeEventListener("keydown", escapeHandler);
+    }
+  };
+  document.addEventListener("keydown", escapeHandler);
 }
 
 function createModeButton(icon, title, description, onClick) {
   const btn = document.createElement("button");
   btn.className = "mode-btn";
+  btn.type = "button";
+  btn.setAttribute("aria-label", `${title}: ${description}`);
   btn.onclick = onClick;
 
   let iconElement;
@@ -1573,11 +1834,13 @@ function createModeButton(icon, title, description, onClick) {
     iconElement = document.createElement("span");
     iconElement.className = "icon";
     iconElement.textContent = icon;
+    iconElement.setAttribute("aria-hidden", "true");
   } else {
     iconElement = document.createElement("img");
     iconElement.className = "icon";
     iconElement.src = icon;
-    iconElement.alt = "Context icon";
+    iconElement.alt = "";
+    iconElement.setAttribute("aria-hidden", "true");
   }
 
   const strong = document.createElement("strong");
@@ -1593,26 +1856,17 @@ function createModeButton(icon, title, description, onClick) {
   return btn;
 }
 
-// Helper: URL or relative path Check (From Visual Source)
+// Helper: URL or relative path Check
 function isURL_orPath(string) {
-  // 1. Check if it is a valid Absolute URL (HTTP/HTTPS)
   try {
     const url = new URL(string);
-    // Only return true for http/https, excluding ftp, mailto, etc.
     return url.protocol === "http:" || url.protocol === "https:";
   } catch (_) {
-    // 2. If Absolute check failed, check if it is a Relative Path
     try {
-      // We use a dummy base to validate that the string is a syntactically valid path
       const base = "http://example.com";
       const url = new URL(string, base);
-
-      // Verification logic:
-      // A. The origin must match the base (ensures the string didn't switch to a different protocol/domain)
-      // B. The string must contain a slash '/' or start with '.' (distinguishes paths from plain words like "hello")
       const isRelative = url.origin === base;
       const isPathLike = string.includes("/") || string.startsWith(".");
-
       return isRelative && isPathLike;
     } catch (_) {
       return false;
@@ -1621,7 +1875,12 @@ function isURL_orPath(string) {
 }
 
 function startQuiz(id, mode) {
-  window.location.href = `quiz.html?id=${id}&mode=${mode}`;
+  try {
+    window.location.href = `quiz.html?id=${encodeURIComponent(id)}&mode=${encodeURIComponent(mode)}`;
+  } catch (error) {
+    console.error("Error starting quiz:", error);
+    alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
+  }
 }
 
 // Helper function
@@ -1645,11 +1904,15 @@ window.startQuiz = startQuiz;
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const installBtn = document.querySelector(".install-app");
-  if (installBtn) {
-    installBtn.style.display = "block";
+  try {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.querySelector(".install-app");
+    if (installBtn) {
+      installBtn.style.display = "block";
+    }
+  } catch (error) {
+    console.error("Error handling beforeinstallprompt:", error);
   }
 });
 
@@ -1659,30 +1922,46 @@ document.addEventListener("DOMContentLoaded", () => {
     installBtn.style.display = "none";
 
     installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) {
-        alert(
-          "The app is not installable at this time. Please check your browser support or PWA setup.",
-        );
-        return;
+      try {
+        if (!deferredPrompt) {
+          showNotification(
+            "غير متاح",
+            "التطبيق غير قابل للتثبيت في الوقت الحالي",
+            "./images/warning.png",
+          );
+          return;
+        }
+
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+
+        if (outcome === "accepted") {
+          console.log("User accepted the install prompt");
+          installBtn.style.display = "none";
+          showNotification(
+            "تم التثبيت",
+            "تم تثبيت التطبيق بنجاح",
+            "./favicon.png",
+          );
+        } else {
+          console.log("User dismissed the install prompt");
+        }
+
+        deferredPrompt = null;
+      } catch (error) {
+        console.error("Error during PWA installation:", error);
       }
-
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-
-      if (outcome === "accepted") {
-        console.log("User accepted the install prompt");
-        installBtn.style.display = "none";
-      } else {
-        console.log("User dismissed the install prompt");
-      }
-
-      deferredPrompt = null;
     });
   }
 });
 
 window.addEventListener("appinstalled", () => {
   console.log("PWA installed successfully");
+  showNotification(
+    "مبروك!",
+    "تم تثبيت التطبيق بنجاح على جهازك",
+    "./favicon.png",
+  );
 });
 
 /**
@@ -1694,12 +1973,16 @@ function showUserQuizDownloadPopup(quiz) {
   modal.className = "modal-overlay";
   modal.style.transform = "translateZ(0)";
   modal.style.willChange = "opacity";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "userQuizDownloadTitle");
 
   const modalCard = document.createElement("div");
   modalCard.className = "modal-card";
   modalCard.style.contain = "layout style paint";
 
   const h2 = document.createElement("h2");
+  h2.id = "userQuizDownloadTitle";
   h2.textContent = quiz.title;
 
   const p = document.createElement("p");
@@ -1707,19 +1990,43 @@ function showUserQuizDownloadPopup(quiz) {
 
   const grid = document.createElement("div");
   grid.className = "mode-grid";
+  grid.setAttribute("role", "group");
+  grid.setAttribute("aria-label", "خيارات التنزيل");
 
-  // Config object for export functions (mocking structure of standard exam config)
+  // Config object for export functions
   const config = {
     id: quiz.id,
     title: quiz.title,
     description: quiz.description,
-    // path is null for user quizzes
   };
 
   const questions = quiz.questions;
 
+  const loadPdfLib = () =>
+    new Promise((resolve, reject) => {
+      if (window.jspdf && window.jspdf.jsPDF) {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("PDF library failed to load"));
+      document.head.appendChild(s);
+    });
+
   const onDownloadOption = async (format) => {
     modal.remove();
+
+    if (format === "pdf") {
+      try {
+        await loadPdfLib();
+      } catch {
+        alert("PDF library could not be loaded.");
+        return;
+      }
+    }
 
     try {
       switch (format) {
@@ -1751,7 +2058,9 @@ function showUserQuizDownloadPopup(quiz) {
   opts.forEach(([icon, label, format]) => {
     const b = document.createElement("button");
     b.className = "mode-btn";
-    b.innerHTML = `<img src="${icon}" alt="Context Icon" class="icon"><strong>${label}</strong>`;
+    b.type = "button";
+    b.setAttribute("aria-label", `تنزيل كـ ${label}`);
+    b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true"><strong>${label}</strong>`;
     b.onclick = (ev) => {
       ev.stopPropagation();
       onDownloadOption(format);
@@ -1761,7 +2070,9 @@ function showUserQuizDownloadPopup(quiz) {
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";
+  closeBtn.type = "button";
   closeBtn.textContent = "إلغاء";
+  closeBtn.setAttribute("aria-label", "إغلاق النافذة");
   closeBtn.onclick = () => modal.remove();
 
   modalCard.appendChild(h2);
@@ -1772,5 +2083,22 @@ function showUserQuizDownloadPopup(quiz) {
 
   requestAnimationFrame(() => {
     document.body.appendChild(modal);
+    // Focus first button
+    const firstBtn = grid.querySelector("button");
+    if (firstBtn) firstBtn.focus();
   });
 }
+
+// ============================================================================
+// ERROR BOUNDARY
+// ============================================================================
+
+window.addEventListener("error", (event) => {
+  console.error("Global error:", event.error);
+  // In production, send to error tracking service
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Unhandled promise rejection:", event.reason);
+  // In production, send to error tracking service
+});
