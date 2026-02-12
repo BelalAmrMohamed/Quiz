@@ -186,48 +186,6 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-/* Progress Card */
-.progress-card {
-  background: linear-gradient(
-    135deg,
-    var(--color-surface) 0%,
-    var(--color-background) 100%
-  );
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.progress-header h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: var(--color-text-primary);
-}
-
-#progressText {
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.progress-bar-container {
-  width: 100%;
-  height: 8px;
-  background: var(--color-border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: var(--gradient-accent);
-  border-radius: 10px;
-  transition: width 0.5s ease;
-}
-
 /* Quiz Metadata */
 .quiz-metadata {
   direction: rtl;

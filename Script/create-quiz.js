@@ -1,4 +1,7 @@
 // Script/create-quiz.js - Enhanced Quiz Creator with Advanced Features
+/* TODO */
+// Pending change => `📑 قوالب الأسئلة` section should appear
+// above the `📑 من القوالب` button (e.g., under the questions), not above the questions
 
 import { showNotification, confirmationNotification } from "./notifications.js";
 
@@ -325,7 +328,7 @@ function renderQuestion(question, insertAtIndex = null) {
             </span>
             <div class="question-actions">
                 <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
-                    🔛
+                    ↕️
                 </button>
                 <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="نسخ السؤال">
                     📋
@@ -1070,7 +1073,7 @@ window.addQuestionFromTemplate = function (templateType) {
     },
     truefalse: {
       q: "أدخل السؤال هنا...",
-      options: ["صح", "خطأ"],
+      options: ["True", "False"],
       correct: 0,
       image: "",
       explanation: "",
@@ -1080,18 +1083,6 @@ window.addQuestionFromTemplate = function (templateType) {
       options: [""],
       correct: 0,
       image: "",
-      explanation: "",
-    },
-    image: {
-      q: "أدخل السؤال هنا...",
-      options: [
-        "الخيار الأول",
-        "الخيار الثاني",
-        "الخيار الثالث",
-        "الخيار الرابع",
-      ],
-      correct: 0,
-      image: "https://",
       explanation: "",
     },
   };
@@ -1600,28 +1591,6 @@ window.processImport = function () {
     hideLoading();
     console.error("Import error:", error);
     showNotification("خطأ في الاستيراد", error.message, "error");
-  }
-};
-
-// ============================================================================
-// DUPLICATE QUIZ
-// ============================================================================
-
-window.duplicateQuiz = function () {
-  if (quizData.questions.length === 0) {
-    showNotification("تنبيه", "لا يوجد اختبار لنسخه", "error");
-    return;
-  }
-
-  const newQuizData = {
-    ...quizData,
-    title: quizData.title + " (نسخة)",
-  };
-
-  const quizId = saveToUserQuizzes(newQuizData);
-
-  if (quizId) {
-    showNotification("تم النسخ!", "تم حفظ نسخة من الاختبار", "success");
   }
 };
 

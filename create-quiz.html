@@ -179,17 +179,6 @@
 
         <!-- Quiz Creator Form -->
         <div class="quiz-creator">
-            <!-- Progress Indicator -->
-            <div class="progress-card card">
-                <div class="progress-header">
-                    <h3>📈 التقدم</h3>
-                    <span id="progressText">0 أسئلة</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-                </div>
-            </div>
-
             <!-- Quiz Metadata -->
             <div class="quiz-metadata card">
                 <h2>📋 معلومات عن الاختبار</h2>
@@ -255,11 +244,6 @@
                             <span class="template-icon">📝</span>
                             <span class="template-name">سؤال مقالي</span>
                             <span class="template-desc">إجابة مفتوحة</span>
-                        </button>
-                        <button class="template-card" onclick="addQuestionFromTemplate('image')">
-                            <span class="template-icon">🖼️</span>
-                            <span class="template-name">سؤال مع صورة</span>
-                            <span class="template-desc">يتضمن صورة</span>
                         </button>
                     </div>
                 </div>
@@ -377,11 +361,8 @@
                         <button class="btn btn-primary" onclick="saveLocally()" title="حفظ (Ctrl+S)">
                             ✅ حفظ محليًا
                         </button>
-                        <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
-                            📱 إرسال عبر الواتساب
-                        </button>
-                        <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
-                            📧 إرسال إلى المطوّر
+                        <button class="btn btn-danger" onclick="resetPage()">
+                            🗑️ إعادة ضبط الصفحة
                         </button>
                     </div>
                 </div>
@@ -389,14 +370,14 @@
                 <div class="action-section">
                     <h3>👁️ معاينة وإدارة</h3>
                     <div class="action-buttons">
+                        <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
+                            📱 إرسال عبر الواتساب
+                        </button>
+                        <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
+                            📧 إرسال إلى المطوّر
+                        </button>
                         <button class="btn btn-secondary" onclick="previewQuiz()" title="معاينة (Ctrl+P)">
                             👁️ معاينة
-                        </button>
-                        <button class="btn btn-secondary" onclick="duplicateQuiz()">
-                            📋 نسخ الاختبار
-                        </button>
-                        <button class="btn btn-danger" onclick="resetPage()">
-                            🗑️ إعادة ضبط الصفحة
                         </button>
                     </div>
                 </div>
