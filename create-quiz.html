@@ -198,7 +198,7 @@
                         عنوان الاختبار *
                         <span class="char-count" id="titleCharCount">0/100</span>
                     </label>
-                    <input type="text" id="quizTitle" placeholder="مثال: إمتحان لغة الـ ++C عن المصفوفات"
+                    <input type="text" id="quizTitle" placeholder="مثال: إمتحان لغة الـ C++ عن المصفوفات"
                         maxlength="100" required aria-required="true" aria-describedby="titleHelp">
                     <small id="titleHelp">اختر عنوانًا واضحًا يصف محتوى الاختبار</small>
                 </div>
@@ -214,45 +214,156 @@
                 </div>
             </div>
 
-            <!-- Questions Section with Search/Filter -->
+            <!-- Questions Section with Enhanced Features -->
             <div class="questions-section">
                 <div class="section-header">
-                    <h2>❓ الأسئلة</h2>
+                    <div class="section-title-group">
+                        <h2>❓ الأسئلة</h2>
+                        <span class="question-badge" id="questionBadge">0</span>
+                    </div>
                     <div class="section-actions">
                         <button class="btn btn-secondary btn-icon-text" onclick="importQuestions()"
                             title="استيراد أسئلة">
                             📥 استيراد
                         </button>
-                        <button class="btn btn-primary btn-icon-text" onclick="addQuestion()"
-                            title="إضافة سؤال جديد (Ctrl+N)">
-                            ➕ إضافة سؤال
+                        <button class="btn btn-secondary btn-icon-text" onclick="toggleBulkMode()" id="bulkModeBtn"
+                            title="الوضع الجماعي">
+                            ☑️ تحديد متعدد
+                        </button>
+                        <button class="btn btn-secondary btn-icon-text" onclick="toggleTemplates()"
+                            title="قوالب الأسئلة">
+                            📑 قوالب
                         </button>
                     </div>
                 </div>
 
-                <!-- Search and Sort Controls -->
+                <!-- Question Templates Panel -->
+                <div class="templates-panel" id="templatesPanel" style="display: none;">
+                    <h3>📑 قوالب الأسئلة</h3>
+                    <div class="templates-grid">
+                        <button class="template-card" onclick="addQuestionFromTemplate('mcq')">
+                            <span class="template-icon">✅</span>
+                            <span class="template-name">اختيار متعدد</span>
+                            <span class="template-desc">4 خيارات</span>
+                        </button>
+                        <button class="template-card" onclick="addQuestionFromTemplate('truefalse')">
+                            <span class="template-icon">⭕</span>
+                            <span class="template-name">صح أم خطأ</span>
+                            <span class="template-desc">خياران فقط</span>
+                        </button>
+                        <button class="template-card" onclick="addQuestionFromTemplate('essay')">
+                            <span class="template-icon">📝</span>
+                            <span class="template-name">سؤال مقالي</span>
+                            <span class="template-desc">إجابة مفتوحة</span>
+                        </button>
+                        <button class="template-card" onclick="addQuestionFromTemplate('image')">
+                            <span class="template-icon">🖼️</span>
+                            <span class="template-name">سؤال مع صورة</span>
+                            <span class="template-desc">يتضمن صورة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search, Sort, and Filter Controls -->
                 <div class="question-controls" id="questionControls" style="display: none;">
-                    <div class="search-box">
-                        <input type="search" id="questionSearch" placeholder="🔍 بحث في الأسئلة..."
-                            aria-label="بحث في الأسئلة">
+                    <div class="controls-row">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="search" id="questionSearch" placeholder="ابحث في الأسئلة..."
+                                aria-label="بحث في الأسئلة">
+                            <button class="clear-search" id="clearSearch" onclick="clearSearch()" style="display: none;"
+                                aria-label="مسح البحث">✕</button>
+                        </div>
+                        <div class="filter-controls">
+                            <select id="questionFilter" onchange="filterQuestions()" aria-label="تصفية الأسئلة">
+                                <option value="all">جميع الأسئلة</option>
+                                <option value="with-images">مع صور</option>
+                                <option value="with-explanations">مع شرح</option>
+                                <option value="mcq">اختيار متعدد</option>
+                                <option value="essay">مقالي</option>
+                                <option value="incomplete">غير مكتملة</option>
+                            </select>
+                        </div>
+                        <div class="sort-controls">
+                            <button class="btn-action" onclick="sortQuestions('alpha')" title="ترتيب أبجدي"
+                                aria-label="ترتيب أبجدي">
+                                🔤
+                            </button>
+                            <button class="btn-action" onclick="sortQuestions('recent')" title="الأحدث أولاً"
+                                aria-label="الأحدث أولاً">
+                                🕐
+                            </button>
+                            <button class="btn-action" onclick="expandAll()" title="توسيع الكل"
+                                aria-label="توسيع جميع الأسئلة">
+                                ⬇️
+                            </button>
+                            <button class="btn-action" onclick="collapseAll()" title="طي الكل"
+                                aria-label="طي جميع الأسئلة">
+                                ⬆️
+                            </button>
+                        </div>
                     </div>
-                    <div class="sort-controls">
-                        <button class="btn-sort" onclick="sortQuestions()" aria-label="ترتيب الأسئلة">
-                            🔀 ترتيب
-                        </button>
+
+                    <!-- Bulk Actions Bar -->
+                    <div class="bulk-actions-bar" id="bulkActionsBar" style="display: none;">
+                        <div class="bulk-info">
+                            <span id="selectedCount">0</span> مُحدد
+                        </div>
+                        <div class="bulk-actions">
+                            <button class="btn-bulk" onclick="selectAllQuestions()">
+                                ✅ تحديد الكل
+                            </button>
+                            <button class="btn-bulk" onclick="deselectAllQuestions()">
+                                ◻️ إلغاء التحديد
+                            </button>
+                            <button class="btn-bulk btn-bulk-danger" onclick="deleteSelectedQuestions()">
+                                🗑️ حذف المحدد
+                            </button>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Questions Container with Enhanced Features -->
                 <div id="questionsContainer">
                     <!-- Questions will be dynamically added here -->
                 </div>
 
+                <!-- Enhanced Empty State -->
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-icon">📝</div>
-                    <h3>لا يوجد أسئلة</h3>
-                    <p>انقر على "إضافة سؤال" لبدء إنشاء الاختبار الخاص بك</p>
-                    <p class="empty-hint">💡 يمكنك أيضًا استخدام <kbd>Ctrl+N</kbd> لإضافة سؤال جديد</p>
+                    <div class="empty-illustration">
+                        <div class="empty-icon">📝</div>
+                        <div class="empty-glow"></div>
+                    </div>
+                    <h3>ابدأ بإنشاء أول سؤال</h3>
+                    <p>اختر من القوالب السريعة أو أنشئ سؤالاً مخصصاً</p>
+                    <div class="empty-actions">
+                        <button class="btn btn-primary btn-large" onclick="addQuestion()">
+                            ➕ إضافة سؤال
+                        </button>
+                        <button class="btn btn-secondary btn-large" onclick="toggleTemplates()">
+                            📑 استخدام قالب
+                        </button>
+                    </div>
+                    <p class="empty-hint">💡 اختصار سريع: اضغط <kbd>Ctrl+N</kbd></p>
                 </div>
+
+                <!-- Add Question Button (Bottom) -->
+                <div class="add-question-bottom" id="addQuestionBottom" style="display: none;">
+                    <button class="btn btn-primary btn-add-question" onclick="addQuestion()">
+                        ➕ إضافة سؤال جديد
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleTemplates()">
+                        📑 من القوالب
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Action Button -->
+            <div class="fab-container" id="fabContainer" style="display: none;">
+                <button class="fab" onclick="addQuestion()" title="إضافة سؤال (Ctrl+N)" aria-label="إضافة سؤال جديد">
+                    ➕
+                </button>
+                <div class="fab-tooltip">إضافة سؤال</div>
             </div>
 
             <!-- Action Buttons with better organization -->

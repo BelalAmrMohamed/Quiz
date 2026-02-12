@@ -18,6 +18,10 @@ let quizData = {
 let questionIdCounter = 0;
 let autosaveTimeout = null;
 let draggedElement = null;
+let bulkModeActive = false;
+let selectedQuestions = new Set();
+let currentFilter = "all";
+let isTemplatesPanelOpen = false;
 
 // ============================================================================
 // INITIALIZATION
@@ -49,11 +53,35 @@ function setupEventListeners() {
     autosave();
   });
 
-  // Search functionality
+  // Search functionality with debounce
   const searchInput = document.getElementById("questionSearch");
   if (searchInput) {
     searchInput.addEventListener("input", debounce(handleSearch, 300));
+    searchInput.addEventListener("input", (e) => {
+      const clearBtn = document.getElementById("clearSearch");
+      if (clearBtn) {
+        clearBtn.style.display = e.target.value ? "flex" : "none";
+      }
+    });
   }
+
+  // Scroll detection for FAB
+  let lastScrollTop = 0;
+  window.addEventListener("scroll", () => {
+    const fabContainer = document.getElementById("fabContainer");
+    if (!fabContainer || quizData.questions.length < 3) return;
+
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Show/hide based on scroll position
+    if (scrollTop > 300) {
+      fabContainer.style.display = "block";
+    } else {
+      fabContainer.style.display = "none";
+    }
+
+    lastScrollTop = scrollTop;
+  });
 }
 
 // ============================================================================
@@ -279,13 +307,26 @@ function renderQuestion(question, insertAtIndex = null) {
   questionCard.draggable = true;
   questionCard.dataset.questionId = question.id;
 
+  // Check if question is incomplete
+  const isIncomplete =
+    !question.q ||
+    question.q.trim() === "" ||
+    question.options.some((opt) => !opt || opt.trim() === "");
+  if (isIncomplete) {
+    questionCard.classList.add("incomplete");
+  }
+
   questionCard.innerHTML = `
         <div class="question-header">
             <span class="question-number">
+                ${bulkModeActive ? `<input type="checkbox" class="question-select-checkbox" onchange="handleQuestionSelect(event, ${question.id})">` : ""}
                 <span class="drag-handle" title="اسحب لإعادة الترتيب">⋮⋮</span>
                 سؤال ${questionNumber}
             </span>
             <div class="question-actions">
+                <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
+                    🔛
+                </button>
                 <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="نسخ السؤال">
                     📋
                 </button>
@@ -374,6 +415,13 @@ function renderQuestion(question, insertAtIndex = null) {
     updateImagePreview(question.id, question.image);
   }
 }
+
+window.toggleQuestionCollapse = function (questionId) {
+  const card = document.getElementById(`question-${questionId}`);
+  if (card) {
+    card.classList.toggle("collapsed");
+  }
+};
 
 function setupQuestionEventListeners(questionId) {
   const questionTextarea = document.getElementById(
@@ -657,32 +705,261 @@ window.toggleCollapsible = function (questionId, section) {
 };
 
 // ============================================================================
-// SEARCH AND FILTER
+// SEARCH AND FILTER - ENHANCED
 // ============================================================================
 
 function handleSearch(e) {
   const searchTerm = e.target.value.toLowerCase();
   const questionCards = document.querySelectorAll(".question-card");
+  const clearBtn = document.getElementById("clearSearch");
 
+  if (clearBtn) {
+    clearBtn.style.display = searchTerm ? "flex" : "none";
+  }
+
+  let visibleCount = 0;
   questionCards.forEach((card) => {
     const questionText = card.querySelector("textarea").value.toLowerCase();
     const matches = questionText.includes(searchTerm);
     card.style.display = matches ? "block" : "none";
+    if (matches) visibleCount++;
   });
+
+  // Show message if no results
+  if (visibleCount === 0 && searchTerm) {
+    showNotification(
+      "لا توجد نتائج",
+      `لم يتم العثور على أسئلة تحتوي على "${searchTerm}"`,
+      "info",
+    );
+  }
 }
 
-window.sortQuestions = function () {
+window.clearSearch = function () {
+  const searchInput = document.getElementById("questionSearch");
+  const clearBtn = document.getElementById("clearSearch");
+
+  if (searchInput) {
+    searchInput.value = "";
+    clearBtn.style.display = "none";
+
+    // Show all questions
+    document.querySelectorAll(".question-card").forEach((card) => {
+      card.style.display = "block";
+    });
+  }
+};
+
+window.filterQuestions = function () {
+  const filter = document.getElementById("questionFilter").value;
+  currentFilter = filter;
+  const questionCards = document.querySelectorAll(".question-card");
+
+  let visibleCount = 0;
+  questionCards.forEach((card) => {
+    const questionId = parseInt(card.dataset.questionId);
+    const question = quizData.questions.find((q) => q.id === questionId);
+
+    let shouldShow = true;
+
+    switch (filter) {
+      case "with-images":
+        shouldShow = question.image && question.image.trim() !== "";
+        break;
+      case "with-explanations":
+        shouldShow = question.explanation && question.explanation.trim() !== "";
+        break;
+      case "mcq":
+        shouldShow = question.options.length > 1;
+        break;
+      case "essay":
+        shouldShow = question.options.length === 1;
+        break;
+      case "incomplete":
+        shouldShow =
+          !question.q ||
+          question.q.trim() === "" ||
+          question.options.some((opt) => !opt || opt.trim() === "");
+        break;
+      default:
+        shouldShow = true;
+    }
+
+    card.style.display = shouldShow ? "block" : "none";
+    if (shouldShow) visibleCount++;
+  });
+
+  showNotification("تم التصفية", `عرض ${visibleCount} سؤال`, "info");
+};
+
+window.sortQuestions = function (type = "alpha") {
   const container = document.getElementById("questionsContainer");
   const cards = Array.from(container.children);
 
   cards.sort((a, b) => {
-    const textA = a.querySelector("textarea").value.toLowerCase();
-    const textB = b.querySelector("textarea").value.toLowerCase();
-    return textA.localeCompare(textB);
+    if (type === "alpha") {
+      const textA = a.querySelector("textarea").value.toLowerCase();
+      const textB = b.querySelector("textarea").value.toLowerCase();
+      return textA.localeCompare(textB, "ar");
+    } else if (type === "recent") {
+      const idA = parseInt(a.dataset.questionId);
+      const idB = parseInt(b.dataset.questionId);
+      return idB - idA; // Most recent first
+    }
+    return 0;
   });
 
   cards.forEach((card) => container.appendChild(card));
-  showNotification("تم الترتيب", "تم ترتيب الأسئلة أبجديًا", "success");
+
+  const sortName = type === "alpha" ? "أبجديًا" : "حسب الأحدث";
+  showNotification("تم الترتيب", `تم ترتيب الأسئلة ${sortName}`, "success");
+};
+
+window.expandAll = function () {
+  document.querySelectorAll(".question-card").forEach((card) => {
+    card.classList.remove("collapsed");
+  });
+  showNotification("تم التوسيع", "تم توسيع جميع الأسئلة", "info");
+};
+
+window.collapseAll = function () {
+  document.querySelectorAll(".question-card").forEach((card) => {
+    card.classList.add("collapsed");
+  });
+  showNotification("تم الطي", "تم طي جميع الأسئلة", "info");
+};
+
+// ============================================================================
+// BULK MODE
+// ============================================================================
+
+window.toggleBulkMode = function () {
+  bulkModeActive = !bulkModeActive;
+  const bulkActionsBar = document.getElementById("bulkActionsBar");
+  const bulkBtn = document.getElementById("bulkModeBtn");
+
+  if (bulkModeActive) {
+    bulkActionsBar.style.display = "flex";
+    bulkBtn.style.background = "var(--color-primary)";
+    bulkBtn.style.color = "white";
+
+    // Add checkboxes to all questions
+    document.querySelectorAll(".question-card").forEach((card) => {
+      if (!card.querySelector(".question-select-checkbox")) {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "question-select-checkbox";
+        checkbox.onchange = (e) =>
+          handleQuestionSelect(e, parseInt(card.dataset.questionId));
+
+        const numberSpan = card.querySelector(".question-number");
+        numberSpan.insertBefore(checkbox, numberSpan.firstChild);
+      }
+    });
+  } else {
+    bulkActionsBar.style.display = "none";
+    bulkBtn.style.background = "";
+    bulkBtn.style.color = "";
+    selectedQuestions.clear();
+
+    // Remove checkboxes
+    document
+      .querySelectorAll(".question-select-checkbox")
+      .forEach((cb) => cb.remove());
+    document.querySelectorAll(".question-card").forEach((card) => {
+      card.classList.remove("selected");
+    });
+    updateSelectedCount();
+  }
+};
+
+window.handleQuestionSelect = function (e, questionId) {
+  const card = document.getElementById(`question-${questionId}`);
+
+  if (e.target.checked) {
+    selectedQuestions.add(questionId);
+    card.classList.add("selected");
+  } else {
+    selectedQuestions.delete(questionId);
+    card.classList.remove("selected");
+  }
+
+  updateSelectedCount();
+};
+
+function updateSelectedCount() {
+  const countSpan = document.getElementById("selectedCount");
+  if (countSpan) {
+    countSpan.textContent = selectedQuestions.size;
+  }
+}
+
+window.selectAllQuestions = function () {
+  document.querySelectorAll(".question-select-checkbox").forEach((cb) => {
+    cb.checked = true;
+    const card = cb.closest(".question-card");
+    if (card) {
+      const questionId = parseInt(card.dataset.questionId);
+      selectedQuestions.add(questionId);
+      card.classList.add("selected");
+    }
+  });
+  updateSelectedCount();
+  showNotification(
+    "تم التحديد",
+    `تم تحديد ${selectedQuestions.size} سؤال`,
+    "info",
+  );
+};
+
+window.deselectAllQuestions = function () {
+  document.querySelectorAll(".question-select-checkbox").forEach((cb) => {
+    cb.checked = false;
+  });
+  document.querySelectorAll(".question-card").forEach((card) => {
+    card.classList.remove("selected");
+  });
+  selectedQuestions.clear();
+  updateSelectedCount();
+};
+
+window.deleteSelectedQuestions = async function () {
+  if (selectedQuestions.size === 0) {
+    showNotification("تنبيه", "لم يتم تحديد أي أسئلة", "error");
+    return;
+  }
+
+  if (
+    !(await confirmationNotification(
+      `هل أنت متأكد من حذف ${selectedQuestions.size} سؤال؟`,
+    ))
+  ) {
+    return;
+  }
+
+  const idsToDelete = Array.from(selectedQuestions);
+
+  idsToDelete.forEach((id) => {
+    const index = quizData.questions.findIndex((q) => q.id === id);
+    if (index !== -1) {
+      quizData.questions.splice(index, 1);
+    }
+
+    const card = document.getElementById(`question-${id}`);
+    if (card) {
+      card.remove();
+    }
+  });
+
+  selectedQuestions.clear();
+  updateQuestionNumbers();
+  updateEmptyState();
+  updateProgress();
+  updateStatistics();
+  updateSelectedCount();
+  autosave();
+
+  showNotification("تم الحذف", `تم حذف ${idsToDelete.length} سؤال`, "success");
 };
 
 // ============================================================================
@@ -739,14 +1016,134 @@ function validateQuiz() {
 function updateEmptyState() {
   const emptyState = document.getElementById("emptyState");
   const questionControls = document.getElementById("questionControls");
+  const addQuestionBottom = document.getElementById("addQuestionBottom");
+  const fabContainer = document.getElementById("fabContainer");
+  const questionBadge = document.getElementById("questionBadge");
 
   if (quizData.questions.length === 0) {
     emptyState.classList.remove("hidden");
     if (questionControls) questionControls.style.display = "none";
+    if (addQuestionBottom) addQuestionBottom.style.display = "none";
+    if (fabContainer) fabContainer.style.display = "none";
   } else {
     emptyState.classList.add("hidden");
-    if (questionControls) questionControls.style.display = "flex";
+    if (questionControls) questionControls.style.display = "block";
+    if (addQuestionBottom) addQuestionBottom.style.display = "flex";
+    if (fabContainer && quizData.questions.length >= 3) {
+      fabContainer.style.display = "block";
+    }
   }
+
+  if (questionBadge) {
+    questionBadge.textContent = quizData.questions.length;
+  }
+}
+
+// ============================================================================
+// TEMPLATES SYSTEM
+// ============================================================================
+
+window.toggleTemplates = function () {
+  const panel = document.getElementById("templatesPanel");
+  isTemplatesPanelOpen = !isTemplatesPanelOpen;
+
+  if (isTemplatesPanelOpen) {
+    panel.style.display = "block";
+  } else {
+    panel.style.display = "none";
+  }
+};
+
+window.addQuestionFromTemplate = function (templateType) {
+  const templates = {
+    mcq: {
+      q: "أدخل السؤال هنا...",
+      options: [
+        "الخيار الأول",
+        "الخيار الثاني",
+        "الخيار الثالث",
+        "الخيار الرابع",
+      ],
+      correct: 0,
+      image: "",
+      explanation: "",
+    },
+    truefalse: {
+      q: "أدخل السؤال هنا...",
+      options: ["صح", "خطأ"],
+      correct: 0,
+      image: "",
+      explanation: "",
+    },
+    essay: {
+      q: "أدخل السؤال المقالي هنا...",
+      options: [""],
+      correct: 0,
+      image: "",
+      explanation: "",
+    },
+    image: {
+      q: "أدخل السؤال هنا...",
+      options: [
+        "الخيار الأول",
+        "الخيار الثاني",
+        "الخيار الثالث",
+        "الخيار الرابع",
+      ],
+      correct: 0,
+      image: "https://",
+      explanation: "",
+    },
+  };
+
+  const template = templates[templateType];
+  if (!template) return;
+
+  const questionId = ++questionIdCounter;
+  const question = {
+    id: questionId,
+    ...template,
+  };
+
+  quizData.questions.push(question);
+  renderQuestion(question);
+  updateEmptyState();
+  updateProgress();
+  updateStatistics();
+  autosave();
+
+  // Close templates panel after selection
+  toggleTemplates();
+
+  setTimeout(() => {
+    const questionCard = document.getElementById(`question-${questionId}`);
+    if (questionCard) {
+      questionCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      const textarea = questionCard.querySelector("textarea");
+      if (textarea) textarea.focus();
+
+      // Auto-open image section if image template
+      if (templateType === "image") {
+        toggleCollapsible(questionId, "image");
+      }
+    }
+  }, 100);
+
+  showNotification(
+    "تم الإضافة!",
+    `تم إضافة سؤال من قالب ${getTemplateName(templateType)}`,
+    "success",
+  );
+};
+
+function getTemplateName(type) {
+  const names = {
+    mcq: "اختيار متعدد",
+    truefalse: "صح أم خطأ",
+    essay: "مقالي",
+    image: "مع صورة",
+  };
+  return names[type] || "افتراضي";
 }
 
 // ============================================================================
