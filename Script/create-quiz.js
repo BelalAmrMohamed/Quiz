@@ -1,7 +1,4 @@
 // Script/create-quiz.js - Enhanced Quiz Creator with Advanced Features
-/* TODO */
-// Pending change => `📑 قوالب الأسئلة` section should appear
-// above the `📑 من القوالب` button (e.g., under the questions), not above the questions
 
 import { showNotification, confirmationNotification } from "./notifications.js";
 
@@ -1061,12 +1058,7 @@ window.addQuestionFromTemplate = function (templateType) {
   const templates = {
     mcq: {
       q: "أدخل السؤال هنا...",
-      options: [
-        "الخيار الأول",
-        "الخيار الثاني",
-        "الخيار الثالث",
-        "الخيار الرابع",
-      ],
+      options: ["", "", "", ""],
       correct: 0,
       image: "",
       explanation: "",
