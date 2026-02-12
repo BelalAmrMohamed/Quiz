@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="أنشئ اختباراتك التفاعلية بسهولة مع دعم الصور والشرح">
 
     <!-- CRITICAL: Anti-flash script -->
     <script>
@@ -40,6 +41,47 @@
 </head>
 
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="shortcuts-panel" id="shortcutsPanel" style="display: none;" role="dialog"
+        aria-labelledby="shortcutsTitle">
+        <div class="shortcuts-content">
+            <div class="shortcuts-header">
+                <h3 id="shortcutsTitle">⌨️ اختصارات لوحة المفاتيح</h3>
+                <button class="close-btn" onclick="toggleShortcuts()" aria-label="إغلاق">✕</button>
+            </div>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>N</kbd>
+                    <span>إضافة سؤال جديد</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                    <span>حفظ الإمتحان</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>P</kbd>
+                    <span>معاينة الإمتحان</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>E</kbd>
+                    <span>تصدير الإمتحان</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>?</kbd>
+                    <span>عرض الاختصارات</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="menu-container">
         <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
@@ -75,7 +117,7 @@
 
                 <div class="theme-controls-section">
                     <div class="theme-section-header">
-                        <span>🏞️</span> الخلفية
+                        <span>🎨</span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
                         <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
@@ -109,42 +151,96 @@
             </nav>
         </div>
     </div>
-    <div class="container">
-        <!-- Breadcrumb -->
-        <div id="breadcrumb">
-            <a href="index.html" class="breadcrumb-text">← الصفحة الرئيسية</a>
-        </div>
 
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <h1>أنشئ اختبارك الخاص ✏️</h1>
-                <p>صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح.</p>
+    <div class="container">
+        <!-- Breadcrumb with autosave indicator -->
+        <div class="top-bar">
+            <div id="breadcrumb">
+                <a href="index.html" class="breadcrumb-text">← الصفحة الرئيسية</a>
+            </div>
+            <div class="autosave-indicator" id="autosaveIndicator">
+                <span class="save-icon">💾</span>
+                <span class="save-text">محفوظ</span>
             </div>
         </div>
 
+        <!-- Header with enhanced description -->
+        <header class="header">
+            <div class="header-content">
+                <h1>أنشئ اختبارك الخاص ✏️</h1>
+                <p>صمم اختبارات تفاعلية، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح مفصل.</p>
+                <div class="header-actions">
+                    <button class="btn-help" onclick="toggleShortcuts()" aria-label="عرض اختصارات لوحة المفاتيح">
+                        ⌨️ اختصارات
+                    </button>
+                </div>
+            </div>
+        </header>
+
         <!-- Quiz Creator Form -->
         <div class="quiz-creator">
+            <!-- Progress Indicator -->
+            <div class="progress-card card">
+                <div class="progress-header">
+                    <h3>📈 التقدم</h3>
+                    <span id="progressText">0 أسئلة</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
             <!-- Quiz Metadata -->
             <div class="quiz-metadata card">
                 <h2>📋 معلومات عن الاختبار</h2>
                 <div class="form-group">
-                    <label for="quizTitle">عنوان الاختبار *</label>
-                    <input type="text" id="quizTitle" placeholder="مثال: إمتحان لغة ال ++C عن المصفوفات" required>
+                    <label for="quizTitle">
+                        عنوان الاختبار *
+                        <span class="char-count" id="titleCharCount">0/100</span>
+                    </label>
+                    <input type="text" id="quizTitle" placeholder="مثال: إمتحان لغة الـ ++C عن المصفوفات"
+                        maxlength="100" required aria-required="true" aria-describedby="titleHelp">
+                    <small id="titleHelp">اختر عنوانًا واضحًا يصف محتوى الاختبار</small>
                 </div>
                 <div class="form-group">
-                    <label for="quizDescription">وصف الإمتحان (إختياري)</label>
-                    <textarea id="quizDescription" rows="3" placeholder="وصف موجز للإختبار"></textarea>
+                    <label for="quizDescription">
+                        وصف الإمتحان (اختياري)
+                        <span class="char-count" id="descCharCount">0/500</span>
+                    </label>
+                    <textarea id="quizDescription" rows="3" maxlength="500"
+                        placeholder="وصف موجز للإختبار يساعد الطلاب على فهم المحتوى"
+                        aria-describedby="descHelp"></textarea>
+                    <small id="descHelp">اشرح ما يتضمنه الاختبار، المستوى المطلوب، أو أي ملاحظات مهمة</small>
                 </div>
             </div>
 
-            <!-- Questions Section -->
+            <!-- Questions Section with Search/Filter -->
             <div class="questions-section">
                 <div class="section-header">
                     <h2>❓ الأسئلة</h2>
-                    <button class="btn btn-primary" onclick="addQuestion()">
-                        ➕ إضافة سؤال
-                    </button>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary btn-icon-text" onclick="importQuestions()"
+                            title="استيراد أسئلة">
+                            📥 استيراد
+                        </button>
+                        <button class="btn btn-primary btn-icon-text" onclick="addQuestion()"
+                            title="إضافة سؤال جديد (Ctrl+N)">
+                            ➕ إضافة سؤال
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Sort Controls -->
+                <div class="question-controls" id="questionControls" style="display: none;">
+                    <div class="search-box">
+                        <input type="search" id="questionSearch" placeholder="🔍 بحث في الأسئلة..."
+                            aria-label="بحث في الأسئلة">
+                    </div>
+                    <div class="sort-controls">
+                        <button class="btn-sort" onclick="sortQuestions()" aria-label="ترتيب الأسئلة">
+                            🔀 ترتيب
+                        </button>
+                    </div>
                 </div>
 
                 <div id="questionsContainer">
@@ -154,31 +250,67 @@
                 <div class="empty-state" id="emptyState">
                     <div class="empty-icon">📝</div>
                     <h3>لا يوجد أسئلة</h3>
-                    <p>انقر على ”إضافة سؤال“ لبدء إنشاء الاختبار الخاص بك</p>
+                    <p>انقر على "إضافة سؤال" لبدء إنشاء الاختبار الخاص بك</p>
+                    <p class="empty-hint">💡 يمكنك أيضًا استخدام <kbd>Ctrl+N</kbd> لإضافة سؤال جديد</p>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Action Buttons with better organization -->
             <div class="action-bar card">
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="exportQuiz()">
-                        📥 تحميل الإمتحان
-                    </button>
-                    <button class="btn btn-primary" onclick="saveLocally()">
-                        ✅ حفظ
-                    </button>
-                    <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
-                        📱 إرسال عبر الواتساب
-                    </button>
-                    <button class="btn btn-secondary" onclick="previewQuiz()">
-                        👁️ معاينة
-                    </button>
-                    <button class="btn btn-secondary" onclick="resetPage()">
-                        🔁 إعادة ضبط الصفحة
-                    </button>
-                    <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
-                        📧 إرسال إلى المطوّر
-                    </button>
+                <div class="action-section">
+                    <h3>💾 حفظ ومشاركة</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="exportQuiz()" title="تحميل الإمتحان (Ctrl+E)">
+                            📥 تحميل الإمتحان
+                        </button>
+                        <button class="btn btn-primary" onclick="saveLocally()" title="حفظ (Ctrl+S)">
+                            ✅ حفظ محليًا
+                        </button>
+                        <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
+                            📱 إرسال عبر الواتساب
+                        </button>
+                        <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
+                            📧 إرسال إلى المطوّر
+                        </button>
+                    </div>
+                </div>
+                <div class="action-divider"></div>
+                <div class="action-section">
+                    <h3>👁️ معاينة وإدارة</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="previewQuiz()" title="معاينة (Ctrl+P)">
+                            👁️ معاينة
+                        </button>
+                        <button class="btn btn-secondary" onclick="duplicateQuiz()">
+                            📋 نسخ الاختبار
+                        </button>
+                        <button class="btn btn-danger" onclick="resetPage()">
+                            🗑️ إعادة ضبط الصفحة
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="stats-card card" id="statsCard" style="display: none;">
+                <h3>📊 إحصائيات الاختبار</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">عدد الأسئلة</span>
+                        <span class="stat-value" id="statQuestions">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">أسئلة مع صور</span>
+                        <span class="stat-value" id="statImages">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">أسئلة مع شرح</span>
+                        <span class="stat-value" id="statExplanations">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">متوسط الخيارات</span>
+                        <span class="stat-value" id="statAvgOptions">0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -195,18 +327,40 @@
         </footer>
     </div>
 
-    <!-- Preview Modal -->
-    <div id="previewModal" class="modal-overlay" style="display: none;">
+    <!-- Enhanced Preview Modal -->
+    <div id="previewModal" class="modal-overlay" style="display: none;" role="dialog" aria-labelledby="previewTitle"
+        aria-modal="true">
         <div class="modal-card preview-modal">
             <div class="modal-header">
-                <h2>🔍 معاينة الاختبار</h2>
-                <button class="close-btn" onclick="closePreview()">✕</button>
+                <h2 id="previewTitle">👁️ معاينة الاختبار</h2>
+                <button class="close-btn" onclick="closePreview()" aria-label="إغلاق المعاينة">✕</button>
             </div>
             <div id="previewContent" class="preview-content">
                 <!-- Preview will be rendered here -->
             </div>
             <div class="modal-footer">
+                <button class="btn btn-primary" onclick="exportQuiz()">📥 تحميل</button>
                 <button class="btn btn-secondary" onclick="closePreview()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Questions Modal -->
+    <div id="importModal" class="modal-overlay" style="display: none;" role="dialog" aria-labelledby="importTitle"
+        aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="importTitle">📥 استيراد أسئلة</h2>
+                <button class="close-btn" onclick="closeImportModal()" aria-label="إغلاق">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>الصق محتوى ملف JavaScript الذي يحتوي على الأسئلة:</p>
+                <textarea id="importTextarea" rows="10" placeholder="export const questions = [...]"
+                    aria-label="محتوى الأسئلة للاستيراد"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="processImport()">استيراد</button>
+                <button class="btn btn-secondary" onclick="closeImportModal()">إلغاء</button>
             </div>
         </div>
     </div>

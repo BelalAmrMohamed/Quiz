@@ -1,9 +1,9 @@
-// Script/create-quiz.js - Enhanced Quiz Creator with Integrated Storage
+// Script/create-quiz.js - Enhanced Quiz Creator with Advanced Features
 
-import  { showNotification, confirmationNotification } from "./notifications.js";
+import { showNotification, confirmationNotification } from "./notifications.js";
 
-const phoneNumber = "201118482193"; // My number
-const emailAddress = "belalamrofficial@gmail.com"; // My email
+const phoneNumber = "201118482193";
+const emailAddress = "belalamrofficial@gmail.com";
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -16,6 +16,8 @@ let quizData = {
 };
 
 let questionIdCounter = 0;
+let autosaveTimeout = null;
+let draggedElement = null;
 
 // ============================================================================
 // INITIALIZATION
@@ -24,18 +26,158 @@ let questionIdCounter = 0;
 document.addEventListener("DOMContentLoaded", () => {
   loadDraftFromLocalStorage();
   updateEmptyState();
-
-  // Add event listeners for metadata
-  document.getElementById("quizTitle").addEventListener("input", (e) => {
-    quizData.title = e.target.value;
-    autosave();
-  });
-
-  document.getElementById("quizDescription").addEventListener("input", (e) => {
-    quizData.description = e.target.value;
-    autosave();
-  });
+  setupEventListeners();
+  setupKeyboardShortcuts();
+  updateProgress();
+  updateStatistics();
 });
+
+function setupEventListeners() {
+  // Metadata event listeners
+  const titleInput = document.getElementById("quizTitle");
+  const descInput = document.getElementById("quizDescription");
+
+  titleInput.addEventListener("input", (e) => {
+    quizData.title = e.target.value;
+    updateCharCount("titleCharCount", e.target.value.length, 100);
+    autosave();
+  });
+
+  descInput.addEventListener("input", (e) => {
+    quizData.description = e.target.value;
+    updateCharCount("descCharCount", e.target.value.length, 500);
+    autosave();
+  });
+
+  // Search functionality
+  const searchInput = document.getElementById("questionSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", debounce(handleSearch, 300));
+  }
+}
+
+// ============================================================================
+// CHARACTER COUNT
+// ============================================================================
+
+function updateCharCount(elementId, current, max) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = `${current}/${max}`;
+    element.classList.remove("warning", "error");
+    if (current > max * 0.9) {
+      element.classList.add("warning");
+    }
+    if (current >= max) {
+      element.classList.add("error");
+    }
+  }
+}
+
+// ============================================================================
+// KEYBOARD SHORTCUTS
+// ============================================================================
+
+function setupKeyboardShortcuts() {
+  document.addEventListener("keydown", (e) => {
+    // Ctrl+N: Add new question
+    if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+      e.preventDefault();
+      addQuestion();
+    }
+
+    // Ctrl+S: Save quiz
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      e.preventDefault();
+      saveLocally();
+    }
+
+    // Ctrl+P: Preview quiz
+    if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+      e.preventDefault();
+      previewQuiz();
+    }
+
+    // Ctrl+E: Export quiz
+    if ((e.ctrlKey || e.metaKey) && e.key === "e") {
+      e.preventDefault();
+      exportQuiz();
+    }
+
+    // ?: Show shortcuts
+    if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
+      const target = e.target;
+      if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+        toggleShortcuts();
+      }
+    }
+  });
+}
+
+window.toggleShortcuts = function () {
+  const panel = document.getElementById("shortcutsPanel");
+  if (panel.style.display === "none") {
+    panel.style.display = "block";
+  } else {
+    panel.style.display = "none";
+  }
+};
+
+// ============================================================================
+// PROGRESS TRACKING
+// ============================================================================
+
+function updateProgress() {
+  const totalQuestions = quizData.questions.length;
+  const progressText = document.getElementById("progressText");
+  const progressBar = document.getElementById("progressBar");
+
+  if (progressText) {
+    progressText.textContent = `${totalQuestions} ${totalQuestions === 1 ? "سؤال" : "أسئلة"}`;
+  }
+
+  if (progressBar) {
+    const progress = Math.min((totalQuestions / 10) * 100, 100);
+    progressBar.style.width = `${progress}%`;
+  }
+}
+
+// ============================================================================
+// STATISTICS
+// ============================================================================
+
+function updateStatistics() {
+  const statsCard = document.getElementById("statsCard");
+  if (!statsCard) return;
+
+  const totalQuestions = quizData.questions.length;
+
+  if (totalQuestions === 0) {
+    statsCard.style.display = "none";
+    return;
+  }
+
+  statsCard.style.display = "block";
+
+  const questionsWithImages = quizData.questions.filter(
+    (q) => q.image && q.image.trim(),
+  ).length;
+  const questionsWithExplanations = quizData.questions.filter(
+    (q) => q.explanation && q.explanation.trim(),
+  ).length;
+  const totalOptions = quizData.questions.reduce(
+    (sum, q) => sum + q.options.length,
+    0,
+  );
+  const avgOptions = (totalOptions / totalQuestions).toFixed(1);
+
+  document.getElementById("statQuestions").textContent = totalQuestions;
+  document.getElementById("statImages").textContent = questionsWithImages;
+  document.getElementById("statExplanations").textContent =
+    questionsWithExplanations;
+  document.getElementById("statAvgOptions").textContent = avgOptions;
+}
 
 // ============================================================================
 // QUESTION MANAGEMENT
@@ -56,18 +198,22 @@ window.addQuestion = function () {
   quizData.questions.push(question);
   renderQuestion(question);
   updateEmptyState();
+  updateProgress();
+  updateStatistics();
   autosave();
 
   setTimeout(() => {
     const questionCard = document.getElementById(`question-${questionId}`);
     if (questionCard) {
       questionCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      const textarea = questionCard.querySelector("textarea");
+      if (textarea) textarea.focus();
     }
   }, 100);
 };
 
 window.removeQuestion = async function (questionId) {
-  if (!await confirmationNotification("Are you sure you want to delete this question?")) {
+  if (!(await confirmationNotification("هل أنت متأكد من حذف هذا السؤال؟"))) {
     return;
   }
 
@@ -77,15 +223,52 @@ window.removeQuestion = async function (questionId) {
 
     const questionCard = document.getElementById(`question-${questionId}`);
     if (questionCard) {
-      questionCard.remove();
+      questionCard.style.animation = "slideOut 0.3s ease";
+      setTimeout(() => {
+        questionCard.remove();
+        updateQuestionNumbers();
+        updateEmptyState();
+        updateProgress();
+        updateStatistics();
+        showNotification("تم الحذف", "تم حذف السؤال بنجاح", "success");
+      }, 300);
     }
 
-    updateEmptyState();
     autosave();
   }
 };
 
-function renderQuestion(question) {
+window.duplicateQuestion = function (questionId) {
+  const question = quizData.questions.find((q) => q.id === questionId);
+  if (!question) return;
+
+  const newId = ++questionIdCounter;
+  const duplicatedQuestion = {
+    ...question,
+    id: newId,
+    q: question.q + " (نسخة)",
+  };
+
+  const index = quizData.questions.findIndex((q) => q.id === questionId);
+  quizData.questions.splice(index + 1, 0, duplicatedQuestion);
+
+  renderQuestion(duplicatedQuestion, index + 1);
+  updateQuestionNumbers();
+  updateProgress();
+  updateStatistics();
+  autosave();
+
+  showNotification("تم النسخ", "تم نسخ السؤال بنجاح", "success");
+
+  setTimeout(() => {
+    const newCard = document.getElementById(`question-${newId}`);
+    if (newCard) {
+      newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 100);
+};
+
+function renderQuestion(question, insertAtIndex = null) {
   const container = document.getElementById("questionsContainer");
   const questionNumber =
     quizData.questions.findIndex((q) => q.id === question.id) + 1;
@@ -93,12 +276,20 @@ function renderQuestion(question) {
   const questionCard = document.createElement("div");
   questionCard.className = "question-card";
   questionCard.id = `question-${question.id}`;
+  questionCard.draggable = true;
+  questionCard.dataset.questionId = question.id;
 
   questionCard.innerHTML = `
         <div class="question-header">
-            <span class="question-number">سؤال ${questionNumber}</span>
+            <span class="question-number">
+                <span class="drag-handle" title="اسحب لإعادة الترتيب">⋮⋮</span>
+                سؤال ${questionNumber}
+            </span>
             <div class="question-actions">
-                <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="Delete Question">
+                <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="نسخ السؤال">
+                    📋
+                </button>
+                <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="حذف السؤال">
                     🗑️
                 </button>
             </div>
@@ -111,6 +302,7 @@ function renderQuestion(question) {
                 rows="3" 
                 placeholder="أدخل سؤالك هنا..."
                 required
+                aria-required="true"
             >${escapeHtml(question.q)}</textarea>
         </div>
         
@@ -126,25 +318,28 @@ function renderQuestion(question) {
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
-                <h4>🖼️ صورة (إختيارية)</h4>
+                <h4>🖼️ صورة (اختيارية)</h4>
                 <span class="collapsible-toggle" id="toggle-image-${question.id}">▼</span>
             </div>
             <div class="collapsible-content" id="content-image-${question.id}">
                 <div class="form-group">
                     <label>رابط الصورة</label>
                     <input 
-                        type="text" 
+                        type="url" 
                         id="question-image-${question.id}" 
                         placeholder="https://example.com/image.jpg"
                         value="${escapeHtml(question.image || "")}"
+                        aria-describedby="image-help-${question.id}"
                     />
+                    <small id="image-help-${question.id}">أدخل رابط الصورة (يجب أن يبدأ بـ http:// أو https://)</small>
                 </div>
+                <div id="image-preview-${question.id}" class="image-preview-container"></div>
             </div>
         </div>
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
-                <h4>💡 الشرح (إختياري)</h4>
+                <h4>💡 الشرح (اختياري)</h4>
                 <span class="collapsible-toggle" id="toggle-explanation-${question.id}">▼</span>
             </div>
             <div class="collapsible-content" id="content-explanation-${question.id}">
@@ -160,8 +355,24 @@ function renderQuestion(question) {
         </div>
     `;
 
-  container.appendChild(questionCard);
+  if (insertAtIndex !== null) {
+    const existingCards = container.children;
+    if (insertAtIndex < existingCards.length) {
+      container.insertBefore(questionCard, existingCards[insertAtIndex]);
+    } else {
+      container.appendChild(questionCard);
+    }
+  } else {
+    container.appendChild(questionCard);
+  }
+
   setupQuestionEventListeners(question.id);
+  setupDragAndDrop(questionCard);
+
+  // Load image preview if exists
+  if (question.image) {
+    updateImagePreview(question.id, question.image);
+  }
 }
 
 function setupQuestionEventListeners(questionId) {
@@ -176,9 +387,13 @@ function setupQuestionEventListeners(questionId) {
 
   const imageInput = document.getElementById(`question-image-${questionId}`);
   if (imageInput) {
-    imageInput.addEventListener("input", (e) => {
-      updateQuestionData(questionId, "image", e.target.value);
-    });
+    imageInput.addEventListener(
+      "input",
+      debounce((e) => {
+        updateQuestionData(questionId, "image", e.target.value);
+        updateImagePreview(questionId, e.target.value);
+      }, 500),
+    );
   }
 
   const explanationTextarea = document.getElementById(
@@ -191,12 +406,137 @@ function setupQuestionEventListeners(questionId) {
   }
 }
 
+function updateImagePreview(questionId, imageUrl) {
+  const previewContainer = document.getElementById(
+    `image-preview-${questionId}`,
+  );
+  if (!previewContainer) return;
+
+  if (!imageUrl || !imageUrl.trim()) {
+    previewContainer.innerHTML = "";
+    return;
+  }
+
+  previewContainer.innerHTML =
+    '<div class="image-loading">⏳ جاري تحميل الصورة...</div>';
+
+  const img = new Image();
+  img.onload = function () {
+    previewContainer.innerHTML = `<img src="${escapeHtml(imageUrl)}" alt="معاينة الصورة" class="image-preview">`;
+  };
+  img.onerror = function () {
+    previewContainer.innerHTML =
+      '<div class="image-error">❌ فشل تحميل الصورة. تحقق من الرابط.</div>';
+  };
+  img.src = imageUrl;
+}
+
 function updateQuestionData(questionId, field, value) {
   const question = quizData.questions.find((q) => q.id === questionId);
   if (question) {
     question[field] = value;
+    if (field === "explanation" || field === "image") {
+      updateStatistics();
+    }
     autosave();
   }
+}
+
+function updateQuestionNumbers() {
+  quizData.questions.forEach((question, index) => {
+    const questionCard = document.getElementById(`question-${question.id}`);
+    if (questionCard) {
+      const numberSpan = questionCard.querySelector(".question-number");
+      if (numberSpan) {
+        const dragHandle = numberSpan.querySelector(".drag-handle");
+        numberSpan.innerHTML = `سؤال ${index + 1}`;
+        if (dragHandle) {
+          numberSpan.insertBefore(dragHandle, numberSpan.firstChild);
+        }
+      }
+    }
+  });
+}
+
+// ============================================================================
+// DRAG AND DROP
+// ============================================================================
+
+function setupDragAndDrop(element) {
+  element.addEventListener("dragstart", handleDragStart);
+  element.addEventListener("dragend", handleDragEnd);
+  element.addEventListener("dragover", handleDragOver);
+  element.addEventListener("drop", handleDrop);
+  element.addEventListener("dragenter", handleDragEnter);
+  element.addEventListener("dragleave", handleDragLeave);
+}
+
+function handleDragStart(e) {
+  draggedElement = this;
+  this.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/html", this.innerHTML);
+}
+
+function handleDragEnd(e) {
+  this.classList.remove("dragging");
+  document.querySelectorAll(".question-card").forEach((card) => {
+    card.classList.remove("drag-over");
+  });
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = "move";
+  return false;
+}
+
+function handleDragEnter(e) {
+  if (this !== draggedElement) {
+    this.classList.add("drag-over");
+  }
+}
+
+function handleDragLeave(e) {
+  this.classList.remove("drag-over");
+}
+
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+
+  if (draggedElement !== this) {
+    const draggedId = parseInt(draggedElement.dataset.questionId);
+    const droppedOnId = parseInt(this.dataset.questionId);
+
+    const draggedIndex = quizData.questions.findIndex(
+      (q) => q.id === draggedId,
+    );
+    const droppedIndex = quizData.questions.findIndex(
+      (q) => q.id === droppedOnId,
+    );
+
+    const [draggedQuestion] = quizData.questions.splice(draggedIndex, 1);
+    quizData.questions.splice(droppedIndex, 0, draggedQuestion);
+
+    rerenderAllQuestions();
+    autosave();
+    showNotification("تم إعادة الترتيب", "تم تغيير ترتيب الأسئلة", "success");
+  }
+
+  return false;
+}
+
+function rerenderAllQuestions() {
+  const container = document.getElementById("questionsContainer");
+  container.innerHTML = "";
+  quizData.questions.forEach((question) => {
+    renderQuestion(question);
+  });
+  updateQuestionNumbers();
 }
 
 // ============================================================================
@@ -214,7 +554,8 @@ function renderOptions(question) {
                 class="option-radio"
                 ${question.correct === index ? "checked" : ""}
                 onchange="setCorrectAnswer(${question.id}, ${index})"
-                title="Mark as correct answer"
+                title="تحديد كإجابة صحيحة"
+                aria-label="تحديد الخيار ${index + 1} كإجابة صحيحة"
             />
             <input 
                 type="text" 
@@ -223,11 +564,12 @@ function renderOptions(question) {
                 placeholder="إختيار ${index + 1}"
                 oninput="updateOption(${question.id}, ${index}, this.value)"
                 required
+                aria-label="نص الخيار ${index + 1}"
             />
             ${
               question.options.length > 1
                 ? `
-                <button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="Delete option">
+                <button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}">
                     ✕
                 </button>
             `
@@ -244,6 +586,7 @@ window.addOption = function (questionId) {
   if (question) {
     question.options.push("");
     rerenderOptions(questionId);
+    updateStatistics();
     autosave();
   }
 };
@@ -255,11 +598,10 @@ window.removeOption = function (questionId, optionIndex) {
 
     if (question.correct >= question.options.length) {
       question.correct = question.options.length - 1;
-    } else if (question.correct > optionIndex) {
-      question.correct--;
     }
 
     rerenderOptions(questionId);
+    updateStatistics();
     autosave();
   }
 };
@@ -276,20 +618,7 @@ window.setCorrectAnswer = function (questionId, optionIndex) {
   const question = quizData.questions.find((q) => q.id === questionId);
   if (question) {
     question.correct = optionIndex;
-
-    const container = document.getElementById(
-      `options-container-${questionId}`,
-    );
-    if (container) {
-      container.querySelectorAll(".option-item").forEach((item, index) => {
-        if (index === optionIndex) {
-          item.classList.add("correct");
-        } else {
-          item.classList.remove("correct");
-        }
-      });
-    }
-
+    rerenderOptions(questionId);
     autosave();
   }
 };
@@ -318,59 +647,85 @@ window.toggleCollapsible = function (questionId, section) {
     const isOpen = content.classList.contains("open");
 
     if (isOpen) {
-      content.classList.remove("open");
       toggle.classList.remove("open");
+      content.classList.remove("open");
     } else {
-      content.classList.add("open");
       toggle.classList.add("open");
+      content.classList.add("open");
     }
   }
 };
 
 // ============================================================================
-// UTILITY FUNCTIONS
+// SEARCH AND FILTER
 // ============================================================================
 
-function updateEmptyState() {
-  const emptyState = document.getElementById("emptyState");
-  if (emptyState) {
-    if (quizData.questions.length === 0) {
-      emptyState.classList.remove("hidden");
-    } else {
-      emptyState.classList.add("hidden");
-    }
-  }
+function handleSearch(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const questionCards = document.querySelectorAll(".question-card");
+
+  questionCards.forEach((card) => {
+    const questionText = card.querySelector("textarea").value.toLowerCase();
+    const matches = questionText.includes(searchTerm);
+    card.style.display = matches ? "block" : "none";
+  });
 }
 
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
+window.sortQuestions = function () {
+  const container = document.getElementById("questionsContainer");
+  const cards = Array.from(container.children);
+
+  cards.sort((a, b) => {
+    const textA = a.querySelector("textarea").value.toLowerCase();
+    const textB = b.querySelector("textarea").value.toLowerCase();
+    return textA.localeCompare(textB);
+  });
+
+  cards.forEach((card) => container.appendChild(card));
+  showNotification("تم الترتيب", "تم ترتيب الأسئلة أبجديًا", "success");
+};
+
+// ============================================================================
+// VALIDATION
+// ============================================================================
 
 function validateQuiz() {
   const errors = [];
 
-  if (!quizData.title.trim()) {
-    errors.push("Quiz title is required");
+  if (!quizData.title || quizData.title.trim() === "") {
+    errors.push("❌ عنوان الاختبار مطلوب");
   }
 
   if (quizData.questions.length === 0) {
-    errors.push("At least one question is required");
+    errors.push("❌ يجب إضافة سؤال واحد على الأقل");
   }
 
   quizData.questions.forEach((q, index) => {
-    if (!q.q.trim()) {
-      errors.push(`Question ${index + 1}: Question text is required`);
+    const questionNum = index + 1;
+
+    if (!q.q || q.q.trim() === "") {
+      errors.push(`❌ السؤال ${questionNum}: نص السؤال مطلوب`);
     }
 
-    if (q.options.some((opt) => !opt.trim())) {
-      errors.push(`Question ${index + 1}: All options must have text`);
+    if (q.options.length > 1) {
+      const emptyOptions = q.options.filter((opt) => !opt || opt.trim() === "");
+      if (emptyOptions.length > 0) {
+        errors.push(
+          `❌ السؤال ${questionNum}: جميع الخيارات يجب أن تحتوي على نص`,
+        );
+      }
+
+      if (q.correct === undefined || q.correct === null) {
+        errors.push(`❌ السؤال ${questionNum}: يجب تحديد الإجابة الصحيحة`);
+      }
     }
 
-    if (q.options.length < 1) {
-      errors.push(`Question ${index + 1}: At least one option is required`);
+    if (q.image && q.image.trim()) {
+      try {
+        new URL(q.image);
+      } catch {
+        errors.push(`❌ السؤال ${questionNum}: رابط الصورة غير صحيح`);
+      }
     }
   });
 
@@ -378,159 +733,86 @@ function validateQuiz() {
 }
 
 // ============================================================================
-// PREVIEW FUNCTIONALITY
+// EMPTY STATE
 // ============================================================================
 
-window.previewQuiz = function () {
-  const errors = validateQuiz();
+function updateEmptyState() {
+  const emptyState = document.getElementById("emptyState");
+  const questionControls = document.getElementById("questionControls");
 
-  if (errors.length > 0) {
-    alert("Please fix the following errors:\n\n" + errors.join("\n"));
-    return;
+  if (quizData.questions.length === 0) {
+    emptyState.classList.remove("hidden");
+    if (questionControls) questionControls.style.display = "none";
+  } else {
+    emptyState.classList.add("hidden");
+    if (questionControls) questionControls.style.display = "flex";
   }
-
-  const modal = document.getElementById("previewModal");
-  const content = document.getElementById("previewContent");
-
-  if (!modal || !content) return;
-
-  let previewHTML = `
-        <div class="preview-header">
-            <h2>${escapeHtml(quizData.title)}</h2>
-            ${quizData.description ? `<p>${escapeHtml(quizData.description)}</p>` : ""}
-            <p class="text-muted">Total Questions: ${quizData.questions.length}</p>
-        </div>
-        <hr style="border: none; border-top: 2px solid var(--color-border); margin: 20px 0;">
-    `;
-
-  quizData.questions.forEach((q, index) => {
-    previewHTML += `
-            <div class="preview-question">
-                <h4>Question ${index + 1}: ${escapeHtml(q.q)}</h4>
-                
-                ${q.image ? `<img src="${escapeHtml(q.image)}" alt="Question image" class="preview-image" onerror="this.style.display='none'">` : ""}
-                
-                <ul class="preview-options">
-                    ${q.options
-                      .map(
-                        (opt, optIndex) => `
-                        <li class="${optIndex === q.correct ? "correct" : ""}">
-                            ${optIndex === q.correct ? "✓ " : ""}${escapeHtml(opt)}
-                        </li>
-                    `,
-                      )
-                      .join("")}
-                </ul>
-                
-                ${
-                  q.explanation
-                    ? `
-                    <div class="preview-explanation">
-                        <strong>💡 Explanation:</strong> ${escapeHtml(q.explanation)}
-                    </div>
-                `
-                    : ""
-                }
-            </div>
-        `;
-  });
-
-  content.innerHTML = previewHTML;
-  modal.style.display = "flex";
-};
-
-window.closePreview = function () {
-  const modal = document.getElementById("previewModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
-};
+}
 
 // ============================================================================
-// SAVE & EXPORT FUNCTIONALITY
+// AUTOSAVE
 // ============================================================================
 
-let autosaveTimeout;
 function autosave() {
   clearTimeout(autosaveTimeout);
+
+  updateAutosaveIndicator("saving");
+
   autosaveTimeout = setTimeout(() => {
-    saveToLocalStorage(true);
+    try {
+      const dataToSave = {
+        title: quizData.title,
+        description: quizData.description,
+        questions: quizData.questions,
+        lastModified: new Date().toISOString(),
+      };
+
+      localStorage.setItem("quiz_draft", JSON.stringify(dataToSave));
+      updateAutosaveIndicator("saved");
+
+      setTimeout(() => {
+        updateAutosaveIndicator("saved");
+      }, 1000);
+    } catch (error) {
+      console.error("Autosave error:", error);
+      updateAutosaveIndicator("error");
+    }
   }, 1000);
 }
 
-window.saveToLocalStorage = function (silent = false) {
-  try {
-    // Save draft
-    const saveData = {
-      ...quizData,
-      lastSaved: new Date().toISOString(),
-    };
+function updateAutosaveIndicator(status) {
+  const indicator = document.getElementById("autosaveIndicator");
+  if (!indicator) return;
 
-    localStorage.setItem("quiz_creator_draft", JSON.stringify(saveData));
+  indicator.classList.remove("saving", "error");
 
-    if (!silent) {
-      showNotification("Draft saved successfully!", "You can come back later.","success");
-    }
-  } catch (error) {
-    console.error("Error saving to localStorage:", error);
-    if (!silent) {
-      showNotification("Error saving draft", "", "error");
-    }
+  if (status === "saving") {
+    indicator.classList.add("saving");
+    indicator.querySelector(".save-text").textContent = "جاري الحفظ...";
+  } else if (status === "saved") {
+    indicator.querySelector(".save-text").textContent = "محفوظ";
+  } else if (status === "error") {
+    indicator.classList.add("error");
+    indicator.querySelector(".save-text").textContent = "خطأ في الحفظ";
   }
-};
-
-/* Function for the `🔁 Reset Page` button 
-   Resets the page so the user can start making a new quiz */
-window.resetPage = async function () {
-  if (
-    !await confirmationNotification(
-      "Are you sure you want to clear the entire quiz? This action cannot be undone.",
-    )
-  ) {
-    return;
-  }
-
-  // 1. Reset State
-  quizData = {
-    title: "",
-    description: "",
-    questions: [],
-  };
-  questionIdCounter = 0;
-
-  // 2. Reset UI Fields
-  const titleInput = document.getElementById("quizTitle");
-  const descInput = document.getElementById("quizDescription");
-  const container = document.getElementById("questionsContainer");
-
-  if (titleInput) titleInput.value = "";
-  if (descInput) descInput.value = "";
-  if (container) container.innerHTML = "";
-
-  // 3. Update UI State
-  updateEmptyState();
-
-  // 4. Save/Clear Local Storage Draft
-  saveToLocalStorage(true);
-
-  // 5. Notify User
-  showNotification("Page reset successfully", "You can make another quiz now!", "🧹");
-};
+}
 
 function loadDraftFromLocalStorage() {
   try {
-    const saved = localStorage.getItem("quiz_creator_draft");
+    const saved = localStorage.getItem("quiz_draft");
     if (saved) {
       const data = JSON.parse(saved);
 
       if (data.title) {
         quizData.title = data.title;
         document.getElementById("quizTitle").value = data.title;
+        updateCharCount("titleCharCount", data.title.length, 100);
       }
 
       if (data.description) {
         quizData.description = data.description;
         document.getElementById("quizDescription").value = data.description;
+        updateCharCount("descCharCount", data.description.length, 500);
       }
 
       if (data.questions && data.questions.length > 0) {
@@ -545,7 +827,9 @@ function loadDraftFromLocalStorage() {
         });
 
         updateEmptyState();
-        showNotification("Draft loaded", "You can continue now.", "success");
+        updateProgress();
+        updateStatistics();
+        showNotification("تم التحميل", "تم تحميل المسودة المحفوظة", "success");
       }
     }
   } catch (error) {
@@ -553,17 +837,18 @@ function loadDraftFromLocalStorage() {
   }
 }
 
+// ============================================================================
+// SAVE TO USER QUIZZES
+// ============================================================================
+
 function saveToUserQuizzes(quizToSave) {
   try {
-    // Get existing user quizzes
     const existingQuizzes = JSON.parse(
       localStorage.getItem("user_quizzes") || "[]",
     );
 
-    // Generate unique ID
     const quizId = `user_quiz_${Date.now()}`;
 
-    // Create quiz object with metadata
     const newQuiz = {
       id: quizId,
       title: quizToSave.title,
@@ -573,10 +858,8 @@ function saveToUserQuizzes(quizToSave) {
       author: "User Created",
     };
 
-    // Add to array
     existingQuizzes.push(newQuiz);
 
-    // Save back to localStorage
     localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
 
     return quizId;
@@ -586,112 +869,135 @@ function saveToUserQuizzes(quizToSave) {
   }
 }
 
+// ============================================================================
+// EXPORT QUIZ
+// ============================================================================
+
 window.exportQuiz = function () {
   const errors = validateQuiz();
 
   if (errors.length > 0) {
-    alert(
-      "Please fix the following errors before exporting:\n\n" +
-        errors.join("\n"),
+    showNotification(
+      "خطأ في التحقق",
+      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
+      "error",
     );
     return;
   }
 
-  const quizId = `user_quiz_${Date.now()}`;
+  showLoading("جاري تصدير الاختبار...");
 
-  if (!quizId) {
-    showNotification("Error saving quiz", "No quiz id.", "error");
-    return;
-  }
+  setTimeout(() => {
+    try {
+      const exportQuestions = quizData.questions.map((q) => {
+        const question = {
+          q: q.q,
+          options: q.options,
+          correct: q.correct,
+        };
 
-  // Convert to export format
-  const exportQuestions = quizData.questions.map((q) => {
-    const question = {
-      q: q.q,
-      options: q.options,
-      correct: q.correct,
-    };
+        if (q.image && q.image.trim()) {
+          question.image = q.image;
+        }
 
-    if (q.image && q.image.trim()) {
-      question.image = q.image;
-    }
+        if (q.explanation && q.explanation.trim()) {
+          question.explanation = q.explanation;
+        }
 
-    if (q.explanation && q.explanation.trim()) {
-      question.explanation = q.explanation;
-    }
+        return question;
+      });
 
-    return question;
-  });
-
-  // Generate file content
-  const fileContent = `// ${quizData.title}${quizData.description ? "\n// " + quizData.description : ""}
+      const fileContent = `// ${quizData.title}${quizData.description ? "\n// " + quizData.description : ""}
 // Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
 
 export const questions = ${JSON.stringify(exportQuestions, null, 2)};
 `;
 
-  // Download file
-  const blob = new Blob([fileContent], { type: "text/javascript" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${quizData.title}.js`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+      const blob = new Blob([fileContent], { type: "text/javascript" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${quizData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.js`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-  showNotification("Quiz exported!", "Send it to the developer", "success");
+      hideLoading();
+      showNotification("تم التصدير!", "تم تحميل ملف الاختبار بنجاح", "success");
+    } catch (error) {
+      hideLoading();
+      showNotification("خطأ", "حدث خطأ أثناء التصدير", "error");
+      console.error("Export error:", error);
+    }
+  }, 500);
 };
 
 // ============================================================================
-// SUBMIT TO PLATFORM (Via API)
+// SAVE LOCALLY
 // ============================================================================
 
 window.saveLocally = function () {
   const errors = validateQuiz();
 
   if (errors.length > 0) {
-    alert(
-      "Please fix the following errors before submitting:\n\n" +
-        errors.join("\n"),
+    showNotification(
+      "خطأ في التحقق",
+      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
+      "error",
     );
     return;
   }
 
-  // Save to user_quizzes first
-  const quizId = saveToUserQuizzes(quizData);
-  showNotification("Saved locally", "You can find it in \"إمتحاناتك\"", "success");
+  showLoading("جاري الحفظ...");
+
+  setTimeout(() => {
+    const quizId = saveToUserQuizzes(quizData);
+    hideLoading();
+
+    if (quizId) {
+      showNotification(
+        "تم الحفظ!",
+        'يمكنك العثور عليه في "إمتحاناتك"',
+        "success",
+      );
+    } else {
+      showNotification("خطأ", "فشل حفظ الاختبار", "error");
+    }
+  }, 500);
 };
 
 // ============================================================================
-// Email To developer
+// EMAIL TO DEVELOPER
 // ============================================================================
 
 window.emailQuizToDeveloper = function () {
   const errors = validateQuiz();
 
   if (errors.length > 0) {
-    alert(
-      "Please fix the following errors before sending:\n\n" + errors.join("\n"),
+    showNotification(
+      "خطأ في التحقق",
+      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
+      "error",
     );
     return;
   }
 
   try {
-    showNotification("Sending quiz to developer...", "This will help upload it to everyone.","info");
+    showNotification(
+      "جاري الإرسال...",
+      "سيتم فتح تطبيق البريد الإلكتروني",
+      "info",
+    );
 
-    // 1. Prepare quiz data
     const exportQuestions = quizData.questions.map((q) => {
       const question = { q: q.q };
 
-      // Add image only if it exists
       if (q.image && q.image.trim()) question.image = q.image;
 
       question.options = q.options;
       question.correct = q.correct;
 
-      // Add explanation only if it exists
       if (q.explanation && q.explanation.trim())
         question.explanation = q.explanation;
 
@@ -700,19 +1006,13 @@ window.emailQuizToDeveloper = function () {
 
     const fileHeader = `// Automated mail - ${quizData.title}.js`;
 
-    // 2. Stringify the data first
     let jsonString = JSON.stringify(exportQuestions, null, 2);
 
-    // 3. Regex to remove quotes from specific keys
-    // This finds "key": and replaces it with key:
-    // We target only your specific known keys to avoid breaking text inside the questions
     const validKeys = ["q", "image", "options", "correct", "explanation"];
     const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
 
-    // Replace "q": with q:
     const jsObjectString = jsonString.replace(keyRegex, "$1:");
 
-    // 4. Construct the final file content
     const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
 
     const encodedBody = encodeURIComponent(fileContent);
@@ -721,11 +1021,7 @@ window.emailQuizToDeveloper = function () {
     window.location.href = mailtoLink;
   } catch (error) {
     console.error("Error submitting quiz:", error);
-    showNotification(
-      "Error submitting quiz to developer.",
-      `${error}`,
-      "error",
-    );
+    showNotification("خطأ", "فشل إرسال الاختبار", "error");
   }
 };
 
@@ -737,13 +1033,14 @@ window.sendToWhatsApp = function () {
   const errors = validateQuiz();
 
   if (errors.length > 0) {
-    alert(
-      "Please fix the following errors before sending:\n\n" + errors.join("\n"),
+    showNotification(
+      "خطأ في التحقق",
+      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
+      "error",
     );
     return;
   }
 
-  // Convert to export format
   const exportQuestions = quizData.questions.map((q) => {
     const question = { q: q.q, options: q.options, correct: q.correct };
     if (q.image && q.image.trim()) question.image = q.image;
@@ -756,19 +1053,13 @@ window.sendToWhatsApp = function () {
 
   let jsonString = JSON.stringify(exportQuestions, null, 2);
 
-  // 3. Regex to remove quotes from specific keys
-  // This finds "key": and replaces it with key:
-  // We target only your specific known keys to avoid breaking text inside the questions
   const validKeys = ["q", "image", "options", "correct", "explanation"];
   const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
 
-  // Replace "q": with q:
   const jsObjectString = jsonString.replace(keyRegex, "$1:");
 
-  // 4. Construct the final file content
   const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
 
-  // Create WhatsApp message
   const message = `*New Quiz Submission*
 
 // *Title:* ${quizData.title}
@@ -778,11 +1069,235 @@ window.sendToWhatsApp = function () {
 
 ${fileContent}`;
 
-  // WhatsApp URL
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-  // Open WhatsApp
   window.open(whatsappUrl, "_blank");
 
-  showNotification("Opening WhatsApp...", "+20 111 848 21 93","info");
+  showNotification("جاري فتح واتساب...", "+20 111 848 21 93", "info");
 };
+
+// ============================================================================
+// PREVIEW
+// ============================================================================
+
+window.previewQuiz = function () {
+  const errors = validateQuiz();
+
+  if (errors.length > 0) {
+    showNotification(
+      "خطأ في التحقق",
+      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
+      "error",
+    );
+    return;
+  }
+
+  const modal = document.getElementById("previewModal");
+  const content = document.getElementById("previewContent");
+
+  let html = `
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h2 style="margin: 0 0 10px 0;">${escapeHtml(quizData.title)}</h2>
+      ${quizData.description ? `<p style="color: var(--color-text-secondary); margin: 0;">${escapeHtml(quizData.description)}</p>` : ""}
+    </div>
+  `;
+
+  quizData.questions.forEach((q, index) => {
+    html += `
+      <div class="preview-question">
+        <h4>السؤال ${index + 1}: ${escapeHtml(q.q)}</h4>
+        ${q.image ? `<img src="${escapeHtml(q.image)}" class="preview-image" alt="صورة السؤال" onerror="this.style.display='none'">` : ""}
+        <ul class="preview-options">
+          ${q.options
+            .map(
+              (opt, i) =>
+                `<li class="${i === q.correct ? "correct" : ""}">${escapeHtml(opt)}${i === q.correct ? " ✓" : ""}</li>`,
+            )
+            .join("")}
+        </ul>
+        ${q.explanation ? `<div class="preview-explanation">💡 ${escapeHtml(q.explanation)}</div>` : ""}
+      </div>
+    `;
+  });
+
+  content.innerHTML = html;
+  modal.style.display = "flex";
+};
+
+window.closePreview = function () {
+  const modal = document.getElementById("previewModal");
+  modal.style.display = "none";
+};
+
+// ============================================================================
+// IMPORT QUESTIONS
+// ============================================================================
+
+window.importQuestions = function () {
+  const modal = document.getElementById("importModal");
+  modal.style.display = "flex";
+};
+
+window.closeImportModal = function () {
+  const modal = document.getElementById("importModal");
+  modal.style.display = "none";
+  document.getElementById("importTextarea").value = "";
+};
+
+window.processImport = function () {
+  const textarea = document.getElementById("importTextarea");
+  const content = textarea.value.trim();
+
+  if (!content) {
+    showNotification("خطأ", "الرجاء إدخال محتوى للاستيراد", "error");
+    return;
+  }
+
+  try {
+    showLoading("جاري الاستيراد...");
+
+    // Extract questions array from the content
+    const match = content.match(
+      /export\s+const\s+questions\s*=\s*(\[[\s\S]*\])/,
+    );
+
+    if (!match) {
+      throw new Error("تنسيق غير صحيح");
+    }
+
+    const questionsStr = match[1];
+    const importedQuestions = eval(`(${questionsStr})`);
+
+    if (!Array.isArray(importedQuestions)) {
+      throw new Error("البيانات المستوردة ليست مصفوفة");
+    }
+
+    // Add imported questions
+    importedQuestions.forEach((q) => {
+      const questionId = ++questionIdCounter;
+      const question = {
+        id: questionId,
+        q: q.q || "",
+        options: q.options || ["", ""],
+        correct: q.correct || 0,
+        image: q.image || "",
+        explanation: q.explanation || "",
+      };
+      quizData.questions.push(question);
+      renderQuestion(question);
+    });
+
+    updateEmptyState();
+    updateProgress();
+    updateStatistics();
+    autosave();
+
+    hideLoading();
+    closeImportModal();
+    showNotification(
+      "تم الاستيراد!",
+      `تم استيراد ${importedQuestions.length} سؤال`,
+      "success",
+    );
+  } catch (error) {
+    hideLoading();
+    console.error("Import error:", error);
+    showNotification("خطأ في الاستيراد", error.message, "error");
+  }
+};
+
+// ============================================================================
+// DUPLICATE QUIZ
+// ============================================================================
+
+window.duplicateQuiz = function () {
+  if (quizData.questions.length === 0) {
+    showNotification("تنبيه", "لا يوجد اختبار لنسخه", "error");
+    return;
+  }
+
+  const newQuizData = {
+    ...quizData,
+    title: quizData.title + " (نسخة)",
+  };
+
+  const quizId = saveToUserQuizzes(newQuizData);
+
+  if (quizId) {
+    showNotification("تم النسخ!", "تم حفظ نسخة من الاختبار", "success");
+  }
+};
+
+// ============================================================================
+// RESET PAGE
+// ============================================================================
+
+window.resetPage = async function () {
+  if (
+    !(await confirmationNotification(
+      "هل أنت متأكد من إعادة ضبط الصفحة؟ سيتم حذف جميع البيانات!",
+    ))
+  ) {
+    return;
+  }
+
+  localStorage.removeItem("quiz_draft");
+
+  quizData = {
+    title: "",
+    description: "",
+    questions: [],
+  };
+
+  questionIdCounter = 0;
+
+  document.getElementById("quizTitle").value = "";
+  document.getElementById("quizDescription").value = "";
+  document.getElementById("questionsContainer").innerHTML = "";
+
+  updateCharCount("titleCharCount", 0, 100);
+  updateCharCount("descCharCount", 0, 500);
+  updateEmptyState();
+  updateProgress();
+  updateStatistics();
+
+  showNotification("تم إعادة الضبط", "تم مسح جميع البيانات", "success");
+};
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function showLoading(text = "جاري التحميل...") {
+  const overlay = document.getElementById("loadingOverlay");
+  const loadingText = document.getElementById("loadingText");
+  if (overlay && loadingText) {
+    loadingText.textContent = text;
+    overlay.style.display = "flex";
+  }
+}
+
+function hideLoading() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) {
+    overlay.style.display = "none";
+  }
+}
