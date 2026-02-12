@@ -1,7 +1,7 @@
 # ------------------------------------
 # SITE CONFIGURATION
 # ------------------------------------
-title: "Quizzes"
+title: "منصة إمتحانات بصمجي"
 description: "Free online quizzes and practice exams for college courses, computer science, and logic. Test your knowledge now."
 author: "Belal Amr Mohamed"
 email: "belalamrofficial@gmail.com"
@@ -10,9 +10,9 @@ email: "belalamrofficial@gmail.com"
 # URL SETTINGS (Fixed)
 # ------------------------------------
 # ⚠️ FIX: URL must NOT include the folder name ("/Quiz")
-url: "https://belalamrmohamed.github.io"
+url: "https://https://basmagi-quiz.vercel.app"
 # The folder name goes here
-baseurl: "/Quiz"
+baseurl: "/"
 
 # ------------------------------------
 # BUILD SETTINGS
