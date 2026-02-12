@@ -57,22 +57,12 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   margin-right: auto;
-  direction: ltr;
+  direction: rtl;
 }
 
 #breadcrumb:hover {
   transform: translateX(-4px);
   box-shadow: var(--shadow-md);
-}
-
-#breadcrumb::before {
-  content: "←";
-  font-size: 1.25rem;
-  font-weight: 600;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 #breadcrumb.show {

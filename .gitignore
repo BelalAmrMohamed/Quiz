@@ -5,6 +5,7 @@
 
 !robots.txt
 !README.md
+!CHANGELOG.MD
 
 # Service Worker cache
 sw-cache/

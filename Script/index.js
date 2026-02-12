@@ -605,22 +605,6 @@ function showOnboardingWizard() {
     const nav = document.createElement("div");
     nav.className = "onboarding-nav";
 
-    if (currentStep > 1) {
-      const backBtn = document.createElement("button");
-      backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "← السابق";
-      backBtn.type = "button";
-      backBtn.setAttribute("aria-label", "الرجوع للخطوة السابقة");
-      backBtn.onclick = () => {
-        currentStep--;
-        render();
-      };
-      nav.appendChild(backBtn);
-    } else {
-      // Spacer
-      nav.appendChild(document.createElement("div"));
-    }
-
     if (currentStep < 3) {
       const nextBtn = document.createElement("button");
       nextBtn.className = "onboarding-btn primary";
@@ -650,6 +634,22 @@ function showOnboardingWizard() {
       }
       finishBtn.onclick = () => finishOnboarding();
       nav.appendChild(finishBtn);
+    }
+
+    if (currentStep > 1) {
+      const backBtn = document.createElement("button");
+      backBtn.className = "onboarding-btn secondary";
+      backBtn.textContent = "← السابق";
+      backBtn.type = "button";
+      backBtn.setAttribute("aria-label", "الرجوع للخطوة السابقة");
+      backBtn.onclick = () => {
+        currentStep--;
+        render();
+      };
+      nav.appendChild(backBtn);
+    } else {
+      // Spacer
+      nav.appendChild(document.createElement("div"));
     }
 
     card.appendChild(nav);
@@ -1728,19 +1728,19 @@ function updateBreadcrumb() {
   const breadcrumbText = breadcrumb.querySelector(".breadcrumb-text");
 
   if (navigationStack.length === 1) {
-    breadcrumbText.textContent = "الرجوع إلى المواد";
+    breadcrumbText.textContent = "الرجوع إلى المواد ←";
     breadcrumb.onclick = renderRootCategories;
-    breadcrumb.setAttribute("aria-label", "الرجوع إلى المواد");
+    breadcrumb.setAttribute("aria-label", "الرجوع إلى المواد ←");
   } else {
     const parentName = navigationStack[navigationStack.length - 2].name;
-    breadcrumbText.textContent = `الرجوع إلى ${parentName}`;
+    breadcrumbText.textContent = `الرجوع إلى ${parentName} ←`;
     breadcrumb.onclick = () => {
       navigationStack.pop();
       const parent = navigationStack[navigationStack.length - 1];
       navigationStack.pop();
       renderCategory(parent);
     };
-    breadcrumb.setAttribute("aria-label", `الرجوع إلى ${parentName}`);
+    breadcrumb.setAttribute("aria-label", `الرجوع إلى ${parentName}  ←`);
   }
 }
 
