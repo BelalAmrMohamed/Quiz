@@ -158,15 +158,15 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="src/styles/themes.css">
     <link rel="stylesheet" href="src/styles/index.css">
-    <link rel="stylesheet" href="src/styles/side-menu.css">
-    <link rel="stylesheet" href="src/styles/notificatinos.css">
+    <link rel="stylesheet" href="src/components/side-menu.css">
+    <link rel="stylesheet" href="src/components/notifications.css">
     <link rel="stylesheet" href="src/styles/profile-styles.css">
 
     <!-- Controller Scripts - with module preload -->
     <link rel="modulepreload" href="src/scripts/theme-controller.js">
     <link rel="modulepreload" href="src/scripts/canvas-animation.js">
     <link rel="modulepreload" href="src/scripts/index.js">
-    <link rel="modulepreload" href="src/scripts/side-menu.js">
+    <link rel="modulepreload" href="src/components/side-menu.js">
 
     <!-- Service Worker Registration -->
     <script>
@@ -233,9 +233,9 @@
 
                 <div class="menu-divider" role="separator" aria-hidden="true"></div>
 
-                <button class="menu-item" data-action="openProfileSettings" type="button" aria-haspopup="dialog">
-                    <span aria-hidden="true">⚙️</span> الملف الشخصي
-                </button>
+                <a href="settings.html" class="menu-item">
+                    <span aria-hidden="true">⚙️</span> الإعدادات
+                </a>
                 <button class="menu-item" data-action="openCourseManager" type="button" aria-haspopup="dialog">
                     <span aria-hidden="true">📚</span> إضافة/حذف مواد
                 </button>
@@ -344,7 +344,7 @@
     <script type="module" src="src/scripts/theme-controller.js"></script>
     <script type="module" src="src/scripts/canvas-animation.js"></script>
     <script type="module" src="src/scripts/index.js"></script>
-    <script type="module" src="src/scripts/side-menu.js"></script>
+    <script type="module" src="src/components/side-menu.js"></script>
 
     <!-- Remove loading class when page is ready -->
     <script>

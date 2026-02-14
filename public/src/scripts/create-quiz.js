@@ -1,6 +1,9 @@
 // src/scripts/create-quiz.js - Enhanced Quiz Creator with Advanced Features
 
-import { showNotification, confirmationNotification } from "./notifications.js";
+import {
+  showNotification,
+  confirmationNotification,
+} from "../components/notifications.js";
 
 const phoneNumber = "201118482193";
 const emailAddress = "belalamrofficial@gmail.com";
@@ -1057,21 +1060,21 @@ window.toggleTemplates = function () {
 window.addQuestionFromTemplate = function (templateType) {
   const templates = {
     mcq: {
-      q: "أدخل السؤال هنا...",
+      q: "",
       options: ["", "", "", ""],
       correct: 0,
       image: "",
       explanation: "",
     },
     truefalse: {
-      q: "أدخل السؤال هنا...",
+      q: "",
       options: ["True", "False"],
       correct: 0,
       image: "",
       explanation: "",
     },
     essay: {
-      q: "أدخل السؤال المقالي هنا...",
+      q: "",
       options: [""],
       correct: 0,
       image: "",
@@ -1547,7 +1550,8 @@ window.processImport = function () {
       const match = content.match(
         /export\s+const\s+questions\s*=\s*(\[[\s\S]*\])/,
       );
-      if (!match) throw new Error("تنسيق غير صحيح (JSON أو export const questions)");
+      if (!match)
+        throw new Error("تنسيق غير صحيح (JSON أو export const questions)");
       try {
         importedQuestions = eval(`(${match[1]})`);
       } catch (e) {

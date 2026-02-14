@@ -1,8 +1,8 @@
-// src/scripts/notifications.js
+// src/components/notifications.js
 // Import in a JS file:
-// import { showNotification, showNotificationBadge, confirmationNotification } from "./notifications.js";
+// import { showNotification, showNotificationBadge, confirmationNotification } from "../components/notifications.js";
 // Include the CSS file in an HTML page:
-// <link rel="stylesheet" href="src/styles/notificatinos.css">
+// <link rel="stylesheet" href="src/components/notifications.css">
 
 /* =========================================
    Unified Notification System

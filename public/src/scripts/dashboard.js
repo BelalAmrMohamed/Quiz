@@ -2,7 +2,7 @@
 import { gameEngine, BADGES } from "./gameEngine.js";
 import { getManifest } from "./quizManifest.js";
 
-import { confirmationNotification } from "./notifications.js";
+import { confirmationNotification } from "../components/notifications.js";
 
 let examList = [];
 

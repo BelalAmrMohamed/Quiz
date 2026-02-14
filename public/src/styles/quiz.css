@@ -806,3 +806,15 @@ body {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Vertical quiz style: all questions in one scrollable page */
+#questionContainer.vertical-style {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 32px;
+}
+
+#questionContainer.vertical-style .vertical-question-card {
+  scroll-margin-top: 80px;
+}

@@ -3,7 +3,7 @@
 // Deals with the export from both main page and results/summary page
 // No libraries used.
 
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 export async function exportToQuiz(config, questions) {
   const processedQuestions = await convertImagesToBase64(questions);

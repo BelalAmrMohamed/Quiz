@@ -9,12 +9,12 @@ import { userProfile } from "./userProfile.js";
 let categoryTree = null;
 
 // Download functions
-import { exportToQuiz } from "./exportToQuiz.js";
-import { exportToHtml } from "./exportToHtml.js";
-import { exportToPdf } from "./exportToPdf.js";
-import { exportToWord } from "./exportToWord.js";
-import { exportToPptx } from "./exportToPptx.js";
-import { exportToMarkdown } from "./exportToMarkdown.js";
+import { exportToQuiz } from "../export/export-to-quiz.js";
+import { exportToHtml } from "../export/export-to-html.js";
+import { exportToPdf } from "../export/export-to-pdf.js";
+import { exportToWord } from "../export/export-to-word.js";
+import { exportToPptx } from "../export/export-to-pptx.js";
+import { exportToMarkdown } from "../export/export-to-markdown.js";
 
 // Helper utilities
 import {
@@ -27,7 +27,10 @@ import {
 } from "./filterUtils.js";
 
 // Notifications
-import { showNotification, confirmationNotification } from "./notifications.js";
+import {
+  showNotification,
+  confirmationNotification,
+} from "../components/notifications.js";
 
 // ============================================================================
 // CONFIGURATION & CONSTANTS
@@ -467,7 +470,23 @@ window.saveProfileSettings = function () {
       oldProfile.term !== term;
 
     if (academicInfoChanged) {
-      // Initialize default subscriptions for new academic info
+      // Unsubscribe from courses that matched the *previous* faculty/year/term
+      // so that only manually subscribed courses (other combos) are kept
+      if (
+        oldProfile.faculty !== "All" &&
+        oldProfile.year !== "All" &&
+        oldProfile.term !== "All"
+      ) {
+        const oldMatchingCourses = filterCourses(categoryTree, oldProfile);
+        const oldMatchingIds = oldMatchingCourses.map((c) => c.id);
+        const subscribedIds = userProfile.getSubscribedCourseIds();
+        oldMatchingIds.forEach((courseId) => {
+          if (subscribedIds.includes(courseId)) {
+            userProfile.unsubscribeFromCourse(courseId);
+          }
+        });
+      }
+      // Subscribe to default courses for the new academic info
       userProfile.initializeDefaultSubscriptions(categoryTree);
     }
 
@@ -1382,7 +1401,8 @@ function playUserQuiz(quiz) {
     sessionStorage.setItem("active_user_quiz", JSON.stringify(quiz));
 
     // Navigate to quiz page with special parameter
-    window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=practice&type=user`;
+    const mode = userProfile.getDefaultQuizMode();
+    window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=${encodeURIComponent(mode)}&type=user`;
   } catch (error) {
     console.error("Error playing user quiz:", error);
     alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
@@ -1565,22 +1585,9 @@ function createExamCard(exam) {
   btn.setAttribute("aria-label", `بدء اختبار ${exam.title || exam.id}`);
   btn.onclick = (ev) => {
     ev.stopPropagation();
-    showModeSelection(exam.id, exam.title || exam.id);
+    const mode = userProfile.getDefaultQuizMode();
+    startQuiz(exam.id, mode);
   };
-
-  const loadPdfLib = () =>
-    new Promise((resolve, reject) => {
-      if (window.jspdf && window.jspdf.jsPDF) {
-        resolve();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("PDF library failed to load"));
-      document.head.appendChild(s);
-    });
 
   const onDownloadOption = async (format, modalEl) => {
     modalEl.remove();
@@ -1597,14 +1604,6 @@ function createExamCard(exam) {
       return;
     }
     const questions = mod.questions;
-    if (format === "pdf") {
-      try {
-        await loadPdfLib();
-      } catch {
-        alert("PDF library could not be loaded.");
-        return;
-      }
-    }
     try {
       switch (format) {
         case "quiz":
@@ -1750,118 +1749,6 @@ function updateBreadcrumb() {
     };
     breadcrumb.setAttribute("aria-label", `الرجوع إلى ${parentName}  ←`);
   }
-}
-
-function showModeSelection(examId, examTitle) {
-  const modal = document.createElement("div");
-  modal.className = "modal-overlay";
-  modal.setAttribute("role", "dialog");
-  modal.setAttribute("aria-modal", "true");
-  modal.setAttribute("aria-labelledby", "modeModalTitle");
-
-  const modalCard = document.createElement("div");
-  modalCard.className = "modal-card";
-
-  const h2 = document.createElement("h2");
-  h2.id = "modeModalTitle";
-  h2.textContent = examTitle;
-
-  const p = document.createElement("p");
-  p.textContent = "اختر وضع الإمتحان";
-
-  const modeGrid = document.createElement("div");
-  modeGrid.className = "mode-grid";
-  modeGrid.setAttribute("role", "group");
-  modeGrid.setAttribute("aria-label", "أوضاع الاختبار");
-
-  const practiceBtn = createModeButton(
-    "./assets/images/quiz.png",
-    "Practice",
-    "يحتوي على مؤقت، ويمكنك رؤية إجابات الأسئلة بعد الحل",
-    () => startQuiz(examId, "practice"),
-  );
-
-  const timedBtn = createModeButton(
-    "https://cdn-icons-png.freepik.com/512/3003/3003126.png",
-    "Timed",
-    "30 ثانية لكل سؤال",
-    () => startQuiz(examId, "timed"),
-  );
-
-  const examBtn = createModeButton(
-    "https://cdn-icons-png.flaticon.com/512/3640/3640554.png",
-    "Exam",
-    "لا إجابات أثناء الإمتحان",
-    () => startQuiz(examId, "exam"),
-  );
-
-  modeGrid.appendChild(practiceBtn);
-  modeGrid.appendChild(timedBtn);
-  modeGrid.appendChild(examBtn);
-
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "close-modal";
-  closeBtn.type = "button";
-  closeBtn.textContent = "إلغاء";
-  closeBtn.setAttribute("aria-label", "إغلاق النافذة");
-  closeBtn.onclick = () => modal.remove();
-
-  modalCard.appendChild(h2);
-  modalCard.appendChild(p);
-  modalCard.appendChild(modeGrid);
-  modalCard.appendChild(closeBtn);
-
-  modal.appendChild(modalCard);
-  document.body.appendChild(modal);
-
-  // Focus first button
-  const firstBtn = modeGrid.querySelector("button");
-  if (firstBtn) {
-    setTimeout(() => firstBtn.focus(), 100);
-  }
-
-  // Close on Escape
-  const escapeHandler = (e) => {
-    if (e.key === "Escape") {
-      modal.remove();
-      document.removeEventListener("keydown", escapeHandler);
-    }
-  };
-  document.addEventListener("keydown", escapeHandler);
-}
-
-function createModeButton(icon, title, description, onClick) {
-  const btn = document.createElement("button");
-  btn.className = "mode-btn";
-  btn.type = "button";
-  btn.setAttribute("aria-label", `${title}: ${description}`);
-  btn.onclick = onClick;
-
-  let iconElement;
-  if (!isURL_orPath(icon)) {
-    iconElement = document.createElement("span");
-    iconElement.className = "icon";
-    iconElement.textContent = icon;
-    iconElement.setAttribute("aria-hidden", "true");
-  } else {
-    iconElement = document.createElement("img");
-    iconElement.className = "icon";
-    iconElement.src = icon;
-    iconElement.alt = "";
-    iconElement.setAttribute("aria-hidden", "true");
-  }
-
-  const strong = document.createElement("strong");
-  strong.textContent = title;
-
-  const small = document.createElement("small");
-  small.textContent = description;
-
-  btn.appendChild(iconElement);
-  btn.appendChild(strong);
-  btn.appendChild(small);
-
-  return btn;
 }
 
 // Helper: URL or relative path Check
@@ -2015,31 +1902,8 @@ function showUserQuizDownloadPopup(quiz) {
 
   const questions = quiz.questions;
 
-  const loadPdfLib = () =>
-    new Promise((resolve, reject) => {
-      if (window.jspdf && window.jspdf.jsPDF) {
-        resolve();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("PDF library failed to load"));
-      document.head.appendChild(s);
-    });
-
   const onDownloadOption = async (format) => {
     modal.remove();
-
-    if (format === "pdf") {
-      try {
-        await loadPdfLib();
-      } catch {
-        alert("PDF library could not be loaded.");
-        return;
-      }
-    }
 
     try {
       switch (format) {
