@@ -59,9 +59,11 @@ function bindOptionCards(name) {
     const wrap = radio.closest(".option-card");
     if (!wrap) return;
     wrap.addEventListener("click", () => {
-      document.querySelectorAll(`.option-cards input[name="${name}"]`).forEach((r) => {
-        r.closest(".option-card")?.classList.remove("selected");
-      });
+      document
+        .querySelectorAll(`.option-cards input[name="${name}"]`)
+        .forEach((r) => {
+          r.closest(".option-card")?.classList.remove("selected");
+        });
       wrap.classList.add("selected");
       radio.checked = true;
     });
@@ -83,12 +85,22 @@ function setupCascade() {
         : getAvailableYears(categoryTree, faculty);
     yearSelect.innerHTML =
       '<option value="All">All Years</option>' +
-      years.map((y) => `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`).join("");
+      years
+        .map(
+          (y) =>
+            `<option value="${escapeHtml(y)}">العام ${escapeHtml(y)}</option>`,
+        )
+        .join("");
     yearSelect.value = "All";
     const terms = getAvailableTerms(categoryTree, faculty, "All");
     termSelect.innerHTML =
       '<option value="All">All Terms</option>' +
-      terms.map((t) => `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`).join("");
+      terms
+        .map(
+          (t) =>
+            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
+        )
+        .join("");
     termSelect.value = "All";
   });
 
@@ -99,7 +111,12 @@ function setupCascade() {
     const current = termSelect.value;
     termSelect.innerHTML =
       '<option value="All">All Terms</option>' +
-      terms.map((t) => `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`).join("");
+      terms
+        .map(
+          (t) =>
+            `<option value="${escapeHtml(t)}">الترم ${escapeHtml(t)}</option>`,
+        )
+        .join("");
     if (terms.includes(current)) termSelect.value = current;
     else termSelect.value = "All";
   });
@@ -114,7 +131,12 @@ function populateAcademic(faculty, year, term) {
 
   facultySelect.innerHTML =
     '<option value="All">All Faculties</option>' +
-    metadata.faculties.map((f) => `<option value="${escapeHtml(f)}" ${f === faculty ? "selected" : ""}>${escapeHtml(f)}</option>`).join("");
+    metadata.faculties
+      .map(
+        (f) =>
+          `<option value="${escapeHtml(f)}" ${f === faculty ? "selected" : ""}>${escapeHtml(f)}</option>`,
+      )
+      .join("");
 
   const years =
     faculty === "All"
@@ -122,23 +144,93 @@ function populateAcademic(faculty, year, term) {
       : getAvailableYears(categoryTree, faculty);
   yearSelect.innerHTML =
     '<option value="All">All Years</option>' +
-    years.map((y) => `<option value="${escapeHtml(y)}" ${y === year ? "selected" : ""}>العام ${escapeHtml(y)}</option>`).join("");
+    years
+      .map(
+        (y) =>
+          `<option value="${escapeHtml(y)}" ${y === year ? "selected" : ""}>العام ${escapeHtml(y)}</option>`,
+      )
+      .join("");
 
   const terms = getAvailableTerms(categoryTree, faculty, year);
   termSelect.innerHTML =
     '<option value="All">All Terms</option>' +
-    terms.map((t) => `<option value="${escapeHtml(t)}" ${t === term ? "selected" : ""}>الترم ${escapeHtml(t)}</option>`).join("");
+    terms
+      .map(
+        (t) =>
+          `<option value="${escapeHtml(t)}" ${t === term ? "selected" : ""}>الترم ${escapeHtml(t)}</option>`,
+      )
+      .join("");
 }
 
 function showFeedback(message, isError = false) {
   const el = document.getElementById("saveFeedback");
   if (!el) return;
   el.textContent = message;
-  el.style.color = isError ? "var(--color-error)" : "var(--color-success)";
+  el.style.color = isError
+    ? "var(--color-error, red)"
+    : "var(--color-success, green)";
   if (message) {
-    setTimeout(() => { el.textContent = ""; }, 3000);
+    setTimeout(() => {
+      el.textContent = "";
+    }, 3000);
   }
 }
+
+// --- Course Manager Logic ---
+function renderCourseManagerList() {
+  const listContainer = document.getElementById("courseManagerList");
+  if (!listContainer) return;
+
+  const faculty = document.getElementById("settingsFaculty")?.value;
+  const year = document.getElementById("settingsYear")?.value;
+  const term = document.getElementById("settingsTerm")?.value;
+
+  const tempProfile = {
+    faculty: faculty === "All" ? null : faculty,
+    year: year === "All" ? null : year,
+    term: term === "All" ? null : term,
+  };
+
+  const allCourses = filterCourses(categoryTree, tempProfile);
+  const subscribedIds = userProfile.getSubscribedCourseIds();
+
+  if (allCourses.length === 0) {
+    listContainer.innerHTML =
+      '<p style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--color-text-secondary);">لا توجد مواد تطابق خيارات العرض الحالية</p>';
+    return;
+  }
+
+  listContainer.innerHTML = allCourses
+    .map((course) => {
+      const isSubscribed = subscribedIds.includes(course.id);
+      return `
+      <div class="course-item">
+        <div class="course-info">
+          <h4>${escapeHtml(course.name)}</h4>
+          <p class="course-details">
+            ${escapeHtml(course.faculty)} | ${course.year} | ${course.term}
+          </p>
+        </div>
+        <label class="toggle-container">
+            <input type="checkbox" onchange="toggleCourseSubscription('${escapeHtml(course.id)}')" ${isSubscribed ? "checked" : ""}>
+            <span class="toggle-switch"></span>
+        </label>
+      </div>
+    `;
+    })
+    .join("");
+}
+
+window.toggleCourseSubscription = function (courseId) {
+  try {
+    userProfile.toggleSubscription(courseId);
+    // No need to re-render entire list, checkbox state is enough
+    // But if we want to update UI feedback or something?
+    // Let's leave it simple.
+  } catch (error) {
+    console.error("Error toggling subscription:", error);
+  }
+};
 
 async function init() {
   try {
@@ -154,8 +246,22 @@ async function init() {
   const nameInput = document.getElementById("settingsName");
   if (nameInput) nameInput.value = profile.username || "";
 
-  populateAcademic(profile.faculty || "All", profile.year || "All", profile.term || "All");
+  populateAcademic(
+    profile.faculty || "All",
+    profile.year || "All",
+    profile.term || "All",
+  );
   setupCascade();
+
+  // Render initial course list
+  renderCourseManagerList();
+
+  // Update course list when academic info changes
+  ["settingsFaculty", "settingsYear", "settingsTerm"].forEach((id) => {
+    document
+      .getElementById(id)
+      ?.addEventListener("change", renderCourseManagerList);
+  });
 
   setOptionCardsSelection("quizStyle", profile.quizStyle || "pagination");
   setOptionCardsSelection("defaultMode", profile.defaultQuizMode || "practice");
@@ -172,8 +278,12 @@ async function init() {
     const faculty = document.getElementById("settingsFaculty")?.value;
     const year = document.getElementById("settingsYear")?.value;
     const term = document.getElementById("settingsTerm")?.value;
-    const quizStyle = form.querySelector('input[name="quizStyle"]:checked')?.value || "pagination";
-    const defaultMode = form.querySelector('input[name="defaultMode"]:checked')?.value || "practice";
+    const quizStyle =
+      form.querySelector('input[name="quizStyle"]:checked')?.value ||
+      "pagination";
+    const defaultMode =
+      form.querySelector('input[name="defaultMode"]:checked')?.value ||
+      "practice";
 
     if (username) {
       const validation = validateUsername(username);
