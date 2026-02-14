@@ -30,7 +30,6 @@
 
     <link rel="stylesheet" href="src/styles/themes.css">
     <link rel="stylesheet" href="src/styles/settings.css">
-    <link rel="stylesheet" href="src/components/side-menu.css">
 </head>
 
 <body>
@@ -39,7 +38,7 @@
 
         <header class="settings-header">
             <h1>⚙️ الإعدادات</h1>
-            <p>خصّص اسمك، معلوماتك الأكاديمية، وأسلوب الاختبار</p>
+            <p>خصّص اسمك، معلوماتك الأكاديمية، والمواد التي تدرسها</p>
         </header>
 
         <form id="settingsForm">
@@ -78,6 +77,17 @@
                 </div>
             </section>
 
+            <!-- Course Subscriptions (Moved from Main Page) -->
+            <section class="settings-card" aria-labelledby="courses-heading">
+                <h2 id="courses-heading"><span>🎓</span> اشتراكات المواد</h2>
+                <p class="profile-hint">حدد المواد التي تريد متابعتها في اللوحة الرئيسية</p>
+
+                <div id="courseManagerList" class="course-list-grid">
+                    <!-- Javascript will populate this list -->
+                    <div style="padding:20px; text-align:center;">جاري تحميل المواد...</div>
+                </div>
+            </section>
+
             <!-- Quiz style -->
             <section class="settings-card" aria-labelledby="quiz-style-heading">
                 <h2 id="quiz-style-heading"><span>📋</span> شكل الاختبار</h2>
@@ -113,7 +123,7 @@
                             aria-describedby="mode-practice-desc">
                         <div class="option-card-content">
                             <div class="option-card-title">تدريب (Practice)</div>
-                            <div class="option-card-desc" id="mode-practice-desc">مؤقت اختياري، ورؤية الإجابات بعد الحل
+                            <div class="option-card-desc" id="mode-practice-desc">رؤية الإجابات بعد الحل
                             </div>
                         </div>
                     </label>

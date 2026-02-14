@@ -524,464 +524,6 @@ window.closeProfileModal = function () {
 };
 
 // ============================================================================
-// FIRST-TIME USER EXPERIENCE (ONBOARDING WIZARD)
-// ============================================================================
-
-/**
- * Faculty icons mapping for visual selection
- */
-const facultyIcons = {
-  Medicine: "🩺",
-  Pharmacy: "💊",
-  Dentistry: "🦷",
-  Engineering: "⚙️",
-  Science: "🔬",
-  Arts: "🎨",
-  Law: "⚖️",
-  Commerce: "📊",
-  "Computer Science": "💻",
-  Nursing: "🏥",
-  Agriculture: "🌾",
-  Veterinary: "🐾",
-  Education: "📚",
-  default: "📖",
-};
-
-/**
- * Get icon for a faculty
- */
-function getFacultyIcon(faculty) {
-  return facultyIcons[faculty] || facultyIcons.default;
-}
-
-/**
- * Show the onboarding wizard for first-time users
- */
-function showOnboardingWizard() {
-  const metadata = extractMetadata(categoryTree);
-
-  // Wizard state
-  let currentStep = 1;
-  let selectedFaculty = null;
-  let selectedYear = null;
-  let selectedTerm = null;
-
-  // Create overlay
-  const overlay = document.createElement("div");
-  overlay.className = "onboarding-overlay";
-  overlay.id = "onboardingWizard";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-labelledby", "onboardingTitle");
-
-  // Create card
-  const card = document.createElement("div");
-  card.className = "onboarding-card";
-
-  // Render function
-  function render() {
-    card.innerHTML = "";
-
-    // Skip button
-    const skipBtn = document.createElement("button");
-    skipBtn.className = "onboarding-skip";
-    skipBtn.textContent = "تخطي الآن";
-    skipBtn.type = "button";
-    skipBtn.setAttribute("aria-label", "تخطي عملية الإعداد");
-    skipBtn.onclick = () => closeOnboarding();
-    card.appendChild(skipBtn);
-
-    // Progress dots
-    const progress = document.createElement("div");
-    progress.className = "onboarding-progress";
-    progress.setAttribute("role", "progressbar");
-    progress.setAttribute("aria-valuemin", "1");
-    progress.setAttribute("aria-valuemax", "3");
-    progress.setAttribute("aria-valuenow", currentStep.toString());
-
-    for (let i = 1; i <= 3; i++) {
-      const dot = document.createElement("div");
-      dot.className = "progress-dot";
-      if (i < currentStep) dot.classList.add("completed");
-      if (i === currentStep) dot.classList.add("active");
-      progress.appendChild(dot);
-    }
-    card.appendChild(progress);
-
-    // Step content
-    const stepContainer = document.createElement("div");
-    stepContainer.className = "onboarding-step";
-
-    if (currentStep === 1) {
-      renderFacultyStep(stepContainer);
-    } else if (currentStep === 2) {
-      renderYearStep(stepContainer);
-    } else if (currentStep === 3) {
-      renderTermStep(stepContainer);
-    }
-
-    card.appendChild(stepContainer);
-
-    // Navigation
-    const nav = document.createElement("div");
-    nav.className = "onboarding-nav";
-
-    if (currentStep < 3) {
-      const nextBtn = document.createElement("button");
-      nextBtn.className = "onboarding-btn primary";
-      nextBtn.textContent = "→ التالي";
-      nextBtn.type = "button";
-      nextBtn.disabled =
-        (currentStep === 1 && !selectedFaculty) ||
-        (currentStep === 2 && !selectedYear);
-      nextBtn.setAttribute("aria-label", "الانتقال للخطوة التالية");
-      if (nextBtn.disabled) {
-        nextBtn.setAttribute("aria-disabled", "true");
-      }
-      nextBtn.onclick = () => {
-        currentStep++;
-        render();
-      };
-      nav.appendChild(nextBtn);
-    } else {
-      const finishBtn = document.createElement("button");
-      finishBtn.className = "onboarding-btn finish";
-      finishBtn.textContent = "🎉 ابدأ الآن";
-      finishBtn.type = "button";
-      finishBtn.disabled = !selectedTerm;
-      finishBtn.setAttribute("aria-label", "إنهاء الإعداد والبدء");
-      if (finishBtn.disabled) {
-        finishBtn.setAttribute("aria-disabled", "true");
-      }
-      finishBtn.onclick = () => finishOnboarding();
-      nav.appendChild(finishBtn);
-    }
-
-    if (currentStep > 1) {
-      const backBtn = document.createElement("button");
-      backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "السابق ←";
-      backBtn.type = "button";
-      backBtn.setAttribute("aria-label", "الرجوع للخطوة السابقة");
-      backBtn.onclick = () => {
-        currentStep--;
-        render();
-      };
-      nav.appendChild(backBtn);
-    } else {
-      // Spacer
-      nav.appendChild(document.createElement("div"));
-    }
-
-    card.appendChild(nav);
-  }
-
-  function renderFacultyStep(container) {
-    const header = document.createElement("div");
-    header.className = "onboarding-header";
-    header.innerHTML = `
-      <h2 id="onboardingTitle">👋 مرحباً بك في منصة إمتحانات بصمجي</h2>
-      <p>دعنا نحسن تجربتك. ما هي كليتك؟</p>
-    `;
-    container.appendChild(header);
-
-    const grid = document.createElement("div");
-    grid.className = "faculty-grid";
-    grid.setAttribute("role", "group");
-    grid.setAttribute("aria-label", "اختر كليتك");
-
-    metadata.faculties.forEach((faculty) => {
-      const option = document.createElement("button");
-      option.className = "faculty-option";
-      option.type = "button";
-      option.setAttribute(
-        "aria-pressed",
-        selectedFaculty === faculty ? "true" : "false",
-      );
-      if (selectedFaculty === faculty) option.classList.add("selected");
-      option.innerHTML = `
-        <span class="faculty-icon" aria-hidden="true">${getFacultyIcon(faculty)}</span>
-        <span class="faculty-name">${escapeHtml(faculty)}</span>
-      `;
-      option.onclick = () => {
-        selectedFaculty = faculty;
-        // Reset year and term when faculty changes
-        selectedYear = null;
-        selectedTerm = null;
-        render();
-      };
-      grid.appendChild(option);
-    });
-
-    container.appendChild(grid);
-  }
-
-  function renderYearStep(container) {
-    const header = document.createElement("div");
-    header.className = "onboarding-header";
-    header.innerHTML = `
-      <h2 id="onboardingTitle">اختر العام الدراسي 📅</h2>
-      <p>في أي سنة دراسية أنت الآن؟</p>
-    `;
-    container.appendChild(header);
-
-    const availableYears = getAvailableYears(categoryTree, selectedFaculty);
-
-    if (availableYears.length === 0) {
-      const noOptions = document.createElement("div");
-      noOptions.className = "no-options-message";
-      noOptions.textContent = "No years available for this faculty yet.";
-      container.appendChild(noOptions);
-      return;
-    }
-
-    const pills = document.createElement("div");
-    pills.className = "year-pills";
-    pills.setAttribute("role", "group");
-    pills.setAttribute("aria-label", "اختر العام الدراسي");
-
-    availableYears.forEach((year) => {
-      const pill = document.createElement("button");
-      pill.className = "year-pill";
-      pill.type = "button";
-      pill.setAttribute(
-        "aria-pressed",
-        selectedYear === year ? "true" : "false",
-      );
-      if (selectedYear === year) pill.classList.add("selected");
-      pill.textContent = `العام ${year}`;
-      pill.onclick = () => {
-        selectedYear = year;
-        // Reset term when year changes
-        selectedTerm = null;
-        render();
-      };
-      pills.appendChild(pill);
-    });
-
-    container.appendChild(pills);
-  }
-
-  function renderTermStep(container) {
-    const header = document.createElement("div");
-    header.className = "onboarding-header";
-    header.innerHTML = `
-      <h2 id="onboardingTitle">📚 اختر الترم</h2>
-      <p>في أي فصل دراسي تدرس؟</p>
-    `;
-    container.appendChild(header);
-
-    const availableTerms = getAvailableTerms(
-      categoryTree,
-      selectedFaculty,
-      selectedYear,
-    );
-
-    if (availableTerms.length === 0) {
-      const noOptions = document.createElement("div");
-      noOptions.className = "no-options-message";
-      noOptions.textContent = "No terms available for this selection yet.";
-      container.appendChild(noOptions);
-      return;
-    }
-
-    const toggle = document.createElement("div");
-    toggle.className = "term-toggle";
-    toggle.setAttribute("role", "group");
-    toggle.setAttribute("aria-label", "اختر الترم");
-
-    availableTerms.forEach((term) => {
-      const btn = document.createElement("button");
-      btn.className = "term-btn";
-      btn.type = "button";
-      btn.setAttribute(
-        "aria-pressed",
-        selectedTerm === term ? "true" : "false",
-      );
-      if (selectedTerm === term) btn.classList.add("selected");
-      btn.innerHTML = `
-        <span class="term-icon" aria-hidden="true">${term === "1" ? "🍂" : "🌸"}</span>
-        <span>الترم ${term}</span>
-      `;
-      btn.onclick = () => {
-        selectedTerm = term;
-        render();
-      };
-      toggle.appendChild(btn);
-    });
-
-    container.appendChild(toggle);
-  }
-
-  function closeOnboarding() {
-    overlay.remove();
-    renderRootCategories();
-  }
-
-  function finishOnboarding() {
-    try {
-      // Save the selections
-      userProfile.saveInitialSetup(
-        {
-          faculty: selectedFaculty,
-          year: selectedYear,
-          term: selectedTerm,
-        },
-        categoryTree,
-      );
-
-      // Update welcome message
-      updateWelcomeMessage();
-
-      // Close wizard and render courses
-      overlay.remove();
-      renderRootCategories();
-
-      showNotification("مرحباً!", "تم إعداد حسابك بنجاح", "./favicon.png");
-    } catch (error) {
-      console.error("Error finishing onboarding:", error);
-      alert("حدث خطأ أثناء حفظ الإعدادات. حاول مرة أخرى.");
-    }
-  }
-
-  // Initial render
-  render();
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  // Focus first interactive element
-  const firstButton = card.querySelector("button");
-  if (firstButton) {
-    setTimeout(() => firstButton.focus(), 100);
-  }
-}
-
-// ============================================================================
-// COURSE SUBSCRIPTION MANAGEMENT
-// ============================================================================
-
-window.openCourseManager = function () {
-  try {
-    const modal = document.createElement("div");
-    modal.className = "modal-overlay";
-    modal.id = "courseManagerModal";
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "courseManagerTitle");
-
-    const modalCard = document.createElement("div");
-    modalCard.className = "modal-card course-manager-modal";
-
-    modalCard.innerHTML = `
-      <h2 id="courseManagerTitle">📚 إدارة المواد</h2>
-      <p class="modal-subtitle">اختر المواد التي تريد متابعتها</p>
-      
-      <div id="courseManagerList" class="course-list">
-        <!-- Content will be rendered by renderCourseManagerList() -->
-      </div>
-      
-      <div class="modal-actions">
-        <button class="profile-btn primary" 
-                onclick="window.closeCourseManager()"
-                type="button"
-                aria-label="إغلاق">
-          ✓ تم
-        </button>
-      </div>
-    `;
-
-    modal.appendChild(modalCard);
-    document.body.appendChild(modal);
-
-    // Render course list
-    renderCourseManagerList();
-
-    // Close on overlay click
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) window.closeCourseManager();
-    });
-
-    // Close on Escape key
-    const escapeHandler = (e) => {
-      if (e.key === "Escape") {
-        window.closeCourseManager();
-        document.removeEventListener("keydown", escapeHandler);
-      }
-    };
-    document.addEventListener("keydown", escapeHandler);
-  } catch (error) {
-    console.error("Error opening course manager:", error);
-    alert("حدث خطأ أثناء فتح إدارة المواد. حاول مرة أخرى.");
-  }
-};
-
-function renderCourseManagerList() {
-  const listContainer = document.getElementById("courseManagerList");
-  if (!listContainer) return;
-
-  const subscribedIds = userProfile.getSubscribedCourseIds();
-  const allCourses = filterCourses(categoryTree, userProfile.getProfile());
-
-  listContainer.innerHTML = allCourses
-    .map((course) => {
-      const isSubscribed = subscribedIds.includes(course.id);
-      return `
-      <div class="course-item">
-        <div class="course-info">
-          <h4>${escapeHtml(course.name)}</h4>
-          <p class="course-details">
-            ${escapeHtml(course.faculty)} | العام ${escapeHtml(
-              course.year,
-            )} | الترم ${escapeHtml(course.term)}
-          </p>
-        </div>
-        <button 
-          class="course-toggle-btn ${isSubscribed ? "active" : ""}"
-          onclick="window.toggleCourseSubscription('${escapeHtml(course.id)}')"
-          type="button"
-          aria-pressed="${isSubscribed ? "true" : "false"}"
-          aria-label="${isSubscribed ? "إلغاء الاشتراك في" : "الاشتراك في"} ${escapeHtml(course.name)}"
-        >
-          ${isSubscribed ? "✓ Subscribed" : "+ Subscribe"}
-        </button>
-      </div>
-    `;
-    })
-    .join("");
-}
-
-window.toggleCourseSubscription = function (courseId) {
-  try {
-    userProfile.toggleSubscription(courseId);
-    renderCourseManagerList();
-  } catch (error) {
-    console.error("Error toggling subscription:", error);
-  }
-};
-
-window.closeCourseManager = function () {
-  try {
-    const modal = document.getElementById("courseManagerModal");
-    if (modal) {
-      modal.remove();
-
-      // Return focus to trigger
-      const trigger = document.querySelector(
-        '[data-action="openCourseManager"]',
-      );
-      if (trigger) {
-        trigger.focus();
-      }
-    }
-
-    // Refresh main view
-    renderRootCategories();
-  } catch (error) {
-    console.error("Error closing course manager:", error);
-  }
-};
-
-// ============================================================================
 // NAVIGATION & RENDERING
 // ============================================================================
 
@@ -1007,12 +549,17 @@ async function initApp() {
     console.error("Failed to load quiz manifest:", err);
     categoryTree = {};
   }
+
+  // Check for first time visit
   try {
-    if (userProfile.checkFirstVisit()) {
-      showOnboardingWizard();
-    } else {
-      renderRootCategories();
+    const hasVisited = localStorage.getItem("first_visit_complete");
+    if (!hasVisited && userProfile.checkFirstVisit()) {
+      // Redirect to onboarding
+      window.location.href = "onboarding.html";
+      return;
     }
+
+    renderRootCategories();
   } catch (error) {
     console.error("Error initializing:", error);
     renderRootCategories();
@@ -1596,14 +1143,44 @@ function createExamCard(exam) {
       title: exam.title || exam.id,
       path: exam.path,
     };
-    let mod;
+    // Load exam data (HANDLES .js vs .json issue)
+    let questions = [];
     try {
-      mod = await import(config.path);
+      const path = config.path;
+      if (path.endsWith(".json")) {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        questions = data.questions;
+      } else if (path.endsWith(".js")) {
+        // Try fetching as JSON first if it might be a mislabeled path
+        // But if it's really a JS file with export, we use import
+        // The issue reported is 404 on .js because the file is .json
+        // Let's try to check: if 404 on .js, try replacing with .json
+        try {
+          mod = await import(config.path);
+          questions = mod.questions;
+        } catch (jsErr) {
+          console.warn(
+            "Failed to load as JS, trying JSON substitute...",
+            jsErr,
+          );
+          const jsonPath = config.path.replace(/\.js$/, ".json");
+          const res = await fetch(jsonPath);
+          if (!res.ok) throw new Error("Failed to load as JSON as well");
+          const data = await res.json();
+          questions = data.questions;
+        }
+      } else {
+        // Fallback
+        mod = await import(config.path);
+        questions = mod.questions;
+      }
     } catch (e) {
-      alert("Failed to load exam.");
+      console.error("Load failed", e);
+      alert("Failed to load exam data.");
       return;
     }
-    const questions = mod.questions;
     try {
       switch (format) {
         case "quiz":

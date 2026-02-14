@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرحباً بك | منصة إمتحانات بصمجي</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="src/styles/onboarding.css">
+
+    <script>
+        // Redirect if already onboarded (optional check, main logic in index.js)
+        if (localStorage.getItem('first_visit_complete') === 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="wizard-container">
+        <div class="wizard-header" style="position: relative;">
+            <h1>إعداد حسابك</h1>
+            <p>لنستعد لتجربة تعليمية مخصصة لك</p>
+            <button id="skipBtn" class="btn btn-secondary"
+                style="position: absolute; top: 30px; left: 40px; border: 1px solid rgba(0,0,0,0.1);">تخطي</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-step active"></div> <!-- Name -->
+            <div class="progress-step"></div> <!-- Faculty -->
+            <div class="progress-step"></div> <!-- Year -->
+            <div class="progress-step"></div> <!-- Term -->
+            <div class="progress-step"></div> <!-- Preferences -->
+            <div class="progress-step"></div> <!-- Courses -->
+            <div class="progress-step"></div> <!-- Welcome -->
+        </div>
+
+        <div class="wizard-content">
+
+            <!-- Step 0: Name -->
+            <div id="step-0" class="step-panel active">
+                <h2 class="step-title">ما هو اسمك؟</h2>
+                <div class="input-group">
+                    <label for="nameInput">الاسم بالكامل</label>
+                    <input type="text" id="nameInput" class="form-input" placeholder="اكتب اسمك هنا..." autofocus>
+                </div>
+            </div>
+
+            <!-- Step 1: Faculty -->
+            <div id="step-1" class="step-panel">
+                <h2 class="step-title">في أي كلية تدرس؟</h2>
+                <div id="facultyGrid" class="cards-grid">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+
+            <!-- Step 2: Year -->
+            <div id="step-2" class="step-panel">
+                <h2 class="step-title">أي سنة دراسية؟</h2>
+                <div id="yearGrid" class="cards-grid"></div>
+            </div>
+
+            <!-- Step 3: Term -->
+            <div id="step-3" class="step-panel">
+                <h2 class="step-title">أي تيرم؟</h2>
+                <div id="termGrid" class="cards-grid"></div>
+            </div>
+
+            <!-- Step 4: Preferences -->
+            <div id="step-4" class="step-panel">
+                <h2 class="step-title">تفضيلات الاختبار</h2>
+
+                <h3 style="font-size:1rem; margin-bottom:10px;">وضع الاختبار المفضل</h3>
+                <div class="cards-grid" style="margin-bottom:20px;">
+                    <label class="selection-card selected" onclick="updatePreference('defaultMode', 'practice')">
+                        <input type="radio" name="defaultMode" value="practice" style="display:none" checked>
+                        <div class="card-icon">🎯</div>
+                        <div class="card-content">
+                            <div class="card-label">تدريب (Practice)</div>
+                            <div class="card-desc">رؤية الإجابات بعد الحل</div>
+                        </div>
+                    </label>
+                    <label class="selection-card" onclick="updatePreference('defaultMode', 'timed')">
+                        <input type="radio" name="defaultMode" value="timed" style="display:none">
+                        <div class="card-icon">⌛</div>
+                        <div class="card-content">
+                            <div class="card-label">مؤقت (Timed)</div>
+                            <div class="card-desc">30 ثانية لكل سؤال</div>
+                        </div>
+                    </label>
+                    <label class="selection-card" onclick="updatePreference('defaultMode', 'exam')">
+                        <input type="radio" name="defaultMode" value="exam" style="display:none">
+                        <div class="card-icon">⏱️</div>
+                        <div class="card-content">
+                            <div class="card-label">امتحان (Exam)</div>
+                            <div class="card-desc">بدون إجابات أثناء الاختبار</div>
+                        </div>
+                    </label>
+                </div>
+
+                <h3 style="font-size:1rem; margin-bottom:10px;">نمط عرض الأسئلة</h3>
+                <div class="cards-grid">
+                    <label class="selection-card selected" onclick="updatePreference('quizStyle', 'pagination')">
+                        <input type="radio" name="quizStyle" value="pagination" style="display:none" checked>
+                        <div class="card-icon">📄</div>
+                        <div class="card-content">
+                            <div class="card-label">سؤال بسؤال (Pagination)</div>
+                            <div class="card-desc">سؤال واحد في الصفحة</div>
+                        </div>
+                    </label>
+                    <label class="selection-card" onclick="updatePreference('quizStyle', 'vertical')">
+                        <input type="radio" name="quizStyle" value="vertical" style="display:none">
+                        <div class="card-icon">📜</div>
+                        <div class="card-content">
+                            <div class="card-label">قائمة طويلة (Vertical)</div>
+                            <div class="card-desc">جميع الأسئلة في صفحة واحدة</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 5: Courses -->
+            <div id="step-5" class="step-panel">
+                <h2 class="step-title">اختر موادك</h2>
+                <div class="filters-container">
+                    <select id="courseFacultyFilter" class="filter-select"></select>
+                    <select id="courseYearFilter" class="filter-select"></select>
+                    <select id="courseTermFilter" class="filter-select"></select>
+                </div>
+                <div id="coursesList" class="course-list"></div>
+            </div>
+
+            <!-- Step 6: Welcome -->
+            <div id="step-6" class="step-panel">
+                <div class="welcome-step">
+                    <div class="welcome-icon">🎉</div>
+                    <h2 id="welcomeMsg">أهلاً بك!</h2>
+                    <p>تم إعداد حسابك بنجاح. نتمنى لك تجربة تعليمية ممتعة.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="wizard-actions">
+            <button id="prevBtn" class="btn btn-secondary">السابق</button>
+            <button id="nextBtn" class="btn btn-primary">التالي</button>
+        </div>
+    </div>
+
+    <script type="module" src="src/scripts/onboarding.js"></script>
+</body>
+
+</html>
