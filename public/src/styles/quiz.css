@@ -428,6 +428,7 @@ body {
   font-weight: 700;
   line-height: 1.5;
   margin-bottom: 20px;
+  direction: ltr;
 }
 
 /* Question Image */
@@ -548,6 +549,7 @@ body {
   border: 2px solid var(--color-border);
   cursor: pointer;
   transition: all 0.3s ease;
+  direction: ltr;
 }
 
 .option-row:hover {

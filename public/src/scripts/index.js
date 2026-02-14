@@ -610,7 +610,7 @@ function showOnboardingWizard() {
     if (currentStep < 3) {
       const nextBtn = document.createElement("button");
       nextBtn.className = "onboarding-btn primary";
-      nextBtn.textContent = "التالي →";
+      nextBtn.textContent = "→ التالي";
       nextBtn.type = "button";
       nextBtn.disabled =
         (currentStep === 1 && !selectedFaculty) ||
@@ -641,7 +641,7 @@ function showOnboardingWizard() {
     if (currentStep > 1) {
       const backBtn = document.createElement("button");
       backBtn.className = "onboarding-btn secondary";
-      backBtn.textContent = "← السابق";
+      backBtn.textContent = "السابق ←";
       backBtn.type = "button";
       backBtn.setAttribute("aria-label", "الرجوع للخطوة السابقة");
       backBtn.onclick = () => {

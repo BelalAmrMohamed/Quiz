@@ -971,13 +971,16 @@ function checkAnswer() {
 
 // === Utilities ===
 function updateNav() {
-  if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
-
-  if (els.nextBtn) {
-    els.nextBtn.style.display =
-      currentIdx === questions.length - 1 ? "none" : "inline-block";
+  // Handle Previous Button
+  if (els.prevBtn) {
+    els.prevBtn.disabled = currentIdx === 0;
   }
 
+  if (els.nextBtn) {
+    const isLastQuestion = currentIdx === questions.length - 1;
+    els.nextBtn.style.display = "inline-block";
+    els.nextBtn.disabled = isLastQuestion;
+  }
   if (els.finishBtn) {
     els.finishBtn.style.display = "flex";
     const totalLocked = Object.keys(lockedQuestions).length;
