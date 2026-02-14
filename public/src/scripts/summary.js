@@ -1,5 +1,5 @@
 // src/scripts/summary.js
-import { examList } from "../../data/quiz-manifest.js";
+import { getManifest } from "./quizManifest.js";
 
 // Download functions
 import { exportToQuiz } from "./exportToQuiz.js";
@@ -46,6 +46,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const exportHtmlBtn = document.getElementById("exportHtmlBtn");
   const exportQuizBtn = document.getElementById("exportQuizBtn");
 
+  let examList = [];
+  try {
+    const manifest = await getManifest();
+    examList = manifest.examList || [];
+  } catch (e) {
+    console.error("Failed to load manifest", e);
+  }
+
   const config = examList.find((e) => e.id === result.examId) || {
     id: result.examId,
     title: result.examTitle || "User Quiz",
@@ -56,8 +64,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   let questions = [];
   if (config.path) {
     try {
-      const module = await import(config.path);
-      questions = module.questions;
+      const baseUrl = new URL(import.meta.url);
+      const quizUrl = new URL(config.path, baseUrl);
+      if (config.path.toLowerCase().endsWith(".json")) {
+        const res = await fetch(quizUrl.href);
+        if (res.ok) {
+          const data = await res.json();
+          questions = data.questions || [];
+        }
+      } else {
+        const loaded = await import(quizUrl.href);
+        questions = loaded.questions || [];
+      }
     } catch (e) {
       console.error("Failed to load questions", e);
     }

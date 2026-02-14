@@ -1,0 +1,120 @@
+{
+  "questions": [
+    {
+      "q": "What is a 'Data Structure'?",
+      "options": [
+        "The way data is organized in a computer's memory",
+        "The physical metal inside a CPU",
+        "The keyboard layout",
+        "A type of internet virus"
+      ],
+      "correct": 0,
+      "explanation": "Data structures (like Arrays) help us store data so we can use it efficiently."
+    },
+    {
+      "q": "What is an 'Algorithm'?",
+      "options": [
+        "A type of computer screen",
+        "A step-by-step procedure to solve a problem",
+        "The name of a software company",
+        "A digital photo"
+      ],
+      "correct": 1,
+      "explanation": "An algorithm is like a recipe for a computer to follow."
+    },
+    {
+      "q": "Which data structure is like a 'stack' of plates (last one in is the first one out)?",
+      "options": [
+        "Queue",
+        "Stack",
+        "Tree",
+        "Graph"
+      ],
+      "correct": 1,
+      "explanation": "A Stack follows the LIFO (Last-In, First-Out) principle."
+    },
+    {
+      "q": "If you want to find a name in a sorted phonebook, which method is faster?",
+      "options": [
+        "Checking every page one by one",
+        "Binary Search (splitting the book in half repeatedly)",
+        "Closing your eyes and guessing",
+        "Waiting for someone to call"
+      ],
+      "correct": 1,
+      "explanation": "Binary search is much faster for sorted data than a linear search."
+    },
+    {
+      "q": "What is an 'Array'?",
+      "options": [
+        "A collection of items stored at contiguous memory locations",
+        "A single number",
+        "A type of cable",
+        "A computer fan"
+      ],
+      "correct": 0,
+      "explanation": "Arrays are the most basic way to store a list of items of the same type."
+    },
+    {
+      "q": "True or False: A good algorithm should be fast and use as little memory as possible.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 0,
+      "explanation": "Efficiency in time and space is the goal of every programmer."
+    },
+    {
+      "q": "True or False: You can only have one 'correct' algorithm for a single problem.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 1,
+      "explanation": "Many different algorithms can solve the same problem; some are just faster than others."
+    },
+    {
+      "q": "True or False: A 'Queue' data structure is like a line at a grocery store (first in, first out).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 0,
+      "explanation": "Queues follow the FIFO (First-In, First-Out) principle."
+    },
+    {
+      "q": "True or False: Sorting an array means putting the elements in a specific order (like A to Z).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 0,
+      "explanation": "Sorting is one of the most fundamental tasks in computer science."
+    },
+    {
+      "q": "True or False: Data structures have nothing to do with how fast a program runs.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 1,
+      "explanation": "Choosing the wrong data structure can make a program very slow."
+    },
+    {
+      "q": "What is the difference between a Data Structure and an Algorithm?",
+      "options": [
+        "A data structure is a way to store data, while an algorithm is the set of steps used to process or manipulate that data."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "Give an example of an algorithm you use in real life.",
+      "options": [
+        "Following a recipe to bake a cake or following directions on a map to reach a destination."
+      ],
+      "correct": 0,
+      "explanation": ""
+    }
+  ]
+}

@@ -3,8 +3,10 @@
 // All original functionality preserved + improvements added
 // ============================================================================
 
-import { categoryTree } from "../../data/quiz-manifest.js";
+import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
+
+let categoryTree = null;
 
 // Download functions
 import { exportToQuiz } from "./exportToQuiz.js";
@@ -977,19 +979,25 @@ function getCategoriesLazy() {
   return categoriesCache;
 }
 
-// Initialize - Check for first-time user
-try {
-  if (userProfile.checkFirstVisit()) {
-    // First visit: show onboarding wizard
-    showOnboardingWizard();
-  } else {
-    // Returning user: render courses directly
+// Initialize after manifest is loaded (called from DOMContentLoaded)
+async function initApp() {
+  try {
+    const manifest = await getManifest();
+    categoryTree = manifest.categoryTree;
+  } catch (err) {
+    console.error("Failed to load quiz manifest:", err);
+    categoryTree = {};
+  }
+  try {
+    if (userProfile.checkFirstVisit()) {
+      showOnboardingWizard();
+    } else {
+      renderRootCategories();
+    }
+  } catch (error) {
+    console.error("Error initializing:", error);
     renderRootCategories();
   }
-} catch (error) {
-  console.error("Error initializing:", error);
-  // Fallback to root categories
-  renderRootCategories();
 }
 
 function renderRootCategories() {
@@ -1917,6 +1925,11 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  initApp().catch((err) => {
+    console.error("Init error:", err);
+    if (typeof renderRootCategories === "function") renderRootCategories();
+  });
+
   const installBtn = document.querySelector(".install-app");
   if (installBtn) {
     installBtn.style.display = "none";

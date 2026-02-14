@@ -1,0 +1,553 @@
+{
+  "questions": [
+    {
+      "q": "What is a thread?",
+      "options": [
+        "A complete program",
+        "A lightweight process within a process",
+        "A system call",
+        "A memory management unit"
+      ],
+      "correct": 1,
+      "explanation": "A thread is the smallest unit of execution within a process; it's 'lightweight' because it shares resources with other threads."
+    },
+    {
+      "q": "Threads within the same process share:",
+      "options": [
+        "Registers",
+        "Stack",
+        "Code and data",
+        "Program counter"
+      ],
+      "correct": 2,
+      "explanation": "While each thread has its own stack and registers, they all share the same memory (code and data) of the parent process."
+    },
+    {
+      "q": "Which of the following is NOT a benefit of multithreading?",
+      "options": [
+        "Responsiveness",
+        "Resource sharing",
+        "Higher security",
+        "Economy"
+      ],
+      "correct": 2,
+      "explanation": "Multithreading doesn't inherently increase security; in fact, shared memory can sometimes make it harder to protect data."
+    },
+    {
+      "q": "In a multithreaded server, when a request arrives, the server:",
+      "options": [
+        "Ignores it",
+        "Creates a new process",
+        "Creates a new thread",
+        "Shuts down"
+      ],
+      "correct": 2,
+      "explanation": "Creating a new thread is much faster than creating a whole new process to handle a request."
+    },
+    {
+      "q": "Which term refers to performing multiple tasks simultaneously on multiple cores?",
+      "options": [
+        "Concurrency",
+        "Parallelism",
+        "Multitasking",
+        "Serial execution"
+      ],
+      "correct": 1,
+      "explanation": "Parallelism is doing multiple things at the exact same time; Concurrency is making progress on multiple things over time."
+    },
+    {
+      "q": "Data parallelism refers to:",
+      "options": [
+        "Different operations on different data",
+        "Same operation on subsets of data across cores",
+        "One thread per core",
+        "Sequential processing"
+      ],
+      "correct": 1,
+      "explanation": "This is like giving 4 people the same math problem but different numbers to work on simultaneously."
+    },
+    {
+      "q": "Amdahl's Law is used to predict:",
+      "options": [
+        "Memory usage",
+        "Speedup from adding cores",
+        "Power consumption",
+        "Network latency"
+      ],
+      "correct": 1,
+      "explanation": "It calculates the maximum improvement you can get by adding more CPUs to a program that has a serial portion."
+    },
+    {
+      "q": "User threads are managed by:",
+      "options": [
+        "Operating system kernel",
+        "User-level thread library",
+        "Hardware",
+        "BIOS"
+      ],
+      "correct": 1,
+      "explanation": "User threads are handled by a library (like Pthreads) without the OS kernel being involved."
+    },
+    {
+      "q": "Which threading model maps many user threads to one kernel thread?",
+      "options": [
+        "One-to-One",
+        "Many-to-Many",
+        "Many-to-One",
+        "Two-level"
+      ],
+      "correct": 2,
+      "explanation": "The Many-to-One model handles all threads via a single kernel entry; if one blocks, they all block."
+    },
+    {
+      "q": "In the One-to-One threading model, each user thread maps to:",
+      "options": [
+        "One kernel thread",
+        "One LWP",
+        "One process",
+        "One CPU core"
+      ],
+      "correct": 0,
+      "explanation": "Every user thread created results in a corresponding kernel thread being created."
+    },
+    {
+      "q": "Which operating system uses the One-to-One threading model?",
+      "options": [
+        "Solaris Green Threads",
+        "GNU Portable Threads",
+        "Windows",
+        "None of the above"
+      ],
+      "correct": 2,
+      "explanation": "Modern Windows and Linux systems primarily use the One-to-One model for better performance."
+    },
+    {
+      "q": "The Many-to-Many model allows:",
+      "options": [
+        "One user thread per kernel thread",
+        "Many user threads to many kernel threads",
+        "Only one kernel thread",
+        "No user threads"
+      ],
+      "correct": 1,
+      "explanation": "It multiplexes many user-level threads onto a smaller or equal number of kernel threads."
+    },
+    {
+      "q": "Pthreads is a thread API standard for:",
+      "options": [
+        "Windows only",
+        "Java only",
+        "UNIX-like systems",
+        "macOS only"
+      ],
+      "correct": 2,
+      "explanation": "POSIX threads (Pthreads) is the standard for Linux, Solaris, and other UNIX systems."
+    },
+    {
+      "q": "In Pthreads, which function creates a thread?",
+      "options": [
+        "pthread_create()",
+        "pthread_join()",
+        "pthread_exit()",
+        "pthread_cancel()"
+      ],
+      "correct": 0,
+      "explanation": "The name clearly defines its purpose: creating a new thread of execution."
+    },
+    {
+      "q": "Which Windows function creates a thread?",
+      "options": [
+        "CreateProcess()",
+        "CreateThread()",
+        "BeginThread()",
+        "NewThread()"
+      ],
+      "correct": 1,
+      "explanation": "Windows uses CreateThread() for threads and CreateProcess() for entire programs."
+    },
+    {
+      "q": "Java threads are managed by:",
+      "options": [
+        "Operating system",
+        "Java Virtual Machine (JVM)",
+        "CPU directly",
+        "Web browser"
+      ],
+      "correct": 1,
+      "explanation": "The JVM handles thread creation and management across different operating systems."
+    },
+    {
+      "q": "Implicit threading is managed by:",
+      "options": [
+        "Programmer",
+        "Compiler and runtime libraries",
+        "Kernel only",
+        "Hardware scheduler"
+      ],
+      "correct": 1,
+      "explanation": "The programmer identifies 'what' should be parallel, and the library/compiler decides 'how' to run the threads."
+    },
+    {
+      "q": "Which is NOT an implicit threading method?",
+      "options": [
+        "Thread pools",
+        "OpenMP",
+        "Grand Central Dispatch",
+        "Pthreads"
+      ],
+      "correct": 3,
+      "explanation": "Pthreads is explicit; the programmer must manually create and manage every thread."
+    },
+    {
+      "q": "A thread pool is used to:",
+      "options": [
+        "Increase memory usage",
+        "Limit number of threads",
+        "Slow down execution",
+        "Prevent multithreading"
+      ],
+      "correct": 1,
+      "explanation": "A pool keeps threads ready for use, preventing the system from being overwhelmed by too many threads."
+    },
+    {
+      "q": "OpenMP is used for:",
+      "options": [
+        "Distributed systems",
+        "Shared-memory parallel programming",
+        "Real-time systems",
+        "Database management"
+      ],
+      "correct": 1,
+      "explanation": "OpenMP uses directives to make C/C++ code run in parallel on shared-memory systems."
+    },
+    {
+      "q": "Grand Central Dispatch is associated with:",
+      "options": [
+        "Windows",
+        "Linux",
+        "Apple systems",
+        "Android"
+      ],
+      "correct": 2,
+      "explanation": "GCD is a technology developed by Apple for macOS and iOS."
+    },
+    {
+      "q": "In a multithreaded program, fork() may:",
+      "options": [
+        "Duplicate all threads",
+        "Duplicate only the calling thread",
+        "Not work at all",
+        "Always fail"
+      ],
+      "correct": 1,
+      "explanation": "Most modern UNIX systems provide a version of fork that only copies the thread that called it."
+    },
+    {
+      "q": "Signals in UNIX are used to:",
+      "options": [
+        "Manage memory",
+        "Notify processes of events",
+        "Create threads",
+        "Schedule CPUs"
+      ],
+      "correct": 1,
+      "explanation": "Signals are like software interrupts that tell a process something happened (like Ctrl+C)."
+    },
+    {
+      "q": "Thread cancellation types include:",
+      "options": [
+        "Asynchronous and deferred",
+        "Immediate and delayed",
+        "Soft and hard",
+        "User and kernel"
+      ],
+      "correct": 0,
+      "explanation": "Asynchronous kills the thread instantly; deferred lets the thread finish its current task safely."
+    },
+    {
+      "q": "Thread-Local Storage (TLS) is used to:",
+      "options": [
+        "Share data between threads",
+        "Give each thread its own copy of data",
+        "Store kernel data",
+        "Manage CPU registers"
+      ],
+      "correct": 1,
+      "explanation": "TLS allows a thread to have its own unique variables that aren't shared with other threads."
+    },
+    {
+      "q": "Scheduler activations are used in which threading model?",
+      "options": [
+        "Many-to-One",
+        "One-to-One",
+        "Many-to-Many",
+        "One-to-Many"
+      ],
+      "correct": 2,
+      "explanation": "They help the kernel communicate with the thread library to manage LWPs efficiently."
+    },
+    {
+      "q": "Lightweight Process (LWP) acts as:",
+      "options": [
+        "A virtual processor",
+        "A system call",
+        "A memory block",
+        "A network socket"
+      ],
+      "correct": 0,
+      "explanation": "An LWP is a data structure that sits between user threads and kernel threads."
+    },
+    {
+      "q": "Windows threads use which mapping model?",
+      "options": [
+        "Many-to-One",
+        "One-to-One",
+        "Many-to-Many",
+        "Two-level"
+      ],
+      "correct": 1,
+      "explanation": "Windows creates a kernel thread for every user thread."
+    },
+    {
+      "q": "In Windows, the thread environment block (TEB) stores:",
+      "options": [
+        "Kernel stack",
+        "User stack and TLS",
+        "Scheduling info",
+        "Process list"
+      ],
+      "correct": 1,
+      "explanation": "The TEB is a user-space structure containing the thread's local data."
+    },
+    {
+      "q": "Linux uses which system call to create threads?",
+      "options": [
+        "fork()",
+        "clone()",
+        "thread()",
+        "exec()"
+      ],
+      "correct": 1,
+      "explanation": "clone() is powerful because it allows the programmer to choose exactly what resources to share."
+    },
+    {
+      "q": "The clone() system call in Linux can share:",
+      "options": [
+        "Memory space",
+        "File descriptors",
+        "Signal handlers",
+        "All of the above"
+      ],
+      "correct": 3,
+      "explanation": "The flags passed to clone() determine how much the parent and child share."
+    },
+    {
+      "q": "Concurrency is possible on:",
+      "options": [
+        "Multi-core only",
+        "Single-core only",
+        "Both single and multi-core"
+      ],
+      "correct": 2,
+      "explanation": "Concurrency just means tasks overlap in time; on a single core, this is done by switching back and forth fast."
+    },
+    {
+      "q": "Parallelism is possible on:",
+      "options": [
+        "Single-core systems",
+        "Multi-core systems",
+        "Both",
+        "Neither"
+      ],
+      "correct": 1,
+      "explanation": "Parallelism requires multiple hardware units (cores) to do two things at the exact same instant."
+    },
+    {
+      "q": "Which is NOT a challenge in multicore programming?",
+      "options": [
+        "Data splitting",
+        "Testing and debugging",
+        "Higher clock speed",
+        "Data dependency"
+      ],
+      "correct": 2,
+      "explanation": "Clock speed is a hardware trait; it isn't a programming challenge like splitting data is."
+    },
+    {
+      "q": "Task parallelism refers to:",
+      "options": [
+        "Same task on multiple data sets",
+        "Different tasks on different cores",
+        "Sequential execution",
+        "Single-threaded processing"
+      ],
+      "correct": 1,
+      "explanation": "This is like having one person cook while another person cleans the dishes at the same time."
+    },
+    {
+      "q": "The primary thread libraries mentioned are:",
+      "options": [
+        "Pthreads, Windows threads, Java threads",
+        "C threads, Python threads, Ruby threads",
+        "Kernel threads, system threads, user threads",
+        "Hard threads, soft threads, light threads"
+      ],
+      "correct": 0,
+      "explanation": "These are the three most common standard APIs for thread management."
+    },
+    {
+      "q": "In the Many-to-One model, if one thread blocks:",
+      "options": [
+        "Only that thread blocks",
+        "All threads block",
+        "Kernel threads are created",
+        "Process terminates"
+      ],
+      "correct": 1,
+      "explanation": "Since the kernel only sees one thread, if that one thread waits for I/O, the entire process is put to sleep."
+    },
+    {
+      "q": "The Two-level model is similar to:",
+      "options": [
+        "Many-to-One",
+        "One-to-One",
+        "Many-to-Many",
+        "One-to-Many"
+      ],
+      "correct": 2,
+      "explanation": "It's a variation of Many-to-Many that also allows a user thread to be bound strictly to a kernel thread."
+    },
+    {
+      "q": "A thread library can be implemented in:",
+      "options": [
+        "User space only",
+        "Kernel space only",
+        "Both user and kernel space",
+        "Hardware only"
+      ],
+      "correct": 2,
+      "explanation": "Libraries can either be purely user-level or utilize OS kernel support."
+    },
+    {
+      "q": "Pthreads is a:",
+      "options": [
+        "Implementation",
+        "Specification",
+        "Hardware feature",
+        "Programming language"
+      ],
+      "correct": 1,
+      "explanation": "It defines the 'behavior' required; different OSes might implement that behavior differently."
+    },
+    {
+      "q": "In the Pthreads example, pthread_join() is used to:",
+      "options": [
+        "Create a thread",
+        "Wait for a thread to finish",
+        "Cancel a thread",
+        "Schedule a thread"
+      ],
+      "correct": 1,
+      "explanation": "It's used to synchronize; the main thread waits at this point until the child thread is done."
+    },
+    {
+      "q": "Java threads are created by implementing:",
+      "options": [
+        "Thread class",
+        "Runnable interface",
+        "Executable interface",
+        "Startable class"
+      ],
+      "correct": 1,
+      "explanation": "The Runnable interface is the standard way to define the code that a thread will run."
+    },
+    {
+      "q": "OpenMP uses ________ to define parallel regions.",
+      "options": [
+        "Preprocessor directives",
+        "System calls",
+        "Function calls",
+        "Kernel modules"
+      ],
+      "correct": 0,
+      "explanation": "It uses #pragma directives to tell the compiler which parts of the code to parallelize."
+    },
+    {
+      "q": "Grand Central Dispatch uses ________ to encapsulate work.",
+      "options": [
+        "Functions",
+        "Blocks",
+        "Methods",
+        "Signals"
+      ],
+      "correct": 1,
+      "explanation": "Blocks (chunks of code) are submitted to dispatch queues to be executed."
+    },
+    {
+      "q": "Serial dispatch queues in GCD process blocks in:",
+      "options": [
+        "Random order",
+        "LIFO order",
+        "FIFO order",
+        "Priority order"
+      ],
+      "correct": 2,
+      "explanation": "First-In, First-Out; tasks are completed in the exact order they are added to the queue."
+    },
+    {
+      "q": "In thread cancellation, deferred cancellation allows the thread to:",
+      "options": [
+        "Be killed immediately",
+        "Check for cancellation at specific points",
+        "Never be cancelled",
+        "Cancel other threads"
+      ],
+      "correct": 1,
+      "explanation": "This is safer because the thread can clean up resources before it stops."
+    },
+    {
+      "q": "Thread-Local Storage is similar to:",
+      "options": [
+        "Global variables",
+        "Static variables but per-thread",
+        "Shared memory",
+        "Kernel data"
+      ],
+      "correct": 1,
+      "explanation": "It acts like a static variable but its value is unique to each individual thread."
+    },
+    {
+      "q": "Scheduler activations use ________ to communicate between kernel and thread library.",
+      "options": [
+        "Signals",
+        "Upcalls",
+        "Interrupts",
+        "Messages"
+      ],
+      "correct": 1,
+      "explanation": "Upcalls allow the kernel to tell the user-level thread library about events like a thread blocking."
+    },
+    {
+      "q": "Windows thread data structures include:",
+      "options": [
+        "ETHREAD, KTHREAD, TEB",
+        "PCB, TCB, LWP",
+        "Pthread, Kthread, Uthread",
+        "Thread, Process, Kernel"
+      ],
+      "correct": 0,
+      "explanation": "ETHREAD (Executive Thread), KTHREAD (Kernel Thread), and TEB (Thread Environment Block) are the specific names used in Windows."
+    },
+    {
+      "q": "Linux threads are referred to as:",
+      "options": [
+        "Threads",
+        "Tasks",
+        "Processes",
+        "LWPs"
+      ],
+      "correct": 1,
+      "explanation": "In Linux, the kernel doesn't distinguish much between processes and threads; it calls them both 'tasks'."
+    }
+  ]
+}
