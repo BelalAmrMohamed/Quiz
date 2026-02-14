@@ -14,7 +14,7 @@
  * - visual polish for Header/Footer
  */
 
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 let pptxgen;
 

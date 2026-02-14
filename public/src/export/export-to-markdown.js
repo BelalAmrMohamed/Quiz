@@ -2,7 +2,7 @@
 // Downloads the quiz as markdown (.md)
 // Deals with the export from both main page and results/summary page
 // No libraries used
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 const isEssayQuestion = (q) => q.options && q.options.length === 1;
 const isLocalPath = (url) => {

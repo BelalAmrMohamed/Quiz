@@ -1,7 +1,11 @@
 // src/scripts/quiz.js - Performance Optimized
 import { getManifest } from "./quizManifest.js";
 import { gameEngine } from "./gameEngine.js";
-import { showNotification, confirmationNotification } from "./notifications.js";
+import {
+  showNotification,
+  confirmationNotification,
+} from "../components/notifications.js";
+import { userProfile } from "./userProfile.js";
 
 showNotification(
   "الإمتحان بدأ",
@@ -26,6 +30,7 @@ let quizMode = "exam";
 let timeRemaining = 0;
 let viewMode = "grid";
 let autoSubmitTimeout = null;
+let quizStyle = "pagination"; // "pagination" | "vertical"
 
 // === Performance: Debounce helpers ===
 let renderNavDebounce = null;
@@ -59,6 +64,47 @@ window.restartQuiz = () => restart(); // Not implemented
 window.exitQuiz = () => exit();
 window.prevQuestion = () => nav(-1);
 window.nextQuestion = () => nav(1);
+
+// Vertical style: select option for a specific question
+window.handleSelectForQuestion = (qIdx, optIdx) => {
+  if (lockedQuestions[qIdx]) return;
+  userAnswers[qIdx] = optIdx;
+  saveStateDebounced();
+  renderQuestion();
+  renderMenuNavigationDebounced();
+  maybeAutoSubmit();
+};
+
+// Vertical style: check answer for a specific question
+window.checkAnswerForQuestion = (qIdx) => {
+  const q = questions[qIdx];
+  const isEssay = isEssayQuestion(q);
+  if (isEssay) {
+    const textarea = document.getElementById(`essayInput-${qIdx}`);
+    if (!textarea || !textarea.value.trim()) return;
+  } else {
+    if (userAnswers[qIdx] === undefined) return;
+  }
+  lockedQuestions[qIdx] = true;
+  saveStateDebounced();
+  renderQuestion();
+  renderMenuNavigationDebounced();
+  updateNav();
+};
+
+// Vertical style: essay input for a specific question
+window.handleEssayInputForQuestion = (qIdx) => {
+  if (lockedQuestions[qIdx]) return;
+  const textarea = document.getElementById(`essayInput-${qIdx}`);
+  if (textarea) {
+    userAnswers[qIdx] = textarea.value;
+    saveStateDebounced();
+    const checkBtn = textarea
+      .closest(".question-card")
+      ?.querySelector(".check-answer-btn");
+    if (checkBtn) checkBtn.disabled = !textarea.value.trim();
+  }
+};
 
 // === Helper: HTML Escaping ===
 const escapeHtml = (unsafe) => {
@@ -169,6 +215,13 @@ async function init() {
   // Load saved view mode
   const savedView = localStorage.getItem("quiz_view_mode");
   if (savedView) viewMode = savedView;
+
+  // Load quiz style (vertical = all questions at once, pagination = one per page)
+  quizStyle =
+    userProfile && userProfile.getQuizStyle
+      ? userProfile.getQuizStyle()
+      : localStorage.getItem("quiz_style") || "pagination";
+  if (quizStyle !== "vertical") quizStyle = "pagination";
 
   // Update view toggle button
   if (els.viewIcon && els.viewText) {
@@ -319,7 +372,10 @@ async function init() {
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
 
-      const questionCard = document.querySelector(".question-card");
+      const questionCard =
+        quizStyle === "vertical"
+          ? document.getElementById(`q-${idx}`)
+          : document.querySelector(".question-card");
       if (questionCard) {
         questionCard.scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -590,9 +646,128 @@ function updateMenuActionButtons() {
   }
 }
 
+// === Vertical style: build one question card HTML for index idx ===
+function buildVerticalQuestionCard(q, idx) {
+  const isEssay = isEssayQuestion(q);
+  const correctIdx = q.correct ?? q.answer;
+  const isLocked = !!lockedQuestions[idx];
+  const userSelected = userAnswers[idx];
+  const isBookmarked = gameEngine.isBookmarked(examId, idx);
+  const isFlagged = gameEngine.isFlagged(examId, idx);
+  const showCheckButton = quizMode !== "exam";
+  let feedbackClass = "feedback";
+  let feedbackText = "";
+  const explanationText =
+    q.explanation || q.desc || q.info || "No explanation provided.";
+
+  if (isLocked) {
+    let isCorrect;
+    if (isEssay) {
+      const userAnswer = String(userSelected || "")
+        .trim()
+        .toLowerCase();
+      const correctAnswer = String(q.options[0] || "")
+        .trim()
+        .toLowerCase();
+      isCorrect = userAnswer === correctAnswer;
+      feedbackClass += " essay-feedback show";
+      const statusMsg = isCorrect
+        ? "Your answer matches! ✅"
+        : "Your answer differs ⚠️";
+      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate.</div><div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
+    } else {
+      isCorrect = userSelected === correctIdx;
+      feedbackClass += isCorrect ? " correct show" : " wrong show";
+      const statusMsg = isCorrect ? "Correct ✅" : "Wrong ❌";
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
+    }
+  }
+
+  const actionBtns = `
+    <div class="question-actions">
+      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? "★" : "☆"}</button>
+      <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? "🚩" : "🏳️"}</button>
+    </div>
+  `;
+
+  const header = `
+    <div class="question-header">
+      <div class="question-number">سؤال ${idx + 1} من ${questions.length}</div>
+      ${actionBtns}
+    </div>
+    ${renderQuestionImage(q.image)}
+    <h2 class="question-text">${escapeHtml(q.q)}</h2>
+  `;
+
+  if (isEssay) {
+    return `
+      <div class="question-card vertical-question-card" data-question-index="${idx}" id="q-${idx}">
+        ${header}
+        <div class="essay-container">
+          <label for="essayInput-${idx}" class="essay-label">Your Answer:</label>
+          <textarea id="essayInput-${idx}" class="essay-textarea ${isLocked ? "locked" : ""}" placeholder="Type your answer here..." ${isLocked ? "disabled" : ""} oninput="window.handleEssayInputForQuestion(${idx})">${escapeHtml(userSelected || "")}</textarea>
+        </div>
+        <button class="check-answer-btn ${isLocked || !showCheckButton ? "hidden" : ""}" onclick="window.checkAnswerForQuestion(${idx})" ${!userSelected || String(userSelected).trim() === "" ? "disabled" : ""}>Check Answer</button>
+        <div class="${feedbackClass}">${feedbackText}</div>
+        ${isLocked ? `<div class="formal-answer"><strong>📝 Formal Answer:</strong><div class="formal-answer-text">${escapeHtml(q.options[0])}</div></div>` : ""}
+      </div>
+    `;
+  }
+
+  const optionsHtml = q.options
+    .map((opt, i) => {
+      const isSelected = userSelected === i;
+      let optionClass = "option-row";
+      if (isSelected) optionClass += " selected";
+      if (isLocked) {
+        optionClass += " locked";
+        if (i === correctIdx) optionClass += " correct";
+        if (isSelected && i !== correctIdx) optionClass += " wrong";
+      }
+      return `
+        <div class="${optionClass}" ${isLocked ? "" : `onclick="window.handleSelectForQuestion(${idx}, ${i})"`}>
+          <input type="radio" name="answer-${idx}" ${isSelected ? "checked" : ""} ${isLocked ? "disabled" : ""} aria-label="Option ${i + 1}">
+          <span class="option-label">${escapeHtml(opt)}</span>
+        </div>`;
+    })
+    .join("");
+
+  return `
+    <div class="question-card vertical-question-card" data-question-index="${idx}" id="q-${idx}">
+      ${header}
+      <div class="options-grid">${optionsHtml}</div>
+      <button class="check-answer-btn ${isLocked || !showCheckButton ? "hidden" : ""}" onclick="window.checkAnswerForQuestion(${idx})" ${userSelected === undefined ? "disabled" : ""}>Check Answer</button>
+      <div class="${feedbackClass}">${feedbackText}</div>
+    </div>
+  `;
+}
+
+function renderAllQuestionsVertical() {
+  if (!els.questionContainer || !questions.length) return;
+
+  const answeredCount = Object.keys(userAnswers).length;
+  const progressPercent = (answeredCount / questions.length) * 100;
+  if (els.progressFill) els.progressFill.style.width = `${progressPercent}%`;
+  if (els.progressText)
+    els.progressText.textContent = `${Math.round(progressPercent)}% (${answeredCount}/${questions.length})`;
+
+  els.questionContainer.innerHTML = questions
+    .map((q, idx) => buildVerticalQuestionCard(q, idx))
+    .join("");
+  els.questionContainer.classList.remove("loading");
+  els.questionContainer.classList.add("vertical-style");
+}
+
 // === Core: Render Question (unchanged logic, optimized DOM) ===
 function renderQuestion() {
   if (!questions.length) return;
+
+  if (quizStyle === "vertical") {
+    renderAllQuestionsVertical();
+    updateNav();
+    return;
+  }
+
   const q = questions[currentIdx];
   const isEssay = isEssayQuestion(q);
   const correctIdx = q.correct ?? q.answer;
@@ -816,6 +991,10 @@ function nav(dir) {
   renderQuestion();
   renderMenuNavigationDebounced();
   updateMenuActionButtons();
+  if (quizStyle === "vertical") {
+    const el = document.getElementById(`q-${currentIdx}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 async function finish(skipconfirmationNotification) {
@@ -971,15 +1150,22 @@ function checkAnswer() {
 
 // === Utilities ===
 function updateNav() {
-  // Handle Previous Button
-  if (els.prevBtn) {
-    els.prevBtn.disabled = currentIdx === 0;
-  }
-
-  if (els.nextBtn) {
-    const isLastQuestion = currentIdx === questions.length - 1;
-    els.nextBtn.style.display = "inline-block";
-    els.nextBtn.disabled = isLastQuestion;
+  if (quizStyle === "vertical") {
+    // In vertical mode, prev/next scroll to previous/next question card
+    if (els.prevBtn) {
+      els.prevBtn.disabled = currentIdx === 0;
+      els.prevBtn.textContent = "السابق ←";
+    }
+    if (els.nextBtn) {
+      els.nextBtn.disabled = currentIdx === questions.length - 1;
+      els.nextBtn.textContent = "→ التالي";
+    }
+  } else {
+    if (els.prevBtn) els.prevBtn.disabled = currentIdx === 0;
+    if (els.nextBtn) {
+      els.nextBtn.style.display = "inline-block";
+      els.nextBtn.disabled = currentIdx === questions.length - 1;
+    }
   }
   if (els.finishBtn) {
     els.finishBtn.style.display = "flex";

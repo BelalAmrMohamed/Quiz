@@ -2,15 +2,15 @@
 import { getManifest } from "./quizManifest.js";
 
 // Download functions
-import { exportToQuiz } from "./exportToQuiz.js";
-import { exportToHtml } from "./exportToHtml.js";
-import { exportToPdf } from "./exportToPdf.js";
-import { exportToWord } from "./exportToWord.js";
-import { exportToPptx } from "./exportToPptx.js";
-import { exportToMarkdown } from "./exportToMarkdown.js";
+import { exportToQuiz } from "../export/export-to-quiz.js";
+import { exportToHtml } from "../export/export-to-html.js";
+import { exportToPdf } from "../export/export-to-pdf.js";
+import { exportToWord } from "../export/export-to-word.js";
+import { exportToPptx } from "../export/export-to-pptx.js";
+import { exportToMarkdown } from "../export/export-to-markdown.js";
 
 // Notifications
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 // Helpers
 const currentName = localStorage.getItem("username") || "User";

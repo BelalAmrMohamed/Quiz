@@ -3,7 +3,7 @@
 // Deals with the export from both main page and results/summary page
 // `jsPDF` library used, included in the html. See => "summary.html"
 
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 const currentName = localStorage.getItem("username") || "User";
 

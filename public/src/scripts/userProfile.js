@@ -19,6 +19,8 @@ const DEFAULT_PROFILE = {
   year: "All",
   term: "All",
   subscribedCourseIds: [],
+  quizStyle: "pagination", // "pagination" | "vertical"
+  defaultQuizMode: "practice", // "practice" | "timed" | "exam"
 };
 
 export class UserProfileManager {
@@ -107,6 +109,38 @@ export class UserProfileManager {
     if (term !== undefined) this.profile.term = term;
 
     this.saveProfile();
+  }
+
+  /**
+   * Get/set quiz display style: "pagination" (one per page) or "vertical" (all at once)
+   */
+  getQuizStyle() {
+    return this.profile.quizStyle || DEFAULT_PROFILE.quizStyle;
+  }
+
+  setQuizStyle(style) {
+    if (style === "pagination" || style === "vertical") {
+      this.profile.quizStyle = style;
+      this.saveProfile();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get/set default quiz mode: "practice" | "timed" | "exam"
+   */
+  getDefaultQuizMode() {
+    return this.profile.defaultQuizMode || DEFAULT_PROFILE.defaultQuizMode;
+  }
+
+  setDefaultQuizMode(mode) {
+    if (mode === "practice" || mode === "timed" || mode === "exam") {
+      this.profile.defaultQuizMode = mode;
+      this.saveProfile();
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>الإعدادات | منصة إمتحانات بصمجي</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#0088cc">
+
+    <script>
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem("quiz_theme_pref") || "light";
+                const savedAnimations = localStorage.getItem("quiz_animations_pref") !== "disabled";
+                const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                document.documentElement.setAttribute("data-theme", savedTheme);
+                document.documentElement.setAttribute("data-animations", (savedAnimations && !reducedMotion) ? "enabled" : "disabled");
+            } catch (e) { console.error('Theme init:', e); }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="src/styles/themes.css">
+    <link rel="stylesheet" href="src/styles/settings.css">
+    <link rel="stylesheet" href="src/components/side-menu.css">
+</head>
+
+<body>
+    <div class="settings-page">
+        <a href="index.html" class="back-link">← الرجوع للرئيسية</a>
+
+        <header class="settings-header">
+            <h1>⚙️ الإعدادات</h1>
+            <p>خصّص اسمك، معلوماتك الأكاديمية، وأسلوب الاختبار</p>
+        </header>
+
+        <form id="settingsForm">
+            <!-- Personal -->
+            <section class="settings-card" aria-labelledby="personal-heading">
+                <h2 id="personal-heading"><span>👤</span> البيانات الشخصية</h2>
+                <div class="settings-row">
+                    <label for="settingsName">الاسم</label>
+                    <input type="text" id="settingsName" name="username" placeholder="أدخل اسمك" maxlength="50"
+                        autocomplete="name">
+                </div>
+            </section>
+
+            <!-- Academic -->
+            <section class="settings-card" aria-labelledby="academic-heading">
+                <h2 id="academic-heading"><span>📚</span> المعلومات الأكاديمية</h2>
+                <p class="profile-hint">تساعدنا على عرض المواد المناسبة لك</p>
+                <div class="settings-row">
+                    <label for="settingsFaculty">الكلية</label>
+                    <select id="settingsFaculty" name="faculty" aria-label="اختر الكلية">
+                        <option value="All">All Faculties</option>
+                        <!-- filled by JS -->
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <label for="settingsYear">العام</label>
+                    <select id="settingsYear" name="year" aria-label="اختر العام">
+                        <option value="All">All Years</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <label for="settingsTerm">الترم</label>
+                    <select id="settingsTerm" name="term" aria-label="اختر الترم">
+                        <option value="All">All Terms</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Quiz style -->
+            <section class="settings-card" aria-labelledby="quiz-style-heading">
+                <h2 id="quiz-style-heading"><span>📋</span> شكل الاختبار</h2>
+                <div class="option-cards" role="group" aria-labelledby="quiz-style-heading">
+                    <label class="option-card" id="style-pagination-wrap">
+                        <input type="radio" name="quizStyle" value="pagination" id="quizStylePagination"
+                            aria-describedby="style-pagination-desc">
+                        <div class="option-card-content">
+                            <div class="option-card-title">صفحة واحدة لكل سؤال (Pagination)</div>
+                            <div class="option-card-desc" id="style-pagination-desc">سؤال واحد في الصفحة مع أزرار التالي
+                                والسابق</div>
+                        </div>
+                    </label>
+                    <label class="option-card" id="style-vertical-wrap">
+                        <input type="radio" name="quizStyle" value="vertical" id="quizStyleVertical"
+                            aria-describedby="style-vertical-desc">
+                        <div class="option-card-content">
+                            <div class="option-card-title">جميع الأسئلة في صفحة واحدة (Vertical)</div>
+                            <div class="option-card-desc" id="style-vertical-desc">مثل نماذج جوجل: كل الأسئلة ظاهرة مع
+                                التمرير</div>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Default quiz mode -->
+            <section class="settings-card" aria-labelledby="mode-heading">
+                <h2 id="mode-heading"><span>🎯</span> وضع الاختبار الافتراضي</h2>
+                <p class="profile-hint">يُستخدم عند بدء أي اختبار دون سؤالك في كل مرة</p>
+                <div class="option-cards" role="group" aria-labelledby="mode-heading">
+                    <label class="option-card" id="mode-practice-wrap">
+                        <input type="radio" name="defaultMode" value="practice" id="defaultModePractice"
+                            aria-describedby="mode-practice-desc">
+                        <div class="option-card-content">
+                            <div class="option-card-title">تدريب (Practice)</div>
+                            <div class="option-card-desc" id="mode-practice-desc">مؤقت اختياري، ورؤية الإجابات بعد الحل
+                            </div>
+                        </div>
+                    </label>
+                    <label class="option-card" id="mode-timed-wrap">
+                        <input type="radio" name="defaultMode" value="timed" id="defaultModeTimed"
+                            aria-describedby="mode-timed-desc">
+                        <div class="option-card-content">
+                            <div class="option-card-title">مؤقت (Timed)</div>
+                            <div class="option-card-desc" id="mode-timed-desc">30 ثانية لكل سؤال</div>
+                        </div>
+                    </label>
+                    <label class="option-card" id="mode-exam-wrap">
+                        <input type="radio" name="defaultMode" value="exam" id="defaultModeExam"
+                            aria-describedby="mode-exam-desc">
+                        <div class="option-card-content">
+                            <div class="option-card-title">امتحان (Exam)</div>
+                            <div class="option-card-desc" id="mode-exam-desc">بدون إجابات أثناء الاختبار</div>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <button type="submit" class="btn-save">💾 حفظ الإعدادات</button>
+            <p id="saveFeedback" class="save-feedback" role="status" aria-live="polite"></p>
+        </form>
+    </div>
+
+    <script type="module" src="src/scripts/settings.js"></script>
+</body>
+
+</html>

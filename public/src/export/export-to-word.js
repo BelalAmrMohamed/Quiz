@@ -1,9 +1,9 @@
-// src/scripts/exportToWord.js
+// src/scripts/export-to-word.js
 // Downloads the quiz as a Word file (.docx)
 // Deals with the export from both main page and results/summary page
 // `docx` library used, included in this file.
 
-import { showNotification } from "./notifications.js";
+import { showNotification } from "../components/notifications.js";
 
 const currentName = localStorage.getItem("username") || "User";
 let docx;
