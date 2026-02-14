@@ -1,0 +1,32 @@
+{
+  "name": "examination-platform",
+  "version": "2.3.0",
+  "description": "Vanilla JS examination platform with quiz creation and export features",
+  "type": "module",
+  "scripts": {
+    "dev": "npx http-server public -p 8080 -o",
+    "build": "node scripts/build.js",
+    "generate-manifest": "node scripts/generate-exam-manifest.js",
+    "deploy:test": "node scripts/deploy-testing.js",
+    "deploy:prod": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1"
+  },
+  "keywords": [
+    "examination",
+    "quiz",
+    "education",
+    "vanilla-js"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "jspdf": "^2.5.1",
+    "pptxgenjs": "^3.12.0",
+    "docx": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -781,7 +781,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
     showNotification(
       "PowerPoint file downloaded.",
       "You have it now",
-      "./public/assets/images/pptx_icon.png",
+      "./assets/images/pptx_icon.png",
     );
 
     return true;

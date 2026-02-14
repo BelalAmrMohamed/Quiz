@@ -48,7 +48,7 @@ export const questions = [
   // Question 2 - Part B
   {
     q: "Consider the figure showing distances between four cities (A, B, C, D). Assuming the home city is A, find the shortest path for the salesman to travel and return home.",
-    image: "./public/assets/quiz-media/salesman-graph.png",
+    image: "./assets/quiz-media/salesman-graph.png",
     options: [
       "Shortest path using Exhaustive Search",
       "Shortest path using Nearest Neighbor Algorithm",
@@ -68,7 +68,7 @@ export const questions = [
   // Question 3 - Part B
   {
     q: "Apply the backtrack search algorithm on the provided graph where the start state is A and the desired goal state is K.",
-    image: "./public/assets/quiz-media/backtrack-graph.png",
+    image: "./assets/quiz-media/backtrack-graph.png",
     options: ["Show successive values of SL, NSL, DE, and CS"],
     correct: 0,
   },

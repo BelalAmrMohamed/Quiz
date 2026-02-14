@@ -1,6 +1,6 @@
 // src/scripts/dashboard.js - Enhanced with All Features
 import { gameEngine, BADGES } from "./gameEngine.js";
-import { examList } from "../../public/data/quiz-manifest.js";
+import { examList } from "../../data/quiz-manifest.js";
 
 import { confirmationNotification } from "./notifications.js";
 

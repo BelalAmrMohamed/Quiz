@@ -136,7 +136,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
   showNotification(
     "HTML file Downloaded",
     "You have it now",
-    "./public/assets/images/HTML_Icon.png",
+    "./assets/images/HTML_Icon.png",
   );
 }
 

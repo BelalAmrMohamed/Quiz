@@ -1,5 +1,5 @@
 // src/scripts/summary.js
-import { examList } from "../../public/data/quiz-manifest.js";
+import { examList } from "../../data/quiz-manifest.js";
 
 // Download functions
 import { exportToQuiz } from "./exportToQuiz.js";

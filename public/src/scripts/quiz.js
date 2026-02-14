@@ -1,12 +1,12 @@
 // src/scripts/quiz.js - Performance Optimized
-import { examList } from "../../public/data/quiz-manifest.js";
+import { examList } from "../../data/quiz-manifest.js";
 import { gameEngine } from "./gameEngine.js";
 import { showNotification, confirmationNotification } from "./notifications.js";
 
 showNotification(
   "الإمتحان بدأ",
   "أسأل الله لك التوفيق والسداد",
-  "./public/assets/images/صلى_على_النبي_2.png",
+  "./assets/images/صلى_على_النبي_2.png",
 );
 // D:\Code projects\Websites\Quiz\images\صلى على النبي.jpg
 // === MEMORY CACHE for exam modules ===

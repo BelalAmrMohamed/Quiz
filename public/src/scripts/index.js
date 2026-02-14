@@ -3,7 +3,7 @@
 // All original functionality preserved + improvements added
 // ============================================================================
 
-import { categoryTree } from "../../public/data/quiz-manifest.js";
+import { categoryTree } from "../../data/quiz-manifest.js";
 import { userProfile } from "./userProfile.js";
 
 // Download functions
@@ -70,7 +70,7 @@ function setInStorage(key, value) {
       showNotification(
         "تحذير",
         "مساحة التخزين ممتلئة. قد تفقد بعض البيانات.",
-        "./public/assets/images/warning.png",
+        "./assets/images/warning.png",
       );
     }
     return false;
@@ -123,11 +123,11 @@ const welcomeMessages = [
 
 const opts = [
   ["./favicon.png", "Quiz (.html)", "quiz"],
-  ["./public/assets/images/HTML_Icon.png", "HTML (.html)", "html"],
-  ["./public/assets/images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
-  ["./public/assets/images/word_icon.png", "Word (.docx)", "docx"],
-  ["./public/assets/images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
-  ["./public/assets/images/mardownIcon.png", "Markdown (.md)", "md"],
+  ["./assets/images/HTML_Icon.png", "HTML (.html)", "html"],
+  ["./assets/images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
+  ["./assets/images/word_icon.png", "Word (.docx)", "docx"],
+  ["./assets/images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
+  ["./assets/images/mardownIcon.png", "Markdown (.md)", "md"],
 ];
 
 /**
@@ -203,7 +203,7 @@ try {
   showNotification(
     "منصة إمتحانات بصمجي",
     `السلام عليكم يا ${escapeHtml(username)}`,
-    "./public/assets/images/السلام عليكم.png",
+    "./assets/images/السلام عليكم.png",
   );
 } catch (error) {
   console.error("Error showing welcome notification:", error);
@@ -1767,7 +1767,7 @@ function showModeSelection(examId, examTitle) {
   modeGrid.setAttribute("aria-label", "أوضاع الاختبار");
 
   const practiceBtn = createModeButton(
-    "./public/assets/images/quiz.png",
+    "./assets/images/quiz.png",
     "Practice",
     "يحتوي على مؤقت، ويمكنك رؤية إجابات الأسئلة بعد الحل",
     () => startQuiz(examId, "practice"),
@@ -1927,7 +1927,7 @@ document.addEventListener("DOMContentLoaded", () => {
           showNotification(
             "غير متاح",
             "التطبيق غير قابل للتثبيت في الوقت الحالي",
-            "./public/assets/images/warning.png",
+            "./assets/images/warning.png",
           );
           return;
         }

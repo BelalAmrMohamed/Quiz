@@ -335,8 +335,8 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body: event.data ? event.data.text() : "لديك إشعار جديد",
-    icon: "/public/assets/images/icon-192.png",
-    badge: "/public/assets/images/badge-72.png",
+    icon: "/assets/images/icon-192.png",
+    badge: "/assets/images/badge-72.png",
     vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
@@ -346,12 +346,12 @@ self.addEventListener("push", (event) => {
       {
         action: "explore",
         title: "عرض",
-        icon: "/public/assets/images/checkmark.png",
+        icon: "/assets/images/checkmark.png",
       },
       {
         action: "close",
         title: "إغلاق",
-        icon: "/public/assets/images/close.png",
+        icon: "/assets/images/close.png",
       },
     ],
   };

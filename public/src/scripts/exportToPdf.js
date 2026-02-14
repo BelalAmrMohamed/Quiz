@@ -1185,7 +1185,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     showNotification(
       "PDF file downloaded.",
       "You have it now",
-      "./public/assets/images/PDF_Icon.png",
+      "./assets/images/PDF_Icon.png",
     );
 
     return { success: true, filename };

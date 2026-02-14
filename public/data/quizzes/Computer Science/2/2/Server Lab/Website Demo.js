@@ -20,7 +20,7 @@ export const questions = [
   // Question with relative path image
   {
     q: "Is this component a CPU?",
-    image: "./public/assets/quiz-media/dashboard-thumbnail.jpg",
+    image: "./assets/quiz-media/dashboard-thumbnail.jpg",
     options: ["True", "False"],
     correct: 1,
     explanation:
