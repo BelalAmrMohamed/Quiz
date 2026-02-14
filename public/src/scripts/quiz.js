@@ -1,5 +1,5 @@
 // src/scripts/quiz.js - Performance Optimized
-import { examList } from "../../data/quiz-manifest.js";
+import { getManifest } from "./quizManifest.js";
 import { gameEngine } from "./gameEngine.js";
 import { showNotification, confirmationNotification } from "./notifications.js";
 
@@ -124,7 +124,7 @@ function toggleView() {
   updateMenuActionButtons();
 }
 
-// === OPTIMIZED: Load exam module with caching ===
+// === OPTIMIZED: Load exam JSON with caching ===
 async function loadExamModule(config) {
   // Check cache first
   if (examModuleCache.has(config.id)) {
@@ -132,9 +132,20 @@ async function loadExamModule(config) {
     return examModuleCache.get(config.id);
   }
 
-  // Load module
+  // Load quiz data: fetch .json or dynamic import .js
   console.log(`[Quiz] Loading exam: ${config.id}`);
-  const module = await import(config.path);
+  const baseUrl = new URL(import.meta.url);
+  const quizUrl = new URL(config.path, baseUrl);
+  let module;
+  if (config.path.toLowerCase().endsWith(".json")) {
+    const res = await fetch(quizUrl.href);
+    if (!res.ok) throw new Error(`Failed to load quiz: ${res.status}`);
+    const data = await res.json();
+    module = { questions: data.questions || [] };
+  } else {
+    const loaded = await import(quizUrl.href);
+    module = { questions: loaded.questions || [] };
+  }
 
   // Cache it
   examModuleCache.set(config.id, module);
@@ -202,6 +213,7 @@ async function init() {
       };
     } else {
       // === LOGIC FOR STANDARD EXAM (Original Code) ===
+      const { examList } = await getManifest();
       const config = examList.find((e) => e.id === examId);
 
       if (!config) {
@@ -216,7 +228,7 @@ async function init() {
 
       const parts = config.path.replace(/\\/g, "/").split("/");
       const filename = parts[parts.length - 1] || "";
-      const name = filename.replace(/\.js$/i, "").replace(/[_-]+/g, " ");
+      const name = filename.replace(/\.(json|js)$/i, "").replace(/[_-]+/g, " ");
       const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
       metaData = { title, category: parts[parts.length - 2] || "" };
     }

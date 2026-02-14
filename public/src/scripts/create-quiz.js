@@ -1287,17 +1287,14 @@ window.exportQuiz = function () {
         return question;
       });
 
-      const fileContent = `// ${quizData.title}${quizData.description ? "\n// " + quizData.description : ""}
-// Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+      const payload = { questions: exportQuestions };
+      const fileContent = JSON.stringify(payload, null, 2);
 
-export const questions = ${JSON.stringify(exportQuestions, null, 2)};
-`;
-
-      const blob = new Blob([fileContent], { type: "text/javascript" });
+      const blob = new Blob([fileContent], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${quizData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.js`;
+      a.download = `${quizData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1536,17 +1533,27 @@ window.processImport = function () {
   try {
     showLoading("جاري الاستيراد...");
 
-    // Extract questions array from the content
-    const match = content.match(
-      /export\s+const\s+questions\s*=\s*(\[[\s\S]*\])/,
-    );
+    let importedQuestions;
 
-    if (!match) {
-      throw new Error("تنسيق غير صحيح");
+    // Try JSON first (e.g. { "questions": [...] } or just [...])
+    const trimmed = content.trim();
+    if (trimmed.startsWith("{")) {
+      const data = JSON.parse(content);
+      importedQuestions = data.questions != null ? data.questions : data;
+    } else if (trimmed.startsWith("[")) {
+      importedQuestions = JSON.parse(content);
+    } else {
+      // Legacy: JS format export const questions = [...]
+      const match = content.match(
+        /export\s+const\s+questions\s*=\s*(\[[\s\S]*\])/,
+      );
+      if (!match) throw new Error("تنسيق غير صحيح (JSON أو export const questions)");
+      try {
+        importedQuestions = eval(`(${match[1]})`);
+      } catch (e) {
+        throw new Error("تنسيق غير صحيح");
+      }
     }
-
-    const questionsStr = match[1];
-    const importedQuestions = eval(`(${questionsStr})`);
 
     if (!Array.isArray(importedQuestions)) {
       throw new Error("البيانات المستوردة ليست مصفوفة");

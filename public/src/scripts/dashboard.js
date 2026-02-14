@@ -1,8 +1,10 @@
 // src/scripts/dashboard.js - Enhanced with All Features
 import { gameEngine, BADGES } from "./gameEngine.js";
-import { examList } from "../../data/quiz-manifest.js";
+import { getManifest } from "./quizManifest.js";
 
 import { confirmationNotification } from "./notifications.js";
+
+let examList = [];
 
 function refreshUI() {
   const user = gameEngine.getUserData();
@@ -59,7 +61,13 @@ window.changeUsername = function () {
   refreshUI();
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const manifest = await getManifest();
+    examList = manifest.examList || [];
+  } catch (err) {
+    console.error("Failed to load quiz manifest:", err);
+  }
   refreshUI();
 });
 

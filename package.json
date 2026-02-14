@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npx http-server public -p 8080 -o",
     "generate-manifest": "node scripts/generate-quiz-manifest.js",
+    "migrate-quiz-to-json": "node scripts/migrate-quiz-data-to-json.js",
     "deploy:test": "scripts\\deploy-to-testing.bat",
     "deploy:prod": "powershell -ExecutionPolicy Bypass -File scripts/deploy-to-Production.ps1"
   },

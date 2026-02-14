@@ -1,0 +1,120 @@
+{
+  "questions": [
+    {
+      "q": "What does the derivative of a function represent?",
+      "options": [
+        "The area under a curve",
+        "The rate of change or the slope of the curve",
+        "The total sum of all values",
+        "The starting point"
+      ],
+      "correct": 1,
+      "explanation": "Derivatives tell us how fast a value is changing at a specific moment."
+    },
+    {
+      "q": "What is the derivative of x² with respect to x?",
+      "options": [
+        "x",
+        "2",
+        "2x",
+        "x/2"
+      ],
+      "correct": 2,
+      "explanation": "Using the power rule, the exponent 2 comes to the front and decreases by 1."
+    },
+    {
+      "q": "In a right-angled triangle, what is the Sine of an angle?",
+      "options": [
+        "Adjacent / Hypotenuse",
+        "Opposite / Adjacent",
+        "Opposite / Hypotenuse",
+        "Hypotenuse / Opposite"
+      ],
+      "correct": 2,
+      "explanation": "Remember 'SOH'—Sine is Opposite over Hypotenuse."
+    },
+    {
+      "q": "What is the integral of 1 with respect to x?",
+      "options": [
+        "0",
+        "x + C",
+        "x²",
+        "1/x"
+      ],
+      "correct": 1,
+      "explanation": "Integration is the reverse of differentiation; the derivative of x is 1."
+    },
+    {
+      "q": "What is the sum of the interior angles of a triangle?",
+      "options": [
+        "90 degrees",
+        "180 degrees",
+        "360 degrees",
+        "270 degrees"
+      ],
+      "correct": 1,
+      "explanation": "This is a fundamental rule in Euclidean geometry."
+    },
+    {
+      "q": "True or False: Pi (π) is a rational number that can be written as a simple fraction.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 1,
+      "explanation": "Pi is irrational; its decimals go on forever without repeating a simple pattern."
+    },
+    {
+      "q": "True or False: A 'Matrix' is a rectangular array of numbers arranged in rows and columns.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 0,
+      "explanation": "Matrices are key tools in linear algebra and computer graphics."
+    },
+    {
+      "q": "True or False: The square root of a negative number is always a real number.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 1,
+      "explanation": "Square roots of negative numbers lead to the 'Imaginary' number system (i)."
+    },
+    {
+      "q": "True or False: Adding two matrices requires them to have the same dimensions.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 0,
+      "explanation": "You add each corresponding element, so the shapes must match."
+    },
+    {
+      "q": "True or False: Infinity is a specific number that you can reach by counting.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "correct": 1,
+      "explanation": "Infinity is a concept representing something without bound, not a reachable number."
+    },
+    {
+      "q": "In your own words, what is 'Integration' used for?",
+      "options": [
+        "Integration is primarily used to find the area under a curve or to accumulate quantities over time."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "What is a 'Function' in mathematics?",
+      "options": [
+        "A function is a relation that associates each input with exactly one output."
+      ],
+      "correct": 0,
+      "explanation": ""
+    }
+  ]
+}
