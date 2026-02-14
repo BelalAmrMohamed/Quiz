@@ -7,3 +7,6 @@
 
 # Service Worker cache
 sw-cache/
+
+# Broken file
+scripts/deploy-production.js

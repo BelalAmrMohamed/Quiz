@@ -17,6 +17,7 @@ function Print-Error ($message) {
 }
 
 try {
+    # Move to the parent directory
     Set-Location (Split-Path $PSScriptRoot -Parent)
     Write-Host "Working directory: $(Get-Location)" -ForegroundColor Green
 
