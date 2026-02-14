@@ -4,7 +4,7 @@ $host.ui.RawUI.WindowTitle = $title
 
 $mainBranch = "main"
 $prodBranch = "production"
-$nodeScript = "./generate-quiz-manifest.js"
+$nodeScript = "generate-quiz-manifest.js"
 
 function Print-Step ($message) {
     Write-Host "`n--- $message ---" -ForegroundColor Cyan
