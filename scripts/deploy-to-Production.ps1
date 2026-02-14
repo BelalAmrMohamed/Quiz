@@ -1,9 +1,9 @@
-$ErrorActionPreference = "Stop"
-$title = "GitHub Automation Tool"
-$host.ui.RawUI.WindowTitle = $title
+$ErrorActionPreference = "Stop" 
+$title = "GitHub Automation Tool" 
+$host.ui.RawUI.WindowTitle = $title 
 
-$mainBranch = "main"
-$prodBranch = "production"
+$mainBranch = "main" 
+$prodBranch = "production" 
 $nodeScript = "scripts/generate-quiz-manifest.js"
 
 function Print-Step ($message) {
