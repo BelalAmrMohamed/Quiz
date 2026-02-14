@@ -5,6 +5,9 @@
 !README.md
 !CHANGELOG.MD
 
+# Visula Studion files
+.vscode
+
 # Service Worker cache
 sw-cache/
 

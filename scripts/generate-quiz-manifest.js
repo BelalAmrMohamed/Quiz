@@ -2,9 +2,13 @@
 // The next line runs this file which generates ./public/data/quiz-manifest.js
 // >  node scripts/generate-quiz-manifest.js
 
-const fs = require("fs").promises;
-const path = require("path");
-const crypto = require("crypto");
+import fs from "fs/promises";
+import path from "path";
+import crypto from "crypto";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function walk(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -155,7 +159,7 @@ async function buildCategoryTree(examsDir, repoRoot) {
             .relative(dataDir, fullPath)
             .split(path.sep)
             .join("/");
-          if (!relPath.startsWith(".")) relPath = "./" + relPath;
+          if (!relPath.startsWith(".")) relPath = "../../data/" + relPath;
 
           const exam = {
             id: examId,
