@@ -2,13 +2,13 @@
 :: Sets the window title
 Title GitHub Automation Tool
 
-:: Move into the script's directory
+:: Move into the script's parent directory
 cd /d "%~dp0.."
 
 echo ----------------------------------------
 echo [1/4] Updating Manifest...
 echo ----------------------------------------
-node tools/generateExamManifest.js
+node scripts/generate-quiz-manifest.js
 
 :: Check if the node script failed
 if %ERRORLEVEL% NEQ 0 (
