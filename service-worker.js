@@ -13,15 +13,15 @@ const STATIC_ASSETS = [
   "/quiz.html",
   "/dashboard.html",
   "/create-quiz.html",
-  "/CSS/themes.css",
-  "/CSS/index.css",
-  "/CSS/side-menu.css",
-  "/CSS/notificatinos.css",
-  "/CSS/profile-styles.css",
-  "/Script/index.js",
-  "/Script/theme-controller.js",
-  "/Script/canvas-animation.js",
-  "/Script/side-menu.js",
+  "/src/styles/themes.css",
+  "/src/styles/index.css",
+  "/src/styles/side-menu.css",
+  "/src/styles/notificatinos.css",
+  "/src/styles/profile-styles.css",
+  "/src/scripts/index.js",
+  "/src/scripts/theme-controller.js",
+  "/src/scripts/canvas-animation.js",
+  "/src/scripts/side-menu.js",
   "/favicon.png",
   "/manifest.json",
 ];
@@ -141,7 +141,7 @@ self.addEventListener("fetch", (event) => {
       }),
     );
   } else {
-    // Network-first with cache fallback for HTML/CSS/JS
+    // Network-first with cache fallback for HTML/src/scripts/JS
     event.respondWith(networkFirstStrategy(request, DYNAMIC_CACHE));
   }
 });
@@ -335,8 +335,8 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body: event.data ? event.data.text() : "لديك إشعار جديد",
-    icon: "/images/icon-192.png",
-    badge: "/images/badge-72.png",
+    icon: "/public/assets/images/icon-192.png",
+    badge: "/public/assets/images/badge-72.png",
     vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
@@ -346,12 +346,12 @@ self.addEventListener("push", (event) => {
       {
         action: "explore",
         title: "عرض",
-        icon: "/images/checkmark.png",
+        icon: "/public/assets/images/checkmark.png",
       },
       {
         action: "close",
         title: "إغلاق",
-        icon: "/images/close.png",
+        icon: "/public/assets/images/close.png",
       },
     ],
   };

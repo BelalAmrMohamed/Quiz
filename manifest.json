@@ -21,43 +21,43 @@
       "purpose": "any"
     },
     {
-      "src": "images/icon.png",
+      "src": "public/assets/images/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/icon-16.png",
+      "src": "public/assets/images/icon-16.png",
       "sizes": "16x16",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/icon-32.png",
+      "src": "public/assets/images/icon-32.png",
       "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/icon-180.png",
+      "src": "public/assets/images/icon-180.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/icon-192.png",
+      "src": "public/assets/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/icon-512.png",
+      "src": "public/assets/images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/maskable-icon.png",
+      "src": "public/assets/images/maskable-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -65,14 +65,14 @@
   ],
   "screenshots": [
     {
-      "src": "images/screenshot-desktop.png",
+      "src": "public/assets/images/screenshot-desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "لوحة تحكم منصة بصمجي"
     },
     {
-      "src": "images/screenshot-mobile.png",
+      "src": "public/assets/images/screenshot-mobile.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "label": "واجهة الإمتحانات التفاعلية"
@@ -84,14 +84,18 @@
       "short_name": "إنشاء إمتحانات",
       "description": "صمم اختبارات، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح",
       "url": "/create-quiz.html",
-      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        { "src": "public/assets/images/icon-192.png", "sizes": "192x192" }
+      ]
     },
     {
       "name": "اللائحة",
       "short_name": "اللائحة",
       "description": "عرض تقدمك في الإمتحانات والأوسمة التي حصلت عليها",
       "url": "/dashboard.html",
-      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        { "src": "public/assets/images/icon-192.png", "sizes": "192x192" }
+      ]
     }
   ],
   "protocol_handlers": [

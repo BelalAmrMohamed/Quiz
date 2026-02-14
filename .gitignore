@@ -1,7 +1,5 @@
-*.bat
 *.md
 *.txt
-*.ps1
 
 !robots.txt
 !README.md
