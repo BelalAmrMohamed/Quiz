@@ -1,0 +1,41 @@
+# ------------------------------------
+# SITE CONFIGURATION
+# ------------------------------------
+title: "منصة إمتحانات بصمجي"
+description: "منصة تعليمية مجانية تضم مكتبة شاملة من الإمتحانات الخاصة بكلية الحاسبات والمعلومات."
+author: "Belal Amr Mohamed"
+email: "belalamrofficial@gmail.com"
+
+# ------------------------------------
+# URL SETTINGS (Fixed)
+# ------------------------------------
+url: "https://https://basmagi-quiz.vercel.app"
+baseurl: "/"
+
+# ------------------------------------
+# BUILD SETTINGS
+# ------------------------------------
+include:
+  - manifest.json
+  - service-worker.js
+  - robots.txt
+  - sitemap.xml
+  - Exams
+
+exclude:
+  - tools
+  - README.md
+  - LICENSE
+  - .gitignore
+
+# ------------------------------------
+# PLUGINS
+# ------------------------------------
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# ------------------------------------
+# THEME SETTINGS
+# ------------------------------------
+theme: null
