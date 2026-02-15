@@ -187,8 +187,8 @@ function renderCourseManagerList() {
 
   const tempProfile = {
     faculty: faculty === "All" ? null : faculty,
-    year: year === "All" ? null : year,
-    term: term === "All" ? null : term,
+    // year: year === "All" ? null : year,
+    // term: term === "All" ? null : term,
   };
 
   const allCourses = filterCourses(categoryTree, tempProfile);

@@ -7,6 +7,8 @@ import {
   filterCourses,
 } from "./filterUtils.js";
 
+import { showNotification } from "../components/notifications.js";
+
 let categoryTree = null;
 let currentStep = 0;
 const totalSteps = 6;
@@ -129,7 +131,7 @@ function validateStep() {
 
 async function nextStep() {
   if (!validateStep()) {
-    alert("الرجاء إكمال البيانات المطلوبة");
+    showNotification("الرجاء إكمال البيانات المطلوبة");
     return;
   }
 
@@ -173,9 +175,6 @@ function renderStep() {
 
 function renderFacultyStep() {
   const container = document.getElementById("facultyGrid");
-  // Remove early return to allow re-render on selection
-  // if (container.children.length > 0) return;
-
   const metadata = extractMetadata(categoryTree);
   container.innerHTML = metadata.faculties
     .map(
@@ -274,28 +273,17 @@ function renderCoursesStep() {
 }
 
 function updateTermOptionsBasedOnYear() {
-  // Logic to update term dropdown based on selected year (and faculty)
-  // to strictly show available terms.
-  const fVal = document.getElementById("courseFacultyFilter").value;
-  const yVal = document.getElementById("courseYearFilter").value;
+  const faculty_value = document.getElementById("courseFacultyFilter").value;
+  const year_value = document.getElementById("courseYearFilter").value;
   const tSelect = document.getElementById("courseTermFilter");
 
-  // Reset if Year is 'All' or Faculty is 'All' -> maybe just show standard 1/2?
-  // Or keep 'All'.
-  // Ideally we query getAvailableTerms(categoryTree, fVal, yVal)
-
-  // If 'All' is selected, we can't easily narrow down terms unless we list ALL terms from ALL years.
-  // Let's simplified: If Year is designated, show terms for that year.
-
   let terms = [];
-  if (fVal !== "All" && yVal !== "All") {
-    terms = getAvailableTerms(categoryTree, fVal, yVal);
+  if (faculty_value !== "All" && year_value !== "All") {
+    terms = getAvailableTerms(categoryTree, faculty_value, year_value);
   } else {
-    // Fallback or union? Let's just default to standard if uncertain
     terms = ["1", "2"];
   }
 
-  // Preserve current selection if possible
   const currentTerm = tSelect.value;
 
   tSelect.innerHTML =
@@ -350,15 +338,15 @@ function setupCourseFilters() {
 function renderFilteredCourses() {
   const container = document.getElementById("coursesList");
 
-  const fVal = document.getElementById("courseFacultyFilter").value;
-  const yVal = document.getElementById("courseYearFilter").value;
-  const tVal = document.getElementById("courseTermFilter").value;
+  const faculty_value = document.getElementById("courseFacultyFilter").value;
+  const year_value = document.getElementById("courseYearFilter").value;
+  const term_value = document.getElementById("courseTermFilter").value;
 
   // Create temp profile for filtering
   const filterProfile = {
-    faculty: fVal === "All" ? null : fVal,
-    year: yVal === "All" ? null : yVal,
-    term: tVal === "All" ? null : tVal,
+    faculty: faculty_value === "All" ? null : faculty_value,
+    year: year_value === "All" ? null : year_value,
+    term: term_value === "All" ? null : term_value,
   };
 
   const courses = filterCourses(categoryTree, filterProfile);
@@ -371,9 +359,6 @@ function renderFilteredCourses() {
 
   container.innerHTML = courses
     .map((c) => {
-      // Auto-select logic visual check (state is already updated via autoSelectMatchingCourses)
-      // We rely on state.subscribedCourses which now contains the auto-selected ones.
-
       const isSubscribed = state.subscribedCourses.includes(c.id);
 
       return `
@@ -391,8 +376,6 @@ function renderFilteredCourses() {
     })
     .join("");
 }
-
-const originalRenderCourses = renderCoursesStep; // Store reference if needed (not needed really as we replaced it)
 
 let hasAutoSelected = false;
 
