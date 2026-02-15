@@ -7,9 +7,9 @@ author: "Belal Amr Mohamed"
 email: "belalamrofficial@gmail.com"
 
 # ------------------------------------
-# URL SETTINGS (Fixed)
+# URL SETTINGS
 # ------------------------------------
-url: "https://https://basmagi-quiz.vercel.app"
+url: "https://basmagi-quiz.vercel.app"
 baseurl: "/"
 
 # ------------------------------------
@@ -20,10 +20,9 @@ include:
   - service-worker.js
   - robots.txt
   - sitemap.xml
-  - Exams
+  - quizzes
 
 exclude:
-  - tools
   - README.md
   - LICENSE
   - .gitignore
