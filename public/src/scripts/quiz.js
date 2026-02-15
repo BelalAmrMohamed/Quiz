@@ -12,7 +12,6 @@ showNotification(
   "أسأل الله لك التوفيق والسداد",
   "./assets/images/صلى_على_النبي_2.png",
 );
-// D:\Code projects\Websites\Quiz\images\صلى على النبي.jpg
 // === MEMORY CACHE for exam modules ===
 const examModuleCache = new Map();
 const MAX_CACHE_SIZE = 10; // Keep last 10 exams in memory
@@ -222,6 +221,10 @@ async function init() {
       ? userProfile.getQuizStyle()
       : localStorage.getItem("quiz_style") || "pagination";
   if (quizStyle !== "vertical") quizStyle = "pagination";
+  else {
+    nextBtn.style.display = "none";
+    prevBtn.style.display = "none";
+  }
 
   // Update view toggle button
   if (els.viewIcon && els.viewText) {
@@ -758,7 +761,7 @@ function renderAllQuestionsVertical() {
   els.questionContainer.classList.add("vertical-style");
 }
 
-// === Core: Render Question (unchanged logic, optimized DOM) ===
+// === Core: Render Question ===
 function renderQuestion() {
   if (!questions.length) return;
 
