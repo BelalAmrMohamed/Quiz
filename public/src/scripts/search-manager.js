@@ -1,0 +1,659 @@
+// ============================================================================
+// search-manager.js - Advanced Search & Filter System
+// ============================================================================
+
+import { userProfile } from "./userProfile.js";
+import {
+  extractMetadata,
+  filterCourses,
+  getSubscribedCourses,
+  getAvailableYears,
+  getAvailableTerms,
+} from "./filterUtils.js";
+
+export class SearchManager {
+  constructor(containerSelector, onSearchCallback) {
+    this.container = document.querySelector(containerSelector);
+    this.onSearchCallback = onSearchCallback; // Callback when search results change
+    this.allCourses = [];
+    this.filteredCourses = [];
+
+    this.searchConfig = {
+      debounceDelay: 300,
+      minSearchLength: 2,
+      maxHistoryItems: 10,
+    };
+
+    this.filters = {
+      searchQuery: "",
+      scope: "all", // 'all' | 'subscribed'
+      contentType: "all", // 'all' | 'courses' | 'exams'
+      faculty: "all",
+      sortBy: "relevance", // 'relevance' | 'name' | 'recent' | 'progress'
+    };
+
+    this.searchHistory = this.loadSearchHistory();
+    this.debounceTimer = null;
+    this.isFiltersPanelOpen = false;
+
+    // Store references to DOM elements
+    this.elements = {};
+  }
+
+  /**
+   * Initialize the search manager with course data
+   */
+  init(coursesData) {
+    this.allCourses = coursesData;
+    this.filteredCourses = coursesData;
+    this.cacheElements();
+    this.bindSearchInput();
+    this.bindFilterControls();
+    this.bindClearButton();
+    this.bindFilterToggle();
+    this.populateFacultyFilter();
+    this.bindResetFilters();
+    this.setupKeyboardShortcuts();
+  }
+
+  /**
+   * Cache DOM element references for better performance
+   */
+  cacheElements() {
+    this.elements = {
+      searchInput: document.getElementById("courseSearch"),
+      searchClear: document.getElementById("searchClear"),
+      filterToggle: document.getElementById("filterToggle"),
+      searchFilters: document.getElementById("searchFilters"),
+      searchSummary: document.getElementById("searchSummary"),
+      resultCount: document.getElementById("resultCount"),
+      activeFilterTags: document.getElementById("activeFilterTags"),
+      facultyFilter: document.getElementById("facultyFilter"),
+      sortBy: document.getElementById("sortBy"),
+      applyFilters: document.getElementById("applyFilters"),
+      resetFilters: document.getElementById("resetFilters"),
+    };
+  }
+
+  // ===========================
+  // SEARCH INPUT HANDLING
+  // ===========================
+
+  bindSearchInput() {
+    if (!this.elements.searchInput) return;
+
+    this.elements.searchInput.addEventListener("input", (e) => {
+      this.handleSearchInput(e.target.value);
+    });
+
+    this.elements.searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        this.performSearch();
+      } else if (e.key === "Escape") {
+        this.clearSearch();
+      }
+    });
+  }
+
+  handleSearchInput(query) {
+    // Show/hide clear button
+    if (this.elements.searchClear) {
+      this.elements.searchClear.style.display = query ? "flex" : "none";
+    }
+
+    // Clear previous debounce timer
+    clearTimeout(this.debounceTimer);
+
+    // Debounce the search
+    this.debounceTimer = setTimeout(() => {
+      this.filters.searchQuery = query;
+      this.performSearch();
+    }, this.searchConfig.debounceDelay);
+  }
+
+  // ===========================
+  // SEARCH LOGIC
+  // ===========================
+
+  performSearch() {
+    let results = [...this.allCourses];
+
+    // Apply search query
+    if (
+      this.filters.searchQuery &&
+      this.filters.searchQuery.length >= this.searchConfig.minSearchLength
+    ) {
+      results = this.filterBySearchQuery(results);
+      this.addToSearchHistory(this.filters.searchQuery);
+    }
+
+    // Apply scope filter (subscribed only)
+    if (this.filters.scope === "subscribed") {
+      results = this.filterBySubscribed(results);
+    }
+
+    // Apply content type filter
+    if (this.filters.contentType !== "all") {
+      results = this.filterByContentType(results);
+    }
+
+    // Apply faculty filter
+    if (this.filters.faculty !== "all") {
+      results = this.filterByFaculty(results);
+    }
+
+    // Apply sorting
+    results = this.sortResults(results);
+
+    this.filteredCourses = results;
+    this.updateUI(results);
+
+    // Trigger callback to update the main view
+    if (this.onSearchCallback) {
+      this.onSearchCallback(results);
+    }
+  }
+
+  filterBySearchQuery(courses) {
+    const query = this.filters.searchQuery.toLowerCase().trim();
+    const terms = query.split(/\s+/);
+
+    return courses.filter((course) => {
+      const searchableText = [
+        course.name || "",
+        course.code || "",
+        course.faculty || "",
+        course.description || "",
+        (course.tags || []).join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      // All terms must match (AND logic)
+      return terms.every((term) => searchableText.includes(term));
+    });
+  }
+
+  filterBySubscribed(courses) {
+    const subscribedIds = userProfile.getSubscribedCourseIds();
+    return courses.filter((c) => subscribedIds.includes(c.id));
+  }
+
+  filterByContentType(courses) {
+    return courses.filter((c) => {
+      const hasExams = c.exams && c.exams.length > 0;
+      const hasSubcategories = c.subcategories && c.subcategories.length > 0;
+
+      if (this.filters.contentType === "courses") {
+        // Show courses that have subcategories
+        return hasSubcategories;
+      } else if (this.filters.contentType === "exams") {
+        // Show courses that have exams
+        return hasExams;
+      }
+      return true;
+    });
+  }
+
+  filterByFaculty(courses) {
+    return courses.filter((c) => c.faculty === this.filters.faculty);
+  }
+
+  sortResults(courses) {
+    const sortFunctions = {
+      relevance: (a, b) => {
+        if (!this.filters.searchQuery) return 0;
+
+        const query = this.filters.searchQuery.toLowerCase();
+        const aName = (a.name || "").toLowerCase();
+        const bName = (b.name || "").toLowerCase();
+
+        // Prioritize exact matches
+        const aExact = aName === query ? 2 : 0;
+        const bExact = bName === query ? 2 : 0;
+
+        // Prioritize starts with
+        const aStarts = aName.startsWith(query) ? 1 : 0;
+        const bStarts = bName.startsWith(query) ? 1 : 0;
+
+        const aScore = aExact + aStarts;
+        const bScore = bExact + bStarts;
+
+        return bScore - aScore || aName.localeCompare(bName, "ar");
+      },
+
+      name: (a, b) => {
+        const aName = (a.name || "").toLowerCase();
+        const bName = (b.name || "").toLowerCase();
+        return aName.localeCompare(bName, "ar");
+      },
+
+      recent: (a, b) => {
+        const timeA = this.getLastAttemptTime(a.id) || 0;
+        const timeB = this.getLastAttemptTime(b.id) || 0;
+        return timeB - timeA;
+      },
+
+      progress: (a, b) => {
+        const progA = this.getProgress(a.id) || 0;
+        const progB = this.getProgress(b.id) || 0;
+        return progB - progA;
+      },
+    };
+
+    const sortFn =
+      sortFunctions[this.filters.sortBy] || sortFunctions.relevance;
+    return [...courses].sort(sortFn);
+  }
+
+  // ===========================
+  // FILTER CONTROLS
+  // ===========================
+
+  bindFilterControls() {
+    // Search scope radio buttons
+    document.querySelectorAll('input[name="searchScope"]').forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        this.filters.scope = e.target.value;
+        this.performSearch();
+        this.updateActiveFilters();
+      });
+    });
+
+    // Content type radio buttons
+    document.querySelectorAll('input[name="contentType"]').forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        this.filters.contentType = e.target.value;
+        this.performSearch();
+        this.updateActiveFilters();
+      });
+    });
+
+    // Faculty filter
+    if (this.elements.facultyFilter) {
+      this.elements.facultyFilter.addEventListener("change", (e) => {
+        this.filters.faculty = e.target.value;
+        this.performSearch();
+        this.updateActiveFilters();
+      });
+    }
+
+    // Sort by
+    if (this.elements.sortBy) {
+      this.elements.sortBy.addEventListener("change", (e) => {
+        this.filters.sortBy = e.target.value;
+        this.performSearch();
+        this.updateActiveFilters();
+      });
+    }
+  }
+
+  populateFacultyFilter() {
+    if (!this.elements.facultyFilter) return;
+
+    // Extract unique faculties from all courses
+    const faculties = new Set();
+    this.allCourses.forEach((course) => {
+      if (course.faculty) {
+        faculties.add(course.faculty);
+      }
+    });
+
+    // Clear existing options except "All"
+    this.elements.facultyFilter.innerHTML =
+      '<option value="all">جميع الكليات</option>';
+
+    // Add faculty options
+    Array.from(faculties)
+      .sort((a, b) => a.localeCompare(b, "ar"))
+      .forEach((faculty) => {
+        const option = document.createElement("option");
+        option.value = faculty;
+        option.textContent = faculty;
+        this.elements.facultyFilter.appendChild(option);
+      });
+  }
+
+  // ===========================
+  // UI CONTROLS
+  // ===========================
+
+  bindClearButton() {
+    if (!this.elements.searchClear) return;
+
+    this.elements.searchClear.addEventListener("click", () => {
+      this.clearSearch();
+    });
+  }
+
+  bindFilterToggle() {
+    if (!this.elements.filterToggle) return;
+
+    this.elements.filterToggle.addEventListener("click", () => {
+      this.toggleFiltersPanel();
+    });
+  }
+
+  bindResetFilters() {
+    if (!this.elements.resetFilters) return;
+
+    this.elements.resetFilters.addEventListener("click", () => {
+      this.resetFilters();
+    });
+  }
+
+  clearSearch() {
+    if (this.elements.searchInput) {
+      this.elements.searchInput.value = "";
+    }
+    if (this.elements.searchClear) {
+      this.elements.searchClear.style.display = "none";
+    }
+    this.filters.searchQuery = "";
+    this.performSearch();
+  }
+
+  toggleFiltersPanel() {
+    this.isFiltersPanelOpen = !this.isFiltersPanelOpen;
+
+    if (this.elements.searchFilters) {
+      this.elements.searchFilters.style.display = this.isFiltersPanelOpen
+        ? "block"
+        : "none";
+    }
+
+    if (this.elements.filterToggle) {
+      this.elements.filterToggle.classList.toggle(
+        "active",
+        this.isFiltersPanelOpen,
+      );
+      this.elements.filterToggle.setAttribute(
+        "aria-expanded",
+        this.isFiltersPanelOpen,
+      );
+    }
+  }
+
+  resetFilters() {
+    // Reset filter values
+    this.filters = {
+      searchQuery: this.filters.searchQuery, // Keep search query
+      scope: "all",
+      contentType: "all",
+      faculty: "all",
+      sortBy: "relevance",
+    };
+
+    // Reset UI controls
+    document.querySelectorAll('input[name="searchScope"]').forEach((radio) => {
+      radio.checked = radio.value === "all";
+    });
+
+    document.querySelectorAll('input[name="contentType"]').forEach((radio) => {
+      radio.checked = radio.value === "all";
+    });
+
+    if (this.elements.facultyFilter) {
+      this.elements.facultyFilter.value = "all";
+    }
+
+    if (this.elements.sortBy) {
+      this.elements.sortBy.value = "relevance";
+    }
+
+    // Re-run search with reset filters
+    this.performSearch();
+    this.updateActiveFilters();
+  }
+
+  // ===========================
+  // UI UPDATES
+  // ===========================
+
+  updateUI(results) {
+    // Update results count
+    if (this.elements.resultCount) {
+      this.elements.resultCount.textContent = results.length;
+    }
+
+    // Show/hide summary
+    const hasActiveFilters = this.hasActiveFilters();
+    if (this.elements.searchSummary) {
+      this.elements.searchSummary.style.display = hasActiveFilters
+        ? "flex"
+        : "none";
+    }
+
+    // Update active filter tags
+    this.updateActiveFilters();
+  }
+
+  hasActiveFilters() {
+    return (
+      this.filters.searchQuery.length >= this.searchConfig.minSearchLength ||
+      this.filters.scope !== "all" ||
+      this.filters.contentType !== "all" ||
+      this.filters.faculty !== "all" ||
+      this.filters.sortBy !== "relevance"
+    );
+  }
+
+  updateActiveFilters() {
+    if (!this.elements.activeFilterTags) return;
+
+    const tags = [];
+
+    // Scope filter tag
+    if (this.filters.scope === "subscribed") {
+      tags.push({ label: "المواد المشترك بها", key: "scope" });
+    }
+
+    // Content type filter tag
+    if (this.filters.contentType === "courses") {
+      tags.push({ label: "مواد فقط", key: "contentType" });
+    } else if (this.filters.contentType === "exams") {
+      tags.push({ label: "امتحانات فقط", key: "contentType" });
+    }
+
+    // Faculty filter tag
+    if (this.filters.faculty !== "all") {
+      tags.push({ label: this.filters.faculty, key: "faculty" });
+    }
+
+    // Sort filter tag (only if not default)
+    if (this.filters.sortBy !== "relevance") {
+      const sortLabels = {
+        name: "الترتيب: الاسم",
+        recent: "الترتيب: الأحدث",
+        progress: "الترتيب: التقدم",
+      };
+      tags.push({ label: sortLabels[this.filters.sortBy], key: "sortBy" });
+    }
+
+    // Render tags
+    this.elements.activeFilterTags.innerHTML = tags
+      .map(
+        (tag) => `
+      <button class="filter-tag" data-filter="${tag.key}" aria-label="إزالة فلتر ${tag.label}">
+        ${tag.label}
+        <span class="filter-tag-remove" aria-hidden="true">×</span>
+      </button>
+    `,
+      )
+      .join("");
+
+    // Add click handlers to remove individual filters
+    this.elements.activeFilterTags
+      .querySelectorAll(".filter-tag")
+      .forEach((tagEl) => {
+        tagEl.addEventListener("click", () => {
+          this.removeFilter(tagEl.dataset.filter);
+        });
+      });
+  }
+
+  removeFilter(filterKey) {
+    switch (filterKey) {
+      case "scope":
+        this.filters.scope = "all";
+        document
+          .querySelectorAll('input[name="searchScope"]')
+          .forEach((radio) => {
+            radio.checked = radio.value === "all";
+          });
+        break;
+      case "contentType":
+        this.filters.contentType = "all";
+        document
+          .querySelectorAll('input[name="contentType"]')
+          .forEach((radio) => {
+            radio.checked = radio.value === "all";
+          });
+        break;
+      case "faculty":
+        this.filters.faculty = "all";
+        if (this.elements.facultyFilter) {
+          this.elements.facultyFilter.value = "all";
+        }
+        break;
+      case "sortBy":
+        this.filters.sortBy = "relevance";
+        if (this.elements.sortBy) {
+          this.elements.sortBy.value = "relevance";
+        }
+        break;
+    }
+
+    this.performSearch();
+    this.updateActiveFilters();
+  }
+
+  // ===========================
+  // SEARCH HISTORY
+  // ===========================
+
+  loadSearchHistory() {
+    try {
+      const history = localStorage.getItem("quiz_search_history");
+      return history ? JSON.parse(history) : [];
+    } catch (error) {
+      console.error("Error loading search history:", error);
+      return [];
+    }
+  }
+
+  saveSearchHistory() {
+    try {
+      localStorage.setItem(
+        "quiz_search_history",
+        JSON.stringify(this.searchHistory),
+      );
+    } catch (error) {
+      console.error("Error saving search history:", error);
+    }
+  }
+
+  addToSearchHistory(query) {
+    if (!query || query.length < this.searchConfig.minSearchLength) return;
+
+    // Remove if already exists
+    this.searchHistory = this.searchHistory.filter((item) => item !== query);
+
+    // Add to beginning
+    this.searchHistory.unshift(query);
+
+    // Limit history size
+    if (this.searchHistory.length > this.searchConfig.maxHistoryItems) {
+      this.searchHistory = this.searchHistory.slice(
+        0,
+        this.searchConfig.maxHistoryItems,
+      );
+    }
+
+    this.saveSearchHistory();
+  }
+
+  // ===========================
+  // HELPER METHODS
+  // ===========================
+
+  getLastAttemptTime(courseId) {
+    try {
+      const history = userProfile.getQuizHistory();
+      const courseHistory = history.filter(
+        (item) => item.courseId === courseId,
+      );
+      if (courseHistory.length === 0) return 0;
+
+      return Math.max(...courseHistory.map((item) => item.timestamp || 0));
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  getProgress(courseId) {
+    try {
+      return userProfile.getCourseProgress(courseId) || 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  // ===========================
+  // KEYBOARD SHORTCUTS
+  // ===========================
+
+  setupKeyboardShortcuts() {
+    document.addEventListener("keydown", (e) => {
+      // Ctrl+K or Cmd+K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        if (this.elements.searchInput) {
+          this.elements.searchInput.focus();
+        }
+      }
+
+      // Ctrl+F or Cmd+F to open filters (only if search is focused)
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "f" &&
+        document.activeElement === this.elements.searchInput
+      ) {
+        e.preventDefault();
+        if (!this.isFiltersPanelOpen) {
+          this.toggleFiltersPanel();
+        }
+      }
+    });
+  }
+
+  // ===========================
+  // PUBLIC API
+  // ===========================
+
+  /**
+   * Get current filtered results
+   */
+  getResults() {
+    return this.filteredCourses;
+  }
+
+  /**
+   * Check if search is active
+   */
+  isSearchActive() {
+    return this.hasActiveFilters();
+  }
+
+  /**
+   * Manually trigger search
+   */
+  search(query) {
+    if (this.elements.searchInput) {
+      this.elements.searchInput.value = query;
+    }
+    this.filters.searchQuery = query;
+    this.performSearch();
+  }
+}

@@ -110,7 +110,6 @@ body {
     padding: 8px 14px;
     top: 16px;
     left: 16px;
-    /* right: 16px; */
     max-width: calc(100vw - 32px);
     gap: 6px;
   }
@@ -131,7 +130,6 @@ body {
     padding: 7px 12px;
     top: 12px;
     left: 12px;
-    /* right: 12px; */
     max-width: calc(100vw - 24px);
   }
 

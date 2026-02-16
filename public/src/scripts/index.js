@@ -5,8 +5,10 @@
 
 import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
+import { SearchManager } from "./search-manager.js";
 
 let categoryTree = null;
+let searchManager = null;
 
 // Download functions
 import { exportToQuiz } from "../export/export-to-quiz.js";
@@ -545,6 +547,9 @@ async function initApp() {
   try {
     const manifest = await getManifest();
     categoryTree = manifest.categoryTree;
+
+    // Initialize search manager after data is loaded
+    initializeSearchManager();
   } catch (err) {
     console.error("Failed to load quiz manifest:", err);
     categoryTree = {};
@@ -563,6 +568,106 @@ async function initApp() {
   } catch (error) {
     console.error("Error initializing:", error);
     renderRootCategories();
+  }
+}
+
+/**
+ * Initialize the search manager with course data
+ */
+function initializeSearchManager() {
+  try {
+    // Get all root courses
+    const allCourses = Object.entries(categoryTree)
+      .filter(([key, category]) => !category.parent)
+      .map(([key, category]) => ({ key, ...category }));
+
+    // Create search manager instance
+    searchManager = new SearchManager("#searchContainer", handleSearchResults);
+    searchManager.init(allCourses);
+  } catch (error) {
+    console.error("Error initializing search manager:", error);
+  }
+}
+
+/**
+ * Handle search results from SearchManager
+ * This function is called whenever search results change
+ */
+function handleSearchResults(results) {
+  try {
+    // Clear navigation stack when searching
+    if (searchManager && searchManager.isSearchActive()) {
+      navigationStack = [];
+      updateBreadcrumb();
+    }
+
+    // Update title based on search state
+    if (title) {
+      if (searchManager && searchManager.isSearchActive()) {
+        title.textContent = "نتائج البحث";
+      } else {
+        const subscribedIds = userProfile.getSubscribedCourseIds();
+        const subscribedCourses = getSubscribedCourses(
+          categoryTree,
+          subscribedIds,
+        );
+        title.textContent =
+          subscribedCourses.length > 0 ? "المواد خاصتي" : "جميع المواد";
+      }
+    }
+
+    // Render search results
+    renderSearchResults(results);
+  } catch (error) {
+    console.error("Error handling search results:", error);
+  }
+}
+
+/**
+ * Render search results in the main container
+ */
+function renderSearchResults(courses) {
+  try {
+    if (!container) return;
+
+    container.innerHTML = "";
+    container.className = "grid-container";
+    container.setAttribute("aria-busy", "false");
+
+    const fragment = document.createDocumentFragment();
+
+    if (courses.length === 0) {
+      // Empty state for no results
+      const emptyState = document.createElement("div");
+      emptyState.className = "empty-state";
+      emptyState.setAttribute("role", "status");
+      emptyState.innerHTML = `
+        <div class="empty-state-icon" aria-hidden="true">🔍</div>
+        <h3>لا توجد نتائج</h3>
+        <p>جرّب البحث بكلمات مختلفة أو تعديل الفلاتر</p>
+      `;
+      container.appendChild(emptyState);
+      return;
+    }
+
+    // Render course cards
+    courses.forEach((course) => {
+      const itemCount = getCourseItemCount(course);
+      const card = createCategoryCard(course.name, itemCount, true, course);
+      card.onclick = () => renderCategory(categoryTree[course.key]);
+      fragment.appendChild(card);
+    });
+
+    container.appendChild(fragment);
+  } catch (error) {
+    console.error("Error rendering search results:", error);
+    if (container) {
+      container.innerHTML = `
+        <div class="error-state" role="alert">
+          <p>حدث خطأ أثناء عرض النتائج. يرجى المحاولة مرة أخرى.</p>
+        </div>
+      `;
+    }
   }
 }
 
