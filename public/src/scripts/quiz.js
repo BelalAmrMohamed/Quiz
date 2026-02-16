@@ -205,11 +205,38 @@ async function loadExamModule(config) {
 }
 
 async function init() {
+  // Read from localStorage instead of URL parameters
+  examId = localStorage.getItem("quiz_current_id");
+  quizMode = localStorage.getItem("quiz_current_mode") || "exam";
+  const startTime = localStorage.getItem("quiz_start_time");
+
+  // Also check URL params for backward compatibility with user quizzes
   const params = new URLSearchParams(window.location.search);
-  examId = params.get("id");
-  quizMode = params.get("mode") || "exam";
-  const quizType = params.get("type"); // Added per instructions
+  const quizType = params.get("type"); // For user-created quizzes
   const startAt = params.get("startAt");
+
+  // Validate quiz data exists
+  if (!examId && !quizType) {
+    console.error("No quiz selected");
+    alert("لم يتم اختيار اختبار. سيتم توجيهك للصفحة الرئيسية.");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Validate start time (prevent stale quiz sessions - max 24 hours)
+  if (startTime && examId) {
+    const now = Date.now();
+    const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
+    if (now - parseInt(startTime) > maxSessionAge) {
+      console.warn("Quiz session expired");
+      localStorage.removeItem("quiz_current_mode");
+      localStorage.removeItem("quiz_current_id");
+      localStorage.removeItem("quiz_start_time");
+      alert("انتهت صلاحية الجلسة. يرجى بدء الاختبار من جديد.");
+      window.location.href = "index.html";
+      return;
+    }
+  }
 
   // Load saved view mode
   const savedView = localStorage.getItem("quiz_view_mode");
@@ -1055,6 +1082,11 @@ async function finish(skipconfirmationNotification) {
   localStorage.removeItem(`quiz_state_${examId}`);
   gameEngine.clearFlags(examId);
 
+  // Clear quiz session data
+  localStorage.removeItem("quiz_current_mode");
+  localStorage.removeItem("quiz_current_id");
+  localStorage.removeItem("quiz_start_time");
+
   window.location.href = "summary.html";
 }
 
@@ -1129,6 +1161,11 @@ async function exit(skipconfirmationNotification) {
     return;
 
   localStorage.removeItem(`quiz_state_${examId}`);
+
+  // Clear quiz session data
+  localStorage.removeItem("quiz_current_mode");
+  localStorage.removeItem("quiz_current_id");
+  localStorage.removeItem("quiz_start_time");
 
   window.location.href = "index.html";
 }

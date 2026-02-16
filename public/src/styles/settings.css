@@ -1,3 +1,9 @@
+/* settings.css - Settings Page Styles with Mobile Responsiveness */
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
 * {
   margin: 0;
   padding: 0;
@@ -24,148 +30,149 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   padding: 40px 24px;
-  position: relative;
-  overflow-x: hidden;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
+
+/* ============================================================================
+   SETTINGS PAGE CONTAINER
+   ============================================================================ */
 
 .settings-page {
-  max-width: 640px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 80px 16px 48px;
   position: relative;
+  z-index: 1;
 }
 
-.settings-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+/* ============================================================================
+   BACK LINK
+   ============================================================================ */
 
-.settings-header h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 0 0 12px 0;
-  color: var(--color-text-primary, #1a1a1a);
-  letter-spacing: -0.02em;
-}
-
-.settings-header p {
-  color: var(--color-text-secondary, #666);
-  font-size: 1rem;
-  margin: 0;
-  line-height: 1.5;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-/* ==================
-   BACK LINK - RTL OPTIMIZED
-   ================== */
 .back-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
-  background: var(--color-surface, #ffffff);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  border: 1px solid var(--color-border, #e0e0e0);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--color-text-primary);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--color-text-primary, #1a1a1a);
-  position: fixed;
-  top: 24px;
-  z-index: 100;
-
-  /* Always on left to avoid hamburger menu overlap (hamburger is always on right) */
-  left: 40px;
-  right: auto;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .back-link:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  border-color: var(--color-primary, #0088cc);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
 }
 
-.back-link:active {
-  transform: translateY(0);
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding: 32px 24px;
+  background: var(--color-surface);
+  border-radius: 24px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
 }
 
-.back-link:focus-visible {
-  outline: 2px solid var(--color-primary, #0088cc);
-  outline-offset: 2px;
+.settings-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
 }
 
-/* ==================
-   SETTINGS CARDS
-   ================== */
+.settings-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.settings-header p {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+   SETTINGS FORM
+   ============================================================================ */
+
+#settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ============================================================================
+   SETTINGS CARD
+   ============================================================================ */
+
 .settings-card {
-  background: var(--color-surface, #ffffff);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 24px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.05),
-    0 1px 2px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--color-border, #e0e0e0);
-  transition: box-shadow 0.3s ease;
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 }
 
 .settings-card:hover {
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 2px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg);
 }
 
 .settings-card h2 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin: 0 0 20px 0;
-  color: var(--color-text-primary, #1a1a1a);
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
-  gap: 10px;
-  letter-spacing: -0.01em;
+  gap: 12px;
 }
 
 .settings-card h2 span {
-  font-size: 1.4rem;
-  line-height: 1;
+  font-size: 1.75rem;
 }
 
-/* Profile hint text */
 .profile-hint {
-  color: var(--color-text-secondary, #666);
-  font-size: 0.875rem;
-  margin: -8px 0 20px 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
   line-height: 1.5;
-  padding: 12px 16px;
-  background: var(--color-background, #f5f5f5);
-  border-radius: 8px;
-  border-right: 3px solid var(--color-primary, #0088cc);
 }
 
-html[dir="ltr"] .profile-hint {
-  border-right: none;
-  border-left: 3px solid var(--color-primary, #0088cc);
-}
+/* ============================================================================
+   SETTINGS ROW
+   ============================================================================ */
 
-/* ==================
-   FORM ROWS
-   ================== */
 .settings-row {
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .settings-row:last-child {
@@ -173,172 +180,101 @@ html[dir="ltr"] .profile-hint {
 }
 
 .settings-row label {
-  display: block;
-  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--color-text-primary, #1a1a1a);
-  letter-spacing: -0.01em;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
 }
 
-/* ==================
-   INPUT & SELECT STYLES
-   ================== */
-.settings-row input[type="text"],
+.settings-row input,
 .settings-row select {
-  width: 100%;
   padding: 12px 16px;
-  border: 2px solid var(--color-border, #e0e0e0);
-  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
-  background: var(--color-background, #f5f5f5);
-  color: var(--color-text-primary, #1a1a1a);
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-}
-
-.settings-row input[type="text"]::placeholder {
-  color: var(--color-text-secondary, #999);
-  opacity: 0.7;
-}
-
-.settings-row input[type="text"]:hover,
-.settings-row select:hover {
-  border-color: var(--color-primary, #0088cc);
-  background: var(--color-surface, #ffffff);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  transition: all 0.3s ease;
+  width: 100%;
 }
 
 .settings-row input:focus,
 .settings-row select:focus {
   outline: none;
-  border-color: var(--color-primary, #0088cc);
-  background: var(--color-surface, #ffffff);
-  box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-/* Valid/Invalid states */
-.settings-row input:valid:not(:placeholder-shown) {
-  border-color: var(--color-success, #10b981);
+.settings-row input:hover,
+.settings-row select:hover {
+  border-color: var(--color-primary);
 }
 
-.settings-row input:invalid:not(:placeholder-shown) {
-  border-color: var(--color-error, #ef4444);
-}
+/* ============================================================================
+   OPTION CARDS (Radio Buttons)
+   ============================================================================ */
 
-/* Select arrow styling for RTL */
-.settings-row select {
-  appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-size: 20px;
-}
-
-html[dir="rtl"] .settings-row select {
-  background-position: left 12px center;
-  padding-left: 40px;
-  padding-right: 16px;
-}
-
-html[dir="ltr"] .settings-row select {
-  background-position: right 12px center;
-  padding-right: 40px;
-  padding-left: 16px;
-}
-
-/* ==================
-   OPTION CARDS
-   ================== */
 .option-cards {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  margin-top: 20px;
 }
 
 .option-card {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 16px 18px;
-  border: 2px solid var(--color-border, #e0e0e0);
+  gap: 16px;
+  padding: 20px;
+  border: 2px solid var(--color-border);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--color-background, #f5f5f5);
-  position: relative;
-}
-
-.option-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary, #0088cc) 0%,
-    var(--color-primary-dark, #006699) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
+  transition: all 0.3s ease;
+  background: var(--color-background);
 }
 
 .option-card:hover {
-  border-color: var(--color-primary, #0088cc);
-  background: var(--color-surface, #ffffff);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.15);
 }
 
 .option-card.selected {
-  border-color: var(--color-primary, #0088cc);
-  background: var(--color-primary-light, #e6f4fb);
-  box-shadow:
-    0 0 0 1px var(--color-primary, #0088cc),
-    0 4px 12px rgba(0, 136, 204, 0.2);
-}
-
-.option-card.selected::before {
-  opacity: 0.03;
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-md);
 }
 
 .option-card input[type="radio"] {
-  margin: 4px 0 0 0;
+  margin-top: 2px;
   width: 20px;
   height: 20px;
-  accent-color: var(--color-primary, #0088cc);
   cursor: pointer;
+  accent-color: var(--color-primary);
   flex-shrink: 0;
-}
-
-.option-card:focus-within {
-  outline: 2px solid var(--color-primary, #0088cc);
-  outline-offset: 2px;
 }
 
 .option-card-content {
   flex: 1;
-  min-width: 0;
 }
 
 .option-card-title {
-  font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 6px;
-  color: var(--color-text-primary, #1a1a1a);
-  line-height: 1.4;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
 }
 
 .option-card-desc {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary, #666);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
-/* ==================
+/* ============================================================================
    COURSE LIST GRID
-   ================== */
+   ============================================================================ */
+
 .course-list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -398,48 +334,39 @@ html[dir="ltr"] .settings-row select {
 
 .course-info {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  min-width: 0; /* Allow text truncation */
 }
 
 .course-info h4 {
-  margin: 0;
   font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text-primary, #1a1a1a);
-  line-height: 1.4;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .course-details {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary, #666);
-  line-height: 1.4;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
-/* Ensure toggle is properly aligned in course items */
-.course-item .toggle-container {
-  flex-shrink: 0;
-  align-self: center;
-}
+/* ============================================================================
+   TOGGLE SWITCH (Scoped to course items to avoid conflicts with side-menu.css)
+   ============================================================================ */
 
-/* ==================
-   TOGGLE SWITCH (for course list only)
-   ================== */
-/* Matches side-menu.css pattern but scoped to course items */
+/* Container for the toggle - scoped to course items */
 .course-item .toggle-container {
   position: relative;
   display: inline-block;
   width: 48px;
   height: 26px;
   flex-shrink: 0;
+  align-self: center;
 }
 
+/* Hide the default checkbox */
 .course-item .toggle-container input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -448,18 +375,19 @@ html[dir="ltr"] .settings-row select {
   pointer-events: none;
 }
 
+/* The toggle background track */
 .course-item .toggle-switch {
   position: relative;
+  display: block;
   width: 48px;
   height: 26px;
   border-radius: 100px;
   background: var(--color-border, #ccc);
   transition: background 0.3s ease;
-  flex-shrink: 0;
   cursor: pointer;
-  display: block;
 }
 
+/* The toggle circle/knob */
 .course-item .toggle-switch::after {
   content: "";
   position: absolute;
@@ -473,6 +401,7 @@ html[dir="ltr"] .settings-row select {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
+/* Checked state */
 .course-item .toggle-container input[type="checkbox"]:checked + .toggle-switch {
   background: var(--color-primary, #6366f1);
 }
@@ -484,11 +413,13 @@ html[dir="ltr"] .settings-row select {
   left: 25px;
 }
 
+/* Focus state for accessibility */
 .course-item .toggle-container input[type="checkbox"]:focus + .toggle-switch {
   outline: 2px solid var(--color-primary, #6366f1);
   outline-offset: 2px;
 }
 
+/* Disabled state */
 .course-item
   .toggle-container
   input[type="checkbox"]:disabled
@@ -497,222 +428,259 @@ html[dir="ltr"] .settings-row select {
   cursor: not-allowed;
 }
 
+/* Hover effect */
 .course-item .toggle-container:hover .toggle-switch {
   opacity: 0.9;
 }
 
-/* ==================
+/* ============================================================================
    SAVE BUTTON
-   ================== */
+   ============================================================================ */
+
 .btn-save {
-  width: 100%;
-  padding: 16px 24px;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary, #0088cc) 0%,
-    var(--color-primary-dark, #006699) 100%
-  );
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
+  padding: 16px 32px;
   font-size: 1.1rem;
   font-weight: 700;
-  font-family: inherit;
+  color: white;
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-top: 16px;
-  box-shadow:
-    0 4px 12px rgba(0, 136, 204, 0.3),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-save::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.2) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+  margin-top: 24px;
+  display: none; /* Hidden by default for auto-save */
 }
 
 .btn-save:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 8px 20px rgba(0, 136, 204, 0.4),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-save:hover::before {
-  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .btn-save:active {
-  transform: translateY(-1px);
-  box-shadow:
-    0 4px 12px rgba(0, 136, 204, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
 }
 
-.btn-save:focus-visible {
-  outline: 3px solid var(--color-primary, #0088cc);
-  outline-offset: 3px;
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* Loading state */
-.btn-save.loading {
-  pointer-events: none;
-  opacity: 0.7;
+/* ============================================================================
+   SAVE FEEDBACK (Auto-save indicator)
+   ============================================================================ */
+
+.save-feedback {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 16px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-save.loading::after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  top: 50%;
-  left: 50%;
-  margin-left: -10px;
-  margin-top: -10px;
-  border: 2px solid transparent;
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+.save-feedback.saving {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }
 
-/* ==================
-   SAVE FEEDBACK
-   ================== */
-.save-feedback {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  min-height: 28px;
-  line-height: 28px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
+/* ============================================================================
+   MOBILE RESPONSIVE STYLES
+   ============================================================================ */
 
-.save-feedback.success {
-  color: var(--color-success, #10b981);
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.save-feedback.error {
-  color: var(--color-error, #ef4444);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-/* ==================
-   RESPONSIVE DESIGN
-   ================== */
-
-/* Tablet */
+/* Tablet styles (768px and below) */
 @media (max-width: 768px) {
+  body {
+    padding: 24px 16px;
+  }
+
   .settings-page {
-    padding-top: 70px;
-    padding-bottom: 32px;
+    max-width: 100%;
   }
 
   .back-link {
-    top: 16px;
-    left: 16px;
-    padding: 8px 14px;
     font-size: 0.85rem;
-    gap: 6px;
+    padding: 8px 14px;
+  }
+
+  .settings-header {
+    margin-bottom: 32px;
+    padding: 24px 20px;
   }
 
   .settings-header h1 {
-    font-size: 1.75rem;
+    font-size: 2rem;
   }
 
   .settings-header p {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .settings-card {
     padding: 24px 20px;
   }
 
-  .course-list-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    max-height: 350px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 480px) {
-  .settings-page {
-    padding: 60px 12px 24px;
+  .settings-card h2 {
+    font-size: 1.35rem;
   }
 
-  .back-link {
-    top: 12px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    gap: 4px;
-    border-radius: 8px;
-  }
-
-  .settings-header {
-    margin-bottom: 28px;
-  }
-
-  .settings-header h1 {
+  .settings-card h2 span {
     font-size: 1.5rem;
   }
 
-  .settings-header p {
-    font-size: 0.9rem;
-  }
-
-  .settings-card {
-    padding: 20px 16px;
-    margin-bottom: 16px;
-    border-radius: 12px;
-  }
-
-  .settings-card h2 {
-    font-size: 1.1rem;
-    margin-bottom: 16px;
-  }
-
   .profile-hint {
-    font-size: 0.8rem;
-    padding: 10px 12px;
-  }
-
-  .settings-row {
-    margin-bottom: 20px;
+    font-size: 0.9rem;
   }
 
   .settings-row label {
     font-size: 0.9rem;
   }
 
-  .settings-row input[type="text"],
+  .settings-row input,
   .settings-row select {
-    padding: 11px 14px;
     font-size: 0.95rem;
+    padding: 12px 14px;
   }
 
   .option-card {
-    padding: 14px 16px;
+    padding: 16px;
+  }
+
+  .option-card-title {
+    font-size: 1rem;
+  }
+
+  .option-card-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Course list - 2 columns on tablet */
+  .course-list-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+
+  .course-item {
+    padding: 14px;
+  }
+
+  .course-info h4 {
+    font-size: 0.95rem;
+  }
+
+  .course-details {
+    font-size: 0.8rem;
+  }
+
+  .btn-save {
+    font-size: 1rem;
+    padding: 14px 28px;
+  }
+
+  .save-feedback {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile styles (640px and below) */
+@media (max-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    padding: 20px 12px;
+  }
+
+  .back-link {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+  }
+
+  .settings-header {
+    margin-bottom: 24px;
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 8px;
+  }
+
+  .settings-header p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  #settingsForm {
+    gap: 20px;
+  }
+
+  .settings-card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .settings-card h2 {
+    font-size: 1.25rem;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .settings-card h2 span {
+    font-size: 1.35rem;
+  }
+
+  .profile-hint {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .settings-row {
+    margin-bottom: 16px;
+  }
+
+  .settings-row label {
+    font-size: 0.85rem;
+  }
+
+  .settings-row input,
+  .settings-row select {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+
+  .option-cards {
     gap: 12px;
+  }
+
+  .option-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .option-card input[type="radio"] {
+    width: 18px;
+    height: 18px;
   }
 
   .option-card-title {
@@ -723,39 +691,213 @@ html[dir="ltr"] .settings-row select {
     font-size: 0.8rem;
   }
 
+  /* Course list - single column on mobile */
   .course-list-grid {
     grid-template-columns: 1fr;
-    max-height: 300px;
     gap: 12px;
+    max-height: 400px;
   }
 
   .course-item {
-    padding: 12px 14px;
+    padding: 14px 12px;
+    min-height: auto;
     gap: 12px;
-    min-height: 70px;
   }
 
   .course-info h4 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .course-details {
     font-size: 0.75rem;
   }
 
+  /* Keep toggle size consistent on mobile */
+  .course-item .toggle-container {
+    width: 48px;
+    height: 26px;
+  }
+
+  .course-item .toggle-switch {
+    width: 48px;
+    height: 26px;
+  }
+
+  .course-item .toggle-switch::after {
+    width: 20px;
+    height: 20px;
+    top: 3px;
+    left: 3px;
+  }
+
+  .course-item
+    .toggle-container
+    input[type="checkbox"]:checked
+    + .toggle-switch::after {
+    left: 25px;
+  }
+
   .btn-save {
-    padding: 14px 20px;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    padding: 14px 24px;
+    margin-top: 20px;
   }
 
   .save-feedback {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    min-height: 40px;
   }
 }
 
-/* ==================
-   ACCESSIBILITY
-   ================== */
+/* Very small screens (380px and below) */
+@media (max-width: 380px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    padding: 16px 10px;
+  }
+
+  .back-link {
+    font-size: 0.75rem;
+    padding: 7px 10px;
+    gap: 6px;
+  }
+
+  .settings-header {
+    padding: 16px 12px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-header p {
+    font-size: 0.85rem;
+  }
+
+  .settings-card {
+    padding: 16px 12px;
+  }
+
+  .settings-card h2 {
+    font-size: 1.15rem;
+    gap: 8px;
+  }
+
+  .settings-card h2 span {
+    font-size: 1.25rem;
+  }
+
+  .profile-hint {
+    font-size: 0.8rem;
+  }
+
+  .settings-row label {
+    font-size: 0.8rem;
+  }
+
+  .settings-row input,
+  .settings-row select {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  .option-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .option-card input[type="radio"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .option-card-title {
+    font-size: 0.9rem;
+  }
+
+  .option-card-desc {
+    font-size: 0.75rem;
+  }
+
+  /* Course list on very small screens */
+  .course-list-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-height: 350px;
+  }
+
+  .course-item {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .course-info h4 {
+    font-size: 0.85rem;
+  }
+
+  .course-details {
+    font-size: 0.7rem;
+  }
+
+  /* Slightly smaller toggle on very small screens */
+  .course-item .toggle-container {
+    width: 44px;
+    height: 24px;
+  }
+
+  .course-item .toggle-switch {
+    width: 44px;
+    height: 24px;
+  }
+
+  .course-item .toggle-switch::after {
+    width: 18px;
+    height: 18px;
+    top: 3px;
+    left: 3px;
+  }
+
+  .course-item
+    .toggle-container
+    input[type="checkbox"]:checked
+    + .toggle-switch::after {
+    left: 23px;
+  }
+
+  .btn-save {
+    font-size: 0.9rem;
+    padding: 12px 20px;
+  }
+
+  .save-feedback {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    min-height: 36px;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================================================ */
+
+/* Focus visible styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
@@ -765,87 +907,9 @@ html[dir="ltr"] .settings-row select {
     border-width: 3px;
   }
 
-  .btn-save {
-    border: 2px solid #000000;
+  .back-link:hover,
+  .option-card:hover,
+  .course-item:hover {
+    border-width: 3px;
   }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Focus visible for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid var(--color-primary, #0088cc);
-  outline-offset: 2px;
-}
-
-/* ==================
-   PRINT STYLES
-   ================== */
-@media print {
-  .back-link,
-  .btn-save,
-  .save-feedback {
-    display: none;
-  }
-
-  .settings-card {
-    page-break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #000;
-  }
-}
-
-/* ==================
-   DARK MODE ENHANCEMENTS
-   ================== */
-html[data-theme="dark"] .settings-row input[type="text"],
-html[data-theme="dark"] .settings-row select {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-html[data-theme="dark"] .option-card,
-html[data-theme="dark"] .course-item {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-html[data-theme="dark"] .option-card:hover,
-html[data-theme="dark"] .course-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ==================
-   LOADING STATE
-   ================== */
-.loading-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  color: var(--color-text-secondary, #666);
-  font-size: 0.95rem;
-}
-
-.loading-state::before {
-  content: "";
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-  border: 3px solid var(--color-border, #e0e0e0);
-  border-top-color: var(--color-primary, #0088cc);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-html[dir="ltr"] .loading-state::before {
-  margin-right: 0;
-  margin-left: 12px;
 }

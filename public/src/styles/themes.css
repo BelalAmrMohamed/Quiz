@@ -280,14 +280,14 @@ body {
 
 /* Solution for showing the side bar at the right, and the rest normally rtl */
 .side-menu nav {
-  direction: ltr; 
+  direction: ltr;
 }
 
 .side-menu nav > * {
-  direction: rtl; 
+  direction: rtl;
 }
 
-[data-theme="light"] .hamburger-icon{
+[data-theme="light"] .hamburger-icon {
   color: var(--color-text-primary);
 }
 
