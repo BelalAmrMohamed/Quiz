@@ -163,6 +163,12 @@
       "category": "Computer Network"
     },
     {
+      "id": "IN6JQ7QO",
+      "title": "Lecture 1 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Lecture 1 quiz.json",
+      "category": "Data Structures and Algorithms"
+    },
+    {
       "id": "WBXQKRLD",
       "title": "Introduction To Data Structure",
       "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure.json",
@@ -1448,6 +1454,12 @@
           "id": "WBXQKRLD",
           "title": "Introduction To Data Structure",
           "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure.json",
+          "category": "Data Structures and Algorithms"
+        },
+        {
+          "id": "IN6JQ7QO",
+          "title": "Lecture 1 Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Lecture 1 quiz.json",
           "category": "Data Structures and Algorithms"
         }
       ]
