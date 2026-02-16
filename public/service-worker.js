@@ -14,7 +14,6 @@ const STATIC_ASSETS = [
   "/quiz.html",
   "/summary.html",
   "/settings.html",
-  "/create-quiz.html",
 
   // used css files
   "/src/styles/themes.css",
@@ -22,14 +21,12 @@ const STATIC_ASSETS = [
   "/src/styles/quiz.css",
   "/src/styles/summary.css",
   "/src/styles/settings.css",
-  "/src/styles/create-quiz.css",
 
   // used js files
   "/src/scripts/index.js",
   "/src/scripts/quiz.js",
   "/src/scripts/summary.js",
   "/src/scripts/settings.js",
-  "/src/scripts/create-quiz.js",
   "/src/scripts/theme-controller.js",
 
   // Notifications and side menu
