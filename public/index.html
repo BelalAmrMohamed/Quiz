@@ -160,6 +160,7 @@
     <link rel="stylesheet" href="src/styles/index.css">
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
+    <link rel="stylesheet" href="src/styles/search.css">
 
     <!-- Controller Scripts - with module preload -->
     <link rel="modulepreload" href="src/scripts/theme-controller.js">
@@ -305,6 +306,83 @@
                 </div>
             </div>
         </header>
+
+        <!-- Advanced Search System -->
+        <div class="search-container" id="searchContainer">
+            <!-- Search Input -->
+            <div class="search-bar">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="courseSearch" placeholder="ابحث عن مادة أو اختبار..." class="search-input"
+                    autocomplete="off" aria-label="البحث عن المواد والاختبارات" />
+                <button class="search-clear" id="searchClear" style="display:none;" aria-label="مسح البحث">×</button>
+                <button class="search-filters-toggle" id="filterToggle" aria-label="فتح الفلاتر" aria-expanded="false">
+                    <span class="filter-icon" aria-hidden="true">⚙️</span>
+                </button>
+            </div>
+
+            <!-- Search Filters Panel (Collapsible) -->
+            <div class="search-filters" id="searchFilters" style="display:none;">
+                <div class="filter-section">
+                    <h4>نطاق البحث</h4>
+                    <div class="filter-options">
+                        <label class="filter-chip">
+                            <input type="radio" name="searchScope" value="all" checked>
+                            <span>جميع المواد</span>
+                        </label>
+                        <label class="filter-chip">
+                            <input type="radio" name="searchScope" value="subscribed">
+                            <span>المواد المشترك بها فقط</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>نوع المحتوى</h4>
+                    <div class="filter-options">
+                        <label class="filter-chip">
+                            <input type="radio" name="contentType" value="all" checked>
+                            <span>الكل</span>
+                        </label>
+                        <label class="filter-chip">
+                            <input type="radio" name="contentType" value="courses">
+                            <span>مواد فقط</span>
+                        </label>
+                        <label class="filter-chip">
+                            <input type="radio" name="contentType" value="exams">
+                            <span>امتحانات فقط</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>الكلية</h4>
+                    <select id="facultyFilter" class="filter-select" aria-label="اختر الكلية">
+                        <option value="all">جميع الكليات</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <h4>الترتيب</h4>
+                    <select id="sortBy" class="filter-select" aria-label="ترتيب النتائج">
+                        <option value="relevance">الأكثر صلة</option>
+                        <option value="name">الاسم (أ-ي)</option>
+                        <option value="recent">الأحدث</option>
+                        <option value="progress">التقدم</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-reset-filters" id="resetFilters">إعادة تعيين</button>
+                </div>
+            </div>
+
+            <!-- Search Results Summary -->
+            <div class="search-results-summary" id="searchSummary" style="display:none;">
+                <span><span id="resultCount">0</span> نتيجة</span>
+                <div class="active-filters" id="activeFilterTags"></div>
+            </div>
+        </div>
 
         <main id="contentArea" class="loading" role="main" aria-live="polite" aria-busy="true"
             aria-label="محتوى الصفحة الرئيسية">
