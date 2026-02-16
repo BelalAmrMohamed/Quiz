@@ -1,7 +1,7 @@
 // Service Worker for Basmagi Quiz Platform
 // Provides offline support, caching, and performance improvements
 
-const CACHE_VERSION = "basmagi-v2.3.0";
+const CACHE_VERSION = "basmagi-v2.4.0";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -9,19 +9,36 @@ const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 // Files to cache immediately
 const STATIC_ASSETS = [
   "/",
+  // main pages
   "/index.html",
   "/quiz.html",
-  "/dashboard.html",
+  "/summary.html",
+  "/settings.html",
   "/create-quiz.html",
+
+  // used css files
   "/src/styles/themes.css",
   "/src/styles/index.css",
-  "/src/components/side-menu.css",
-  "/src/components/notifications.css",
-  "/src/styles/profile-styles.css",
+  "/src/styles/quiz.css",
+  "/src/styles/summary.css",
+  "/src/styles/settings.css",
+  "/src/styles/create-quiz.css",
+
+  // used js files
   "/src/scripts/index.js",
+  "/src/scripts/quiz.js",
+  "/src/scripts/summary.js",
+  "/src/scripts/settings.js",
+  "/src/scripts/create-quiz.js",
   "/src/scripts/theme-controller.js",
-  "/src/scripts/canvas-animation.js",
+
+  // Notifications and side menu
+  "/src/components/side-menu.css",
   "/src/components/side-menu.js",
+  "/src/components/notifications.css",
+  "/src/components/notifications.js",
+
+  // Icon and manifest
   "/favicon.png",
   "/manifest.json",
 ];
