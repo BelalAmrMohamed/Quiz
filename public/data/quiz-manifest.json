@@ -1,634 +1,622 @@
 {
   "examList": [
     {
-      "id": "EF2QYLQA",
+      "id": "6OE7S2DT",
       "title": "Introduction To AI",
       "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Introduction to AI.json",
       "category": "Artificial Intelligence"
     },
     {
-      "id": "NFPIXSZO",
+      "id": "XOZPTJYP",
       "title": "Final 2020 2021",
       "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Final 2020-2021.json",
       "category": "Artificial Intelligence"
     },
     {
-      "id": "TPEHUPBI",
-      "title": "Introduction To Computer Architecture",
-      "path": "../../data/quizzes/Computer Science/1/2/Computer Architecture/Introduction to Computer Architecture.json",
+      "id": "N5ORNEW3",
+      "title": "AI Introduction To Computer Architecture",
+      "path": "../../data/quizzes/Computer Science/1/2/Computer Architecture/AI Introduction to Computer Architecture.json",
       "category": "Computer Architecture"
     },
     {
-      "id": "OCMK3D4C",
-      "title": "Lecture 2 MCQs",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.json",
-      "category": "Computer Network/أسئلة الدكتورة"
-    },
-    {
-      "id": "OI35ILVQ",
-      "title": "Lecture 3 MCQs",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.json",
-      "category": "Computer Network/أسئلة الدكتورة"
-    },
-    {
-      "id": "YKA62S4U",
+      "id": "65B46FGF",
       "title": "Lecture 1 MCQs",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 1 MCQs.json",
       "category": "Computer Network/أسئلة الدكتورة"
     },
     {
-      "id": "2RMCFWMQ",
-      "title": "Lecture 5",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      "id": "HF26WPWK",
+      "title": "Lecture 3 MCQs",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.json",
+      "category": "Computer Network/أسئلة الدكتورة"
     },
     {
-      "id": "3CXBZRCP",
-      "title": "Lecture 9",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+      "id": "YOSEUHWJ",
+      "title": "Lecture 2 MCQs",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.json",
+      "category": "Computer Network/أسئلة الدكتورة"
     },
     {
-      "id": "4ZTLBHZV",
-      "title": "Questions On Computer Networking",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "7HA5KDKG",
-      "title": "Lecture 4",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "CAIBAM3P",
+      "id": "4USHNGDH",
       "title": "Lecture 6",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 6.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "OAW5K4V2",
-      "title": "Lecture 3",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "QFLPI3JL",
-      "title": "Lecture 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "SRPITH45",
-      "title": "40 MCQs On Lecture 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "SS4SHCN5",
+      "id": "5OSBMVO2",
       "title": "Lecture 7",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 7.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "TYP5NWBM",
-      "title": "Lecture 8",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.json",
+      "id": "6B2XCLPL",
+      "title": "Questions On Computer Networking",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "UTMXAPIJ",
-      "title": "Revision",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.json",
-      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
-    },
-    {
-      "id": "YGCTXZEI",
+      "id": "7M7U3RFJ",
       "title": "CIDAR Notation",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "Z2IZDVJB",
-      "title": "40 MCQs On Lecture 4",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.json",
+      "id": "AROAAY6I",
+      "title": "40 MCQs On Lecture 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "ZHJS4EAP",
+      "id": "FQS3TY56",
       "title": "Lecture 2",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 2.json",
       "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "3SLNCSQN",
-      "title": "Lotus Mid 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 1.json",
-      "category": "Computer Network"
+      "id": "GJB3DS3S",
+      "title": "Lecture 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "HG5K6SHH",
-      "title": "Unknown Mid Exam",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Unknown Mid Exam.json",
-      "category": "Computer Network"
+      "id": "GJIC2BEM",
+      "title": "Revision",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "LVS2S3AP",
-      "title": "فاينل الدكتورة في كلية علوم",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/فاينل الدكتورة في كلية علوم.json",
-      "category": "Computer Network"
+      "id": "O6DAADJL",
+      "title": "40 MCQs On Lecture 4",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "MF2OMZDE",
-      "title": "Previous Mid",
-      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Previous Mid.json",
-      "category": "Computer Network"
+      "id": "TBOXVZLR",
+      "title": "Lecture 8",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
     },
     {
-      "id": "OWTY327J",
+      "id": "WPHTLLCC",
+      "title": "Lecture 5",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+    },
+    {
+      "id": "XHE3PKIQ",
+      "title": "Lecture 4",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+    },
+    {
+      "id": "XO6NQ4JJ",
+      "title": "Lecture 9",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+    },
+    {
+      "id": "YPPNGNUU",
+      "title": "Lecture 3",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.json",
+      "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
+    },
+    {
+      "id": "2UELRZ7J",
       "title": "Lotus Mid 2",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 2.json",
       "category": "Computer Network"
     },
     {
-      "id": "VNOGJBCM",
+      "id": "4ELX4TGB",
       "title": "Our Mid",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Our Mid.json",
       "category": "Computer Network"
     },
     {
-      "id": "WRB3XEBY",
+      "id": "CLRENIXC",
+      "title": "Unknown Mid Exam",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Unknown Mid Exam.json",
+      "category": "Computer Network"
+    },
+    {
+      "id": "N5F3YDQO",
+      "title": "Previous Mid",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Previous Mid.json",
+      "category": "Computer Network"
+    },
+    {
+      "id": "PDUVKJT6",
       "title": "IP Address",
       "path": "../../data/quizzes/Computer Science/2/1/Computer Network/IP Address.json",
       "category": "Computer Network"
     },
     {
-      "id": "Z6BC2HM3",
-      "title": "Introduction To Data Structure ",
-      "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure .json",
+      "id": "UVL56BME",
+      "title": "فاينل الدكتورة في كلية علوم",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/فاينل الدكتورة في كلية علوم.json",
+      "category": "Computer Network"
+    },
+    {
+      "id": "YBPJM7MQ",
+      "title": "Lotus Mid 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 1.json",
+      "category": "Computer Network"
+    },
+    {
+      "id": "WBXQKRLD",
+      "title": "Introduction To Data Structure",
+      "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure.json",
       "category": "Data Structures and Algorithms"
     },
     {
-      "id": "LCM7CNP4",
-      "title": "Introduction To Database ",
-      "path": "../../data/quizzes/Computer Science/2/2/Database Management Systems/Introduction to Database .json",
+      "id": "HC4RZL7I",
+      "title": "AI Introduction To Database",
+      "path": "../../data/quizzes/Computer Science/2/2/Database Management Systems/AI Introduction to Database.json",
       "category": "Database Management Systems"
     },
     {
-      "id": "3UIUR6U5",
-      "title": "Quiz 3",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 3.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "5F2G4CXA",
-      "title": "Midterm 2023",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2023.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "6Z3BHMDE",
-      "title": "Revision 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 2.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "G6QXACJT",
-      "title": "Quiz 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 1.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "GDANJ4WC",
-      "title": "55 MCQs On Chapter 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/55 MCQs on Chapter 1.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "JYY2XB5X",
-      "title": "Midterm 2025",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2025.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "K4GM5FR2",
-      "title": "Oral 2026 FCI",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Oral 2026 FCI.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "P4SKLEP6",
-      "title": "Quiz 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 2.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "PXCPAFUY",
-      "title": "Practical Exam   Model A",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Practical Exam - Model A.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "RGZLNQBX",
-      "title": "Midterm 2026",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2026.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "TNU5OHR5",
-      "title": "Quiz 4",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 4.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "XD37GOPR",
-      "title": "Quiz 5",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 5.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "XDSWB2XD",
-      "title": "MCQs On Chapter 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/MCQs on Chapter 2.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "YBF437GL",
-      "title": "50 MCQs On Chapter 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/50 MCQs on Chapter 1.json",
-      "category": "Discrete Structure"
-    },
-    {
-      "id": "YHP4JITG",
+      "id": "3444L2T4",
       "title": "Revision 1",
       "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 1.json",
       "category": "Discrete Structure"
     },
     {
-      "id": "GSJZLMUP",
-      "title": "Introduction To Electronics",
-      "path": "../../data/quizzes/Computer Science/1/2/Electronics/Introduction to Electronics.json",
+      "id": "3WXTWZQD",
+      "title": "Revision 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 2.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "675QZPZQ",
+      "title": "Practical Exam   Model A",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Practical Exam - Model A.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "B74IWWZD",
+      "title": "Midterm 2025",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2025.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "BFTJHAWT",
+      "title": "Midterm 2026",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2026.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "DFALCQXQ",
+      "title": "Quiz 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 2.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "DOVXTUID",
+      "title": "Quiz 5",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 5.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "H2RRWDDB",
+      "title": "Quiz 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 1.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "H56UADL5",
+      "title": "Quiz 3",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 3.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "O6VJ4ALZ",
+      "title": "Oral 2026 FCI",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Oral 2026 FCI.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "SUWCHGVU",
+      "title": "MCQs On Chapter 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/MCQs on Chapter 2.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "VEGURCXY",
+      "title": "Midterm 2023",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2023.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "VFDMA3X5",
+      "title": "55 MCQs On Chapter 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/55 MCQs on Chapter 1.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "W7RTMNFE",
+      "title": "50 MCQs On Chapter 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/50 MCQs on Chapter 1.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "ZSJ6Y3UF",
+      "title": "Quiz 4",
+      "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 4.json",
+      "category": "Discrete Structure"
+    },
+    {
+      "id": "V5UU4B4U",
+      "title": "AI Introduction To Electronics",
+      "path": "../../data/quizzes/Computer Science/1/2/Electronics/AI Introduction to Electronics.json",
       "category": "Electronics"
     },
     {
-      "id": "C5DZKIZD",
-      "title": "Ch 8 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch 8 Quiz.json",
-      "category": "Foundation of IS"
-    },
-    {
-      "id": "CCOCET36",
+      "id": "EC5JPOBO",
       "title": "Ch1 Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1 Quiz.json",
       "category": "Foundation of IS"
     },
     {
-      "id": "JQ3SK4XN",
-      "title": "General Exam",
-      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General Exam.json",
-      "category": "Foundation of IS"
-    },
-    {
-      "id": "Q36AG3KG",
-      "title": "Midterm Exam",
-      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Midterm Exam.json",
-      "category": "Foundation of IS"
-    },
-    {
-      "id": "UQSKQLGZ",
+      "id": "GDNK7GXI",
       "title": "General AI Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General AI quiz.json",
       "category": "Foundation of IS"
     },
     {
-      "id": "VQCFH67G",
-      "title": "Ch6 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch6 Quiz.json",
+      "id": "MJEQKPZN",
+      "title": "General Exam",
+      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General Exam.json",
       "category": "Foundation of IS"
     },
     {
-      "id": "X2EOAY6A",
+      "id": "N6465BPF",
       "title": "Ch1, 2, And 3 Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1, 2, and 3 Quiz.json",
       "category": "Foundation of IS"
     },
     {
-      "id": "ULSXAGSO",
-      "title": "Introduction To Math 2",
-      "path": "../../data/quizzes/Computer Science/1/2/Math 2/Introduction to Math 2.json",
+      "id": "QKWH5XTU",
+      "title": "Ch6 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch6 Quiz.json",
+      "category": "Foundation of IS"
+    },
+    {
+      "id": "SJSNGUV3",
+      "title": "Ch 8 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch 8 Quiz.json",
+      "category": "Foundation of IS"
+    },
+    {
+      "id": "IBTMOUCN",
+      "title": "AI Introduction To Math 2",
+      "path": "../../data/quizzes/Computer Science/1/2/Math 2/AI Introduction to Math 2.json",
       "category": "Math 2"
     },
     {
-      "id": "353O7U72",
+      "id": "T3PBR4EY",
       "title": "Final Exam",
       "path": "../../data/quizzes/Computer Science/2/1/Object-Oriented Programming/Final Exam.json",
       "category": "Object-Oriented Programming"
     },
     {
-      "id": "3LEY7JD4",
+      "id": "E4ZS34V2",
       "title": "2. Operating Systems Structures",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/2. Operating Systems Structures.json",
       "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
     },
     {
-      "id": "3TVLTYVT",
-      "title": "6. CPU Scheduling",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.json",
-      "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
-    },
-    {
-      "id": "4PCWKLBY",
+      "id": "EFCUT6SY",
       "title": "1. Introduction",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/1. Introduction.json",
       "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
     },
     {
-      "id": "B3KPJDMT",
-      "title": "3. Processes",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.json",
+      "id": "NSY7GGE2",
+      "title": "6. CPU Scheduling",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.json",
       "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
     },
     {
-      "id": "K23GCU4K",
+      "id": "XKMFPBNP",
       "title": "4. Threads",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/4. Threads.json",
       "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
     },
     {
-      "id": "S2EYICRV",
+      "id": "YS6WPPGF",
+      "title": "3. Processes",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.json",
+      "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
+    },
+    {
+      "id": "F7NKDWCH",
       "title": "1. Introduction",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.json",
       "category": "Operatings Systems/أسئلة الدكتور المحلولة"
     },
     {
-      "id": "SIGTWTKD",
-      "title": "4. Threads",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.json",
-      "category": "Operatings Systems/أسئلة الدكتور المحلولة"
-    },
-    {
-      "id": "TDII6MOV",
+      "id": "HNJCLPUZ",
       "title": "2. Operating Systems Structures",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.json",
       "category": "Operatings Systems/أسئلة الدكتور المحلولة"
     },
     {
-      "id": "W274SMN2",
+      "id": "SIVD3F6E",
       "title": "3. Processes",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.json",
       "category": "Operatings Systems/أسئلة الدكتور المحلولة"
     },
     {
-      "id": "XEWWGTGU",
+      "id": "TBB2EHFR",
+      "title": "4. Threads",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.json",
+      "category": "Operatings Systems/أسئلة الدكتور المحلولة"
+    },
+    {
+      "id": "TNNNWL5D",
       "title": "6. CPU Scheduling",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.json",
       "category": "Operatings Systems/أسئلة الدكتور المحلولة"
     },
     {
-      "id": "FM7TDVUU",
+      "id": "GN3CQGDJ",
       "title": "Ch1 Zaqazeeq",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch1 Zaqazeeq.json",
       "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
     },
     {
-      "id": "LAIW3S5Z",
-      "title": "Ch3 Zaqazeeq",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.json",
-      "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
-    },
-    {
-      "id": "Z7LCDQ7I",
+      "id": "OXSWYQ6F",
       "title": "Ch2 Zaqazeeq",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch2 Zaqazeeq.json",
       "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
     },
     {
-      "id": "2YWYS2RB",
-      "title": "Process Concept And Management",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Process Concept and Management.json",
-      "category": "Operatings Systems"
+      "id": "SGUYS4AA",
+      "title": "Ch3 Zaqazeeq",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.json",
+      "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
     },
     {
-      "id": "3X7M5H4E",
-      "title": "أسئلة مقالي 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي 2.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "5PQLWMN5",
-      "title": "Ch 6 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 6 Quiz.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "5QKPOJRR",
-      "title": "Threads And CPU Scheduling",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Threads and CPU Scheduling.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "AYSTY4MM",
-      "title": "General Exam",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "DBVYJEXL",
-      "title": "Ch2 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch2 Quiz.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "E2ASKPML",
-      "title": "Ch 1, 2, 3, And 4 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "FZ5KL5GT",
-      "title": "Ch 4 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 4 Quiz.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "GXJMRT55",
+      "id": "72PBDHAF",
       "title": "Quiz On The First Chapter",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Quiz on the First Chapter.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "JMU445KY",
-      "title": "Midterm Exam",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Midterm Exam.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "KBWGJU7Q",
-      "title": "Introduction And Structure",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Introduction and Structure.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "KN6WE4QU",
-      "title": "أسئلة مقالي",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي.json",
-      "category": "Operatings Systems"
-    },
-    {
-      "id": "KOQBJMYR",
+      "id": "7BHAWERX",
       "title": "General Exam 3",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 3.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "LXP3UKAT",
-      "title": "General Exam 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 2.json",
+      "id": "AULYTXN2",
+      "title": "Ch2 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch2 Quiz.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "MO4KWCHT",
+      "id": "CEB4SEBE",
       "title": "Ch1 And 2 Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 and 2 Quiz.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "O3M2UZD3",
-      "title": "Final السنة اللي فاتت",
-      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Final السنة اللي فاتت.json",
+      "id": "HBKVXOGB",
+      "title": "Midterm Exam",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Midterm Exam.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "UJ7S5236",
+      "id": "HNVDSRSQ",
+      "title": "Threads And CPU Scheduling",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Threads and CPU Scheduling.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "I3PCL2OZ",
+      "title": "General Exam 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 2.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "K2IGYWCO",
+      "title": "Ch 1, 2, 3, And 4 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "N263XGBP",
+      "title": "Ch 6 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 6 Quiz.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "NLZ63OIJ",
+      "title": "أسئلة مقالي",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "PBMB2SC5",
+      "title": "أسئلة مقالي 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي 2.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "Q5TUZ23Q",
+      "title": "Process Concept And Management",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Process Concept and Management.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "QKZ4S4AG",
       "title": "Ch1 Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 Quiz.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "ZU6LJ62Z",
+      "id": "SAPKL7VW",
+      "title": "Final السنة اللي فاتت",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Final السنة اللي فاتت.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "SCV5FKX7",
+      "title": "Ch 4 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 4 Quiz.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "T352NJZ3",
+      "title": "Introduction And Structure",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Introduction and Structure.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "TSQCHFUJ",
+      "title": "General Exam",
+      "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam.json",
+      "category": "Operatings Systems"
+    },
+    {
+      "id": "X7BXLFU2",
       "title": "Ch3 Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch3 Quiz.json",
       "category": "Operatings Systems"
     },
     {
-      "id": "EW67P5EE",
-      "title": "Introduction To Probability ",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Introduction to Probability .json",
+      "id": "6U2BBKAE",
+      "title": "Lecture 1 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Lecture 1 quiz.json",
       "category": "Probability and Statistics"
     },
     {
-      "id": "TN42OUXL",
-      "title": "Introduction To C Sharp",
-      "path": "../../data/quizzes/Computer Science/1/2/Programming 1/Introduction to C Sharp.json",
+      "id": "YPVPXTHQ",
+      "title": "AI Introduction To Probability",
+      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
+      "category": "Probability and Statistics"
+    },
+    {
+      "id": "YEA7D4UI",
+      "title": "AI Introduction To C Sharp",
+      "path": "../../data/quizzes/Computer Science/1/2/Programming 1/AI Introduction to C Sharp.json",
       "category": "Programming 1"
     },
     {
-      "id": "5YGW26RV",
-      "title": "General Quiz (Hard)",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz (Hard).json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "6QHEWIDE",
-      "title": "Forth And 5th Ch Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Forth and 5th Ch Quiz.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "BFVGH46A",
-      "title": "Quiz 3",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 3.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "IAE7MHRQ",
-      "title": "Sixth And 7th Ch Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Sixth and 7th Ch Quiz.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "JT3UBCZU",
-      "title": "General Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "KUIYGXK4",
-      "title": "Third Chapter Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Third Chapter Quiz.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "N5JP4XY5",
+      "id": "2KTVJKDL",
       "title": "Final Exam",
       "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Final Exam.json",
       "category": "Programming 2"
     },
     {
-      "id": "NYZL4NSD",
-      "title": "Quiz 1",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 1.json",
+      "id": "3R6ST2AT",
+      "title": "General Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz.json",
       "category": "Programming 2"
     },
     {
-      "id": "OD66JQ7R",
-      "title": "Quiz 5",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 5.json",
+      "id": "4MHAOHXT",
+      "title": "Quiz 3",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 3.json",
       "category": "Programming 2"
     },
     {
-      "id": "Q36XOON4",
+      "id": "4SIVGNVY",
       "title": "Quiz 4",
       "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 4.json",
       "category": "Programming 2"
     },
     {
-      "id": "U4BXTHD5",
-      "title": "Quiz 2",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 2.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "VY3C2EAR",
-      "title": "First Chapter Quiz",
-      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/First Chapter quiz.json",
-      "category": "Programming 2"
-    },
-    {
-      "id": "WMVZOPPQ",
+      "id": "BOGQJI2Y",
       "title": "Second Chapter Quiz",
       "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Second Chapter Quiz.json",
       "category": "Programming 2"
     },
     {
-      "id": "KAYZW5N7",
-      "title": "Introduction To Scientific Thinking",
-      "path": "../../data/quizzes/Computer Science/1/2/Scientific thinking/Introduction to Scientific Thinking.json",
+      "id": "F4NTGCF4",
+      "title": "First Chapter Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/First Chapter quiz.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "FD22OVZB",
+      "title": "Sixth And 7th Ch Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Sixth and 7th Ch Quiz.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "HHKIMM2Z",
+      "title": "Third Chapter Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Third Chapter Quiz.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "ILLNREUX",
+      "title": "Forth And 5th Ch Quiz",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Forth and 5th Ch Quiz.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "NP67NLCW",
+      "title": "Quiz 1",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 1.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "PEWBXCIO",
+      "title": "Quiz 5",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 5.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "RWKCN2IY",
+      "title": "General Quiz (Hard)",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz (Hard).json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "WKU3RSJ4",
+      "title": "Quiz 2",
+      "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 2.json",
+      "category": "Programming 2"
+    },
+    {
+      "id": "OECSSTV5",
+      "title": "AI Introduction To Scientific Thinking",
+      "path": "../../data/quizzes/Computer Science/1/2/Scientific thinking/AI Introduction to Scientific Thinking.json",
       "category": "Scientific thinking"
     },
     {
-      "id": "5ZAYQ3Z2",
-      "title": "Introduction To Server Lab ",
-      "path": "../../data/quizzes/Computer Science/2/2/Server Lab/Introduction to Server Lab .json",
+      "id": "FA7VQHDF",
+      "title": "AI Introduction To Server Lab",
+      "path": "../../data/quizzes/Computer Science/2/2/Server Lab/AI Introduction to Server Lab.json",
       "category": "Server Lab"
     },
     {
-      "id": "CGS36U44",
+      "id": "3SVMT2U3",
       "title": "Website Demo",
-      "path": "../../data/quizzes/Computer Science/2/2/Server Lab/Website Demo.json",
-      "category": "Server Lab"
-    },
-    {
-      "id": "OLJQCLYH",
-      "title": "Introduction To System ",
-      "path": "../../data/quizzes/Computer Science/2/2/System Analysis and Design/Introduction to System .json",
-      "category": "System Analysis and Design"
-    },
-    {
-      "id": "IQ7VB7GC",
-      "title": "Introduction To Technical Writing",
-      "path": "../../data/quizzes/Computer Science/1/2/Technical Writing/Introduction to Technical Writing.json",
-      "category": "Technical Writing"
+      "path": "../../data/quizzes/Computer Science/2/2/Website demo/Website Demo.json",
+      "category": "Website demo"
     }
   ],
   "categoryTree": {
@@ -645,9 +633,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "TPEHUPBI",
-          "title": "Introduction To Computer Architecture",
-          "path": "../../data/quizzes/Computer Science/1/2/Computer Architecture/Introduction to Computer Architecture.js",
+          "id": "N5ORNEW3",
+          "title": "AI Introduction To Computer Architecture",
+          "path": "../../data/quizzes/Computer Science/1/2/Computer Architecture/AI Introduction to Computer Architecture.json",
           "category": "Computer Architecture"
         }
       ]
@@ -665,9 +653,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "GSJZLMUP",
-          "title": "Introduction To Electronics",
-          "path": "../../data/quizzes/Computer Science/1/2/Electronics/Introduction to Electronics.js",
+          "id": "V5UU4B4U",
+          "title": "AI Introduction To Electronics",
+          "path": "../../data/quizzes/Computer Science/1/2/Electronics/AI Introduction to Electronics.json",
           "category": "Electronics"
         }
       ]
@@ -685,9 +673,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "ULSXAGSO",
-          "title": "Introduction To Math 2",
-          "path": "../../data/quizzes/Computer Science/1/2/Math 2/Introduction to Math 2.js",
+          "id": "IBTMOUCN",
+          "title": "AI Introduction To Math 2",
+          "path": "../../data/quizzes/Computer Science/1/2/Math 2/AI Introduction to Math 2.json",
           "category": "Math 2"
         }
       ]
@@ -705,9 +693,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "TN42OUXL",
-          "title": "Introduction To C Sharp",
-          "path": "../../data/quizzes/Computer Science/1/2/Programming 1/Introduction to C Sharp.js",
+          "id": "YEA7D4UI",
+          "title": "AI Introduction To C Sharp",
+          "path": "../../data/quizzes/Computer Science/1/2/Programming 1/AI Introduction to C Sharp.json",
           "category": "Programming 1"
         }
       ]
@@ -725,30 +713,10 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "KAYZW5N7",
-          "title": "Introduction To Scientific Thinking",
-          "path": "../../data/quizzes/Computer Science/1/2/Scientific thinking/Introduction to Scientific Thinking.js",
+          "id": "OECSSTV5",
+          "title": "AI Introduction To Scientific Thinking",
+          "path": "../../data/quizzes/Computer Science/1/2/Scientific thinking/AI Introduction to Scientific Thinking.json",
           "category": "Scientific thinking"
-        }
-      ]
-    },
-    "Technical Writing": {
-      "id": "D5PMFRY5",
-      "name": "Technical Writing",
-      "faculty": "Computer Science",
-      "year": "1",
-      "term": "2",
-      "path": [
-        "Technical Writing"
-      ],
-      "parent": null,
-      "subcategories": [],
-      "exams": [
-        {
-          "id": "IQ7VB7GC",
-          "title": "Introduction To Technical Writing",
-          "path": "../../data/quizzes/Computer Science/1/2/Technical Writing/Introduction to Technical Writing.js",
-          "category": "Technical Writing"
         }
       ]
     },
@@ -768,45 +736,45 @@
       ],
       "exams": [
         {
-          "id": "WRB3XEBY",
+          "id": "PDUVKJT6",
           "title": "IP Address",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/IP Address.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/IP Address.json",
           "category": "Computer Network"
         },
         {
-          "id": "3SLNCSQN",
+          "id": "YBPJM7MQ",
           "title": "Lotus Mid 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 1.json",
           "category": "Computer Network"
         },
         {
-          "id": "OWTY327J",
+          "id": "2UELRZ7J",
           "title": "Lotus Mid 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Lotus Mid 2.json",
           "category": "Computer Network"
         },
         {
-          "id": "VNOGJBCM",
+          "id": "4ELX4TGB",
           "title": "Our Mid",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Our Mid.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Our Mid.json",
           "category": "Computer Network"
         },
         {
-          "id": "MF2OMZDE",
+          "id": "N5F3YDQO",
           "title": "Previous Mid",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Previous Mid.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Previous Mid.json",
           "category": "Computer Network"
         },
         {
-          "id": "HG5K6SHH",
+          "id": "CLRENIXC",
           "title": "Unknown Mid Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Unknown Mid Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/Unknown Mid Exam.json",
           "category": "Computer Network"
         },
         {
-          "id": "LVS2S3AP",
+          "id": "UVL56BME",
           "title": "فاينل الدكتورة في كلية علوم",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/فاينل الدكتورة في كلية علوم.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/فاينل الدكتورة في كلية علوم.json",
           "category": "Computer Network"
         }
       ]
@@ -821,21 +789,21 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "YKA62S4U",
+          "id": "65B46FGF",
           "title": "Lecture 1 MCQs",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 1 MCQs.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 1 MCQs.json",
           "category": "Computer Network/أسئلة الدكتورة"
         },
         {
-          "id": "OCMK3D4C",
+          "id": "YOSEUHWJ",
           "title": "Lecture 2 MCQs",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 2 MCQs.json",
           "category": "Computer Network/أسئلة الدكتورة"
         },
         {
-          "id": "OI35ILVQ",
+          "id": "HF26WPWK",
           "title": "Lecture 3 MCQs",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة الدكتورة/Lecture 3 MCQs.json",
           "category": "Computer Network/أسئلة الدكتورة"
         }
       ]
@@ -850,87 +818,87 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "SRPITH45",
+          "id": "AROAAY6I",
           "title": "40 MCQs On Lecture 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 2.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "Z2IZDVJB",
+          "id": "O6DAADJL",
           "title": "40 MCQs On Lecture 4",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/40 MCQs on Lecture 4.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "YGCTXZEI",
+          "id": "7M7U3RFJ",
           "title": "CIDAR Notation",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/CIDAR notation.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "QFLPI3JL",
+          "id": "GJB3DS3S",
           "title": "Lecture 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 1.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "ZHJS4EAP",
+          "id": "FQS3TY56",
           "title": "Lecture 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 2.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "OAW5K4V2",
+          "id": "YPPNGNUU",
           "title": "Lecture 3",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 3.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "7HA5KDKG",
+          "id": "XHE3PKIQ",
           "title": "Lecture 4",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 4.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "2RMCFWMQ",
+          "id": "WPHTLLCC",
           "title": "Lecture 5",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 5.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "CAIBAM3P",
+          "id": "4USHNGDH",
           "title": "Lecture 6",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 6.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 6.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "SS4SHCN5",
+          "id": "5OSBMVO2",
           "title": "Lecture 7",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 7.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 7.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "TYP5NWBM",
+          "id": "TBOXVZLR",
           "title": "Lecture 8",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 8.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "3CXBZRCP",
+          "id": "XO6NQ4JJ",
           "title": "Lecture 9",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Lecture 9.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "4ZTLBHZV",
+          "id": "6B2XCLPL",
           "title": "Questions On Computer Networking",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Questions on Computer Networking.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         },
         {
-          "id": "UTMXAPIJ",
+          "id": "GJIC2BEM",
           "title": "Revision",
-          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Computer Network/أسئلة بالذكاء الإصطناعي/Revision.json",
           "category": "Computer Network/أسئلة بالذكاء الإصطناعي"
         }
       ]
@@ -948,93 +916,93 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "YBF437GL",
+          "id": "W7RTMNFE",
           "title": "50 MCQs On Chapter 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/50 MCQs on Chapter 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/50 MCQs on Chapter 1.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "GDANJ4WC",
+          "id": "VFDMA3X5",
           "title": "55 MCQs On Chapter 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/55 MCQs on Chapter 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/55 MCQs on Chapter 1.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "XDSWB2XD",
+          "id": "SUWCHGVU",
           "title": "MCQs On Chapter 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/MCQs on Chapter 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/MCQs on Chapter 2.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "5F2G4CXA",
+          "id": "VEGURCXY",
           "title": "Midterm 2023",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2023.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2023.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "JYY2XB5X",
+          "id": "B74IWWZD",
           "title": "Midterm 2025",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2025.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2025.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "RGZLNQBX",
+          "id": "BFTJHAWT",
           "title": "Midterm 2026",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2026.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Midterm 2026.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "K4GM5FR2",
+          "id": "O6VJ4ALZ",
           "title": "Oral 2026 FCI",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Oral 2026 FCI.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Oral 2026 FCI.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "PXCPAFUY",
+          "id": "675QZPZQ",
           "title": "Practical Exam   Model A",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Practical Exam - Model A.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Practical Exam - Model A.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "G6QXACJT",
+          "id": "H2RRWDDB",
           "title": "Quiz 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 1.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "P4SKLEP6",
+          "id": "DFALCQXQ",
           "title": "Quiz 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 2.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "3UIUR6U5",
+          "id": "H56UADL5",
           "title": "Quiz 3",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 3.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 3.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "TNU5OHR5",
+          "id": "ZSJ6Y3UF",
           "title": "Quiz 4",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 4.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 4.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "XD37GOPR",
+          "id": "DOVXTUID",
           "title": "Quiz 5",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 5.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Quiz 5.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "YHP4JITG",
+          "id": "3444L2T4",
           "title": "Revision 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 1.json",
           "category": "Discrete Structure"
         },
         {
-          "id": "6Z3BHMDE",
+          "id": "3WXTWZQD",
           "title": "Revision 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Discrete Structure/Revision 2.json",
           "category": "Discrete Structure"
         }
       ]
@@ -1052,45 +1020,39 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "C5DZKIZD",
+          "id": "SJSNGUV3",
           "title": "Ch 8 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch 8 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch 8 Quiz.json",
           "category": "Foundation of IS"
         },
         {
-          "id": "CCOCET36",
+          "id": "EC5JPOBO",
           "title": "Ch1 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1 Quiz.json",
           "category": "Foundation of IS"
         },
         {
-          "id": "X2EOAY6A",
+          "id": "N6465BPF",
           "title": "Ch1, 2, And 3 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1, 2, and 3 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch1, 2, and 3 Quiz.json",
           "category": "Foundation of IS"
         },
         {
-          "id": "VQCFH67G",
+          "id": "QKWH5XTU",
           "title": "Ch6 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch6 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Ch6 Quiz.json",
           "category": "Foundation of IS"
         },
         {
-          "id": "UQSKQLGZ",
+          "id": "GDNK7GXI",
           "title": "General AI Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General AI quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General AI quiz.json",
           "category": "Foundation of IS"
         },
         {
-          "id": "JQ3SK4XN",
+          "id": "MJEQKPZN",
           "title": "General Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General Exam.js",
-          "category": "Foundation of IS"
-        },
-        {
-          "id": "Q36AG3KG",
-          "title": "Midterm Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/Midterm Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Foundation of IS/General Exam.json",
           "category": "Foundation of IS"
         }
       ]
@@ -1108,9 +1070,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "353O7U72",
+          "id": "T3PBR4EY",
           "title": "Final Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Object-Oriented Programming/Final Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Object-Oriented Programming/Final Exam.json",
           "category": "Object-Oriented Programming"
         }
       ]
@@ -1132,111 +1094,111 @@
       ],
       "exams": [
         {
-          "id": "E2ASKPML",
+          "id": "K2IGYWCO",
           "title": "Ch 1, 2, 3, And 4 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 1, 2, 3, and 4 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "FZ5KL5GT",
+          "id": "SCV5FKX7",
           "title": "Ch 4 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 4 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 4 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "5PQLWMN5",
+          "id": "N263XGBP",
           "title": "Ch 6 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 6 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch 6 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "MO4KWCHT",
+          "id": "CEB4SEBE",
           "title": "Ch1 And 2 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 and 2 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 and 2 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "UJ7S5236",
+          "id": "QKZ4S4AG",
           "title": "Ch1 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch1 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "DBVYJEXL",
+          "id": "AULYTXN2",
           "title": "Ch2 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch2 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch2 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "ZU6LJ62Z",
+          "id": "X7BXLFU2",
           "title": "Ch3 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch3 Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Ch3 Quiz.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "O3M2UZD3",
+          "id": "SAPKL7VW",
           "title": "Final السنة اللي فاتت",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Final السنة اللي فاتت.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Final السنة اللي فاتت.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "LXP3UKAT",
+          "id": "I3PCL2OZ",
           "title": "General Exam 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 2.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "KOQBJMYR",
+          "id": "7BHAWERX",
           "title": "General Exam 3",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 3.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam 3.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "AYSTY4MM",
+          "id": "TSQCHFUJ",
           "title": "General Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/General Exam.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "KBWGJU7Q",
+          "id": "T352NJZ3",
           "title": "Introduction And Structure",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Introduction and Structure.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Introduction and Structure.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "JMU445KY",
+          "id": "HBKVXOGB",
           "title": "Midterm Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Midterm Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Midterm Exam.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "2YWYS2RB",
+          "id": "Q5TUZ23Q",
           "title": "Process Concept And Management",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Process Concept and Management.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Process Concept and Management.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "GXJMRT55",
+          "id": "72PBDHAF",
           "title": "Quiz On The First Chapter",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Quiz on the First Chapter.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Quiz on the First Chapter.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "5QKPOJRR",
+          "id": "HNVDSRSQ",
           "title": "Threads And CPU Scheduling",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Threads and CPU Scheduling.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/Threads and CPU Scheduling.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "3X7M5H4E",
+          "id": "PBMB2SC5",
           "title": "أسئلة مقالي 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي 2.json",
           "category": "Operatings Systems"
         },
         {
-          "id": "KN6WE4QU",
+          "id": "NLZ63OIJ",
           "title": "أسئلة مقالي",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة مقالي.json",
           "category": "Operatings Systems"
         }
       ]
@@ -1251,33 +1213,33 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "4PCWKLBY",
+          "id": "EFCUT6SY",
           "title": "1. Introduction",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/1. Introduction.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/1. Introduction.json",
           "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
         },
         {
-          "id": "3LEY7JD4",
+          "id": "E4ZS34V2",
           "title": "2. Operating Systems Structures",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/2. Operating Systems Structures.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/2. Operating Systems Structures.json",
           "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
         },
         {
-          "id": "B3KPJDMT",
+          "id": "YS6WPPGF",
           "title": "3. Processes",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/3. Processes.json",
           "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
         },
         {
-          "id": "K23GCU4K",
+          "id": "XKMFPBNP",
           "title": "4. Threads",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/4. Threads.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/4. Threads.json",
           "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
         },
         {
-          "id": "3TVLTYVT",
+          "id": "NSY7GGE2",
           "title": "6. CPU Scheduling",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور اللي مش محلولة/6. CPU Scheduling.json",
           "category": "Operatings Systems/أسئلة الدكتور اللي مش محلولة"
         }
       ]
@@ -1292,33 +1254,33 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "S2EYICRV",
+          "id": "F7NKDWCH",
           "title": "1. Introduction",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/1. Introduction.json",
           "category": "Operatings Systems/أسئلة الدكتور المحلولة"
         },
         {
-          "id": "TDII6MOV",
+          "id": "HNJCLPUZ",
           "title": "2. Operating Systems Structures",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/2. Operating Systems Structures.json",
           "category": "Operatings Systems/أسئلة الدكتور المحلولة"
         },
         {
-          "id": "W274SMN2",
+          "id": "SIVD3F6E",
           "title": "3. Processes",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/3. Processes.json",
           "category": "Operatings Systems/أسئلة الدكتور المحلولة"
         },
         {
-          "id": "SIGTWTKD",
+          "id": "TBB2EHFR",
           "title": "4. Threads",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/4. Threads.json",
           "category": "Operatings Systems/أسئلة الدكتور المحلولة"
         },
         {
-          "id": "XEWWGTGU",
+          "id": "TNNNWL5D",
           "title": "6. CPU Scheduling",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/أسئلة الدكتور المحلولة/6. CPU Scheduling.json",
           "category": "Operatings Systems/أسئلة الدكتور المحلولة"
         }
       ]
@@ -1333,21 +1295,21 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "FM7TDVUU",
+          "id": "GN3CQGDJ",
           "title": "Ch1 Zaqazeeq",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch1 Zaqazeeq.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch1 Zaqazeeq.json",
           "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
         },
         {
-          "id": "Z7LCDQ7I",
+          "id": "OXSWYQ6F",
           "title": "Ch2 Zaqazeeq",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch2 Zaqazeeq.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch2 Zaqazeeq.json",
           "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
         },
         {
-          "id": "LAIW3S5Z",
+          "id": "SGUYS4AA",
           "title": "Ch3 Zaqazeeq",
-          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Operatings Systems/إمتحانات جامعة الزقازيق/Ch3 Zaqazeeq.json",
           "category": "Operatings Systems/إمتحانات جامعة الزقازيق"
         }
       ]
@@ -1365,81 +1327,81 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "N5JP4XY5",
+          "id": "2KTVJKDL",
           "title": "Final Exam",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Final Exam.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Final Exam.json",
           "category": "Programming 2"
         },
         {
-          "id": "VY3C2EAR",
+          "id": "F4NTGCF4",
           "title": "First Chapter Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/First Chapter quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/First Chapter quiz.json",
           "category": "Programming 2"
         },
         {
-          "id": "6QHEWIDE",
+          "id": "ILLNREUX",
           "title": "Forth And 5th Ch Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Forth and 5th Ch Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Forth and 5th Ch Quiz.json",
           "category": "Programming 2"
         },
         {
-          "id": "5YGW26RV",
+          "id": "RWKCN2IY",
           "title": "General Quiz (Hard)",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz (Hard).js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz (Hard).json",
           "category": "Programming 2"
         },
         {
-          "id": "JT3UBCZU",
+          "id": "3R6ST2AT",
           "title": "General Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/General Quiz.json",
           "category": "Programming 2"
         },
         {
-          "id": "NYZL4NSD",
+          "id": "NP67NLCW",
           "title": "Quiz 1",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 1.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 1.json",
           "category": "Programming 2"
         },
         {
-          "id": "U4BXTHD5",
+          "id": "WKU3RSJ4",
           "title": "Quiz 2",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 2.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 2.json",
           "category": "Programming 2"
         },
         {
-          "id": "BFVGH46A",
+          "id": "4MHAOHXT",
           "title": "Quiz 3",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 3.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 3.json",
           "category": "Programming 2"
         },
         {
-          "id": "Q36XOON4",
+          "id": "4SIVGNVY",
           "title": "Quiz 4",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 4.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 4.json",
           "category": "Programming 2"
         },
         {
-          "id": "OD66JQ7R",
+          "id": "PEWBXCIO",
           "title": "Quiz 5",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 5.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Quiz 5.json",
           "category": "Programming 2"
         },
         {
-          "id": "WMVZOPPQ",
+          "id": "BOGQJI2Y",
           "title": "Second Chapter Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Second Chapter Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Second Chapter Quiz.json",
           "category": "Programming 2"
         },
         {
-          "id": "IAE7MHRQ",
+          "id": "FD22OVZB",
           "title": "Sixth And 7th Ch Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Sixth and 7th Ch Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Sixth and 7th Ch Quiz.json",
           "category": "Programming 2"
         },
         {
-          "id": "KUIYGXK4",
+          "id": "HHKIMM2Z",
           "title": "Third Chapter Quiz",
-          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Third Chapter Quiz.js",
+          "path": "../../data/quizzes/Computer Science/2/1/Programming 2/Third Chapter Quiz.json",
           "category": "Programming 2"
         }
       ]
@@ -1457,15 +1419,15 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "NFPIXSZO",
+          "id": "XOZPTJYP",
           "title": "Final 2020 2021",
-          "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Final 2020-2021.js",
+          "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Final 2020-2021.json",
           "category": "Artificial Intelligence"
         },
         {
-          "id": "EF2QYLQA",
+          "id": "6OE7S2DT",
           "title": "Introduction To AI",
-          "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Introduction to AI.js",
+          "path": "../../data/quizzes/Computer Science/2/2/Artificial Intelligence/Introduction to AI.json",
           "category": "Artificial Intelligence"
         }
       ]
@@ -1483,9 +1445,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "Z6BC2HM3",
-          "title": "Introduction To Data Structure ",
-          "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure .js",
+          "id": "WBXQKRLD",
+          "title": "Introduction To Data Structure",
+          "path": "../../data/quizzes/Computer Science/2/2/Data Structures and Algorithms/Introduction to Data Structure.json",
           "category": "Data Structures and Algorithms"
         }
       ]
@@ -1503,9 +1465,9 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "LCM7CNP4",
-          "title": "Introduction To Database ",
-          "path": "../../data/quizzes/Computer Science/2/2/Database Management Systems/Introduction to Database .js",
+          "id": "HC4RZL7I",
+          "title": "AI Introduction To Database",
+          "path": "../../data/quizzes/Computer Science/2/2/Database Management Systems/AI Introduction to Database.json",
           "category": "Database Management Systems"
         }
       ]
@@ -1523,9 +1485,15 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "EW67P5EE",
-          "title": "Introduction To Probability ",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Introduction to Probability .js",
+          "id": "YPVPXTHQ",
+          "title": "AI Introduction To Probability",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
+          "category": "Probability and Statistics"
+        },
+        {
+          "id": "6U2BBKAE",
+          "title": "Lecture 1 Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Lecture 1 quiz.json",
           "category": "Probability and Statistics"
         }
       ]
@@ -1543,36 +1511,30 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "5ZAYQ3Z2",
-          "title": "Introduction To Server Lab ",
-          "path": "../../data/quizzes/Computer Science/2/2/Server Lab/Introduction to Server Lab .js",
-          "category": "Server Lab"
-        },
-        {
-          "id": "CGS36U44",
-          "title": "Website Demo",
-          "path": "../../data/quizzes/Computer Science/2/2/Server Lab/Website Demo.js",
+          "id": "FA7VQHDF",
+          "title": "AI Introduction To Server Lab",
+          "path": "../../data/quizzes/Computer Science/2/2/Server Lab/AI Introduction to Server Lab.json",
           "category": "Server Lab"
         }
       ]
     },
-    "System Analysis and Design": {
-      "id": "LP5BFZXK",
-      "name": "System Analysis and Design",
+    "Website demo": {
+      "id": "IPZ52MID",
+      "name": "Website demo",
       "faculty": "Computer Science",
       "year": "2",
       "term": "2",
       "path": [
-        "System Analysis and Design"
+        "Website demo"
       ],
       "parent": null,
       "subcategories": [],
       "exams": [
         {
-          "id": "OLJQCLYH",
-          "title": "Introduction To System ",
-          "path": "../../data/quizzes/Computer Science/2/2/System Analysis and Design/Introduction to System .js",
-          "category": "System Analysis and Design"
+          "id": "3SVMT2U3",
+          "title": "Website Demo",
+          "path": "../../data/quizzes/Computer Science/2/2/Website demo/Website Demo.json",
+          "category": "Website demo"
         }
       ]
     }
