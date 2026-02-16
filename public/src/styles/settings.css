@@ -1,12 +1,31 @@
-body {
-  font-family: "Tajawal", "Inter", sans-serif;
-  background: var(--color-background, #f5f5f5);
-  color: var(--color-text-primary, #1a1a1a);
-  min-height: 100vh;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Tajawal",
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  padding: 40px 24px;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .settings-page {
@@ -63,10 +82,8 @@ body {
   position: fixed;
   top: 24px;
   z-index: 100;
-}
 
-/* Always on left to avoid hamburger menu overlap (hamburger is always on right) */
-.back-link {
+  /* Always on left to avoid hamburger menu overlap (hamburger is always on right) */
   left: 40px;
   right: auto;
 }

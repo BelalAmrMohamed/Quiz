@@ -13,20 +13,17 @@ const STATIC_ASSETS = [
   "/index.html",
   "/quiz.html",
   "/summary.html",
-  "/settings.html",
 
   // used css files
   "/src/styles/themes.css",
   "/src/styles/index.css",
   "/src/styles/quiz.css",
   "/src/styles/summary.css",
-  "/src/styles/settings.css",
 
   // used js files
   "/src/scripts/index.js",
   "/src/scripts/quiz.js",
   "/src/scripts/summary.js",
-  "/src/scripts/settings.js",
   "/src/scripts/theme-controller.js",
 
   // Notifications and side menu
