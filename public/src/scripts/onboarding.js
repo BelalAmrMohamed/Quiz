@@ -7,7 +7,10 @@ import {
   filterCourses,
 } from "./filterUtils.js";
 
-import { showNotification } from "../components/notifications.js";
+import {
+  showNotification,
+  // confirmationNotification,
+} from "../components/notifications.js";
 
 let categoryTree = null;
 let currentStep = 0;

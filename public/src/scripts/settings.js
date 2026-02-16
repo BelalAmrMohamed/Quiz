@@ -8,9 +8,14 @@ import {
   filterCourses,
 } from "./filterUtils.js";
 
-const CONFIG = { MAX_USERNAME_LENGTH: 50 };
+const CONFIG = {
+  MAX_USERNAME_LENGTH: 50,
+  AUTOSAVE_DELAY: 800, // ms - delay before auto-saving
+};
 
 let categoryTree = null;
+let autoSaveTimeout = null;
+let isSaving = false;
 
 function escapeHtml(unsafe) {
   if (unsafe === null || unsafe === undefined) return "";
@@ -176,6 +181,144 @@ function showFeedback(message, isError = false) {
   }
 }
 
+// === AUTO-SAVE FUNCTIONS ===
+function scheduleAutoSave() {
+  clearTimeout(autoSaveTimeout);
+  showSavingIndicator();
+
+  autoSaveTimeout = setTimeout(async () => {
+    await saveSettingsAuto();
+  }, CONFIG.AUTOSAVE_DELAY);
+}
+
+function showSavingIndicator() {
+  const feedback = document.getElementById("saveFeedback");
+  if (feedback) {
+    feedback.textContent = "💾 جاري الحفظ...";
+    feedback.style.color = "var(--color-primary, #6366f1)";
+    feedback.classList.add("saving");
+  }
+}
+
+function showSavedIndicator() {
+  const feedback = document.getElementById("saveFeedback");
+  if (feedback) {
+    feedback.textContent = "✓ تم الحفظ تلقائياً";
+    feedback.style.color = "var(--color-success, #10b981)";
+    feedback.classList.remove("saving");
+
+    setTimeout(() => {
+      feedback.textContent = "";
+      feedback.classList.remove("saving");
+    }, 2000);
+  }
+}
+
+async function saveSettingsAuto() {
+  if (isSaving) return;
+  isSaving = true;
+
+  try {
+    const username = document.getElementById("settingsName")?.value?.trim();
+
+    // Validate and save username
+    if (username) {
+      const validation = validateUsername(username);
+      if (!validation.valid) {
+        showFeedback(validation.message, true);
+        isSaving = false;
+        return;
+      }
+      userProfile.setUsername(username);
+    }
+
+    // Save academic info
+    const faculty = document.getElementById("settingsFaculty")?.value;
+    const year = document.getElementById("settingsYear")?.value;
+    const term = document.getElementById("settingsTerm")?.value;
+
+    const oldProfile = userProfile.getProfile();
+    userProfile.updateAcademicInfo({ faculty, year, term });
+
+    // Handle academic info changes (subscription updates)
+    const academicInfoChanged =
+      oldProfile.faculty !== faculty ||
+      oldProfile.year !== year ||
+      oldProfile.term !== term;
+
+    if (academicInfoChanged) {
+      if (
+        oldProfile.faculty !== "All" &&
+        oldProfile.year !== "All" &&
+        oldProfile.term !== "All"
+      ) {
+        const oldMatchingCourses = filterCourses(categoryTree, oldProfile);
+        const oldMatchingIds = oldMatchingCourses.map((c) => c.id);
+        const subscribedIds = userProfile.getSubscribedCourseIds();
+        oldMatchingIds.forEach((courseId) => {
+          if (subscribedIds.includes(courseId)) {
+            userProfile.unsubscribeFromCourse(courseId);
+          }
+        });
+      }
+      userProfile.initializeDefaultSubscriptions(categoryTree);
+    }
+
+    showSavedIndicator();
+  } catch (error) {
+    console.error("Auto-save failed:", error);
+    showFeedback("فشل الحفظ التلقائي", true);
+  } finally {
+    isSaving = false;
+  }
+}
+
+function setupAutoSave() {
+  // Username auto-save with debounce
+  const nameInput = document.getElementById("settingsName");
+  if (nameInput) {
+    nameInput.addEventListener("input", scheduleAutoSave);
+    nameInput.addEventListener("blur", () => {
+      // Validate immediately on blur
+      const username = nameInput.value?.trim();
+      if (username) {
+        const validation = validateUsername(username);
+        if (!validation.valid) {
+          showFeedback(validation.message, true);
+        }
+      }
+    });
+  }
+
+  // Academic dropdowns auto-save
+  ["settingsFaculty", "settingsYear", "settingsTerm"].forEach((id) => {
+    const select = document.getElementById(id);
+    if (select) {
+      select.addEventListener("change", () => {
+        scheduleAutoSave();
+        // Re-render course list when academic info changes
+        renderCourseManagerList();
+      });
+    }
+  });
+
+  // Quiz style auto-save
+  document.querySelectorAll('input[name="quizStyle"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      userProfile.setQuizStyle(radio.value);
+      showFeedback("✓ تم تحديث نمط العرض", false);
+    });
+  });
+
+  // Default mode auto-save
+  document.querySelectorAll('input[name="defaultMode"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      userProfile.setDefaultQuizMode(radio.value);
+      showFeedback("✓ تم تحديث الوضع الافتراضي", false);
+    });
+  });
+}
+
 // --- Course Manager Logic ---
 function renderCourseManagerList() {
   const listContainer = document.getElementById("courseManagerList");
@@ -268,64 +411,8 @@ async function init() {
   bindOptionCards("quizStyle");
   bindOptionCards("defaultMode");
 
-  const form = document.getElementById("settingsForm");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const username = document.getElementById("settingsName")?.value?.trim();
-    const faculty = document.getElementById("settingsFaculty")?.value;
-    const year = document.getElementById("settingsYear")?.value;
-    const term = document.getElementById("settingsTerm")?.value;
-    const quizStyle =
-      form.querySelector('input[name="quizStyle"]:checked')?.value ||
-      "pagination";
-    const defaultMode =
-      form.querySelector('input[name="defaultMode"]:checked')?.value ||
-      "practice";
-
-    if (username) {
-      const validation = validateUsername(username);
-      if (!validation.valid) {
-        showFeedback(validation.message, true);
-        document.getElementById("settingsName")?.focus();
-        return;
-      }
-      userProfile.setUsername(username.trim());
-    }
-
-    const oldProfile = userProfile.getProfile();
-    userProfile.updateAcademicInfo({ faculty, year, term });
-
-    const academicInfoChanged =
-      oldProfile.faculty !== faculty ||
-      oldProfile.year !== year ||
-      oldProfile.term !== term;
-
-    if (academicInfoChanged) {
-      if (
-        oldProfile.faculty !== "All" &&
-        oldProfile.year !== "All" &&
-        oldProfile.term !== "All"
-      ) {
-        const oldMatchingCourses = filterCourses(categoryTree, oldProfile);
-        const oldMatchingIds = oldMatchingCourses.map((c) => c.id);
-        const subscribedIds = userProfile.getSubscribedCourseIds();
-        oldMatchingIds.forEach((courseId) => {
-          if (subscribedIds.includes(courseId)) {
-            userProfile.unsubscribeFromCourse(courseId);
-          }
-        });
-      }
-      userProfile.initializeDefaultSubscriptions(categoryTree);
-    }
-
-    userProfile.setQuizStyle(quizStyle);
-    userProfile.setDefaultQuizMode(defaultMode);
-
-    showFeedback("تم حفظ الإعدادات بنجاح");
-  });
+  // Setup auto-save instead of form submit
+  setupAutoSave();
 }
 
 init();

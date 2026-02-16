@@ -1323,7 +1323,7 @@ function updateBreadcrumb() {
     return;
   }
 
-  breadcrumb.style.display = "flex";
+  breadcrumb.style.display = "inline-flex";
   breadcrumb.setAttribute("aria-hidden", "false");
   const breadcrumbText = breadcrumb.querySelector(".breadcrumb-text");
 
@@ -1364,7 +1364,17 @@ function isURL_orPath(string) {
 
 function startQuiz(id, mode) {
   try {
-    window.location.href = `quiz.html?id=${encodeURIComponent(id)}&mode=${encodeURIComponent(mode)}`;
+    // Get default mode from user profile if not specified
+    const quizMode =
+      mode || userProfile.getProfile().defaultQuizMode || "practice";
+
+    // Store in localStorage instead of URL parameters
+    localStorage.setItem("quiz_current_mode", quizMode);
+    localStorage.setItem("quiz_current_id", id);
+    localStorage.setItem("quiz_start_time", Date.now().toString());
+
+    // Navigate with clean URL (no parameters)
+    window.location.href = "quiz.html";
   } catch (error) {
     console.error("Error starting quiz:", error);
     alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
