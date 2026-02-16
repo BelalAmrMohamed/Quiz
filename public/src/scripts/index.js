@@ -1044,12 +1044,26 @@ function createCategoryCard(
   courseData = null,
 ) {
   const card = document.createElement("div");
+
+  const getItemText = (count) =>
+    `${
+      count === 0
+        ? "لا يوجد إمتحانات"
+        : count === 1
+          ? "إمتحان واحد"
+          : count === 2
+            ? "إمتحانان"
+            : count <= 10
+              ? "إمتحانات"
+              : "إمتحان"
+    }`;
+
   card.className = "card category-card";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
   card.setAttribute(
     "aria-label",
-    `${name}, ${itemCount} ${itemCount === 1 ? "إمتحان" : "إمتحانات"}`,
+    `${name}, ${itemCount} ${getItemText(itemCount)}`,
   );
 
   const icon = isFolder ? "📁" : "📂";
@@ -1064,15 +1078,11 @@ function createCategoryCard(
 
   const p = document.createElement("p");
 
-  p.textContent =
-    itemCount === 1
-      ? `إمتحان واحد`
-      : itemCount === 2
-        ? `إمتحانان`
-        : `${itemCount} إمتحانات`;
+  p.textContent = `${itemCount > 2 ? itemCount : ""} ${getItemText(itemCount)}`;
 
   // Add course metadata if available
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
+    const profile = userProfile.getProfile();
     const metaDiv = document.createElement("div");
     metaDiv.className = "course-meta";
 
@@ -1089,9 +1099,15 @@ function createCategoryCard(
     termBadge.className = "course-meta-badge term";
     termBadge.textContent = `الترم ${courseData.term}`;
 
-    metaDiv.appendChild(facultyBadge);
-    metaDiv.appendChild(yearBadge);
-    metaDiv.appendChild(termBadge);
+    // Only show the faculty if the user didn't set their faculty
+    if (profile.faculty === "All") metaDiv.appendChild(facultyBadge);
+
+    // Only show the year if the user didn't set their year, or is from a different year that the user
+    if (courseData.year != profile.year || profile.year === "All")
+      metaDiv.appendChild(yearBadge);
+
+    if (courseData.term != profile.term || profile.term === "All")
+      metaDiv.appendChild(termBadge);
 
     card.appendChild(iconDiv);
     card.appendChild(h3);

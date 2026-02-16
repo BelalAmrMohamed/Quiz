@@ -428,6 +428,7 @@ Container
 
 .category-card {
   text-align: center;
+  padding-bottom: 10px;
 }
 
 .category-card .icon {
