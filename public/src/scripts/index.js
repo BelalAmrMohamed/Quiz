@@ -581,52 +581,80 @@ function initializeSearchManager() {
       .filter(([key, category]) => !category.parent)
       .map(([key, category]) => ({ key, ...category }));
 
-    // Create search manager instance
-    searchManager = new SearchManager("#searchContainer", handleSearchResults);
-    searchManager.init(allCourses);
+    // Create search manager instance with navigation stack getter
+    searchManager = new SearchManager(
+      "#searchContainer",
+      handleSearchResults,
+      () => navigationStack,
+    );
+    searchManager.init(allCourses, categoryTree);
   } catch (error) {
     console.error("Error initializing search manager:", error);
   }
 }
 
 /**
- * Handle search results from SearchManager
- * This function is called whenever search results change
+ * Handle search results from SearchManager.
+ * Called whenever search results change, or when isReset = true to restore the original view.
  */
-function handleSearchResults(results) {
+function handleSearchResults(results, context, isReset = false) {
   try {
-    // Clear navigation stack when searching
-    if (searchManager && searchManager.isSearchActive()) {
-      navigationStack = [];
-      updateBreadcrumb();
+    // When the search bar is closed, restore the full root view without filtering
+    if (isReset) {
+      renderRootCategories();
+      return;
     }
 
-    // Update title based on search state
-    if (title) {
-      if (searchManager && searchManager.isSearchActive()) {
-        title.textContent = "نتائج البحث";
-      } else {
-        const subscribedIds = userProfile.getSubscribedCourseIds();
-        const subscribedCourses = getSubscribedCourses(
-          categoryTree,
-          subscribedIds,
-        );
-        title.textContent =
-          subscribedCourses.length > 0 ? "المواد خاصتي" : "جميع المواد";
-      }
+    if (context === "courses") {
+      handleCourseSearchResults(results);
+    } else if (context === "quizzes") {
+      handleQuizSearchResults(results);
     }
-
-    // Render search results
-    renderSearchResults(results);
   } catch (error) {
     console.error("Error handling search results:", error);
   }
 }
 
 /**
- * Render search results in the main container
+ * Handle course search results (in root view)
  */
-function renderSearchResults(courses) {
+function handleCourseSearchResults(results) {
+  try {
+    if (searchManager && searchManager.isSearchActive()) {
+      // Active search — show filtered course results
+      navigationStack = [];
+      updateBreadcrumb();
+      if (title) title.textContent = "نتائج البحث";
+      renderCourseSearchResults(results);
+    } else {
+      // Search query cleared inside the bar (not a full close) — restore root view.
+      // NOTE: a full close (× button) triggers isReset = true in handleSearchResults,
+      // which calls renderRootCategories() directly. This branch handles the case
+      // where the user just backspaces the query while keeping the bar open.
+      renderRootCategories();
+    }
+  } catch (error) {
+    console.error("Error handling course search results:", error);
+  }
+}
+
+/**
+ * Handle quiz search results (inside a course)
+ */
+function handleQuizSearchResults(results) {
+  try {
+    // Keep navigation stack and title as is
+    // Just update the quiz display
+    renderQuizSearchResults(results);
+  } catch (error) {
+    console.error("Error handling quiz search results:", error);
+  }
+}
+
+/**
+ * Render course search results in the main container
+ */
+function renderCourseSearchResults(courses) {
   try {
     if (!container) return;
 
@@ -650,17 +678,23 @@ function renderSearchResults(courses) {
       return;
     }
 
-    // Render course cards
+    // Render course cards with subscribe button
     courses.forEach((course) => {
       const itemCount = getCourseItemCount(course);
       const card = createCategoryCard(course.name, itemCount, true, course);
+
+      // Add subscribe button if in search results
+      if (searchManager && searchManager.isSearchActive()) {
+        addSubscribeButton(card, course);
+      }
+
       card.onclick = () => renderCategory(categoryTree[course.key]);
       fragment.appendChild(card);
     });
 
     container.appendChild(fragment);
   } catch (error) {
-    console.error("Error rendering search results:", error);
+    console.error("Error rendering course search results:", error);
     if (container) {
       container.innerHTML = `
         <div class="error-state" role="alert">
@@ -671,10 +705,185 @@ function renderSearchResults(courses) {
   }
 }
 
+/**
+ * Render quiz search results
+ */
+function renderQuizSearchResults(exams) {
+  try {
+    if (!container) return;
+
+    // Get current category from navigation stack
+    const currentCategory = navigationStack[navigationStack.length - 1];
+    if (!currentCategory) return;
+
+    container.innerHTML = "";
+    container.className = "grid-container";
+    container.setAttribute("aria-busy", "false");
+
+    const fragment = document.createDocumentFragment();
+
+    // Render subcategories first (if any)
+    if (
+      currentCategory.subcategories &&
+      currentCategory.subcategories.length > 0
+    ) {
+      currentCategory.subcategories.forEach((subCatKey) => {
+        const subCat = categoryTree[subCatKey];
+        if (subCat) {
+          const itemCount = getCourseItemCount(subCat);
+          const card = createCategoryCard(subCat.name, itemCount, true);
+          card.onclick = () => renderCategory(subCat);
+          fragment.appendChild(card);
+        }
+      });
+    }
+
+    if (
+      exams.length === 0 &&
+      (!currentCategory.subcategories ||
+        currentCategory.subcategories.length === 0)
+    ) {
+      // Empty state for no results
+      const emptyState = document.createElement("div");
+      emptyState.className = "empty-state";
+      emptyState.setAttribute("role", "status");
+      emptyState.innerHTML = `
+        <div class="empty-state-icon" aria-hidden="true">🔍</div>
+        <h3>لا توجد نتائج</h3>
+        <p>جرّب البحث بكلمات مختلفة</p>
+      `;
+      container.appendChild(emptyState);
+      return;
+    }
+
+    // Render filtered exams
+    exams.forEach((exam) => {
+      const card = createExamCard(exam);
+      fragment.appendChild(card);
+    });
+
+    container.appendChild(fragment);
+  } catch (error) {
+    console.error("Error rendering quiz search results:", error);
+  }
+}
+
+/**
+ * Add subscribe button to a course card
+ */
+function addSubscribeButton(card, course) {
+  try {
+    // Check if already subscribed
+    const subscribedIds = userProfile.getSubscribedCourseIds();
+    const isSubscribed = subscribedIds.includes(course.id);
+
+    // Create button container
+    const btnContainer = document.createElement("div");
+    btnContainer.style.cssText = `
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    `;
+
+    // Create subscribe button
+    const subscribeBtn = document.createElement("button");
+    subscribeBtn.className = "subscribe-btn";
+    subscribeBtn.textContent = isSubscribed ? "✓ مشترك" : "+ إضافة";
+    subscribeBtn.type = "button";
+    subscribeBtn.setAttribute(
+      "aria-label",
+      isSubscribed ? `مشترك في ${course.name}` : `إضافة ${course.name}`,
+    );
+    subscribeBtn.style.cssText = `
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      ${
+        isSubscribed
+          ? `
+          background: var(--color-success-light, #d1fae5);
+          color: var(--color-success, #059669);
+          cursor: default;
+        `
+          : `
+          background: var(--gradient-accent);
+          color: white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        `
+      }
+    `;
+
+    if (!isSubscribed) {
+      subscribeBtn.onclick = (e) => {
+        e.stopPropagation();
+        subscribeToCourse(course, subscribeBtn);
+      };
+
+      subscribeBtn.onmouseenter = () => {
+        if (!isSubscribed) {
+          subscribeBtn.style.transform = "translateY(-1px)";
+          subscribeBtn.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.15)";
+        }
+      };
+
+      subscribeBtn.onmouseleave = () => {
+        if (!isSubscribed) {
+          subscribeBtn.style.transform = "translateY(0)";
+          subscribeBtn.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)";
+        }
+      };
+    }
+
+    btnContainer.appendChild(subscribeBtn);
+    card.appendChild(btnContainer);
+  } catch (error) {
+    console.error("Error adding subscribe button:", error);
+  }
+}
+
+/**
+ * Subscribe to a course
+ */
+function subscribeToCourse(course, button) {
+  try {
+    userProfile.subscribeToCourse(course.id);
+
+    // Update button appearance
+    button.textContent = "✓ مشترك";
+    button.style.background = "var(--color-success-light, #d1fae5)";
+    button.style.color = "var(--color-success, #059669)";
+    button.style.cursor = "default";
+    button.style.boxShadow = "none";
+    button.setAttribute("aria-label", `مشترك في ${course.name}`);
+    button.onclick = null;
+
+    // Show notification
+    showNotification(
+      "تم الإشتراك",
+      `تم إضافة ${course.name} إلى موادك`,
+      "./favicon.png",
+    );
+  } catch (error) {
+    console.error("Error subscribing to course:", error);
+    alert("حدث خطأ أثناء الإشتراك. حاول مرة أخرى.");
+  }
+}
+
 function renderRootCategories() {
   try {
     navigationStack = [];
     updateBreadcrumb();
+
+    // Update search context when returning to root
+    if (searchManager) {
+      searchManager.updateContextVisibility();
+    }
 
     if (!title || !container) return;
 
@@ -771,6 +980,11 @@ function renderUserQuizzesView() {
     // Update Navigation Stack
     navigationStack.push({ name: "إمتحاناتك" });
     updateBreadcrumb();
+
+    // Update search context (hide search in user quizzes view)
+    if (searchManager) {
+      searchManager.container.style.display = "none";
+    }
 
     // Update Title & Clear Container
     if (title) title.textContent = "إمتحاناتك";
@@ -1093,6 +1307,11 @@ function renderCategory(category) {
   try {
     navigationStack.push(category);
     updateBreadcrumb();
+
+    // Update search context when entering a category
+    if (searchManager) {
+      searchManager.updateContextVisibility();
+    }
 
     title.textContent = category.name;
     container.innerHTML = "";

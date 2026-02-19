@@ -1,5 +1,5 @@
 // ============================================================================
-// search-manager.js - Advanced Search & Filter System
+// search-manager.js - Context-Aware Advanced Search System
 // ============================================================================
 
 import { userProfile } from "./userProfile.js";
@@ -12,11 +12,14 @@ import {
 } from "./filterUtils.js";
 
 export class SearchManager {
-  constructor(containerSelector, onSearchCallback) {
+  constructor(containerSelector, onSearchCallback, getNavigationStack) {
     this.container = document.querySelector(containerSelector);
     this.onSearchCallback = onSearchCallback; // Callback when search results change
+    this.getNavigationStack = getNavigationStack; // Function to get current navigation stack
     this.allCourses = [];
     this.filteredCourses = [];
+    this.categoryTree = null;
+    this.currentContext = null; // 'courses' or 'quizzes'
 
     this.searchConfig = {
       debounceDelay: 300,
@@ -35,6 +38,7 @@ export class SearchManager {
     this.searchHistory = this.loadSearchHistory();
     this.debounceTimer = null;
     this.isFiltersPanelOpen = false;
+    this.isBarOpen = false; // NEW: tracks whether the search bar is expanded
 
     // Store references to DOM elements
     this.elements = {};
@@ -43,17 +47,21 @@ export class SearchManager {
   /**
    * Initialize the search manager with course data
    */
-  init(coursesData) {
+  init(coursesData, categoryTree) {
     this.allCourses = coursesData;
     this.filteredCourses = coursesData;
+    this.categoryTree = categoryTree;
     this.cacheElements();
     this.bindSearchInput();
     this.bindFilterControls();
     this.bindClearButton();
     this.bindFilterToggle();
+    this.bindHeaderSearchBtn(); // NEW
+    this.bindSearchClose(); // NEW
     this.populateFacultyFilter();
     this.bindResetFilters();
     this.setupKeyboardShortcuts();
+    this.updateContextVisibility();
   }
 
   /**
@@ -63,6 +71,8 @@ export class SearchManager {
     this.elements = {
       searchInput: document.getElementById("courseSearch"),
       searchClear: document.getElementById("searchClear"),
+      searchClose: document.getElementById("searchClose"), // NEW: collapses the bar
+      headerSearchBtn: document.getElementById("headerSearchBtn"), // NEW: header icon trigger
       filterToggle: document.getElementById("filterToggle"),
       searchFilters: document.getElementById("searchFilters"),
       searchSummary: document.getElementById("searchSummary"),
@@ -73,6 +83,77 @@ export class SearchManager {
       applyFilters: document.getElementById("applyFilters"),
       resetFilters: document.getElementById("resetFilters"),
     };
+  }
+
+  /**
+   * Update search context based on navigation.
+   * Shows/hides the header trigger button. Does NOT open/close the bar itself.
+   */
+  updateContextVisibility() {
+    const navStack = this.getNavigationStack ? this.getNavigationStack() : [];
+
+    if (navStack.length === 0) {
+      // Course categories view — search for courses
+      this.currentContext = "courses";
+      if (this.elements.searchInput) {
+        this.elements.searchInput.placeholder = "ابحث عن مادة...";
+      }
+      // Show header trigger button
+      if (this.elements.headerSearchBtn) {
+        this.elements.headerSearchBtn.style.display = "flex";
+      }
+    } else {
+      // Inside a course — search for quizzes
+      const currentCategory = navStack[navStack.length - 1];
+      const hasExams =
+        currentCategory &&
+        ((currentCategory.exams && currentCategory.exams.length > 0) ||
+          (currentCategory.quizzes && currentCategory.quizzes.length > 0));
+
+      this.currentContext = "quizzes";
+
+      if (hasExams) {
+        if (this.elements.searchInput) {
+          this.elements.searchInput.placeholder = "ابحث عن اختبار...";
+        }
+        if (this.elements.headerSearchBtn) {
+          this.elements.headerSearchBtn.style.display = "flex";
+        }
+      } else {
+        // No exams — hide the trigger button and close the bar if open
+        if (this.elements.headerSearchBtn) {
+          this.elements.headerSearchBtn.style.display = "none";
+        }
+        this.closeSearchBar();
+      }
+    }
+
+    // Show/hide filters toggle (only relevant in course context)
+    if (this.elements.filterToggle) {
+      this.elements.filterToggle.style.display =
+        this.currentContext === "courses" ? "flex" : "none";
+    }
+
+    // When context changes (e.g. navigated to a different view), close the bar cleanly
+    // but DON'T call clearSearch() to avoid the render loop — just reset internal state
+    this._resetSearchState();
+  }
+
+  /**
+   * Reset search state without triggering a render callback.
+   * Used internally when context changes.
+   */
+  _resetSearchState() {
+    this.filters.searchQuery = "";
+    if (this.elements.searchInput) {
+      this.elements.searchInput.value = "";
+    }
+    if (this.elements.searchClear) {
+      this.elements.searchClear.style.display = "none";
+    }
+    if (this.elements.searchSummary) {
+      this.elements.searchSummary.style.display = "none";
+    }
   }
 
   // ===========================
@@ -91,7 +172,8 @@ export class SearchManager {
         e.preventDefault();
         this.performSearch();
       } else if (e.key === "Escape") {
-        this.clearSearch();
+        // Close bar entirely on Escape
+        this.closeSearchBar();
       }
     });
   }
@@ -117,6 +199,17 @@ export class SearchManager {
   // ===========================
 
   performSearch() {
+    if (this.currentContext === "courses") {
+      this.searchCourses();
+    } else if (this.currentContext === "quizzes") {
+      this.searchQuizzes();
+    }
+  }
+
+  /**
+   * Search for courses (in course categories view)
+   */
+  searchCourses() {
     let results = [...this.allCourses];
 
     // Apply search query
@@ -124,7 +217,7 @@ export class SearchManager {
       this.filters.searchQuery &&
       this.filters.searchQuery.length >= this.searchConfig.minSearchLength
     ) {
-      results = this.filterBySearchQuery(results);
+      results = this.filterCoursesBySearchQuery(results);
       this.addToSearchHistory(this.filters.searchQuery);
     }
 
@@ -151,11 +244,47 @@ export class SearchManager {
 
     // Trigger callback to update the main view
     if (this.onSearchCallback) {
-      this.onSearchCallback(results);
+      this.onSearchCallback(results, "courses");
     }
   }
 
-  filterBySearchQuery(courses) {
+  /**
+   * Search for quizzes/exams (inside a course)
+   */
+  searchQuizzes() {
+    const navStack = this.getNavigationStack ? this.getNavigationStack() : [];
+    if (navStack.length === 0) return;
+
+    const currentCategory = navStack[navStack.length - 1];
+    if (!currentCategory) return;
+
+    // Support both .exams and .quizzes as the quiz list property
+    const quizList = currentCategory.exams || currentCategory.quizzes || [];
+    if (quizList.length === 0) return;
+
+    let results = [...quizList];
+
+    // Apply search query
+    if (
+      this.filters.searchQuery &&
+      this.filters.searchQuery.length >= this.searchConfig.minSearchLength
+    ) {
+      results = this.filterQuizzesBySearchQuery(results);
+      this.addToSearchHistory(this.filters.searchQuery);
+    }
+
+    // Sort quizzes
+    results = this.sortQuizzes(results);
+
+    this.updateUI(results);
+
+    // Trigger callback to update the main view
+    if (this.onSearchCallback) {
+      this.onSearchCallback(results, "quizzes");
+    }
+  }
+
+  filterCoursesBySearchQuery(courses) {
     const query = this.filters.searchQuery.toLowerCase().trim();
     const terms = query.split(/\s+/);
 
@@ -166,6 +295,25 @@ export class SearchManager {
         course.faculty || "",
         course.description || "",
         (course.tags || []).join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      // All terms must match (AND logic)
+      return terms.every((term) => searchableText.includes(term));
+    });
+  }
+
+  filterQuizzesBySearchQuery(quizzes) {
+    const query = this.filters.searchQuery.toLowerCase().trim();
+    const terms = query.split(/\s+/);
+
+    return quizzes.filter((quiz) => {
+      const searchableText = [
+        quiz.title || "",
+        quiz.name || "", // some datasets use "name" instead of "title"
+        quiz.id || "",
+        quiz.description || "",
       ]
         .join(" ")
         .toLowerCase();
@@ -245,6 +393,30 @@ export class SearchManager {
     const sortFn =
       sortFunctions[this.filters.sortBy] || sortFunctions.relevance;
     return [...courses].sort(sortFn);
+  }
+
+  sortQuizzes(quizzes) {
+    const query = this.filters.searchQuery.toLowerCase();
+
+    return [...quizzes].sort((a, b) => {
+      if (!query) return 0;
+
+      const aTitle = (a.title || "").toLowerCase();
+      const bTitle = (b.title || "").toLowerCase();
+
+      // Prioritize exact matches
+      const aExact = aTitle === query ? 2 : 0;
+      const bExact = bTitle === query ? 2 : 0;
+
+      // Prioritize starts with
+      const aStarts = aTitle.startsWith(query) ? 1 : 0;
+      const bStarts = bTitle.startsWith(query) ? 1 : 0;
+
+      const aScore = aExact + aStarts;
+      const bScore = bExact + bStarts;
+
+      return bScore - aScore || aTitle.localeCompare(bTitle, "ar");
+    });
   }
 
   // ===========================
@@ -327,6 +499,83 @@ export class SearchManager {
     });
   }
 
+  /**
+   * NEW: Bind the header icon button that opens the search bar
+   */
+  bindHeaderSearchBtn() {
+    if (!this.elements.headerSearchBtn) return;
+
+    this.elements.headerSearchBtn.addEventListener("click", () => {
+      if (this.isBarOpen) {
+        this.closeSearchBar();
+      } else {
+        this.openSearchBar();
+      }
+    });
+  }
+
+  /**
+   * NEW: Bind the × close button inside the search bar (collapses bar + resets view)
+   */
+  bindSearchClose() {
+    if (!this.elements.searchClose) return;
+
+    this.elements.searchClose.addEventListener("click", () => {
+      this.closeSearchBar();
+    });
+  }
+
+  /**
+   * NEW: Expand the search bar below the header and focus the input
+   */
+  openSearchBar() {
+    if (!this.container) return;
+    this.isBarOpen = true;
+    this.container.classList.add("is-open");
+    this.container.setAttribute("aria-hidden", "false");
+    if (this.elements.headerSearchBtn) {
+      this.elements.headerSearchBtn.setAttribute("aria-expanded", "true");
+    }
+    // Auto-focus the input
+    setTimeout(() => {
+      if (this.elements.searchInput) {
+        this.elements.searchInput.focus();
+      }
+    }, 80);
+  }
+
+  /**
+   * NEW: Collapse the search bar and reset search state + view
+   */
+  closeSearchBar() {
+    if (!this.container) return;
+    this.isBarOpen = false;
+    this.container.classList.remove("is-open");
+    this.container.setAttribute("aria-hidden", "true");
+    if (this.elements.headerSearchBtn) {
+      this.elements.headerSearchBtn.setAttribute("aria-expanded", "false");
+    }
+    // Close filters panel too
+    if (this.isFiltersPanelOpen) {
+      this.isFiltersPanelOpen = false;
+      if (this.elements.searchFilters) {
+        this.elements.searchFilters.style.display = "none";
+      }
+      if (this.elements.filterToggle) {
+        this.elements.filterToggle.classList.remove("active");
+        this.elements.filterToggle.setAttribute("aria-expanded", "false");
+      }
+    }
+    // Trigger a reset (restores original view)
+    if (this.filters.searchQuery || this.hasActiveFilters()) {
+      this._resetSearchState();
+      // Signal a full reset to index.js so it can re-render the proper root view
+      if (this.onSearchCallback) {
+        this.onSearchCallback(null, this.currentContext, true /* isReset */);
+      }
+    }
+  }
+
   bindFilterToggle() {
     if (!this.elements.filterToggle) return;
 
@@ -351,10 +600,14 @@ export class SearchManager {
       this.elements.searchClear.style.display = "none";
     }
     this.filters.searchQuery = "";
+    // Re-run search with empty query so results show all items again
     this.performSearch();
   }
 
   toggleFiltersPanel() {
+    // Only show filters in course search context
+    if (this.currentContext !== "courses") return;
+
     this.isFiltersPanelOpen = !this.isFiltersPanelOpen;
 
     if (this.elements.searchFilters) {
@@ -425,8 +678,16 @@ export class SearchManager {
         : "none";
     }
 
-    // Update active filter tags
-    this.updateActiveFilters();
+    // Update active filter tags (only for course search)
+    if (this.currentContext === "courses") {
+      this.updateActiveFilters();
+    }
+
+    // Hide filter toggle for quiz search
+    if (this.elements.filterToggle) {
+      this.elements.filterToggle.style.display =
+        this.currentContext === "courses" ? "flex" : "none";
+    }
   }
 
   hasActiveFilters() {
@@ -606,19 +867,32 @@ export class SearchManager {
 
   setupKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
-      // Ctrl+K or Cmd+K to focus search
+      // Ctrl+K or Cmd+K to open search bar and focus input
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        if (this.elements.searchInput) {
-          this.elements.searchInput.focus();
+        if (
+          this.elements.headerSearchBtn &&
+          this.elements.headerSearchBtn.style.display !== "none"
+        ) {
+          if (!this.isBarOpen) {
+            this.openSearchBar();
+          } else {
+            this.elements.searchInput && this.elements.searchInput.focus();
+          }
         }
       }
 
-      // Ctrl+F or Cmd+F to open filters (only if search is focused)
+      // Escape closes the bar when search input is focused
+      if (e.key === "Escape" && this.isBarOpen) {
+        this.closeSearchBar();
+      }
+
+      // Ctrl+F or Cmd+F to open filters (only if bar is open and in course context)
       if (
         (e.ctrlKey || e.metaKey) &&
         e.key === "f" &&
-        document.activeElement === this.elements.searchInput
+        this.isBarOpen &&
+        this.currentContext === "courses"
       ) {
         e.preventDefault();
         if (!this.isFiltersPanelOpen) {

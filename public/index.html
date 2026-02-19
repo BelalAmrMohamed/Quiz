@@ -305,16 +305,28 @@
                     جميع المواد
                 </div>
             </div>
+
+            <!-- Search Toggle Button — shown/hidden by SearchManager based on context -->
+            <button class="header-search-btn" id="headerSearchBtn" type="button" aria-label="بحث" aria-expanded="false"
+                style="display:none;">
+                <img src="assets/images/search-icon.png" alt="" aria-hidden="true" class="header-search-icon" />
+            </button>
         </header>
 
-        <!-- Advanced Search System -->
-        <div class="search-container" id="searchContainer">
-            <!-- Search Input -->
+        <!-- Context-Aware Search System — collapsed by default, opened via header icon -->
+        <div class="search-container" id="searchContainer" aria-hidden="true">
+            <!-- Compact Search Bar -->
             <div class="search-bar">
-                <span class="search-icon" aria-hidden="true">🔍</span>
-                <input type="text" id="courseSearch" placeholder="ابحث عن مادة أو اختبار..." class="search-input"
+                <img src="assets/images/search-icon.png" alt="" class="search-icon" aria-hidden="true" />
+                <input type="text" id="courseSearch" placeholder="ابحث عن مادة..." class="search-input"
                     autocomplete="off" aria-label="البحث عن المواد والاختبارات" />
                 <button class="search-clear" id="searchClear" style="display:none;" aria-label="مسح البحث">×</button>
+                <button class="search-close" id="searchClose" aria-label="إغلاق البحث">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
                 <button class="search-filters-toggle" id="filterToggle" aria-label="فتح الفلاتر" aria-expanded="false">
                     <span class="filter-icon" aria-hidden="true">⚙️</span>
                 </button>
