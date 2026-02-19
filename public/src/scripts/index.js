@@ -558,12 +558,28 @@ async function initApp() {
   // Check for first time visit
   try {
     const hasVisited = localStorage.getItem("first_visit_complete");
-    if (!hasVisited && userProfile.checkFirstVisit()) {
-      // Redirect to onboarding
+    // Read from the standalone "username" key — this is what userProfile.setUsername()
+    // always syncs to, so it is the authoritative source regardless of whether the
+    // full quiz_user_profile JSON blob exists yet.
+    const storedUsername = localStorage.getItem("username");
+    const isDefaultName = !storedUsername || storedUsername === "User";
+
+    // Redirect to onboarding when EITHER:
+    //   1. The user has never completed onboarding (!hasVisited), OR
+    //   2. They completed onboarding but their username is still the default
+    //      — meaning they skipped the name step or something went wrong.
+    //
+    // IMPORTANT: onboarding.html bounces straight back to index.html when it
+    // sees first_visit_complete === "true".  So if we're redirecting because
+    // of a default username (case 2), we must clear that flag first — otherwise
+    // we get an infinite redirect loop between the two pages.
+    if (!hasVisited || isDefaultName) {
+      if (isDefaultName) {
+        localStorage.removeItem("first_visit_complete");
+      }
       window.location.href = "onboarding.html";
       return;
     }
-
     renderRootCategories();
   } catch (error) {
     console.error("Error initializing:", error);
