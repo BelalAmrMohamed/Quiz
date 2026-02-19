@@ -511,9 +511,15 @@
       "category": "Operatings Systems"
     },
     {
-      "id": "6U2BBKAE",
-      "title": "Lecture 1 Quiz",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Lecture 1 quiz.json",
+      "id": "7IGTGFXT",
+      "title": "2  Probability",
+      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/2- Probability.json",
+      "category": "Probability and Statistics"
+    },
+    {
+      "id": "YAYFLGTG",
+      "title": "1  Counting Techniques",
+      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/1- Counting Techniques.json",
       "category": "Probability and Statistics"
     },
     {
@@ -617,6 +623,12 @@
       "title": "AI Introduction To Server Lab",
       "path": "../../data/quizzes/Computer Science/2/2/Server Lab/AI Introduction to Server Lab.json",
       "category": "Server Lab"
+    },
+    {
+      "id": "6FWYH3H3",
+      "title": "Lecture 1 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 quiz.json",
+      "category": "System Analysis"
     },
     {
       "id": "3SVMT2U3",
@@ -1497,15 +1509,21 @@
       "subcategories": [],
       "exams": [
         {
-          "id": "YPVPXTHQ",
-          "title": "AI Introduction To Probability",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
+          "id": "YAYFLGTG",
+          "title": "1  Counting Techniques",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/1- Counting Techniques.json",
           "category": "Probability and Statistics"
         },
         {
-          "id": "6U2BBKAE",
-          "title": "Lecture 1 Quiz",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/Lecture 1 quiz.json",
+          "id": "7IGTGFXT",
+          "title": "2  Probability",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/2- Probability.json",
+          "category": "Probability and Statistics"
+        },
+        {
+          "id": "YPVPXTHQ",
+          "title": "AI Introduction To Probability",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
           "category": "Probability and Statistics"
         }
       ]
@@ -1527,6 +1545,26 @@
           "title": "AI Introduction To Server Lab",
           "path": "../../data/quizzes/Computer Science/2/2/Server Lab/AI Introduction to Server Lab.json",
           "category": "Server Lab"
+        }
+      ]
+    },
+    "System Analysis": {
+      "id": "S47SCTTB",
+      "name": "System Analysis",
+      "faculty": "Computer Science",
+      "year": "2",
+      "term": "2",
+      "path": [
+        "System Analysis"
+      ],
+      "parent": null,
+      "subcategories": [],
+      "exams": [
+        {
+          "id": "6FWYH3H3",
+          "title": "Lecture 1 Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 quiz.json",
+          "category": "System Analysis"
         }
       ]
     },
