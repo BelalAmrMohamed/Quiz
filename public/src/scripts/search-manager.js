@@ -23,7 +23,7 @@ export class SearchManager {
 
     this.searchConfig = {
       debounceDelay: 300,
-      minSearchLength: 2,
+      minSearchLength: 1,
       maxHistoryItems: 10,
     };
 
