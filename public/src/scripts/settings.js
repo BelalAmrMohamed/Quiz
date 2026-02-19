@@ -262,6 +262,7 @@ async function saveSettingsAuto() {
         });
       }
       userProfile.initializeDefaultSubscriptions(categoryTree);
+      renderCourseManagerList(); // Re-render now that subscriptions reflect the new profile
     }
 
     showSavedIndicator();
