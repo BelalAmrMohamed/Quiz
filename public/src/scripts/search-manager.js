@@ -249,7 +249,11 @@ export class SearchManager {
   }
 
   /**
-   * Search for quizzes/exams (inside a course)
+   * Search for quizzes/exams inside the current course.
+   * Uses collectAllExams() to recursively gather quizzes from all subcategories,
+   * so a search for "Lecture 1" inside "Computer Network" will also find quizzes
+   * sitting inside "أسئلة الدكتورة", "أسئلة بالذكاء الإصطناعي", and any other
+   * nested subfolder — not just the quizzes at the top level.
    */
   searchQuizzes() {
     const navStack = this.getNavigationStack ? this.getNavigationStack() : [];
@@ -258,13 +262,13 @@ export class SearchManager {
     const currentCategory = navStack[navStack.length - 1];
     if (!currentCategory) return;
 
-    // Support both .exams and .quizzes as the quiz list property
-    const quizList = currentCategory.exams || currentCategory.quizzes || [];
-    if (quizList.length === 0) return;
+    // Collect every exam in the whole subtree (current node + all subcategories, recursively)
+    const allExams = this.collectAllExams(currentCategory);
+    if (allExams.length === 0) return;
 
-    let results = [...quizList];
+    let results = allExams;
 
-    // Apply search query
+    // Apply search query filter
     if (
       this.filters.searchQuery &&
       this.filters.searchQuery.length >= this.searchConfig.minSearchLength
@@ -273,15 +277,58 @@ export class SearchManager {
       this.addToSearchHistory(this.filters.searchQuery);
     }
 
-    // Sort quizzes
+    // Sort
     results = this.sortQuizzes(results);
 
     this.updateUI(results);
 
-    // Trigger callback to update the main view
     if (this.onSearchCallback) {
       this.onSearchCallback(results, "quizzes");
     }
+  }
+
+  /**
+   * Recursively collect every exam from a category node AND all its subcategory nodes.
+   *
+   * The manifest structure is:
+   *   category.exams          → array of exam objects at this level
+   *   category.subcategories  → array of string keys into this.categoryTree
+   *
+   * Each collected exam gets a _sourceCategoryName field so the render layer
+   * can optionally display which subfolder the quiz came from.
+   *
+   * @param  {object} category  - a categoryTree node
+   * @param  {Set}    visited   - guards against circular refs in malformed data
+   * @returns {Array}           - flat, deduplicated list of exam objects
+   */
+  collectAllExams(category, visited = new Set()) {
+    if (!category) return [];
+
+    // Prevent infinite loops
+    const nodeKey = category.id || category.name;
+    if (nodeKey && visited.has(nodeKey)) return [];
+    if (nodeKey) visited.add(nodeKey);
+
+    // Direct exams at this level (support both "exams" and "quizzes" property names)
+    const directExams = (category.exams || category.quizzes || []).map(
+      (exam) => ({
+        ...exam,
+        _sourceCategoryName: category.name || "",
+      }),
+    );
+
+    // Recursively collect from all child subcategories
+    const childExams = [];
+    if (Array.isArray(category.subcategories) && this.categoryTree) {
+      for (const subKey of category.subcategories) {
+        const subCat = this.categoryTree[subKey];
+        if (subCat) {
+          childExams.push(...this.collectAllExams(subCat, visited));
+        }
+      }
+    }
+
+    return [...directExams, ...childExams];
   }
 
   filterCoursesBySearchQuery(courses) {
@@ -314,6 +361,8 @@ export class SearchManager {
         quiz.name || "", // some datasets use "name" instead of "title"
         quiz.id || "",
         quiz.description || "",
+        quiz.category || "", // e.g. "Computer Network/أسئلة الدكتورة"
+        quiz._sourceCategoryName || "", // human-readable subfolder name injected by collectAllExams
       ]
         .join(" ")
         .toLowerCase();
