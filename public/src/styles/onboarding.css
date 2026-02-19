@@ -209,69 +209,6 @@ body {
   font-size: 0.95rem;
 }
 
-/* Course List & Filters */
-.filters-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-}
-
-.filter-select {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.5);
-  font-family: inherit;
-  font-size: 0.9rem;
-  flex: 1;
-  min-width: 100px;
-}
-
-.course-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 5px;
-}
-
-.course-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 12px;
-  transition: var(--transition);
-  border: 1px solid transparent;
-}
-
-.course-item:hover {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.05);
-}
-
-.course-info h4 {
-  font-size: 1rem;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.course-info p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-/* Toggle Switch */
-.toggle-container {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
 .toggle-switch {
   position: absolute;
   top: 0;
@@ -374,5 +311,142 @@ input:checked + .toggle-switch::after {
   }
   60% {
     transform: translateY(-10px);
+  }
+}
+/* =============================================================================
+   TOGGLE FIX — append to the bottom of onboarding.css
+   
+   Root cause: the native <input type="checkbox"> inside .toggle-container was
+   never fully hidden. `opacity:0 + width:0 + height:0` is unreliable — some
+   browsers still paint the native widget chrome. `display:none` is the only
+   guaranteed way to remove it from both layout AND painting.
+   ============================================================================= */
+
+/* 1. Hide the native checkbox completely — no paint, no layout, no interaction */
+#coursesList .toggle-container input[type="checkbox"] {
+  display: none !important;
+}
+
+/* 2. The label itself becomes the click target — needs correct dimensions */
+#coursesList .toggle-container {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+  align-self: center;
+  cursor: pointer;
+}
+
+/* 3. Track — stretches to fill the label exactly via inset:0 */
+#coursesList .toggle-switch {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: #ccc;
+  background: var(--color-border, #ccc);
+  transition: background 0.28s ease;
+  cursor: pointer;
+}
+
+/* 4. Knob */
+#coursesList .toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Use transform instead of `left` to avoid knob escaping track bounds */
+}
+
+/* 5. Checked state — colour the track (label carries the :has trick isn't
+      needed — the checkbox is still in the DOM, just display:none, so
+      :checked still works as a CSS state hook via the adjacent sibling) */
+#coursesList .toggle-container:has(input:checked) .toggle-switch {
+  background: #6366f1;
+  background: var(--color-primary, #6366f1);
+}
+
+#coursesList .toggle-container:has(input:checked) .toggle-switch::after {
+  /* 52px wide - 20px knob - 4px right margin = 28px travel */
+  transform: translateX(24px);
+}
+
+/* 6. Course item card layout */
+#coursesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-top: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border, #ddd) transparent;
+}
+
+#coursesList::-webkit-scrollbar {
+  width: 6px;
+}
+#coursesList::-webkit-scrollbar-thumb {
+  background: var(--color-border, #ddd);
+  border-radius: 3px;
+}
+
+#coursesList .course-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  min-height: 72px;
+  border-radius: 12px;
+  border: 2px solid var(--color-border, #e5e7eb);
+  background: var(--color-background, #f9fafb);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+#coursesList .course-item:hover {
+  border-color: var(--color-primary, #6366f1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  background: var(--color-surface, #fff);
+  transform: translateY(-2px);
+}
+
+#coursesList .course-info {
+  flex: 1;
+  min-width: 0;
+  text-align: right; /* RTL */
+}
+
+#coursesList .course-info h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #111);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#coursesList .course-details {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #6b7280);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  #coursesList {
+    grid-template-columns: 1fr;
+    max-height: 380px;
   }
 }

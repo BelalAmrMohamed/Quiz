@@ -23,7 +23,7 @@ const state = {
   term: null,
   quizStyle: "pagination",
   defaultMode: "practice",
-  subscribedCourses: [], // Set of course IDs
+  subscribedCourses: [],
 };
 
 const facultyIcons = {
@@ -43,6 +43,20 @@ const facultyIcons = {
   default: "📖",
 };
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function escapeHtml(unsafe) {
+  if (unsafe === null || unsafe === undefined) return "";
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
 async function init() {
   try {
     const manifest = await getManifest();
@@ -55,94 +69,68 @@ async function init() {
   }
 }
 
+// ── Event Listeners ───────────────────────────────────────────────────────────
+
 function setupEventListeners() {
   document.getElementById("nextBtn").addEventListener("click", nextStep);
   document.getElementById("prevBtn").addEventListener("click", prevStep);
 
-  // Enter key navigation
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      // Prevent default if it's a form submission to avoid reload
-      if (e.target.tagName !== "TEXTAREA") {
-        e.preventDefault();
-        nextStep();
-      }
+    if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault();
+      nextStep();
     }
   });
 
-  // Filter listeners
-  ["courseFacultyFilter", "courseYearFilter", "courseTermFilter"].forEach(
-    (id) => {
-      document.getElementById(id)?.addEventListener("change", (e) => {
-        if (id === "courseYearFilter") updateTermOptionsBasedOnYear();
-        renderFilteredCourses();
-      });
-    },
-  );
-
-  // Skip button
   document.getElementById("skipBtn")?.addEventListener("click", skipOnboarding);
 }
 
+// ── Progress ──────────────────────────────────────────────────────────────────
+
 function updateProgress() {
-  const dots = document.querySelectorAll(".progress-step");
-  dots.forEach((dot, idx) => {
-    if (idx === currentStep) {
-      dot.classList.add("active");
-      dot.classList.remove("completed");
-    } else if (idx < currentStep) {
-      dot.classList.add("completed");
-      dot.classList.remove("active");
-    } else {
-      dot.classList.remove("active", "completed");
-    }
+  document.querySelectorAll(".progress-step").forEach((dot, idx) => {
+    dot.classList.toggle("active", idx === currentStep);
+    dot.classList.toggle("completed", idx < currentStep);
   });
 
-  // Update buttons
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
 
   prevBtn.style.visibility = currentStep === 0 ? "hidden" : "visible";
-
-  if (currentStep === totalSteps) {
-    nextBtn.textContent = "ابدأ رحلتك 🚀";
-  } else {
-    nextBtn.textContent = "التالي";
-  }
+  nextBtn.textContent = currentStep === totalSteps ? "ابدأ رحلتك 🚀" : "التالي";
 }
+
+// ── Validation ────────────────────────────────────────────────────────────────
 
 function validateStep() {
   switch (currentStep) {
-    case 0: // Name
-      const nameInput = document.getElementById("nameInput");
-      state.username = nameInput.value.trim();
+    case 0:
+      state.username = document.getElementById("nameInput").value.trim();
       return state.username.length > 0;
-    case 1: // Faculty
+    case 1:
       return !!state.faculty;
-    case 2: // Year
+    case 2:
       return !!state.year;
-    case 3: // Term
+    case 3:
       return !!state.term;
-    case 4: // Preferences
-      return true; // Defaults set
-    case 5: // Courses
-      return true; // Optional
+    case 4:
+    case 5:
     default:
       return true;
   }
 }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
 
 async function nextStep() {
   if (!validateStep()) {
     showNotification("الرجاء إكمال البيانات المطلوبة");
     return;
   }
-
   if (currentStep < totalSteps) {
     currentStep++;
     renderStep();
   } else {
-    // Finish
     await saveAndRedirect();
   }
 }
@@ -154,17 +142,16 @@ function prevStep() {
   }
 }
 
+// ── Step Router ───────────────────────────────────────────────────────────────
+
 function renderStep() {
-  // Hide all steps
   document
     .querySelectorAll(".step-panel")
     .forEach((el) => el.classList.remove("active"));
 
-  // Show current step
-  const currentPanel = document.getElementById(`step-${currentStep}`);
-  if (currentPanel) currentPanel.classList.add("active");
+  const panel = document.getElementById(`step-${currentStep}`);
+  if (panel) panel.classList.add("active");
 
-  // Dynamic rendering for specific steps
   if (currentStep === 1) renderFacultyStep();
   if (currentStep === 2) renderYearStep();
   if (currentStep === 3) renderTermStep();
@@ -174,7 +161,7 @@ function renderStep() {
   updateProgress();
 }
 
-// --- Renderers ---
+// ── Step Renderers ────────────────────────────────────────────────────────────
 
 function renderFacultyStep() {
   const container = document.getElementById("facultyGrid");
@@ -182,42 +169,38 @@ function renderFacultyStep() {
   container.innerHTML = metadata.faculties
     .map(
       (f) => `
-        <div class="selection-card ${state.faculty === f ? "selected" : ""}" onclick="selectFaculty('${f}')">
-            <div class="card-icon">${facultyIcons[f] || facultyIcons.default}</div>
-            <div class="card-label">${f}</div>
-        </div>
-    `,
+      <div class="selection-card ${state.faculty === f ? "selected" : ""}"
+           onclick="selectFaculty('${escapeHtml(f)}')">
+        <div class="card-icon">${facultyIcons[f] || facultyIcons.default}</div>
+        <div class="card-label">${escapeHtml(f)}</div>
+      </div>`,
     )
     .join("");
 }
 
 window.selectFaculty = (f) => {
   state.faculty = f;
-  state.year = null; // Reset dependants
+  state.year = null;
   state.term = null;
-  renderFacultyStep(); // Re-render to show selection
-  // Auto advance? Maybe better to let user click next
+  renderFacultyStep();
 };
 
 function renderYearStep() {
   const container = document.getElementById("yearGrid");
-  container.innerHTML = "";
-
   const years = getAvailableYears(categoryTree, state.faculty);
   if (years.length === 0) {
     container.innerHTML =
       "<p>لا توجد سنوات دراسية متاحة لهذه الكلية حالياً.</p>";
     return;
   }
-
   container.innerHTML = years
     .map(
       (y) => `
-        <div class="selection-card ${state.year === y ? "selected" : ""}" onclick="selectYear('${y}')">
-            <div class="card-icon">📅</div>
-            <div class="card-label">العام ${y}</div>
-        </div>
-    `,
+      <div class="selection-card ${state.year === y ? "selected" : ""}"
+           onclick="selectYear('${escapeHtml(y)}')">
+        <div class="card-icon">📅</div>
+        <div class="card-label">العام ${escapeHtml(y)}</div>
+      </div>`,
     )
     .join("");
 }
@@ -230,22 +213,19 @@ window.selectYear = (y) => {
 
 function renderTermStep() {
   const container = document.getElementById("termGrid");
-  container.innerHTML = "";
-
   const terms = getAvailableTerms(categoryTree, state.faculty, state.year);
   if (terms.length === 0) {
     container.innerHTML = "<p>لا توجد فصول دراسية متاحة حالياً.</p>";
     return;
   }
-
   container.innerHTML = terms
     .map(
       (t) => `
-        <div class="selection-card ${state.term === t ? "selected" : ""}" onclick="selectTerm('${t}')">
-            <div class="card-icon">${t === "1" ? "🍂" : "🌸"}</div>
-            <div class="card-label">الترم ${t}</div>
-        </div>
-    `,
+      <div class="selection-card ${state.term === t ? "selected" : ""}"
+           onclick="selectTerm('${escapeHtml(t)}')">
+        <div class="card-icon">${t === "1" ? "🍂" : "🌸"}</div>
+        <div class="card-label">الترم ${escapeHtml(t)}</div>
+      </div>`,
     )
     .join("");
 }
@@ -259,148 +239,86 @@ window.updatePreference = (key, value) => {
   state[key] = value;
   document.querySelectorAll(`[name="${key}"]`).forEach((inp) => {
     const card = inp.closest(".selection-card");
-    if (inp.value === value) card.classList.add("selected");
-    else card.classList.remove("selected");
+    if (card) card.classList.toggle("selected", inp.value === value);
   });
 };
 
-function renderCoursesStep() {
-  const container = document.getElementById("coursesList");
-  container.innerHTML = "";
-
-  autoSelectMatchingCourses();
-
-  setupCourseFilters();
-
-  renderFilteredCourses();
-}
-
-function updateTermOptionsBasedOnYear() {
-  const faculty_value = document.getElementById("courseFacultyFilter").value;
-  const year_value = document.getElementById("courseYearFilter").value;
-  const tSelect = document.getElementById("courseTermFilter");
-
-  let terms = [];
-  if (faculty_value !== "All" && year_value !== "All") {
-    terms = getAvailableTerms(categoryTree, faculty_value, year_value);
-  } else {
-    terms = ["1", "2"];
-  }
-
-  const currentTerm = tSelect.value;
-
-  tSelect.innerHTML =
-    '<option value="All">كل الفصول</option>' +
-    terms.map((t) => `<option value="${t}">تيرم ${t}</option>`).join("");
-
-  if (terms.includes(currentTerm)) {
-    tSelect.value = currentTerm;
-  } else {
-    tSelect.value = "All";
-  }
-}
-
-function setupCourseFilters() {
-  const fSelect = document.getElementById("courseFacultyFilter");
-  const ySelect = document.getElementById("courseYearFilter");
-  const tSelect = document.getElementById("courseTermFilter");
-
-  // Only populate if empty (first run)
-  if (fSelect.options.length === 0) {
-    const metadata = extractMetadata(categoryTree);
-
-    // Faculty
-    fSelect.innerHTML =
-      '<option value="All">كل الكليات</option>' +
-      metadata.faculties
-        .map((f) => `<option value="${f}">${f}</option>`)
-        .join("");
-
-    // Year
-    ySelect.innerHTML =
-      '<option value="All">كل السنوات</option>' +
-      metadata.years
-        .map((y) => `<option value="${y}">سنة ${y}</option>`)
-        .join("");
-
-    // Term - Remove ghost 'Summmer'
-    tSelect.innerHTML =
-      '<option value="All">كل الفصول</option>' +
-      ["1", "2"].map((t) => `<option value="${t}">تيرم ${t}</option>`).join("");
-
-    // Set defaults to user selection
-    if (state.faculty) fSelect.value = state.faculty;
-    if (state.year) ySelect.value = state.year;
-    // Trigger term update if we have enough info?
-    // Actually simplicity first: just set value if exists in default list
-    if (state.term && ["1", "2"].includes(state.term))
-      tSelect.value = state.term;
-  }
-}
-
-function renderFilteredCourses() {
-  const container = document.getElementById("coursesList");
-
-  const faculty_value = document.getElementById("courseFacultyFilter").value;
-  const year_value = document.getElementById("courseYearFilter").value;
-  const term_value = document.getElementById("courseTermFilter").value;
-
-  // Create temp profile for filtering
-  const filterProfile = {
-    faculty: faculty_value === "All" ? null : faculty_value,
-    year: year_value === "All" ? null : year_value,
-    term: term_value === "All" ? null : term_value,
-  };
-
-  const courses = filterCourses(categoryTree, filterProfile);
-
-  if (courses.length === 0) {
-    container.innerHTML =
-      "<p class='no-data-msg'>لا توجد مواد تطابق خيارات البحث.</p>";
-    return;
-  }
-
-  container.innerHTML = courses
-    .map((c) => {
-      const isSubscribed = state.subscribedCourses.includes(c.id);
-
-      return `
-        <div class="course-item">
-            <div class="course-info">
-                <h4>${c.name}</h4>
-                <p>${c.faculty} - Year ${c.year} - Term ${c.term}</p>
-            </div>
-            <label class="toggle-container">
-                <input type="checkbox" onchange="toggleCourse('${c.id}', this.checked)" ${isSubscribed ? "checked" : ""}>
-                <span class="toggle-switch"></span>
-            </label>
-        </div>
-    `;
-    })
-    .join("");
-}
+// ── Courses Step ──────────────────────────────────────────────────────────────
+//
+//  Mirrors settings.js renderCourseManagerList() exactly:
+//  • NO dropdown filters in this step — removed entirely.
+//  • Filter profile uses only `faculty` (year + term omitted on purpose),
+//    matching the commented-out lines in settings.js:
+//      const tempProfile = {
+//        faculty: faculty === "All" ? null : faculty,
+//        // year: year === "All" ? null : year,   ← intentionally omitted
+//        // term: term === "All" ? null : term,   ← intentionally omitted
+//      };
+//  • Result: every course for the user's college is shown, all years & terms.
+// ─────────────────────────────────────────────────────────────────────────────
 
 let hasAutoSelected = false;
 
-function autoSelectMatchingCourses() {
-  if (hasAutoSelected) return;
+function renderCoursesStep() {
+  // Auto-subscribe courses that match the user's full profile (faculty+year+term)
+  // once on first entry to this step — mirrors initializeDefaultSubscriptions.
+  if (!hasAutoSelected) {
+    filterCourses(categoryTree, {
+      faculty: state.faculty,
+      year: state.year,
+      term: state.term,
+    }).forEach((c) => {
+      if (!state.subscribedCourses.includes(c.id)) {
+        state.subscribedCourses.push(c.id);
+      }
+    });
+    hasAutoSelected = true;
+  }
 
-  // Find all courses matching state
-  const matches = filterCourses(categoryTree, {
-    faculty: state.faculty,
-    year: state.year,
-    term: state.term,
-  });
-
-  matches.forEach((c) => {
-    if (!state.subscribedCourses.includes(c.id)) {
-      state.subscribedCourses.push(c.id);
-    }
-  });
-  hasAutoSelected = true;
+  renderCourseList();
 }
 
-const _oldRenderStep = renderStep;
+function renderCourseList() {
+  const container = document.getElementById("coursesList");
+  if (!container) return;
+
+  // Faculty-only filter — mirrors settings.js tempProfile (year/term omitted)
+  const tempProfile = {
+    faculty: state.faculty, // null means show all
+    // year intentionally omitted
+    // term intentionally omitted
+  };
+
+  const allCourses = filterCourses(categoryTree, tempProfile);
+
+  if (allCourses.length === 0) {
+    container.innerHTML =
+      '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--color-text-secondary);">لا توجد مواد متاحة لكليتك حالياً</p>';
+    return;
+  }
+
+  // HTML template is identical to settings.js renderCourseManagerList
+  container.innerHTML = allCourses
+    .map((course) => {
+      const isSubscribed = state.subscribedCourses.includes(course.id);
+      return `
+        <div class="course-item">
+          <div class="course-info">
+            <h4>${escapeHtml(course.name)}</h4>
+            <p class="course-details">
+              ${escapeHtml(course.faculty)} | ${course.year} | ${course.term}
+            </p>
+          </div>
+          <label class="toggle-container">
+            <input type="checkbox"
+              onchange="toggleCourse('${escapeHtml(course.id)}', this.checked)"
+              ${isSubscribed ? "checked" : ""}>
+            <span class="toggle-switch"></span>
+          </label>
+        </div>`;
+    })
+    .join("");
+}
 
 window.toggleCourse = (id, checked) => {
   if (checked) {
@@ -412,10 +330,14 @@ window.toggleCourse = (id, checked) => {
   }
 };
 
+// ── Welcome Step ──────────────────────────────────────────────────────────────
+
 function renderWelcomeStep() {
   const msg = document.getElementById("welcomeMsg");
-  msg.textContent = `أهلاً بك يا ${state.username}!`;
+  if (msg) msg.textContent = `أهلاً بك يا ${state.username}!`;
 }
+
+// ── Save & Redirect ───────────────────────────────────────────────────────────
 
 async function saveAndRedirect() {
   try {
@@ -425,17 +347,11 @@ async function saveAndRedirect() {
       year: state.year,
       term: state.term,
     });
-
     userProfile.setQuizStyle(state.quizStyle);
     userProfile.setDefaultQuizMode(state.defaultMode);
-
-    // Save Subscriptions - Use the dedicated method to ensure sync
-    // BUT userProfile.setSubscribedCourses might overwrite if persistence is complex.
-    // Let's use setSubscribedCourses which replaces the array.
     userProfile.setSubscribedCourses(state.subscribedCourses);
 
     localStorage.setItem("first_visit_complete", "true");
-
     window.location.href = "index.html";
   } catch (e) {
     console.error("Error saving", e);
