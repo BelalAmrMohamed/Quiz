@@ -22,9 +22,6 @@
         })();
     </script>
 
-    <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
-    <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
-
     <!-- Fonts: Inter (Latin) + Tajawal (Arabic) — optimized loading -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
@@ -34,6 +31,9 @@
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
             rel="stylesheet">
     </noscript>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
     <!-- Preload critical resources -->
     <link rel="preload" href="src/styles/settings.css" as="style">
@@ -50,10 +50,9 @@
 </head>
 
 <body>
-    <!-- Side Menu -->
+    <!-- Side-menu (using seperate side-menu.js and side-menu.css) -->
     <div class="menu-container">
-        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false"
-            type="button">
+        <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
                 <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" />
@@ -64,79 +63,70 @@
             </svg>
         </button>
 
-        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true" role="presentation"></div>
+        <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
 
-        <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
-            aria-hidden="true" tabindex="-1">
+        <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
+            aria-hidden="true">
             <div class="menu-header">
-                <h2 id="menuTitle">القائمة</h2>
-                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة" type="button">
+                <h3>القائمة</h3>
+                <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" aria-hidden="true" focusable="false">
+                        stroke-linecap="round" aria-hidden="true">
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            <nav role="navigation" aria-label="روابط التنقل" aria-labelledby="menuTitle">
-                <a href="index.html" class="menu-item" aria-current="page">
-                    <span aria-hidden="true">🏠</span> الصفحة الرئيسية
-                </a>
-                <a href="dashboard.html" class="menu-item">
-                    <span aria-hidden="true">📊</span> اللائحة
-                </a>
-                <a href="create-quiz.html" class="menu-item">
-                    <span aria-hidden="true">✏️</span> إنشاء إمتحانات
-                </a>
+            <nav role="navigation" aria-label="روابط التنقل">
+                <a href="index.html" class="menu-item"><i data-lucide="house"></i> الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item"><i data-lucide="layout-dashboard"></i> اللائحة</a>
+                <a href="create-quiz.html" class="menu-item"><i data-lucide="pencil"></i> إنشاء إمتحانات</a>
 
-                <div class="menu-divider" role="separator" aria-hidden="true"></div>
+                <div class="menu-divider" role="separator"></div>
 
                 <a href="settings.html" class="menu-item active">
-                    <span aria-hidden="true">⚙️</span> الإعدادات
+                    <span aria-hidden="true"><i data-lucide="settings"></i></span> الإعدادات
                 </a>
 
                 <div class="menu-divider" role="separator" aria-hidden="true"></div>
 
                 <div class="theme-controls-section">
-                    <div class="theme-section-header" role="heading" aria-level="3">
-                        <span aria-hidden="true">🏞️</span> الخلفية
+                    <div class="theme-section-header">
+                        <span><i data-lucide="palette"></i></span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
-                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false" type="button">
-                            <span class="theme-btn-icon" aria-hidden="true">☀️</span>
-                            <span class="theme-btn-label">البيضاء</span>
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
+                            <span class="theme-btn-label">السوداء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false" type="button">
-                            <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                        <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false" type="button">
-                            <span class="theme-btn-icon" aria-hidden="true">🌑</span>
-                            <span class="theme-btn-label">السوداء</span>
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
+                            <span class="theme-btn-label">البيضاء</span>
                         </button>
                     </div>
 
-                    <div class="animation-section-header" role="heading" aria-level="3">
-                        <span aria-hidden="true">✨</span> الرسوم المتحركة
+                    <div class="animation-section-header">
+                        <span><i data-lucide="sparkles"></i></span> الرسوم المتحركة
                     </div>
                     <label class="animation-toggle-container">
                         <span class="animation-toggle-label">تفعيل الرسوم</span>
                         <input type="checkbox" id="animationToggle" class="toggle-input" data-control="animations"
-                            checked aria-label="تفعيل الرسوم المتحركة" role="switch" aria-checked="true">
+                            checked aria-label="تفعيل الرسوم المتحركة">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text">
-                        <span aria-hidden="true">💡</span>
-                        عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة
-                    </p>
+                    <p class="theme-info-text"><i data-lucide="lightbulb"></i> عطّل الرسوم لتحسين الأداء على الأجهزة
+                        الضعيفة</p>
 
-                    <div class="menu-divider" role="separator" aria-hidden="true"></div>
-                    <button class="menu-item install-app" data-action="installApp" type="button" style="display: none;">
-                        <span aria-hidden="true">📱</span> تثبيت التطبيق
-                    </button>
+                    <div class="menu-divider" role="separator"></div>
+                    <button class="menu-item install-app" data-action="installApp"><i data-lucide="smartphone"></i>
+                        تثبيت التطبيق</button>
                 </div>
             </nav>
-        </aside>
+        </div>
     </div>
     <!-- End of the side menu -->
 

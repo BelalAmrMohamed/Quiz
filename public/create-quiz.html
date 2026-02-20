@@ -86,6 +86,7 @@
         </div>
     </div>
 
+    <!-- Side-menu (using seperate side-menu.js and side-menu.css) -->
     <div class="menu-container">
         <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
@@ -130,17 +131,17 @@
                         <span><i data-lucide="palette"></i></span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
-                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
-                            <span class="theme-btn-label">البيضاء</span>
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
+                            <span class="theme-btn-label">السوداء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
                             <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
-                            <span class="theme-btn-label">السوداء</span>
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
+                            <span class="theme-btn-label">البيضاء</span>
                         </button>
                     </div>
 
@@ -471,12 +472,14 @@
 
     <script type="module" src="src/scripts/create-quiz.js"></script>
     <script type="module" src="src/components/side-menu.js"></script>
-    <script>
+
+    <!-- Moved Lucide function to the side-menu.js -->
+    <!-- <script>
         // Initialize Lucide icons after page load
         document.addEventListener("DOMContentLoaded", () => {
             if (typeof lucide !== "undefined") lucide.createIcons();
         });
-    </script>
+    </script> -->
 </body>
 
 </html>
