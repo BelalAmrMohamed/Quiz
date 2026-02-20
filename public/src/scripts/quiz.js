@@ -70,6 +70,7 @@ window.handleSelectForQuestion = (qIdx, optIdx) => {
   userAnswers[qIdx] = optIdx;
   saveStateDebounced();
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigationDebounced();
   maybeAutoSubmit();
 };
@@ -87,6 +88,7 @@ window.checkAnswerForQuestion = (qIdx) => {
   lockedQuestions[qIdx] = true;
   saveStateDebounced();
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateNav();
 };
@@ -157,12 +159,14 @@ function toggleView() {
 
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
-      els.viewIcon.textContent = "📋";
+      els.viewIcon.innerHTML = `<i data-lucide="list"></i>`;
       els.viewText.textContent = "شكل القائمة";
     } else {
-      els.viewIcon.textContent = "🪟";
+      els.viewIcon.innerHTML = `<i data-lucide="layout-grid"></i>`;
       els.viewText.textContent = "شكل الأيقونات";
     }
+
+    resetLucidIcons();
   }
 
   renderMenuNavigation();
@@ -256,12 +260,14 @@ async function init() {
   // Update view toggle button
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
-      els.viewIcon.textContent = "📋";
+      els.viewIcon.innerHTML = `<i data-lucide="list"></i>`;
       els.viewText.textContent = "شكل القائمة";
     } else {
-      els.viewIcon.textContent = "🪟";
+      els.viewIcon.innerHTML = `<i data-lucide="layout-grid"></i>`;
       els.viewText.textContent = "شكل الأيقونات";
     }
+
+    resetLucidIcons();
   }
 
   try {
@@ -360,6 +366,7 @@ async function init() {
     renderMenuNavigation();
     updateMenuActionButtons();
     renderQuestion();
+    resetLucidIcons();
     startTimer();
 
     // Global handlers
@@ -370,12 +377,14 @@ async function init() {
     window.toggleBookmark = () => {
       gameEngine.toggleBookmark(examId, currentIdx);
       renderQuestion();
+      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
     window.toggleFlag = () => {
       gameEngine.toggleFlag(examId, currentIdx);
       renderQuestion();
+      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
@@ -384,6 +393,7 @@ async function init() {
       renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
+        resetLucidIcons();
         updateMenuActionButtons();
       }
     };
@@ -392,6 +402,7 @@ async function init() {
       renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
+        resetLucidIcons();
         updateMenuActionButtons();
       }
     };
@@ -399,6 +410,7 @@ async function init() {
       currentIdx = idx;
       saveStateDebounced();
       renderQuestion();
+      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
 
@@ -704,7 +716,7 @@ function buildVerticalQuestionCard(q, idx) {
       const statusMsg = isCorrect
         ? "Your answer matches! ✅"
         : "Your answer differs ⚠️";
-      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate.</div><div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
@@ -715,7 +727,7 @@ function buildVerticalQuestionCard(q, idx) {
 
   const actionBtns = `
     <div class="question-actions">
-      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? "★" : "☆"}</button>
+      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? `<i data-lucide="star-off"></i>` : `<i data-lucide="star"></i>`}</button>
       <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? "🚩" : "🏳️"}</button>
     </div>
   `;
@@ -786,6 +798,8 @@ function renderAllQuestionsVertical() {
     .join("");
   els.questionContainer.classList.remove("loading");
   els.questionContainer.classList.add("vertical-style");
+
+  resetLucidIcons();
 }
 
 // === Core: Render Question ===
@@ -857,7 +871,7 @@ function renderQuestion() {
       <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
               onclick="window.toggleBookmark()" 
               title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
-        ${isBookmarked ? "★" : "☆"}
+        ${isBookmarked ? `<i data-lucide="star-off"></i>` : `<i data-lucide="star"></i>`}
       </button>
       <button class="flag-btn ${isFlagged ? "active" : ""}" 
               onclick="window.toggleFlag()" 
@@ -866,10 +880,6 @@ function renderQuestion() {
       </button>
     </div>
   `;
-
-  /* 
-<div class="question-number">سؤال ${ + 1} من ${questions.length}</div>
-*/
 
   const questionHeaderHTML = `
     <div class="question-header">
@@ -971,6 +981,7 @@ function handleSelect(index) {
   userAnswers[currentIdx] = index;
   saveStateDebounced();
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigationDebounced();
   maybeAutoSubmit();
 }
@@ -1019,6 +1030,7 @@ function nav(dir) {
   currentIdx = newIdx;
   saveStateDebounced();
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateMenuActionButtons();
   if (quizStyle === "vertical") {
@@ -1145,6 +1157,7 @@ async function restart(skipconfirmationNotification) {
 
   // 8. Re-render
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigation();
   updateMenuActionButtons();
   startTimer();
@@ -1184,6 +1197,7 @@ function checkAnswer() {
   lockedQuestions[currentIdx] = true;
   saveStateDebounced();
   renderQuestion();
+  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateNav();
 }
@@ -1263,6 +1277,18 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
+}
+
+function resetLucidIcons() {
+  // Reset lucid icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  } else {
+    // Fallback: wait for the CDN script if it loads after the module
+    window.addEventListener("load", () => {
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    });
+  }
 }
 
 init();

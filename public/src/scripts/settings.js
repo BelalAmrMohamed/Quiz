@@ -71,6 +71,7 @@ function bindOptionCards(name) {
         });
       wrap.classList.add("selected");
       radio.checked = true;
+      radio.dispatchEvent(new Event("change"));
     });
   });
 }
