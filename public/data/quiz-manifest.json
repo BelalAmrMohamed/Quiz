@@ -637,6 +637,12 @@
       "category": "System Analysis"
     },
     {
+      "id": "QHYBIT4J",
+      "title": "Lecture 1 MCQs",
+      "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 MCQs.json",
+      "category": "System Analysis"
+    },
+    {
       "id": "3SVMT2U3",
       "title": "Website Demo",
       "path": "../../data/quizzes/Computer Science/2/2/Website demo/Website Demo.json",
@@ -1566,6 +1572,12 @@
       "parent": null,
       "subcategories": [],
       "exams": [
+        {
+          "id": "QHYBIT4J",
+          "title": "Lecture 1 MCQs",
+          "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 MCQs.json",
+          "category": "System Analysis"
+        },
         {
           "id": "6FWYH3H3",
           "title": "Lecture 1 Quiz",

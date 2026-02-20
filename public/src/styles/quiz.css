@@ -483,6 +483,7 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
+  direction: ltr;
 }
 
 .essay-textarea {
@@ -496,6 +497,7 @@ body {
   line-height: 1.6;
   resize: vertical;
   transition: all 0.3s ease;
+  direction: ltr;
 }
 
 .essay-textarea:focus {
@@ -520,6 +522,7 @@ body {
   padding: 16px 20px;
   border-radius: 12px;
   border-left: 5px solid;
+  direction: ltr;
 }
 
 .formal-answer strong {
@@ -628,6 +631,7 @@ body {
   font-weight: 600;
   border-left: 5px solid;
   box-shadow: var(--shadow-sm);
+  direction: ltr;
 }
 
 .feedback.show {
@@ -651,10 +655,6 @@ body {
 .feedback.essay-feedback {
   flex-direction: column;
   align-items: flex-start;
-}
-
-.feedback.essay-feedback::before {
-  content: "📝";
 }
 
 /* Navigation */
@@ -817,4 +817,7 @@ body {
 
 #questionContainer.vertical-style .vertical-question-card {
   scroll-margin-top: 80px;
+
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
