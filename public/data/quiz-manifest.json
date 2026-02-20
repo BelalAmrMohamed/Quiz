@@ -631,6 +631,12 @@
       "category": "System Analysis"
     },
     {
+      "id": "G7NCGLFS",
+      "title": "أسئلة مقالي",
+      "path": "../../data/quizzes/Computer Science/2/2/System Analysis/أسئلة مقالي.json",
+      "category": "System Analysis"
+    },
+    {
       "id": "3SVMT2U3",
       "title": "Website Demo",
       "path": "../../data/quizzes/Computer Science/2/2/Website demo/Website Demo.json",
@@ -1564,6 +1570,12 @@
           "id": "6FWYH3H3",
           "title": "Lecture 1 Quiz",
           "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 quiz.json",
+          "category": "System Analysis"
+        },
+        {
+          "id": "G7NCGLFS",
+          "title": "أسئلة مقالي",
+          "path": "../../data/quizzes/Computer Science/2/2/System Analysis/أسئلة مقالي.json",
           "category": "System Analysis"
         }
       ]

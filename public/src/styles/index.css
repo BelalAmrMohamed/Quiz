@@ -516,6 +516,7 @@ Container
   margin-bottom: 12px;
   line-height: 1.3;
   letter-spacing: -0.01em;
+  direction: ltr;
 }
 
 .card p,
