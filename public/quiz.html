@@ -112,18 +112,17 @@
         </div>
 
         <nav role="navigation">
-            <a href="index.html" class="menu-item">
-                <i data-lucide="house"></i> خروج إلى الصفحة الرئيسية
-            </a>
+            <button id="finishBtn" class="menu-item action-btn" data-action="finishEarly">
+                <i data-lucide="check-circle"></i> <span class="btn-text">تسليم الإمتحان</span>
+            </button>
 
             <button id="restartBtn" class="menu-item action-btn" data-action="restartQuiz">
                 <i data-lucide="rotate-ccw"></i> إعادة الإمتحان
             </button>
 
-            <button id="finishBtn" class="menu-item action-btn" data-action="finishEarly">
-                <i data-lucide="check-circle"></i> <span class="btn-text">تسليم الآن</span>
+            <button id="exitBtn" class="menu-item action-btn" onclick="exitQuiz()">
+                <i data-lucide="house"></i> خروج إلى الصفحة الرئيسية
             </button>
-
 
 
             <div class="menu-divider"></div>
