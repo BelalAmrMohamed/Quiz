@@ -819,6 +819,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.6;
   white-space: pre;
+  text-align: left;
 }
 
 .code-block code {
