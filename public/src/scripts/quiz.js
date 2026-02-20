@@ -1210,10 +1210,6 @@ function updateNav() {
   if (els.finishBtn) {
     els.finishBtn.style.display = "flex";
     const totalLocked = Object.keys(lockedQuestions).length;
-    els.finishBtn.innerHTML =
-      totalLocked === questions.length && questions.length > 0
-        ? `<span>✅</span> تسليم الإمتحان`
-        : `<span>✅</span> تسليم الآن`;
   }
 }
 
