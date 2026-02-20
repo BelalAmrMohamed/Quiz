@@ -2,6 +2,30 @@
 /* Uses CSS variables from themes.css */
 
 /* ============================================================================
+   LUCIDE ICON NORMALIZATION
+   ============================================================================ */
+
+[data-lucide] {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  stroke-width: 2;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.empty-icon-svg {
+  width: 4rem;
+  height: 4rem;
+  stroke-width: 1.5;
+  color: var(--color-primary);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================================
    LAYOUT & CONTAINER
    ============================================================================ */
 * {
@@ -95,7 +119,8 @@ body {
 }
 
 .save-icon {
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
   animation: pulse 2s infinite;
 }
 
@@ -358,7 +383,16 @@ body {
 }
 
 .template-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.template-icon [data-lucide] {
+  width: 2rem;
+  height: 2rem;
 }
 
 .template-name {
@@ -397,9 +431,11 @@ body {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
   pointer-events: none;
   z-index: 1;
+  color: var(--color-text-tertiary);
 }
 
 .search-box input {
@@ -605,7 +641,7 @@ body {
 }
 
 .question-card.incomplete::before {
-  content: "⚠️ غير مكتمل";
+  content: "غير مكتمل";
   position: absolute;
   top: 10px;
   left: 10px;
@@ -649,7 +685,8 @@ body {
 .drag-handle {
   cursor: grab;
   color: var(--color-text-tertiary);
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
   padding: 4px;
   transition: color 0.2s;
   user-select: none;
@@ -733,7 +770,9 @@ body {
 }
 
 .empty-icon {
-  font-size: 5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 1;
   animation: float 3s ease-in-out infinite;
@@ -1231,7 +1270,8 @@ body {
 
 .collapsible-toggle {
   color: var(--color-text-secondary);
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
   transition: transform 0.3s;
 }
 
@@ -1755,10 +1795,11 @@ body {
 }
 
 .watermark::before {
-  content: "✨";
+  content: "—";
   font-size: 1.25rem;
   display: inline-flex;
   align-items: center;
+  color: var(--color-text-tertiary);
 }
 
 /* ============================================================================

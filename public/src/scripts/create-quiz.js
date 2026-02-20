@@ -323,18 +323,18 @@ function renderQuestion(question, insertAtIndex = null) {
         <div class="question-header">
             <span class="question-number">
                 ${bulkModeActive ? `<input type="checkbox" class="question-select-checkbox" onchange="handleQuestionSelect(event, ${question.id})">` : ""}
-                <span class="drag-handle" title="اسحب لإعادة الترتيب">⋮⋮</span>
+                <span class="drag-handle" title="اسحب لإعادة الترتيب"><i data-lucide="grip-vertical"></i></span>
                 سؤال ${questionNumber}
             </span>
             <div class="question-actions">
                 <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
-                    ↕️
+                    <i data-lucide="unfold-vertical"></i>
                 </button>
                 <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="نسخ السؤال">
-                    📋
+                    <i data-lucide="copy"></i>
                 </button>
                 <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="حذف السؤال">
-                    🗑️
+                    <i data-lucide="trash-2"></i>
                 </button>
             </div>
         </div>
@@ -356,14 +356,14 @@ function renderQuestion(question, insertAtIndex = null) {
                 ${renderOptions(question)}
             </div>
             <button class="add-option-btn" onclick="addOption(${question.id})">
-                ➕ إضافة خيار
+                <i data-lucide="plus"></i> إضافة خيار
             </button>
         </div>
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
-                <h4>🖼️ صورة (اختيارية)</h4>
-                <span class="collapsible-toggle" id="toggle-image-${question.id}">▼</span>
+                <h4><i data-lucide="image"></i> صورة (اختيارية)</h4>
+                <span class="collapsible-toggle" id="toggle-image-${question.id}"><i data-lucide="chevron-down"></i></span>
             </div>
             <div class="collapsible-content" id="content-image-${question.id}">
                 <div class="form-group">
@@ -383,8 +383,8 @@ function renderQuestion(question, insertAtIndex = null) {
         
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
-                <h4>💡 الشرح (اختياري)</h4>
-                <span class="collapsible-toggle" id="toggle-explanation-${question.id}">▼</span>
+                <h4><i data-lucide="lightbulb"></i> الشرح (اختياري)</h4>
+                <span class="collapsible-toggle" id="toggle-explanation-${question.id}"><i data-lucide="chevron-down"></i></span>
             </div>
             <div class="collapsible-content" id="content-explanation-${question.id}">
                 <div class="form-group">
@@ -417,6 +417,9 @@ function renderQuestion(question, insertAtIndex = null) {
   if (question.image) {
     updateImagePreview(question.id, question.image);
   }
+
+  // Re-initialize Lucide icons for newly injected HTML
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 window.toggleQuestionCollapse = function (questionId) {
@@ -469,7 +472,7 @@ function updateImagePreview(questionId, imageUrl) {
   }
 
   previewContainer.innerHTML =
-    '<div class="image-loading">⏳ جاري تحميل الصورة...</div>';
+    '<div class="image-loading"><i data-lucide="loader-circle" class="spin"></i> جاري تحميل الصورة...</div>';
 
   const img = new Image();
   img.onload = function () {
@@ -477,7 +480,8 @@ function updateImagePreview(questionId, imageUrl) {
   };
   img.onerror = function () {
     previewContainer.innerHTML =
-      '<div class="image-error">❌ فشل تحميل الصورة. تحقق من الرابط.</div>';
+      '<div class="image-error"><i data-lucide="image-off"></i> فشل تحميل الصورة. تحقق من الرابط.</div>';
+    if (typeof lucide !== "undefined") lucide.createIcons();
   };
   img.src = imageUrl;
 }
@@ -588,6 +592,7 @@ function rerenderAllQuestions() {
     renderQuestion(question);
   });
   updateQuestionNumbers();
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ============================================================================
@@ -621,7 +626,7 @@ function renderOptions(question) {
               question.options.length > 1
                 ? `
                 <button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}">
-                    ✕
+                    <i data-lucide="x"></i>
                 </button>
             `
                 : ""
@@ -682,6 +687,7 @@ function rerenderOptions(questionId) {
     );
     if (container) {
       container.innerHTML = renderOptions(question);
+      if (typeof lucide !== "undefined") lucide.createIcons();
     }
   }
 }
@@ -859,6 +865,7 @@ window.toggleBulkMode = function () {
         numberSpan.insertBefore(checkbox, numberSpan.firstChild);
       }
     });
+    if (typeof lucide !== "undefined") lucide.createIcons();
   } else {
     bulkActionsBar.style.display = "none";
     bulkBtn.style.background = "";
@@ -973,30 +980,28 @@ function validateQuiz() {
   const errors = [];
 
   if (!quizData.title || quizData.title.trim() === "") {
-    errors.push("❌ عنوان الاختبار مطلوب");
+    errors.push("عنوان الاختبار مطلوب");
   }
 
   if (quizData.questions.length === 0) {
-    errors.push("❌ يجب إضافة سؤال واحد على الأقل");
+    errors.push("يجب إضافة سؤال واحد على الأقل");
   }
 
   quizData.questions.forEach((q, index) => {
     const questionNum = index + 1;
 
     if (!q.q || q.q.trim() === "") {
-      errors.push(`❌ السؤال ${questionNum}: نص السؤال مطلوب`);
+      errors.push(`السؤال ${questionNum}: نص السؤال مطلوب`);
     }
 
     if (q.options.length > 1) {
       const emptyOptions = q.options.filter((opt) => !opt || opt.trim() === "");
       if (emptyOptions.length > 0) {
-        errors.push(
-          `❌ السؤال ${questionNum}: جميع الخيارات يجب أن تحتوي على نص`,
-        );
+        errors.push(`السؤال ${questionNum}: جميع الخيارات يجب أن تحتوي على نص`);
       }
 
       if (q.correct === undefined || q.correct === null) {
-        errors.push(`❌ السؤال ${questionNum}: يجب تحديد الإجابة الصحيحة`);
+        errors.push(`السؤال ${questionNum}: يجب تحديد الإجابة الصحيحة`);
       }
     }
 
@@ -1004,7 +1009,7 @@ function validateQuiz() {
       try {
         new URL(q.image);
       } catch {
-        errors.push(`❌ السؤال ${questionNum}: رابط الصورة غير صحيح`);
+        errors.push(`السؤال ${questionNum}: رابط الصورة غير صحيح`);
       }
     }
   });
@@ -1304,7 +1309,7 @@ window.exportQuiz = function () {
       URL.revokeObjectURL(url);
 
       hideLoading();
-      showNotification("تم التصدير!", "تم تحميل ملف الاختبار بنجاح", "success");
+      showNotification("تم التحميل!", "تم تحميل ملف الاختبار بنجاح", "success");
     } catch (error) {
       hideLoading();
       showNotification("خطأ", "حدث خطأ أثناء التصدير", "error");
@@ -1371,32 +1376,21 @@ window.emailQuizToDeveloper = function () {
     );
 
     const exportQuestions = quizData.questions.map((q) => {
-      const question = { q: q.q };
-
-      if (q.image && q.image.trim()) question.image = q.image;
-
-      question.options = q.options;
-      question.correct = q.correct;
-
-      if (q.explanation && q.explanation.trim())
-        question.explanation = q.explanation;
-
+      const question = { q: q.q, options: q.options, correct: q.correct };
+      if (q.image?.trim()) question.image = q.image;
+      if (q.explanation?.trim()) question.explanation = q.explanation;
       return question;
     });
 
-    const fileHeader = `// Automated mail - ${quizData.title}.js`;
-
-    let jsonString = JSON.stringify(exportQuestions, null, 2);
-
-    const validKeys = ["q", "image", "options", "correct", "explanation"];
-    const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
-
-    const jsObjectString = jsonString.replace(keyRegex, "$1:");
-
-    const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
+    const payload = {
+      title: quizData.title,
+      description: quizData.description,
+      questions: exportQuestions,
+    };
+    const fileContent = JSON.stringify(payload, null, 2);
 
     const encodedBody = encodeURIComponent(fileContent);
-    const mailtoLink = `mailto:${emailAddress}?subject=New Quiz Submission - ${quizData.title}&body=${encodedBody}`;
+    const mailtoLink = `mailto:${emailAddress}?subject=New Quiz Submission - ${encodeURIComponent(quizData.title)}&body=${encodedBody}`;
 
     window.location.href = mailtoLink;
   } catch (error) {
@@ -1423,31 +1417,19 @@ window.sendToWhatsApp = function () {
 
   const exportQuestions = quizData.questions.map((q) => {
     const question = { q: q.q, options: q.options, correct: q.correct };
-    if (q.image && q.image.trim()) question.image = q.image;
-    if (q.explanation && q.explanation.trim())
-      question.explanation = q.explanation;
+    if (q.image?.trim()) question.image = q.image;
+    if (q.explanation?.trim()) question.explanation = q.explanation;
     return question;
   });
 
-  const fileHeader = `// ${quizData.title}.js`;
+  const payload = {
+    title: quizData.title,
+    description: quizData.description,
+    questions: exportQuestions,
+  };
+  const fileContent = JSON.stringify(payload, null, 2);
 
-  let jsonString = JSON.stringify(exportQuestions, null, 2);
-
-  const validKeys = ["q", "image", "options", "correct", "explanation"];
-  const keyRegex = new RegExp(`"(${validKeys.join("|")})":`, "g");
-
-  const jsObjectString = jsonString.replace(keyRegex, "$1:");
-
-  const fileContent = `${fileHeader}\n\nexport const questions = ${jsObjectString};`;
-
-  const message = `*New Quiz Submission*
-
-// *Title:* ${quizData.title}
-// *Description:* ${quizData.description || "N/A"}
-// *Questions:* ${quizData.questions.length}
-// *Created:* ${new Date().toLocaleString()}
-
-${fileContent}`;
+  const message = `*New Quiz Submission*\n\n*Title:* ${quizData.title}\n*Description:* ${quizData.description || "N/A"}\n*Questions:* ${quizData.questions.length}\n*Created:* ${new Date().toLocaleString()}\n\n${fileContent}`;
 
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
@@ -1495,7 +1477,7 @@ window.previewQuiz = function () {
             )
             .join("")}
         </ul>
-        ${q.explanation ? `<div class="preview-explanation">💡 ${escapeHtml(q.explanation)}</div>` : ""}
+        ${q.explanation ? `<div class="preview-explanation"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;margin-left:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> ${escapeHtml(q.explanation)}</div>` : ""}
       </div>
     `;
   });
@@ -1538,25 +1520,23 @@ window.processImport = function () {
 
     let importedQuestions;
 
-    // Try JSON first (e.g. { "questions": [...] } or just [...])
+    // JSON only — no legacy JS eval
     const trimmed = content.trim();
-    if (trimmed.startsWith("{")) {
-      const data = JSON.parse(content);
-      importedQuestions = data.questions != null ? data.questions : data;
-    } else if (trimmed.startsWith("[")) {
-      importedQuestions = JSON.parse(content);
-    } else {
-      // Legacy: JS format export const questions = [...]
-      const match = content.match(
-        /export\s+const\s+questions\s*=\s*(\[[\s\S]*\])/,
-      );
-      if (!match)
-        throw new Error("تنسيق غير صحيح (JSON أو export const questions)");
-      try {
-        importedQuestions = eval(`(${match[1]})`);
-      } catch (e) {
-        throw new Error("تنسيق غير صحيح");
+    try {
+      if (trimmed.startsWith("{")) {
+        const data = JSON.parse(content);
+        importedQuestions = Array.isArray(data.questions)
+          ? data.questions
+          : data;
+      } else if (trimmed.startsWith("[")) {
+        importedQuestions = JSON.parse(content);
+      } else {
+        throw new Error(
+          "التنسيق غير مدعوم. الرجاء لصق مصفوفة JSON أو كائن يحتوي على مفتاح questions.",
+        );
       }
+    } catch (e) {
+      throw new Error("JSON غير صحيح: " + e.message);
     }
 
     if (!Array.isArray(importedQuestions)) {
