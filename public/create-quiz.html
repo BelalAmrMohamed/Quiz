@@ -33,6 +33,9 @@
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
 
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
     <!-- Theme Controller Script -->
     <script type="module" src="src/scripts/theme-controller.js"></script>
 
@@ -54,8 +57,9 @@
         aria-labelledby="shortcutsTitle">
         <div class="shortcuts-content">
             <div class="shortcuts-header">
-                <h3 id="shortcutsTitle">⌨️ اختصارات لوحة المفاتيح</h3>
-                <button class="close-btn" onclick="toggleShortcuts()" aria-label="إغلاق">✕</button>
+                <h3 id="shortcutsTitle"><i data-lucide="keyboard"></i> اختصارات لوحة المفاتيح</h3>
+                <button class="close-btn" onclick="toggleShortcuts()" aria-label="إغلاق"><i
+                        data-lucide="x"></i></button>
             </div>
             <div class="shortcuts-list">
                 <div class="shortcut-item">
@@ -109,39 +113,39 @@
             </div>
 
             <nav role="navigation" aria-label="روابط التنقل">
-                <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
-                <a href="dashboard.html" class="menu-item">📊 اللائحة</a>
-                <a href="create-quiz.html" class="menu-item active">✏️ إنشاء إمتحانات</a>
+                <a href="index.html" class="menu-item"><i data-lucide="house"></i> الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item"><i data-lucide="layout-dashboard"></i> اللائحة</a>
+                <a href="create-quiz.html" class="menu-item active"><i data-lucide="pencil"></i> إنشاء إمتحانات</a>
 
                 <div class="menu-divider" role="separator"></div>
 
                 <a href="settings.html" class="menu-item">
-                    <span aria-hidden="true">⚙️</span> الإعدادات
+                    <span aria-hidden="true"><i data-lucide="settings"></i></span> الإعدادات
                 </a>
 
                 <div class="menu-divider" role="separator" aria-hidden="true"></div>
 
                 <div class="theme-controls-section">
                     <div class="theme-section-header">
-                        <span>🎨</span> الخلفية
+                        <span><i data-lucide="palette"></i></span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
                         <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">☀️</span>
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
                             <span class="theme-btn-label">البيضاء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">🌑</span>
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
                             <span class="theme-btn-label">السوداء</span>
                         </button>
                     </div>
 
                     <div class="animation-section-header">
-                        <span>✨</span> الرسوم المتحركة
+                        <span><i data-lucide="sparkles"></i></span> الرسوم المتحركة
                     </div>
                     <label class="animation-toggle-container">
                         <span class="animation-toggle-label">تفعيل الرسوم</span>
@@ -149,10 +153,12 @@
                             checked aria-label="تفعيل الرسوم المتحركة">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
+                    <p class="theme-info-text"><i data-lucide="lightbulb"></i> عطّل الرسوم لتحسين الأداء على الأجهزة
+                        الضعيفة</p>
 
                     <div class="menu-divider" role="separator"></div>
-                    <button class="menu-item install-app" data-action="installApp">📱 تثبيت التطبيق</button>
+                    <button class="menu-item install-app" data-action="installApp"><i data-lucide="smartphone"></i>
+                        تثبيت التطبيق</button>
                 </div>
             </nav>
         </div>
@@ -165,7 +171,7 @@
                 <a href="index.html" class="breadcrumb-text">← الصفحة الرئيسية</a>
             </div>
             <div class="autosave-indicator" id="autosaveIndicator">
-                <span class="save-icon">💾</span>
+                <span class="save-icon"><i data-lucide="save"></i></span>
                 <span class="save-text">محفوظ</span>
             </div>
         </div>
@@ -173,11 +179,11 @@
         <!-- Header with enhanced description -->
         <header class="header">
             <div class="header-content">
-                <h1>أنشئ اختبارك الخاص ✏️</h1>
+                <h1>أنشئ اختبارك الخاص <i data-lucide="pencil"></i></h1>
                 <p>صمم اختبارات تفاعلية، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح مفصل.</p>
                 <div class="header-actions">
                     <button class="btn-help" onclick="toggleShortcuts()" aria-label="عرض اختصارات لوحة المفاتيح">
-                        ⌨️ اختصارات
+                        <i data-lucide="keyboard"></i> اختصارات
                     </button>
                 </div>
             </div>
@@ -187,7 +193,7 @@
         <div class="quiz-creator">
             <!-- Quiz Metadata -->
             <div class="quiz-metadata card">
-                <h2>📋 معلومات عن الاختبار</h2>
+                <h2><i data-lucide="clipboard-list"></i> معلومات عن الاختبار</h2>
                 <div class="form-group">
                     <label for="quizTitle">
                         عنوان الاختبار *
@@ -213,21 +219,17 @@
             <div class="questions-section">
                 <div class="section-header">
                     <div class="section-title-group">
-                        <h2>❓ الأسئلة</h2>
+                        <h2><i data-lucide="list-checks"></i> الأسئلة</h2>
                         <span class="question-badge" id="questionBadge">0</span>
                     </div>
                     <div class="section-actions">
                         <button class="btn btn-secondary btn-icon-text" onclick="importQuestions()"
                             title="استيراد أسئلة">
-                            📥 استيراد
+                            <i data-lucide="upload"></i> استيراد
                         </button>
                         <button class="btn btn-secondary btn-icon-text" onclick="toggleBulkMode()" id="bulkModeBtn"
                             title="الوضع الجماعي">
-                            ☑️ تحديد أسئلة
-                        </button>
-                        <button class="btn btn-secondary btn-icon-text" onclick="toggleTemplates()"
-                            title="قوالب الأسئلة">
-                            📑 قوالب
+                            <i data-lucide="check-square"></i> تحديد أسئلة
                         </button>
                     </div>
                 </div>
@@ -238,11 +240,11 @@
                 <div class="question-controls" id="questionControls" style="display: none;">
                     <div class="controls-row">
                         <div class="search-box">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"><i data-lucide="search"></i></span>
                             <input type="search" id="questionSearch" placeholder="ابحث في الأسئلة..."
                                 aria-label="بحث في الأسئلة">
                             <button class="clear-search" id="clearSearch" onclick="clearSearch()" style="display: none;"
-                                aria-label="مسح البحث">✕</button>
+                                aria-label="مسح البحث"><i data-lucide="x"></i></button>
                         </div>
                         <div class="filter-controls">
                             <select id="questionFilter" onchange="filterQuestions()" aria-label="تصفية الأسئلة">
@@ -257,19 +259,19 @@
                         <div class="sort-controls">
                             <button class="btn-action" onclick="sortQuestions('alpha')" title="ترتيب أبجدي"
                                 aria-label="ترتيب أبجدي">
-                                🔤
+                                <i data-lucide="a-large-small"></i>
                             </button>
                             <button class="btn-action" onclick="sortQuestions('recent')" title="الأحدث أولاً"
                                 aria-label="الأحدث أولاً">
-                                🕐
+                                <i data-lucide="clock"></i>
                             </button>
                             <button class="btn-action" onclick="expandAll()" title="توسيع الكل"
                                 aria-label="توسيع جميع الأسئلة">
-                                ⬇️
+                                <i data-lucide="chevrons-down"></i>
                             </button>
                             <button class="btn-action" onclick="collapseAll()" title="طي الكل"
                                 aria-label="طي جميع الأسئلة">
-                                ⬆️
+                                <i data-lucide="chevrons-up"></i>
                             </button>
                         </div>
                     </div>
@@ -281,13 +283,13 @@
                         </div>
                         <div class="bulk-actions">
                             <button class="btn-bulk" onclick="selectAllQuestions()">
-                                ✅ تحديد الكل
+                                <i data-lucide="check-circle-2"></i> تحديد الكل
                             </button>
                             <button class="btn-bulk" onclick="deselectAllQuestions()">
-                                ◻️ إلغاء التحديد
+                                <i data-lucide="circle"></i> إلغاء التحديد
                             </button>
                             <button class="btn-bulk btn-bulk-danger" onclick="deleteSelectedQuestions()">
-                                🗑️ حذف المحدد
+                                <i data-lucide="trash-2"></i> حذف المحدد
                             </button>
                         </div>
                     </div>
@@ -301,38 +303,38 @@
                 <!-- Enhanced Empty State -->
                 <div class="empty-state" id="emptyState">
                     <div class="empty-illustration">
-                        <div class="empty-icon">📝</div>
+                        <div class="empty-icon"><i data-lucide="notebook-pen" class="empty-icon-svg"></i></div>
                         <div class="empty-glow"></div>
                     </div>
                     <h3>ابدأ بإنشاء أول سؤال</h3>
                     <p>اختر من القوالب السريعة أو أنشئ سؤالاً مخصصاً</p>
                     <div class="empty-actions">
                         <button class="btn btn-primary btn-large" onclick="addQuestion()">
-                            ➕ إضافة سؤال
+                            <i data-lucide="plus"></i> إضافة سؤال
                         </button>
                         <button class="btn btn-secondary btn-large" onclick="toggleTemplates()">
-                            📑 استخدام قالب
+                            <i data-lucide="layout-template"></i> استخدام قالب
                         </button>
                     </div>
-                    <p class="empty-hint">💡 اختصار سريع: اضغط <kbd>Ctrl+N</kbd></p>
+                    <p class="empty-hint">اختصار سريع: اضغط <kbd>Ctrl+N</kbd></p>
                 </div>
 
                 <!-- Question Templates Panel -->
                 <div class="templates-panel" id="templatesPanel" style="display: none;">
-                    <h3>📑 قوالب الأسئلة</h3>
+                    <h3><i data-lucide="layout-template"></i> قوالب الأسئلة</h3>
                     <div class="templates-grid">
                         <button class="template-card" onclick="addQuestionFromTemplate('mcq')">
-                            <span class="template-icon">✅</span>
+                            <span class="template-icon"><i data-lucide="list-checks"></i></span>
                             <span class="template-name">اختيار متعدد</span>
                             <span class="template-desc">4 خيارات</span>
                         </button>
                         <button class="template-card" onclick="addQuestionFromTemplate('truefalse')">
-                            <span class="template-icon">⭕</span>
+                            <span class="template-icon"><i data-lucide="toggle-left"></i></span>
                             <span class="template-name">صح أم خطأ</span>
                             <span class="template-desc">خياران فقط</span>
                         </button>
                         <button class="template-card" onclick="addQuestionFromTemplate('essay')">
-                            <span class="template-icon">📝</span>
+                            <span class="template-icon"><i data-lucide="notebook-pen"></i></span>
                             <span class="template-name">سؤال مقالي</span>
                             <span class="template-desc">إجابة مفتوحة</span>
                         </button>
@@ -342,10 +344,10 @@
                 <!-- Add Question Button (Bottom) -->
                 <div class="add-question-bottom" id="addQuestionBottom" style="display: none;">
                     <button class="btn btn-primary btn-add-question" onclick="addQuestion()">
-                        ➕ إضافة سؤال جديد
+                        <i data-lucide="plus"></i> إضافة سؤال جديد
                     </button>
                     <button class="btn btn-secondary" onclick="toggleTemplates()">
-                        📑 من القوالب
+                        <i data-lucide="layout-template"></i> من القوالب
                     </button>
                 </div>
             </div>
@@ -353,7 +355,7 @@
             <!-- Floating Action Button -->
             <div class="fab-container" id="fabContainer" style="display: none;">
                 <button class="fab" onclick="addQuestion()" title="إضافة سؤال (Ctrl+N)" aria-label="إضافة سؤال جديد">
-                    ➕
+                    <i data-lucide="plus"></i>
                 </button>
                 <div class="fab-tooltip">إضافة سؤال</div>
             </div>
@@ -361,31 +363,31 @@
             <!-- Action Buttons with better organization -->
             <div class="action-bar card">
                 <div class="action-section">
-                    <h3>💾 حفظ ومشاركة</h3>
+                    <h3><i data-lucide="save"></i> حفظ ومشاركة</h3>
                     <div class="action-buttons">
                         <button class="btn btn-success" onclick="exportQuiz()" title="تحميل الإمتحان (Ctrl+E)">
-                            📥 تحميل الإمتحان
+                            <i data-lucide="download"></i> تحميل الإمتحان
                         </button>
                         <button class="btn btn-primary" onclick="saveLocally()" title="حفظ (Ctrl+S)">
-                            ✅ حفظ محليًا
+                            <i data-lucide="hard-drive"></i> حفظ محليًا
                         </button>
                         <button class="btn btn-danger" onclick="resetPage()">
-                            🗑️ إعادة ضبط الصفحة
+                            <i data-lucide="rotate-ccw"></i> إعادة ضبط الصفحة
                         </button>
                     </div>
                 </div>
                 <div class="action-divider"></div>
                 <div class="action-section">
-                    <h3>👁️ معاينة وإدارة</h3>
+                    <h3><i data-lucide="eye"></i> معاينة وإدارة</h3>
                     <div class="action-buttons">
                         <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
-                            📱 إرسال عبر الواتساب
+                            <i data-lucide="message-circle"></i> إرسال عبر الواتساب
                         </button>
                         <button class="btn btn-secondary" onclick="emailQuizToDeveloper()">
-                            📧 إرسال إلى المطوّر
+                            <i data-lucide="mail"></i> إرسال إلى المطوّر
                         </button>
                         <button class="btn btn-secondary" onclick="previewQuiz()" title="معاينة (Ctrl+P)">
-                            👁️ معاينة
+                            <i data-lucide="eye"></i> معاينة
                         </button>
                     </div>
                 </div>
@@ -393,7 +395,7 @@
 
             <!-- Statistics Card -->
             <div class="stats-card card" id="statsCard" style="display: none;">
-                <h3>📊 إحصائيات الاختبار</h3>
+                <h3><i data-lucide="bar-chart-2"></i> إحصائيات الاختبار</h3>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <span class="stat-label">عدد الأسئلة</span>
@@ -432,14 +434,15 @@
         aria-modal="true">
         <div class="modal-card preview-modal">
             <div class="modal-header">
-                <h2 id="previewTitle">👁️ معاينة الاختبار</h2>
-                <button class="close-btn" onclick="closePreview()" aria-label="إغلاق المعاينة">✕</button>
+                <h2 id="previewTitle"><i data-lucide="eye"></i> معاينة الاختبار</h2>
+                <button class="close-btn" onclick="closePreview()" aria-label="إغلاق المعاينة"><i
+                        data-lucide="x"></i></button>
             </div>
             <div id="previewContent" class="preview-content">
                 <!-- Preview will be rendered here -->
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="exportQuiz()">📥 تحميل</button>
+                <button class="btn btn-primary" onclick="exportQuiz()"><i data-lucide="download"></i> تحميل</button>
                 <button class="btn btn-secondary" onclick="closePreview()">إغلاق</button>
             </div>
         </div>
@@ -450,12 +453,13 @@
         aria-modal="true">
         <div class="modal-card">
             <div class="modal-header">
-                <h2 id="importTitle">📥 استيراد أسئلة</h2>
-                <button class="close-btn" onclick="closeImportModal()" aria-label="إغلاق">✕</button>
+                <h2 id="importTitle"><i data-lucide="upload"></i> استيراد أسئلة</h2>
+                <button class="close-btn" onclick="closeImportModal()" aria-label="إغلاق"><i
+                        data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
-                <p>الصق محتوى ملف JavaScript الذي يحتوي على الأسئلة:</p>
-                <textarea id="importTextarea" rows="10" placeholder="export const questions = [...]"
+                <p>الصق محتوى ملف JSON الذي يحتوي على الأسئلة:</p>
+                <textarea id="importTextarea" rows="10" placeholder='[{"q":"...", "options":["..."], "correct":0}]'
                     aria-label="محتوى الأسئلة للاستيراد"></textarea>
             </div>
             <div class="modal-footer">
@@ -467,6 +471,12 @@
 
     <script type="module" src="src/scripts/create-quiz.js"></script>
     <script type="module" src="src/components/side-menu.js"></script>
+    <script>
+        // Initialize Lucide icons after page load
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof lucide !== "undefined") lucide.createIcons();
+        });
+    </script>
 </body>
 
 </html>
