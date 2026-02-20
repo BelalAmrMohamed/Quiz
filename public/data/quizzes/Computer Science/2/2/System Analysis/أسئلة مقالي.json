@@ -1,0 +1,60 @@
+{
+  "questions": [
+    {
+      "q": "Define Information System.",
+      "options": [
+        "The process of developing and maintaining an information system."
+      ],
+      "correct": 0,
+      "explanation": "According to the lecture, Systems Analysis and Design is the formal process used by organizations to create and maintain their information systems, requiring an understanding of organizational objectives and IT application."
+    },
+    {
+      "q": "Describe the role of the System Analyst in Information Systems development.",
+      "options": [
+        "A key individual who studies organizational problems and needs to determine how people, methods, and IT can best be combined to improve business."
+      ],
+      "correct": 0,
+      "explanation": "The system analyst must understand organizational processes, objectives, and structures, while possessing the technical knowledge to use IT to the organization's advantage."
+    },
+    {
+      "q": "What are the required skills for system analyst?",
+      "options": [
+        "Analytical: Used to understand the organization, its objectives, structure, and complex business processes. \nTechnical: Required to understand the capabilities and limitations of IT, including programming, hardware, and operating systems. \nManagerial: Essential for project management, risk assessment, and the effective management of resources.\n Interpersonal: Critical for communicating and collaborating effectively with both end-users and programmers."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "Describe the phases of SDLC and the output of each phase.",
+      "options": [
+        "1. Planning and Selection: Identifying and prioritizing needs and conducting feasibility studies. \n2. Systems Analysis: Studying the current system and determining requirements for a new one.\n 3. Systems Design: Creating a technology-independent \"Logical Design\" followed by a technology-specific \"Physical Design.\" \n4. Implementation & Maintenance: Coding, testing, and installing the system, followed by ongoing systematic improvements."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "List methodologies of the SDLC.",
+      "options": [
+        "Prototyping, Joint Application Design (JAD), Rapid Application Development (RAD), Participatory Design, Agile."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "Describe the computer aided software engineering (CASE) tools in systems development.",
+      "options": [
+        "Diagramming tools for visual modeling.\nComputer display and report generators for UI/UX design. \nDocumentation generators to automate manual record-keeping. \nCode generators to automatically produce source code from design models."
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "q": "What are coupling, cohesion, decomposition, and modularity?",
+      "options": [
+        "Coupling: A measure of how much subsystems depend on one another. Ideally, systems should have low coupling (independence). \nCohesion: A measure of how much a single subsystem performs one specific function. Ideally, systems should have high cohesion (focus). \nDecomposition: The process of breaking a complex system down into smaller, more manageable components. \nModularity: Dividing a system into distinct \"chunks\" or modules to simplify management and maintenance."
+      ],
+      "correct": 0,
+      "explanation": ""
+    }
+  ]
+}
