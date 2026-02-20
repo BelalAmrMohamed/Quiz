@@ -16,10 +16,8 @@ fetch('/api/chat', {
    */
 
 export default async function handler(req, res) {
-  // Get your production domain (update this!)
   const ALLOWED_ORIGIN = "https://basmagi-quiz.vercel.app";
 
-  // Handle CORS
   const origin = req.headers.origin;
   if (origin === ALLOWED_ORIGIN) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -28,7 +26,6 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
 
-  // Handle preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
