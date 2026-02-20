@@ -16,10 +16,16 @@ fetch('/api/chat', {
    */
 
 export default async function handler(req, res) {
-  const ALLOWED_ORIGIN = "https://basmagi-quiz.vercel.app";
+  const ALLOWED_ORIGINS = [
+    "https://basmagi-quiz.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8080",
+  ];
 
   const origin = req.headers.origin;
-  if (origin === ALLOWED_ORIGIN) {
+  if (ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
