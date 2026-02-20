@@ -49,6 +49,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
     <!-- CSS Files - CRITICAL ORDER -->
     <link rel="stylesheet" href="src/styles/themes.css">
     <link rel="stylesheet" href="src/styles/quiz.css">
@@ -65,8 +68,17 @@
 <body>
     <!-- The status bar at the top -->
     <div class="stats-bar" id="statsBar">
-        <button class="hamburger-stats" id="menuBtn"
-            onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+        <button class="hamburger hamburger-stats" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu"
+            aria-expanded="false" type="button">
+            <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+                <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-mid" x1="2" y1="11" x2="20" y2="11" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+                <line class="bar bar-bottom" x1="2" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" />
+            </svg>
+        </button>
 
         <div class="stats-content">
             <div class="stat-item">
@@ -84,54 +96,59 @@
         </div>
     </div>
 
-    <!-- The side menu -->
-    <div class="side-menu" id="sideMenu">
+    <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
+
+    <!-- Side-menu (using seperate side-menu.js and side-menu.css) -->
+    <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="القائمة الجانبية"
+        aria-hidden="true" tabindex="-1">
         <div class="menu-header">
             <h3>القائمة</h3>
-            <button class="close-menu" onclick="document.getElementById('sideMenu').classList.remove('open')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12"></path>
+            <button class="close-menu" id="closeMenuBtn" aria-label="إغلاق القائمة" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
             </button>
         </div>
 
-        <nav>
-            <button id="finishBtn" class="menu-item action-btn" onclick="finishEarly()">
-                <span>✅</span> تسليم الآن
+        <nav role="navigation">
+            <a href="index.html" class="menu-item">
+                <i data-lucide="house"></i> خروج إلى الصفحة الرئيسية
+            </a>
+
+            <button id="restartBtn" class="menu-item action-btn" data-action="restartQuiz">
+                <i data-lucide="rotate-ccw"></i> إعادة الإمتحان
             </button>
 
-            <button id="restartBtn" class="menu-item action-btn" onclick="restartQuiz()">
-                <span>🔁</span> إعادة الإمتحان
+            <button id="finishBtn" class="menu-item action-btn" data-action="finishEarly">
+                <i data-lucide="check-circle"></i> <span class="btn-text">تسليم الآن</span>
             </button>
 
-            <button id="exitBtn" class="menu-item action-btn" onclick="exitQuiz()">
-                <span>🔚</span> الخروج
-            </button>
+
 
             <div class="menu-divider"></div>
 
-            <!-- NEW THEME CONTROLS -->
             <div class="theme-controls-section">
                 <div class="theme-section-header">
-                    <span>🏞️</span> الخلفية
+                    <span><i data-lucide="palette"></i></span> الخلفية
                 </div>
                 <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
-                    <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
-                        <span class="theme-btn-icon" aria-hidden="true">☀️</span>
-                        <span class="theme-btn-label">البيضاء</span>
+                    <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                        <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
+                        <span class="theme-btn-label">السوداء</span>
                     </button>
                     <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
-                        <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
                         <span class="theme-btn-label">الزرقاء</span>
                     </button>
-                    <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
-                        <span class="theme-btn-icon" aria-hidden="true">🌑</span>
-                        <span class="theme-btn-label">السوداء</span>
+                    <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                        <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
+                        <span class="theme-btn-label">البيضاء</span>
                     </button>
                 </div>
 
                 <div class="animation-section-header">
-                    <span>✨</span> الرسوم المتحركة
+                    <span><i data-lucide="sparkles"></i></span> الرسوم المتحركة
                 </div>
                 <label class="animation-toggle-container">
                     <span class="animation-toggle-label">تفعيل الرسوم</span>
@@ -139,7 +156,12 @@
                         aria-label="تفعيل الرسوم المتحركة">
                     <span class="toggle-switch" aria-hidden="true"></span>
                 </label>
-                <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
+                <p class="theme-info-text"><i data-lucide="lightbulb"></i> عطّل الرسوم لتحسين الأداء على الأجهزة
+                    الضعيفة</p>
+
+                <div class="menu-divider" role="separator"></div>
+                <button class="menu-item install-app" data-action="installApp"><i data-lucide="smartphone"></i>
+                    تثبيت التطبيق</button>
             </div>
             <!-- End of the new theme cotrolls -->
 
@@ -166,7 +188,7 @@
                 <span id="menuFlagIcon">🏳️</span> <span id="menuFlagText">إضافة علامة للمراجعة</span>
             </button>
         </nav>
-    </div>
+    </aside>
 
     <div class="container">
         <!-- The top header containing the title and timer, etc... -->
@@ -213,8 +235,8 @@
         </div>
     </div>
 
-    <!-- <script type="module" src="src/scripts/pwa-init.js"></script> -->
     <script type="module" src="src/scripts/quiz.js"></script>
+    <script type="module" src="src/components/side-menu.js"></script>
 </body>
 
 </html>

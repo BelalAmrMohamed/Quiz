@@ -45,6 +45,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
     <!-- CSS Files -->
     <link rel="stylesheet" href="src/styles/themes.css">
     <link rel="stylesheet" href="src/styles/dashboard.css">
@@ -58,6 +61,7 @@
 </head>
 
 <body>
+    <!-- Side-menu (using seperate side-menu.js and side-menu.css) -->
     <div class="menu-container">
         <button class="hamburger" id="menuBtn" aria-label="فتح القائمة" aria-controls="sideMenu" aria-expanded="false">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
@@ -85,14 +89,14 @@
             </div>
 
             <nav role="navigation" aria-label="روابط التنقل">
-                <a href="index.html" class="menu-item">🏠 الصفحة الرئيسية</a>
-                <a href="dashboard.html" class="menu-item active">📊 اللائحة</a>
-                <a href="create-quiz.html" class="menu-item">✏️ إنشاء إمتحانات</a>
+                <a href="index.html" class="menu-item"><i data-lucide="house"></i> الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item active"><i data-lucide="layout-dashboard"></i> اللائحة</a>
+                <a href="create-quiz.html" class="menu-item"><i data-lucide="pencil"></i> إنشاء إمتحانات</a>
 
                 <div class="menu-divider" role="separator"></div>
 
                 <a href="settings.html" class="menu-item">
-                    <span aria-hidden="true">⚙️</span> الإعدادات
+                    <span aria-hidden="true"><i data-lucide="settings"></i></span> الإعدادات
                 </a>
 
                 <div class="menu-divider" role="separator" aria-hidden="true"></div>
@@ -105,25 +109,25 @@
 
                 <div class="theme-controls-section">
                     <div class="theme-section-header">
-                        <span>🏞️</span> الخلفية
+                        <span><i data-lucide="palette"></i></span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
-                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">☀️</span>
-                            <span class="theme-btn-label">البيضاء</span>
+                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
+                            <span class="theme-btn-label">السوداء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
-                        <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true">🌑</span>
-                            <span class="theme-btn-label">السوداء</span>
+                        <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
+                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
+                            <span class="theme-btn-label">البيضاء</span>
                         </button>
                     </div>
 
                     <div class="animation-section-header">
-                        <span>✨</span> الرسوم المتحركة
+                        <span><i data-lucide="sparkles"></i></span> الرسوم المتحركة
                     </div>
                     <label class="animation-toggle-container">
                         <span class="animation-toggle-label">تفعيل الرسوم</span>
@@ -131,10 +135,12 @@
                             checked aria-label="تفعيل الرسوم المتحركة">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text">💡 عطّل الرسوم لتحسين الأداء على الأجهزة الضعيفة</p>
+                    <p class="theme-info-text"><i data-lucide="lightbulb"></i> عطّل الرسوم لتحسين الأداء على الأجهزة
+                        الضعيفة</p>
 
                     <div class="menu-divider" role="separator"></div>
-                    <button class="menu-item install-app" data-action="installApp">📱 تثبيت التطبيق</button>
+                    <button class="menu-item install-app" data-action="installApp"><i data-lucide="smartphone"></i>
+                        تثبيت التطبيق</button>
                 </div>
             </nav>
         </div>

@@ -20,7 +20,9 @@
   border: 1px solid var(--color-border);
   background: var(--color-background, #fff);
   color: var(--color-text, #111);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .hamburger:hover {
@@ -36,7 +38,9 @@
 /* Hamburger → X animation */
 .hamburger-icon .bar {
   transform-origin: center;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
 }
 
 .hamburger[aria-expanded="true"] .bar-top {
@@ -115,7 +119,9 @@
   border: 1px solid var(--color-border);
   background: var(--color-background-secondary, #f5f5f5);
   color: var(--color-text);
-  transition: transform 0.25s ease, background-color 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    background-color 0.2s ease;
 }
 
 .close-menu:hover {
@@ -140,10 +146,19 @@ nav {
   scrollbar-color: var(--color-border) transparent;
 }
 
-nav::-webkit-scrollbar        { width: 5px; }
-nav::-webkit-scrollbar-track  { background: transparent; }
-nav::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 4px; }
-nav::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+nav::-webkit-scrollbar {
+  width: 5px;
+}
+nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+nav::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+nav::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
 
 /* Menu items */
 .menu-item {
@@ -163,7 +178,10 @@ nav::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
   cursor: pointer;
   text-align: right;
   direction: inherit;
-  transition: background-color 0.18s ease, transform 0.18s ease, color 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease,
+    color 0.18s ease;
 }
 
 .menu-item:hover {
@@ -226,7 +244,10 @@ nav::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
   padding: 13px 8px;
   cursor: pointer;
   background: none;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -274,7 +295,9 @@ nav::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
   border-radius: 12px;
   padding: 11px 14px;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   user-select: none;
 }
 
