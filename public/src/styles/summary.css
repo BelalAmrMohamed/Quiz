@@ -262,6 +262,7 @@ body {
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   border: 1px solid var(--color-border-light);
+  direction: ltr;
 }
 
 .review-card:hover {

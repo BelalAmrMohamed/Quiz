@@ -118,6 +118,146 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
+// === Helper: Grade Essay — tolerant keyword-based scoring (0–5) ===
+function gradeEssay(userInput, modelAnswer) {
+  const normalize = (s) =>
+    String(s || "")
+      .toLowerCase()
+      .replace(/[.,;:!?()\[\]{}"'\/\\]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const userNorm = normalize(userInput);
+  const modelNorm = normalize(modelAnswer);
+
+  if (!userNorm) return 0;
+
+  // Math detection: if model answer is essentially a number/formula
+  const extractNums = (s) => (s.match(/\d+(\.\d+)?/g) || []).map(Number);
+  const modelNums = extractNums(modelNorm);
+  const userNums = extractNums(userNorm);
+  const modelNoNums = modelNorm.replace(/\d+(\.\d+)?/g, "").trim();
+  if (modelNums.length > 0 && modelNoNums.length < 8) {
+    const allMatch = modelNums.every((mn) =>
+      userNums.some((un) => Math.abs(un - mn) / (Math.abs(mn) || 1) < 0.02),
+    );
+    return allMatch ? 5 : userNums.length > 0 ? 1 : 0;
+  }
+
+  // Keyword scoring
+  const stopWords = new Set([
+    "a",
+    "an",
+    "the",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "shall",
+    "can",
+    "to",
+    "of",
+    "in",
+    "on",
+    "at",
+    "by",
+    "for",
+    "with",
+    "from",
+    "and",
+    "or",
+    "but",
+    "if",
+    "as",
+    "it",
+    "its",
+    "this",
+    "that",
+    "these",
+    "those",
+    "i",
+    "you",
+    "he",
+    "she",
+    "we",
+    "they",
+    "not",
+    "no",
+    "so",
+    "also",
+  ]);
+  const keywords = modelNorm
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !stopWords.has(w));
+
+  if (keywords.length === 0) {
+    return userNorm.includes(modelNorm) || modelNorm.includes(userNorm) ? 5 : 0;
+  }
+
+  const matched = keywords.filter((kw) => userNorm.includes(kw)).length;
+  const ratio = matched / keywords.length;
+
+  if (ratio >= 0.8) return 5;
+  if (ratio >= 0.6) return 4;
+  if (ratio >= 0.4) return 3;
+  if (ratio >= 0.2) return 2;
+  if (matched > 0) return 1;
+  return 0;
+}
+
+// === Helper: Markdown-lite renderer (code blocks, inline code, line breaks) ===
+function renderMarkdown(str) {
+  if (str === null || str === undefined) return "";
+  str = String(str);
+  const codeBlocks = [];
+
+  // 1. Extract fenced code blocks (preserve their inner newlines verbatim)
+  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
+    const idx = codeBlocks.length;
+    const escaped = code
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    codeBlocks.push(
+      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
+    );
+    return `\x00CODE${idx}\x00`;
+  });
+
+  // 2. Escape remaining HTML
+  str = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+  // 3. Inline code (single backticks)
+  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+
+  // 4. Newlines → <br>
+  str = str.replace(/\n/g, "<br>");
+
+  // 5. Restore fenced code blocks
+  str = str.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+
+  return str;
+}
+
 // === Helper: Check if Essay Question ===
 const isEssayQuestion = (q) => {
   return q.options && q.options.length === 1;
@@ -461,7 +601,7 @@ function renderMenuNavigation() {
   const flagCount = gameEngine.getFlaggedCount(examId);
   const flagInfo =
     flagCount > 0
-      ? `<span class="menu-flag-count">🚩 ذو علامة مرجعية:  ${flagCount}</span>`
+      ? `<span class="menu-flag-count"><i data-lucide="flag"></i> ذو علامة مرجعية:  ${flagCount}</span>`
       : "";
 
   if (viewMode === "grid") {
@@ -469,6 +609,9 @@ function renderMenuNavigation() {
   } else {
     renderListView(navContainer, flagInfo);
   }
+
+  // Always refresh icons after re-rendering nav (fixes debounced icon stale state)
+  resetLucidIcons();
 }
 
 // === OPTIMIZED: Grid view with DocumentFragment ===
@@ -543,8 +686,8 @@ function createGridItem(q, idx) {
       isBookmarked || isFlagged
         ? `
       <div class="menu-nav-badges">
-        ${isBookmarked ? '<span class="mini-badge bookmark">★</span>' : ""}
-        ${isFlagged ? '<span class="mini-badge flag">🚩</span>' : ""}
+        ${isBookmarked ? '<span class="mini-badge bookmark"><i data-lucide="star"></i></span>' : ""}
+        ${isFlagged ? '<span class="mini-badge flag"><i data-lucide="flag"></i></span>' : ""}
       </div>
     `
         : ""
@@ -625,12 +768,12 @@ function createListItem(q, idx) {
       <span class="menu-nav-icon bookmark-icon ${isBookmarked ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionBookmark(${idx})"
             title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
-        ${isBookmarked ? "★" : "☆"}
+        ${isBookmarked ? '<i data-lucide="star-off"></i>' : '<i data-lucide="star"></i>'}
       </span>
       <span class="menu-nav-icon flag-icon ${isFlagged ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
             title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
-        ${isFlagged ? "🚩" : "🏳️"}
+        ${isFlagged ? '<i data-lucide="flag"></i>' : '<i data-lucide="flag-off"></i>'}
       </span>
     </div>
   `;
@@ -658,7 +801,10 @@ function updateMenuActionButtons() {
       bookmarkBtn.disabled = false;
 
       const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
-      if (bookmarkIcon) bookmarkIcon.textContent = isBookmarked ? "★" : "☆";
+      if (bookmarkIcon)
+        bookmarkIcon.innerHTML = isBookmarked
+          ? '<i data-lucide="star-off"></i>'
+          : '<i data-lucide="star"></i>';
       if (bookmarkText)
         bookmarkText.textContent = isBookmarked
           ? "حذف من المفضلة"
@@ -677,7 +823,10 @@ function updateMenuActionButtons() {
       flagBtn.disabled = false;
 
       const isFlagged = gameEngine.isFlagged(examId, currentIdx);
-      if (flagIcon) flagIcon.textContent = isFlagged ? "🚩" : "🏳️";
+      if (flagIcon)
+        flagIcon.innerHTML = isFlagged
+          ? '<i data-lucide="flag"></i>'
+          : '<i data-lucide="flag-off"></i>';
       if (flagText)
         flagText.textContent = isFlagged
           ? "إزالة العلامة"
@@ -686,6 +835,8 @@ function updateMenuActionButtons() {
       flagBtn.classList.toggle("flagged", isFlagged);
     }
   }
+
+  resetLucidIcons();
 }
 
 // === Vertical style: build one question card HTML for index idx ===
@@ -705,30 +856,23 @@ function buildVerticalQuestionCard(q, idx) {
   if (isLocked) {
     let isCorrect;
     if (isEssay) {
-      const userAnswer = String(userSelected || "")
-        .trim()
-        .toLowerCase();
-      const correctAnswer = String(q.options[0] || "")
-        .trim()
-        .toLowerCase();
-      isCorrect = userAnswer === correctAnswer;
+      const essayScore = gradeEssay(userSelected, q.options[0]);
+      isCorrect = essayScore >= 3;
       feedbackClass += " essay-feedback show";
-      const statusMsg = isCorrect
-        ? "Your answer matches! ✅"
-        : "Your answer differs ⚠️";
-      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
+      const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
+      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
-      const statusMsg = isCorrect ? "Correct ✅" : "Wrong ❌";
-      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(explanationText)}</div>`;
+      const statusMsg = isCorrect ? "Correct" : "Wrong";
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
     }
   }
 
   const actionBtns = `
     <div class="question-actions">
       <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? `<i data-lucide="star-off"></i>` : `<i data-lucide="star"></i>`}</button>
-      <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? "🚩" : "🏳️"}</button>
+      <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? `<i data-lucide="flag"></i>` : `<i data-lucide="flag-off"></i>`}</button>
     </div>
   `;
 
@@ -738,7 +882,7 @@ function buildVerticalQuestionCard(q, idx) {
       ${actionBtns}
     </div>
     ${renderQuestionImage(q.image)}
-    <h2 class="question-text">${escapeHtml(q.q)}</h2>
+    <h2 class="question-text">${renderMarkdown(q.q)}</h2>
   `;
 
   if (isEssay) {
@@ -751,11 +895,12 @@ function buildVerticalQuestionCard(q, idx) {
         </div>
         <button class="check-answer-btn ${isLocked || !showCheckButton ? "hidden" : ""}" onclick="window.checkAnswerForQuestion(${idx})" ${!userSelected || String(userSelected).trim() === "" ? "disabled" : ""}>Check Answer</button>
         <div class="${feedbackClass}">${feedbackText}</div>
-        ${isLocked ? `<div class="formal-answer"><strong>📝 Formal Answer:</strong><div class="formal-answer-text">${escapeHtml(q.options[0])}</div></div>` : ""}
+        ${isLocked ? `<div class="formal-answer"><strong>Formal Answer:</strong><div class="formal-answer-text">${renderMarkdown(q.options[0])}</div></div>` : ""}
       </div>
     `;
   }
 
+  // === MCQ card ===
   const optionsHtml = q.options
     .map((opt, i) => {
       const isSelected = userSelected === i;
@@ -769,7 +914,7 @@ function buildVerticalQuestionCard(q, idx) {
       return `
         <div class="${optionClass}" ${isLocked ? "" : `onclick="window.handleSelectForQuestion(${idx}, ${i})"`}>
           <input type="radio" name="answer-${idx}" ${isSelected ? "checked" : ""} ${isLocked ? "disabled" : ""} aria-label="Option ${i + 1}">
-          <span class="option-label">${escapeHtml(opt)}</span>
+          <span class="option-label">${renderMarkdown(opt)}</span>
         </div>`;
     })
     .join("");
@@ -841,26 +986,17 @@ function renderQuestion() {
     let isCorrect = false;
 
     if (isEssay) {
-      const userAnswer = String(userSelected || "")
-        .trim()
-        .toLowerCase();
-      const correctAnswer = String(q.options[0] || "")
-        .trim()
-        .toLowerCase();
-      isCorrect = userAnswer === correctAnswer;
+      const essayScore = gradeEssay(userSelected, q.options[0]);
+      isCorrect = essayScore >= 3;
 
       feedbackClass += " essay-feedback show";
-      const statusMsg = isCorrect
-        ? "Your answer matches! ✅"
-        : "Your answer differs ⚠️";
-      feedbackText = `${statusMsg}<div style="margin-top:8px"><strong>Note:</strong> Essay grading may be inaccurate.</div><div style="margin-top:8px">${escapeHtml(
-        explanationText,
-      )}</div>`;
+      const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
+      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
-      const statusMsg = isCorrect ? "Correct ✅" : `Wrong ❌`;
-      feedbackText = `${statusMsg}<div style="margin-top:8px">${escapeHtml(
+      const statusMsg = isCorrect ? "Correct" : "Wrong";
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${renderMarkdown(
         explanationText,
       )}</div>`;
     }
@@ -876,7 +1012,7 @@ function renderQuestion() {
       <button class="flag-btn ${isFlagged ? "active" : ""}" 
               onclick="window.toggleFlag()" 
               title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
-        ${isFlagged ? "🚩" : "🏳️"}
+        ${isFlagged ? `<i data-lucide="flag"></i>` : `<i data-lucide="flag-off"></i>`}
       </button>
     </div>
   `;
@@ -887,7 +1023,7 @@ function renderQuestion() {
       ${actionButtons}
     </div>
     ${renderQuestionImage(q.image)}
-    <h2 class="question-text">${escapeHtml(q.q)}</h2>
+    <h2 class="question-text">${renderMarkdown(q.q)}</h2>
   `;
 
   if (isEssay) {
@@ -903,7 +1039,7 @@ function renderQuestion() {
             ${isLocked ? "disabled" : ""}
             oninput="window.handleEssayInput()"
           >${escapeHtml(userSelected || "")}</textarea>
-          <div class="essay-hint">💡 Tip: Your answer will be compared with the formal answer (case-insensitive)</div>
+          <div class="essay-hint">Tip: Answer is graded on keyword matching — focus on key concepts</div>
         </div>
         <button class="check-answer-btn ${
           isLocked || !showCheckButton ? "hidden" : ""
@@ -921,8 +1057,8 @@ function renderQuestion() {
           isLocked
             ? `
           <div class="formal-answer">
-            <strong>📝 Formal Answer:</strong>
-            <div class="formal-answer-text">${escapeHtml(q.options[0])}</div>
+            <strong>Formal Answer:</strong>
+            <div class="formal-answer-text">${renderMarkdown(q.options[0])}</div>
           </div>
         `
             : ""
@@ -955,7 +1091,7 @@ function renderQuestion() {
                        ${isLocked ? "disabled" : ""} aria-label="Option ${
                          i + 1
                        }">
-                <span class="option-label">${escapeHtml(opt)}</span>
+                <span class="option-label">${renderMarkdown(opt)}</span>
               </div>`;
             })
             .join("")}
@@ -1053,26 +1189,37 @@ async function finish(skipconfirmationNotification) {
 
   stopTimer();
 
-  let correctCount = 0;
+  let correctCount = 0; // MCQ points
+  let essayScore = 0; // Essay points earned
+  let essayMaxScore = 0; // Essay points possible
   let essayQuestions = [];
 
   questions.forEach((q, i) => {
     if (isEssayQuestion(q)) {
       essayQuestions.push(i);
+      const score = gradeEssay(userAnswers[i], q.options[0]);
+      essayScore += score;
+      essayMaxScore += 5;
     } else {
       const correctIdx = q.correct ?? q.answer;
       if (userAnswers[i] === correctIdx) correctCount++;
     }
   });
 
-  const scorableQuestions = questions.length - essayQuestions.length;
+  const mcqCount = questions.length - essayQuestions.length;
+  const totalScore = correctCount + essayScore;
+  const totalPossible = mcqCount + essayMaxScore;
 
   const rawResult = {
     examId,
-    examTitle: metaData.title, // Pass title for summary
-    questions: questions, // Pass questions to avoid reload issues
-    score: correctCount,
-    total: scorableQuestions,
+    examTitle: metaData.title,
+    questions: questions,
+    score: totalScore,
+    total: totalPossible,
+    mcqScore: correctCount,
+    mcqTotal: mcqCount,
+    essayScore: essayScore,
+    essayMaxScore: essayMaxScore,
     totalQuestions: questions.length,
     essayQuestions: essayQuestions,
     userAnswers,
@@ -1149,9 +1296,9 @@ async function restart(skipconfirmationNotification) {
         .toString()
         .padStart(2, "0");
       const secs = (timeRemaining % 60).toString().padStart(2, "0");
-      els.timer.textContent = `⏳ ${mins}:${secs}`;
+      els.timer.textContent = `${mins}:${secs}`;
     } else {
-      els.timer.textContent = `⏱ 00:00`;
+      els.timer.textContent = `00:00`;
     }
   }
 
@@ -1256,7 +1403,7 @@ function startTimer() {
         .padStart(2, "0");
       const secs = (timeRemaining % 60).toString().padStart(2, "0");
       if (els.timer) {
-        els.timer.textContent = `⏳ ${mins}:${secs}`;
+        els.timer.textContent = `${mins}:${secs}`;
         if (timeRemaining < 30) els.timer.style.color = "var(--color-error)";
       }
     } else {
@@ -1265,7 +1412,7 @@ function startTimer() {
         .toString()
         .padStart(2, "0");
       const secs = (timeElapsed % 60).toString().padStart(2, "0");
-      if (els.timer) els.timer.textContent = `⏱ ${mins}:${secs}`;
+      if (els.timer) els.timer.textContent = `${mins}:${secs}`;
 
       // Save less frequently during timer (every 10 seconds)
       if (timeElapsed % 10 === 0) {
