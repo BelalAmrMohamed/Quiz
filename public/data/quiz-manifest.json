@@ -647,6 +647,12 @@
       "title": "Website Demo",
       "path": "../../data/quizzes/Computer Science/2/2/Website demo/Website Demo.json",
       "category": "Website demo"
+    },
+    {
+      "id": "4OBRHDOR",
+      "title": "Test Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
+      "category": "Website demo"
     }
   ],
   "categoryTree": {
@@ -1604,6 +1610,12 @@
       "parent": null,
       "subcategories": [],
       "exams": [
+        {
+          "id": "4OBRHDOR",
+          "title": "Test Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
+          "category": "Website demo"
+        },
         {
           "id": "3SVMT2U3",
           "title": "Website Demo",

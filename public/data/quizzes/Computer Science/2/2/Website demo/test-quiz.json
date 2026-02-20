@@ -1,0 +1,143 @@
+{
+  "questions": [
+    {
+      "q": "What is 2 + 2?",
+      "options": ["3", "4", "5", "22"],
+      "correct": 1,
+      "explanation": "Basic arithmetic: 2 + 2 = 4."
+    },
+
+    {
+      "q": "Which of the following is a valid way to declare a variable in JavaScript that cannot be reassigned?",
+      "options": [
+        "var x = 10;",
+        "let x = 10;",
+        "const x = 10;",
+        "static x = 10;"
+      ],
+      "correct": 2,
+      "explanation": "The `const` keyword declares a block-scoped variable that cannot be reassigned after its initial assignment.\n\n`var` is function-scoped and can be reassigned.\n`let` is block-scoped but CAN be reassigned.\n`static` is not a valid variable declaration keyword in JavaScript."
+    },
+
+    {
+      "q": "What is the output of the following code?\n```\nconst arr = [1, 2, 3];\nconst result = arr.map(x => x * 2).filter(x => x > 3);\nconsole.log(result);\n```",
+      "options": ["[2, 4, 6]", "[4, 6]", "[6]", "[2, 4]"],
+      "correct": 1,
+      "explanation": "Step by step:\n1. `map(x => x * 2)` transforms `[1, 2, 3]` → `[2, 4, 6]`\n2. `filter(x => x > 3)` keeps only values greater than 3 → `[4, 6]`\n\nSo `result` is `[4, 6]`."
+    },
+
+    {
+      "q": "A network has the IP address `192.168.1.0` with a subnet mask of `255.255.255.0`. How many usable host addresses are available?",
+      "options": ["256", "255", "254", "128"],
+      "correct": 2,
+      "explanation": "A `/24` subnet (255.255.255.0) gives 2^8 = 256 total addresses.\n\nSubtract 2 reserved addresses:\n- `192.168.1.0` — Network address\n- `192.168.1.255` — Broadcast address\n\nResult: **254** usable host addresses."
+    },
+
+    {
+      "q": "What is the time complexity of binary search on a sorted array of n elements?",
+      "options": ["O(n)", "O(n²)", "O(log n)", "O(n log n)"],
+      "correct": 2,
+      "explanation": "Binary search works by halving the search space with each comparison.\n\nStarting with n elements:\n- Step 1: n/2 elements remain\n- Step 2: n/4 elements remain\n- Step k: n/2^k elements remain\n\nWe stop when 1 element remains: n/2^k = 1 → k = log₂(n)\n\nTherefore the time complexity is **O(log n)**."
+    },
+
+    {
+      "q": "Which OSI layer is responsible for end-to-end communication and reliability?",
+      "options": [
+        "Layer 2 — Data Link",
+        "Layer 3 — Network",
+        "Layer 4 — Transport",
+        "Layer 5 — Session"
+      ],
+      "correct": 2,
+      "explanation": "Layer 4 (Transport) is responsible for:\n- End-to-end communication between hosts\n- Reliability through acknowledgements (TCP)\n- Flow control and error correction\n- Segmentation and reassembly\n\nTCP and UDP both operate at this layer."
+    },
+
+    {
+      "q": "In a relational database, what does the following SQL query return?\n```\nSELECT department, COUNT(*) AS total\nFROM employees\nWHERE salary > 5000\nGROUP BY department\nHAVING COUNT(*) > 2;\n```",
+      "options": [
+        "All departments with more than 2 employees",
+        "All departments where every employee earns more than 5000",
+        "Departments that have more than 2 employees earning over 5000",
+        "The top 2 highest-paid departments"
+      ],
+      "correct": 2,
+      "explanation": "Breaking the query down:\n1. `WHERE salary > 5000` — first filters to only rows where salary exceeds 5000\n2. `GROUP BY department` — groups the filtered results by department\n3. `HAVING COUNT(*) > 2` — keeps only groups (departments) that have more than 2 such rows\n\nThe key distinction: `WHERE` filters individual rows *before* grouping; `HAVING` filters groups *after* grouping."
+    },
+
+    {
+      "q": "Which sorting algorithm has the best average-case and worst-case time complexity of O(n log n)?",
+      "options": ["Bubble Sort", "Quick Sort", "Merge Sort", "Insertion Sort"],
+      "correct": 2,
+      "explanation": "Merge Sort guarantees O(n log n) in ALL cases (best, average, and worst).\n\nComparison:\n| Algorithm | Best | Average | Worst |\n|---|---|---|---|\n| Bubble Sort | O(n) | O(n²) | O(n²) |\n| Quick Sort | O(n log n) | O(n log n) | O(n²) |\n| Merge Sort | O(n log n) | O(n log n) | O(n log n) |\n| Insertion Sort | O(n) | O(n²) | O(n²) |\n\nQuick Sort has O(n²) worst case (when pivot is always the smallest/largest element)."
+    },
+
+    {
+      "q": "What is the value of `x` after this Python code runs?\n```\nx = 0\nfor i in range(1, 6):\n    if i % 2 == 0:\n        x += i\nprint(x)\n```",
+      "options": ["6", "9", "15", "12"],
+      "correct": 0,
+      "explanation": "`range(1, 6)` produces: 1, 2, 3, 4, 5\n\nOnly even numbers are added (`i % 2 == 0`):\n- i=1: odd, skip\n- i=2: even → x = 0 + 2 = 2\n- i=3: odd, skip\n- i=4: even → x = 2 + 4 = 6\n- i=5: odd, skip\n\nFinal value: x = **6**"
+    },
+
+    {
+      "q": "This question has an image attached. What colour is the Anthropic logo?",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Anthropic_logo.svg/400px-Anthropic_logo.svg.png",
+      "options": [
+        "Blue and white",
+        "Black and white / dark tones",
+        "Red and orange",
+        "Green and grey"
+      ],
+      "correct": 1,
+      "explanation": "The Anthropic logo uses dark tones — typically black/dark grey and white — with a minimal, geometric design aesthetic."
+    },
+
+    {
+      "q": "A very long question designed to stress-test text wrapping in the question card. You are designing a distributed system for a large e-commerce platform that handles 100,000 requests per second at peak load. The system must guarantee 99.99% uptime, support horizontal scaling, and ensure data consistency across multiple geographic regions. Given these constraints, which combination of architectural patterns best addresses all three requirements simultaneously?",
+      "options": [
+        "Monolithic architecture with a single global database and load balancer — simple to operate and guarantees strong consistency across all regions",
+        "Microservices with eventual consistency, CQRS (Command Query Responsibility Segregation), and multi-region active-active replication using a distributed consensus protocol like Raft or Paxos",
+        "Serverless functions with a single-region relational database — serverless handles scaling automatically and SQL provides strong consistency guarantees",
+        "Two-tier client-server architecture with read replicas — read replicas handle the read load and the primary handles writes, giving a good balance"
+      ],
+      "correct": 1,
+      "explanation": "Option B is correct because:\n\n**Microservices** — enable horizontal scaling of individual components independently.\n\n**Eventual consistency + CQRS** — separates read and write workloads, allowing each to scale independently. Eventual consistency is the practical tradeoff for high availability across regions.\n\n**Multi-region active-active + Raft/Paxos** — ensures 99.99% uptime by eliminating single points of failure and handles partition tolerance (CAP theorem).\n\nThe other options fail because:\n- Option A: A single global database is a bottleneck and single point of failure\n- Option C: Single-region violates the geographic distribution requirement\n- Option D: Two-tier with a primary write node is still a single point of failure for writes"
+    },
+
+    {
+      "q": "Short Q: what is `null == undefined` in JavaScript?",
+      "options": ["true", "false"],
+      "correct": 0,
+      "explanation": "In JavaScript, `null == undefined` is `true` due to the loose equality (`==`) rules. Both are considered \"nullish\" values.\n\nHowever, `null === undefined` is `false` because strict equality also checks type."
+    },
+
+    {
+      "q": "What does `git rebase` do compared to `git merge`?",
+      "options": [
+        "They are identical — both combine two branches into one",
+        "Rebase replays your commits on top of the target branch, creating a linear history; merge creates a merge commit preserving the branch topology",
+        "Rebase is safer than merge because it never rewrites history",
+        "Merge replays commits one by one; rebase creates a single merge commit"
+      ],
+      "correct": 1,
+      "explanation": "**git merge** takes the endpoint of both branches and creates a new \"merge commit\" that ties them together. The branch history is fully preserved.\n\n**git rebase** moves or \"replays\" your branch's commits one by one on top of the target branch tip, rewriting commit hashes. This produces a cleaner, linear history.\n\nImportant rule: never rebase commits that have already been pushed to a shared remote, as it rewrites history and will conflict with other developers' work."
+    },
+
+    {
+      "q": "Explain what the OSI model is and describe the role of each of its 7 layers.",
+      "options": [
+        "The OSI (Open Systems Interconnection) model is a conceptual framework that standardises how different network protocols and systems communicate. It divides network communication into 7 ordered layers:\n1. Physical — transmits raw bits over a physical medium (cables, radio)\n2. Data Link — handles node-to-node data transfer and error detection (Ethernet, MAC addresses)\n3. Network — handles routing and logical addressing (IP)\n4. Transport — provides end-to-end communication and reliability (TCP/UDP)\n5. Session — manages sessions and connections between applications\n6. Presentation — handles data translation, encryption, and compression\n7. Application — the layer closest to the user; provides network services to apps (HTTP, FTP, DNS)"
+      ],
+      "correct": 0,
+      "explanation": "A complete answer should mention all 7 layers by number and name, and describe each layer's primary function. Bonus points for examples of protocols at each layer."
+    },
+
+    {
+      "q": "Explain what Big O notation is and why it matters in software engineering. Give at least two examples.",
+      "options": [
+        "Big O notation is a mathematical notation used to describe the upper bound of an algorithm's time or space complexity as the input size (n) grows toward infinity. It describes the worst-case scenario and allows engineers to compare algorithms independently of hardware. Examples: O(1) is constant time (e.g., array index access), O(n) is linear time (e.g., a simple loop through n elements), O(n²) is quadratic time (e.g., nested loops like bubble sort)."
+      ],
+      "correct": 0,
+      "explanation": "Key points to cover:\n- Big O is an *upper bound* (worst case)\n- It's about *growth rate*, not exact time\n- Hardware-independent comparison tool\n\nCommon complexities to know:\n- `O(1)` — constant: hash table lookup\n- `O(log n)` — logarithmic: binary search\n- `O(n)` — linear: simple loop\n- `O(n log n)` — merge sort, heap sort\n- `O(n²)` — quadratic: bubble sort, nested loops\n- `O(2^n)` — exponential: brute-force subset generation"
+    }
+  ]
+}

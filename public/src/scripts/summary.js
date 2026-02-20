@@ -149,6 +149,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   renderReview(container, questions, result.userAnswers);
 
+  resetLucidIcons();
+
   const userName = localStorage.getItem("username") || "User";
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
@@ -268,7 +270,7 @@ function renderReview(container, questions, userAnswers) {
         <div class="review-card essay-card">
           <div class="review-header" style="display:flex; justify-content:space-between; align-items:center">
             <span class="q-num">#${index + 1}</span>
-            <span class="essay-badge">📝 Essay (Not Scored)</span>
+            <span class="essay-badge"><i data-lucide="scroll-text"></i> Essay</span>
           </div>
           <p class="q-text">${escapeHTML(q.q)}</p>
           ${renderQuestionImage(q.image)}
@@ -284,7 +286,7 @@ function renderReview(container, questions, userAnswers) {
           </div>
           ${
             matches
-              ? `<div class="essay-match-notice">✅ Your answer matches the formal answer!</div>`
+              ? `<div class="essay-match-notice"><i data-lucide="shield-check"></i> Your answer matches the formal answer!</div>`
               : `<div class="essay-mismatch-notice">⚠️ Your answer differs from the formal answer. However, it might still be correct in a different way.</div>`
           }
           ${
@@ -302,7 +304,11 @@ function renderReview(container, questions, userAnswers) {
         : isSkipped
           ? "skipped"
           : "wrong";
-      const statusIcon = isCorrect ? "✅" : isSkipped ? "⚪" : "❌";
+      const statusIcon = isCorrect
+        ? `<i data-lucide="shield-check"></i>`
+        : isSkipped
+          ? `<i data-lucide="skip-back"></i>`
+          : `<i data-lucide="circle-x"></i>`;
       const qText = escapeHTML(q.q);
       const userText = isSkipped ? "Skipped" : escapeHTML(q.options[userAns]);
       const correctText = escapeHTML(q.options[q.correct]);
@@ -335,6 +341,17 @@ function renderReview(container, questions, userAnswers) {
       `;
     }
   });
-
   container.innerHTML = html;
+}
+
+function resetLucidIcons() {
+  // Reset lucid icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  } else {
+    // Fallback: wait for the CDN script if it loads after the module
+    window.addEventListener("load", () => {
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    });
+  }
 }

@@ -807,6 +807,89 @@ body {
   }
 }
 
+/* ─── Code Rendering (Issue 4) ──────────────────────────────── */
+.code-block {
+  background: var(--color-background-secondary, #1e1e2e);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  overflow-x: auto;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: var(--color-code, #e2e8f0);
+}
+
+.inline-code {
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--color-background-secondary, rgba(99, 102, 241, 0.1));
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: var(--color-primary, #6366f1);
+  white-space: nowrap;
+}
+
+/* ─── Lucide Icon Sizing ─────────────────────────────────────── */
+
+/* Stat bar icons */
+.stat-icon i,
+.stat-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* Mini-badge icons inside the grid nav cells */
+.mini-badge i,
+.mini-badge svg {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* List-view bookmark / flag icons */
+.menu-nav-icon i,
+.menu-nav-icon svg {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+/* Bookmark / flag action buttons on the question card */
+.bookmark-btn i,
+.bookmark-btn svg,
+.flag-btn i,
+.flag-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  pointer-events: none;
+}
+
+/* Flag count in menu nav header */
+.menu-flag-count i,
+.menu-flag-count svg {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
 /* Vertical quiz style: all questions in one scrollable page */
 #questionContainer.vertical-style {
   display: flex;
