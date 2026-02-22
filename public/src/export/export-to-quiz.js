@@ -15,544 +15,644 @@ export async function exportToQuiz(config, questions) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="${escapeHTML(config.description || "Interactive quiz platform")}">
   <title>${escapeHTML(config.title || "Practice Quiz")}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-  * {
+  *, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-  
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ── Design Tokens ───────────────────────────────────────────── */
   :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8f9fa;
-    --bg-tertiary: #e2e8f0;
-    --text-primary: #2d3748;
+    color-scheme: light;
+
+    /* Backgrounds */
+    --bg-primary:    #ffffff;
+    --bg-secondary:  #f8fafc;
+    --bg-tertiary:   #e8edf3;
+
+    /* Text */
+    --text-primary:   #1a202c;
     --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --border-color: #e2e8f0;
-    --card-bg: #f8f9fa;
-    --card-answered: #f0f4ff;
-    --gradient-start: #667eea;
-    --gradient-end: #764ba2;
-    --success: #48bb78;
-    --error: #f56565;
-    --warning: #ed8936;
-    --info: #4299e1;
-    --shadow: rgba(0, 0, 0, 0.1);
-    --shadow-lg: rgba(0, 0, 0, 0.3);
+    --text-muted:     #718096;
+
+    /* Borders & Cards */
+    --border-color:  #e2e8f0;
+    --card-bg:       #f8fafc;
+    --card-answered: #eef2ff;
+
+    /* Brand */
+    --gradient-start:     #667eea;
+    --gradient-end:       #764ba2;
+    --gradient:           linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    --gradient-body:      var(--gradient);
+    --gradient-body-dark: linear-gradient(135deg, #1a1b3e 0%, #2d1654 100%);
+
+    /* Typography */
+    --font-mono: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+
+    /* Semantic — light */
+    --success:      #10b981;
+    --success-bg:   #ecfdf5;
+    --success-text: #065f46;
+
+    --error:        #ef4444;
+    --error-bg:     #fef2f2;
+    --error-text:   #991b1b;
+
+    --warning:      #f59e0b;
+    --warning-bg:   #fffbeb;
+    --warning-text: #92400e;
+
+    --info:         #3b82f6;
+    --info-bg:      #eff6ff;
+    --info-text:    #1e40af;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
+
+    /* Radius scale */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    /* Transitions */
+    --t-fast: 0.15s ease;
+    --t-base: 0.25s ease;
+    --t-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   [data-theme="dark"] {
-    --bg-primary: #1a202c;
-    --bg-secondary: #2d3748;
-    --bg-tertiary: #4a5568;
-    --text-primary: #f7fafc;
-    --text-secondary: #e2e8f0;
-    --text-muted: #a0aec0;
-    --border-color: #4a5568;
-    --card-bg: #2d3748;
-    --card-answered: #3e4c63;
-    --shadow: rgba(0, 0, 0, 0.3);
-    --shadow-lg: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+
+    --bg-primary:    #0f172a;
+    --bg-secondary:  #1e293b;
+    --bg-tertiary:   #334155;
+    --text-primary:  #f1f5f9;
+    --text-secondary:#cbd5e1;
+    --text-muted:    #94a3b8;
+    --border-color:  #334155;
+    --card-bg:       #1e293b;
+    --card-answered: #1e2d4a;
+
+    --success-bg:   #022c22;
+    --success-text: #6ee7b7;
+    --error-bg:     #2d0a0a;
+    --error-text:   #fca5a5;
+    --warning-bg:   #1c1007;
+    --warning-text: #fcd34d;
+    --info-bg:      #0c1e3f;
+    --info-text:    #93c5fd;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
   }
-  
+
+  /* ── Base ────────────────────────────────────────────────────── */
+  [data-theme="dark"] body {
+    background: var(--gradient-body-dark) center / cover fixed;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    background: var(--gradient-body) center / cover fixed;
     min-height: 100vh;
-    padding: 20px;
-    transition: background 0.3s ease;
-    position: relative;
+    padding: 24px 16px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
-  /* Wave animation background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-    z-index: -2;
+
+  input, button, textarea, select {
+    font-family: inherit;
+    accent-color: var(--gradient-start);
   }
-  
-  .waves {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 15vh;
-    min-height: 100px;
-    max-height: 150px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
+
+  /* Brand text selection */
+  ::selection {
+    background: rgba(102, 126, 234, 0.22);
+    color: inherit;
   }
-  
-  .waves.active {
-    opacity: 1;
-  }
-  
-  .parallax > use {
-    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
-  }
-  
-  .parallax > use:nth-child(1) {
-    animation-delay: -2s;
-    animation-duration: 7s;
-  }
-  
-  .parallax > use:nth-child(2) {
-    animation-delay: -3s;
-    animation-duration: 10s;
-  }
-  
-  .parallax > use:nth-child(3) {
-    animation-delay: -4s;
-    animation-duration: 13s;
-  }
-  
-  .parallax > use:nth-child(4) {
-    animation-delay: -5s;
-    animation-duration: 20s;
-  }
-  
-  @keyframes move-forever {
-    0% { transform: translate3d(-90px, 0, 0); }
-    100% { transform: translate3d(85px, 0, 0); }
-  }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .parallax > use {
-      animation: none;
-    }
-  }
-  
+
+  /* ── Skip Link ───────────────────────────────────────────────── */
   .skip-link {
     position: absolute;
-    top: -40px;
+    top: -48px;
     left: 0;
     background: var(--gradient-start);
-    color: white;
-    padding: 8px 16px;
+    color: #fff;
+    padding: 8px 18px;
     text-decoration: none;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 var(--radius-sm) 0;
     z-index: 2000;
+    font-size: 14px;
+    font-weight: 600;
+    transition: top var(--t-fast);
   }
-  
+
   .skip-link:focus {
     top: 0;
   }
-  
-  /* Fixed hamburger menu button */
+
+  /* ── Menu Toggle ─────────────────────────────────────────────── */
   .menu-toggle {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 18px;
+    right: 18px;
     z-index: 1001;
-    width: 50px;
-    height: 50px;
-    background: var(--gradient-start);
+    width: 48px;
+    height: 48px;
+    background: var(--gradient);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
-    box-shadow: 0 4px 12px var(--shadow-lg);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.45);
+    transition: transform var(--t-base), box-shadow var(--t-base);
   }
-  
+
   .menu-toggle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px var(--shadow-lg);
+    transform: scale(1.06);
+    box-shadow: 0 6px 22px rgba(102, 126, 234, 0.6);
   }
-  
-  .menu-toggle:focus {
-    outline: 2px solid white;
+
+  .menu-toggle:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.85);
     outline-offset: 2px;
   }
-  
+
   .menu-toggle span {
     display: block;
-    width: 24px;
-    height: 3px;
+    width: 22px;
+    height: 2.5px;
     background: #fff;
     border-radius: 2px;
-    transition: all 0.3s ease;
-    position: relative;
+    transition: transform var(--t-base), opacity var(--t-base);
   }
-  
+
   .menu-toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
+    transform: rotate(45deg) translate(5.5px, 5.5px);
   }
-  
+
   .menu-toggle.active span:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0);
   }
-  
+
   .menu-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: rotate(-45deg) translate(5.5px, -5.5px);
   }
-  
+
+  /* ── Side Menu ───────────────────────────────────────────────── */
   .side-menu {
     position: fixed;
     top: 0;
-    right: -320px;
+    right: -324px;
     width: 320px;
     height: 100vh;
     background: var(--bg-primary);
-    box-shadow: -4px 0 20px var(--shadow-lg);
+    box-shadow: -8px 0 48px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: right var(--t-slow);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
   }
-  
+
+  .side-menu::-webkit-scrollbar       { width: 4px; }
+  .side-menu::-webkit-scrollbar-track { background: transparent; }
+  .side-menu::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
   .side-menu.open {
     right: 0;
   }
-  
+
   .side-menu-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     z-index: 999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--t-base);
   }
-  
+
   .side-menu-overlay.show {
     opacity: 1;
     pointer-events: auto;
   }
-  
+
   .side-menu-header {
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    background: var(--gradient);
     color: #fff;
-    padding: 25px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 28px 22px 22px;
+    flex-shrink: 0;
   }
-  
+
   .side-menu-header h2 {
-    font-size: 20px;
-    margin-bottom: 5px;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    letter-spacing: -0.2px;
   }
-  
+
   .side-menu-header p {
     font-size: 13px;
-    opacity: 0.9;
+    opacity: 0.82;
   }
-  
+
   .side-menu-content {
     flex: 1;
-    padding: 20px;
+    padding: 22px;
   }
-  
+
   .menu-section {
-    margin-bottom: 25px;
+    margin-bottom: 28px;
   }
-  
+
   .menu-section h3 {
-    font-size: 14px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    font-weight: 700;
   }
-  
+
   .toggle-option {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
+    padding: 13px 15px;
     background: var(--bg-secondary);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 12px;
+    transition: background var(--t-fast), transform var(--t-fast);
+    margin-bottom: 10px;
   }
-  
+
   .toggle-option:hover {
     background: var(--bg-tertiary);
     transform: translateX(2px);
   }
-  
+
+  .toggle-option:focus-visible {
+    outline: 2px solid var(--gradient-start);
+    outline-offset: 2px;
+  }
+
   .toggle-label {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--text-primary);
     font-weight: 500;
   }
-  
+
   .toggle-switch {
     position: relative;
-    width: 50px;
-    height: 26px;
-    background: var(--border-color);
-    border-radius: 13px;
-    transition: background 0.3s ease;
+    width: 46px;
+    height: 24px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    transition: background var(--t-base);
+    flex-shrink: 0;
   }
-  
+
   .toggle-switch.active {
     background: var(--gradient-start);
   }
-  
+
   .toggle-slider {
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #fff;
     border-radius: 50%;
     transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 2px 4px var(--shadow);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   }
-  
+
   .toggle-switch.active .toggle-slider {
-    transform: translateX(24px);
+    transform: translateX(22px);
   }
-  
+
+  /* ── Question Nav Grid ───────────────────────────────────────── */
   .nav-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
   }
-  
+
   .nav-btn {
-    padding: 12px;
-    border: 2px solid var(--border-color);
+    padding: 9px 4px;
+    border: 1.5px solid var(--border-color);
     background: var(--bg-primary);
     color: var(--text-primary);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 12px;
     text-align: center;
     position: relative;
-    min-height: 44px;
+    min-height: 40px;
+    transition: all var(--t-fast);
   }
-  
+
   .nav-btn:hover {
     border-color: var(--gradient-start);
     background: var(--card-answered);
-    transform: scale(1.05);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
   }
-  
-  .nav-btn:focus {
+
+  .nav-btn:focus-visible {
     outline: 2px solid var(--gradient-start);
     outline-offset: 2px;
   }
-  
+
   .nav-btn.answered {
     background: var(--card-answered);
     border-color: var(--gradient-start);
     color: var(--gradient-start);
   }
-  
+
   .nav-btn.flagged::after {
     content: '🚩';
     position: absolute;
-    top: -5px;
-    right: -5px;
-    font-size: 12px;
+    top: -6px;
+    right: -6px;
+    font-size: 10px;
+    line-height: 1;
   }
-  
+
   .nav-btn.current {
-    background: var(--gradient-start);
+    background: var(--gradient);
     color: #fff;
-    border-color: var(--gradient-start);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.45);
   }
-  
+
+  /* ── Main Container ──────────────────────────────────────────── */
   .container {
-    max-width: 900px;
+    max-width: 860px;
     margin: 0 auto;
     background: var(--bg-primary);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px var(--shadow-lg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
-    transition: background 0.3s ease;
+    transition: background var(--t-base), box-shadow var(--t-base);
     position: relative;
     z-index: 1;
   }
-  
+
+  /* ── Header ──────────────────────────────────────────────────── */
   .header {
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    background: var(--gradient);
     color: #fff;
-    padding: 30px;
+    padding: 36px 32px 28px;
     text-align: center;
     position: relative;
+    overflow: hidden;
   }
-  
+
+  /* Subtle dot-grid texture overlay */
+  .header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+
   .header h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+    text-wrap: balance;
   }
-  
+
   .header-meta {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 8px;
     flex-wrap: wrap;
-    opacity: 0.9;
-    font-size: 14px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
   }
-  
+
+  .header-meta > span {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
   .quiz-timer {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
-  
+
   .progress-container {
     background: rgba(255, 255, 255, 0.2);
-    height: 8px;
-    width: 100%;
-    border-radius: 4px;
+    height: 10px;
+    border-radius: 5px;
     overflow: hidden;
-    margin-top: 15px;
+    position: relative;
+    z-index: 1;
   }
-  
+
   .progress-bar {
-    background: linear-gradient(90deg, #48bb78, #38a169);
+    background: linear-gradient(90deg, #34d399, #10b981);
     height: 100%;
     width: 0%;
+    border-radius: 5px;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
   }
-  
+
   .progress-bar.updating {
     animation: progress-pulse 0.5s ease-out;
   }
-  
+
   @keyframes progress-pulse {
-    0%, 100% { opacity: 1; }
-    50% { 
-      opacity: 0.7; 
-      box-shadow: 0 0 20px rgba(72, 187, 120, 0.8);
-    }
+    50% { box-shadow: 0 0 22px rgba(52, 211, 153, 0.9); }
   }
-  
+
   .progress-text {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 13px;
-    opacity: 0.9;
+    opacity: 0.88;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
   }
-  
+
+  /* ── Quiz Body ───────────────────────────────────────────────── */
   .quiz-body {
-    padding: 30px;
+    padding: 32px;
   }
-  
+
+  /* ── Question Card ───────────────────────────────────────────── */
   .question-card {
     background: var(--card-bg);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 2px solid var(--border-color);
-    transition: all 0.3s ease;
-    scroll-margin-top: 20px;
+    border-radius: var(--radius-lg);
+    padding: 26px 28px;
+    margin-bottom: 22px;
+    border: 1.5px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+    scroll-margin-top: 24px;
   }
-  
+
+  .question-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .question-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
   .question-card.answered {
     border-color: var(--gradient-start);
+    border-left-width: 4px;
     background: var(--card-answered);
   }
-  
+
   .question-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
     gap: 10px;
   }
-  
+
   .question-num {
-    color: var(--gradient-start);
+    background: var(--gradient);
+    color: #fff;
+    font-size: 12px;
     font-weight: 700;
-    font-size: 14px;
+    padding: 5px 13px;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
   }
-  
+
   .question-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
   }
-  
+
   .question-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    background: #e8f5e9;
-    color: #2e7d32;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
   }
-  
+
   .question-badge.essay {
-    background: #fff3e0;
-    color: #e65100;
+    background: var(--warning-bg);
+    color: var(--warning-text);
   }
-  
+
   .flag-btn {
     background: transparent;
-    border: none;
-    font-size: 20px;
+    border: 1.5px solid var(--border-color);
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
     cursor: pointer;
-    transition: transform 0.2s;
-    padding: 4px 8px;
-  }
-  
-  .flag-btn:hover {
-    transform: scale(1.2);
-  }
-  
-  .flag-btn:focus {
-    outline: 2px solid var(--gradient-start);
-    border-radius: 4px;
-  }
-  
-  .question-text {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--text-primary);
-    line-height: 1.6;
-  }
-  
-  .question-image-container {
-    margin-bottom: 20px;
-    text-align: center;
-    position: relative;
-    min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all var(--t-fast);
+    color: var(--text-muted);
   }
-  
+
+  .flag-btn:hover {
+    border-color: var(--warning);
+    background: var(--warning-bg);
+    transform: scale(1.08);
+  }
+
+  .flag-btn:focus-visible {
+    outline: 2px solid var(--gradient-start);
+    outline-offset: 2px;
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 22px;
+    color: var(--text-primary);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* ── Question Image ──────────────────────────────────────────── */
+  .question-image-container {
+    margin-bottom: 22px;
+    text-align: center;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+
   .skeleton-loader {
-    width: 100%;
-    height: 200px;
+    position: absolute;
+    inset: 0;
     background: linear-gradient(
       90deg,
       var(--bg-secondary) 25%,
@@ -561,685 +661,671 @@ export async function exportToQuiz(config, questions) {
     );
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
-    border-radius: 12px;
-    position: absolute;
-    top: 0;
-    left: 0;
   }
-  
+
   @keyframes skeleton-loading {
-    0% { background-position: 200% 0; }
+    0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
-  
+
   .question-image {
     max-width: 100%;
     height: auto;
-    border-radius: 12px;
-    border: 2px solid var(--border-color);
-    box-shadow: 0 2px 8px var(--shadow);
+    border-radius: var(--radius-md);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.35s ease;
     display: block;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
-  
+
   .question-image.loaded {
     opacity: 1;
-    animation: fade-in 0.3s ease-in;
+    animation: fade-in 0.35s ease-in;
   }
-  
+
   @keyframes fade-in {
     from { opacity: 0; transform: scale(0.98); }
-    to { opacity: 1; transform: scale(1); }
+    to   { opacity: 1; transform: scale(1); }
   }
-  
+
+  /* ── Options ─────────────────────────────────────────────────── */
   .options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
-  
+
   .option-btn {
     background: var(--bg-primary);
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    padding: 15px 20px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
     text-align: left;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 16px;
+    transition: border-color var(--t-fast), background var(--t-fast),
+                transform var(--t-fast), box-shadow var(--t-fast), color var(--t-fast);
+    font-size: 15px;
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
     position: relative;
     overflow: hidden;
-    min-height: 44px;
+    min-height: 52px;
+    line-height: 1.5;
   }
-  
+
   .option-btn:hover:not(.disabled) {
     border-color: var(--gradient-start);
     background: var(--card-answered);
-    transform: translateX(5px);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
   }
-  
-  .option-btn:focus {
+
+  .option-btn:focus-visible {
     outline: 2px solid var(--gradient-start);
     outline-offset: 2px;
   }
-  
+
   .option-btn.selecting {
-    animation: select-bounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: select-bounce 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
-  
+
   @keyframes select-bounce {
-    0% { transform: scale(1) translateX(0); }
-    50% { transform: scale(1.05) translateX(8px); }
-    100% { transform: scale(1) translateX(5px); }
+    0%   { transform: scale(1) translateX(0); }
+    50%  { transform: scale(1.03) translateX(6px); }
+    100% { transform: scale(1) translateX(4px); }
   }
-  
+
   .option-letter {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
     border-radius: 50%;
     background: var(--bg-tertiary);
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-weight: 700;
-    flex-shrink: 0;
-    transition: all 0.3s;
+    font-size: 13px;
+    transition: background var(--t-base), color var(--t-base);
   }
-  
-  .option-btn.selected .option-letter {
-    background: var(--gradient-start);
-    color: #fff;
-  }
-  
-  .option-btn.correct .option-letter {
-    background: var(--success);
-    color: #fff;
-  }
-  
-  .option-btn.wrong .option-letter {
-    background: var(--error);
-    color: #fff;
-  }
-  
+
+  .option-btn.selected .option-letter { background: var(--gradient-start); color: #fff; }
+  .option-btn.correct  .option-letter { background: var(--success);         color: #fff; }
+  .option-btn.wrong    .option-letter { background: var(--error);           color: #fff; }
+
   .option-btn.selected {
     background: var(--card-answered);
     border-color: var(--gradient-start);
   }
-  
+
   .option-btn.correct {
-    background: #e8f5e9;
+    background: var(--success-bg);
     border-color: var(--success);
+    color: var(--success-text);
   }
-  
+
   .option-btn.wrong {
-    background: #fee;
+    background: var(--error-bg);
     border-color: var(--error);
+    color: var(--error-text);
   }
-  
+
   .option-btn.disabled {
     cursor: not-allowed;
     opacity: 0.8;
   }
-  
+
+  /* ── Ripple ──────────────────────────────────────────────────── */
   .ripple {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.5);
     transform: scale(0);
-    animation: ripple-animation 0.6s ease-out;
+    animation: ripple-animation 0.55s ease-out;
     pointer-events: none;
   }
-  
+
   @keyframes ripple-animation {
-    to {
-      transform: scale(4);
-      opacity: 0;
-    }
+    to { transform: scale(4); opacity: 0; }
   }
-  
+
+  /* ── Essay ───────────────────────────────────────────────────── */
   .essay-input {
     width: 100%;
     min-height: 150px;
-    padding: 15px;
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    font-family: inherit;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
     font-size: 15px;
     resize: vertical;
-    transition: all 0.3s;
-    line-height: 1.6;
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+    line-height: 1.65;
     background: var(--bg-primary);
     color: var(--text-primary);
+    caret-color: var(--gradient-start);
   }
-  
+
   .essay-input:focus {
     outline: none;
     border-color: var(--gradient-start);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
   }
-  
+
   .essay-input.disabled {
     cursor: not-allowed;
-    opacity: 0.8;
+    opacity: 0.75;
     background: var(--bg-secondary);
   }
-  
+
   .char-count {
     text-align: right;
-    margin-top: 8px;
-    font-size: 13px;
+    margin-top: 6px;
+    font-size: 12px;
     color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
   }
-  
-  .explanation {
-    background: #ebf8ff;
-    border-left: 4px solid var(--info);
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
+
+  /* ── Feedback Boxes ──────────────────────────────────────────── */
+  .explanation,
+  .model-answer,
+  .essay-score {
+    padding: 14px 16px;
+    margin-top: 16px;
+    border-radius: var(--radius-md);
     font-size: 14px;
-    color: #2c5282;
-    line-height: 1.6;
+    line-height: 1.65;
     display: none;
+    border-left: 4px solid;
   }
-  
-  [data-theme="dark"] .explanation {
-    background: #1e3a5f;
-    color: #90cdf4;
-  }
-  
-  .explanation.show {
+
+  .explanation.show,
+  .model-answer.show,
+  .essay-score.show {
     display: block;
-    animation: slideDown 0.3s ease;
+    animation: slideDown 0.28s ease;
   }
-  
-  .model-answer {
-    background: #e8f5e9;
-    border-left: 4px solid var(--success);
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1b5e20;
-    line-height: 1.6;
-    display: none;
-  }
-  
-  [data-theme="dark"] .model-answer {
-    background: #1e4620;
-    color: #9ae6b4;
-  }
-  
-  .model-answer.show {
-    display: block;
-    animation: slideDown 0.3s ease;
-  }
-  
+
+  .explanation  { background: var(--info-bg);    border-color: var(--info);    color: var(--info-text);    }
+  .model-answer { background: var(--success-bg); border-color: var(--success); color: var(--success-text); }
+
+  .essay-score.correct { background: var(--success-bg); border-color: var(--success); color: var(--success-text); }
+  .essay-score.partial { background: var(--warning-bg); border-color: var(--warning); color: var(--warning-text); }
+  .essay-score.wrong   { background: var(--error-bg);   border-color: var(--error);   color: var(--error-text);   }
+
   @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  
+
+  /* ── Controls Bar ────────────────────────────────────────────── */
   .controls {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
+    padding: 20px 24px;
     background: var(--bg-secondary);
     flex-wrap: wrap;
     border-top: 1px solid var(--border-color);
   }
-  
+
+  /* ── Buttons ─────────────────────────────────────────────────── */
   .btn {
-    padding: 12px 30px;
+    padding: 11px 26px;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: transform var(--t-base), box-shadow var(--t-base), background var(--t-base), opacity var(--t-base);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 7px;
     position: relative;
     overflow: hidden;
     min-height: 44px;
+    letter-spacing: -0.1px;
   }
-  
-  .btn:focus {
+
+  .btn:focus-visible {
     outline: 2px solid var(--gradient-start);
     outline-offset: 2px;
   }
-  
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-  
-  .btn:active::before {
-    width: 300px;
-    height: 300px;
-  }
-  
+
   .btn-primary {
-    background: var(--gradient-start);
+    background: var(--gradient);
     color: #fff;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.4);
   }
-  
+
   .btn-primary:hover:not(:disabled) {
-    background: #5a67d8;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.55);
   }
-  
-  /* Attemting to fix the misalignment */
-  .modal-btn{
-    display: block;
-    margin: 0 auto;
-    margin-top: 20px;
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
   }
-  
+
   .btn-secondary {
     background: var(--bg-tertiary);
     color: var(--text-primary);
+    border: 1px solid var(--border-color);
   }
-  
+
   .btn-secondary:hover:not(:disabled) {
     background: var(--border-color);
+    transform: translateY(-1px);
   }
-  
+
+  .btn-block {
+    width: 100%;
+    justify-content: center;
+  }
+
   .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
   }
-  
-  .btn.loading .btn-text {
-    display: none;
-  }
-  
-  .btn.loading .btn-loader {
-    display: inline-flex !important;
-  }
-  
-  .btn-loader {
-    display: none;
-  }
-  
+
+  .btn.loading .btn-text   { display: none; }
+  .btn.loading .btn-loader { display: inline-flex !important; }
+  .btn-loader              { display: none; }
+
   .spinner {
-    width: 20px;
-    height: 20px;
-    animation: rotate 2s linear infinite;
+    width: 18px;
+    height: 18px;
+    animation: rotate 1.8s linear infinite;
   }
-  
+
   .spinner circle {
     stroke-linecap: round;
     animation: dash 1.5s ease-in-out infinite;
   }
-  
-  @keyframes rotate {
-    100% { transform: rotate(360deg); }
-  }
-  
+
+  @keyframes rotate { 100% { transform: rotate(360deg); } }
+
   @keyframes dash {
-    0% {
-      stroke-dasharray: 1, 150;
-      stroke-dashoffset: 0;
-    }
-    50% {
-      stroke-dasharray: 90, 150;
-      stroke-dashoffset: -35;
-    }
-    100% {
-      stroke-dasharray: 90, 150;
-      stroke-dashoffset: -124;
-    }
+    0%   { stroke-dasharray: 1, 150;  stroke-dashoffset: 0;    }
+    50%  { stroke-dasharray: 90, 150; stroke-dashoffset: -35;  }
+    100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
   }
-  
+
+  /* ── Results ─────────────────────────────────────────────────── */
   .results {
-    padding: 30px;
+    padding: 40px 32px;
     text-align: center;
     display: none;
+    border-top: 1px solid var(--border-color);
   }
-  
+
   .results.show {
     display: block;
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.45s ease;
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  
+
   .score-circle {
-    width: 160px;
-    height: 160px;
+    width: 148px;
+    height: 148px;
     border-radius: 50%;
-    margin: 0 auto 20px;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 42px;
-    font-weight: 700;
+    font-size: 38px;
+    font-weight: 800;
     color: #fff;
-    box-shadow: 0 8px 24px var(--shadow);
     animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    letter-spacing: -1px;
+    will-change: transform, opacity;
   }
-  
-  @keyframes scaleIn {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
+
+  /* Outer ring */
+  .score-circle::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+    opacity: 0.28;
+    animation: scaleIn 0.5s 0.08s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
   }
-  
+
   .score-circle.pass {
-    background: linear-gradient(135deg, #48bb78, #38a169);
+    background: linear-gradient(135deg, #34d399, #059669);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.45);
+    color: #fff;
   }
-  
+
   .score-circle.fail {
-    background: linear-gradient(135deg, #f56565, #e53e3e);
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.45);
+    color: #fff;
   }
-  
+
+  @keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
   .results h2 {
-    font-size: 28px;
+    font-size: 24px;
+    font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 10px;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+    text-wrap: balance;
   }
-  
+
   .results-detail {
-    margin-top: 20px;
-    padding: 20px;
+    margin: 20px auto 0;
+    max-width: 360px;
+    padding: 20px 24px;
     background: var(--bg-secondary);
-    border-radius: 12px;
-    display: inline-block;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    text-align: left;
   }
-  
+
   .results-detail p {
-    margin: 8px 0;
-    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    font-size: 14px;
     color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
   }
-  
+
+  .results-detail p:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .results-detail p:first-child {
+    padding-top: 0;
+  }
+
+  .results-detail p strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ── Modal ───────────────────────────────────────────────────── */
   .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 1100;
     align-items: center;
     justify-content: center;
+    padding: 20px;
   }
-  
+
   .modal.show {
     display: flex;
   }
-  
+
   .modal-content {
     background: var(--bg-primary);
-    padding: 30px;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    margin: 20px;
-    box-shadow: 0 20px 60px var(--shadow-lg);
-    animation: modalSlideIn 0.3s ease;
+    padding: 28px 28px 24px;
+    border-radius: var(--radius-xl);
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+    animation: modalSlideIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     max-height: 80vh;
     overflow-y: auto;
   }
-  
+
   .modal-content h3 {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: var(--text-primary);
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    text-wrap: balance;
   }
-  
+
   .modal-content p {
     color: var(--text-secondary);
-    margin-bottom: 20px;
+    margin-bottom: 8px;
     line-height: 1.6;
+    font-size: 14px;
   }
-  
+
   .modal-buttons {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
     flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
   }
-  
+
+  .modal-btn {
+    flex-shrink: 0;
+  }
+
   .review-summary {
     text-align: left;
   }
-  
+
   .review-summary .warning {
-    color: var(--warning);
-    background: #fffaf0;
-    padding: 10px;
-    border-radius: 8px;
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
     margin: 10px 0;
+    font-size: 13px;
+    border-left: 3px solid var(--warning);
   }
-  
-  [data-theme="dark"] .review-summary .warning {
-    background: #3d2817;
-  }
-  
+
   .review-actions {
     display: flex;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 16px;
     flex-wrap: wrap;
   }
-  
+
   @keyframes modalSlideIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
   }
-  
+
+  /* ── Toast ───────────────────────────────────────────────────── */
   .toast {
     position: fixed;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    transform: translateX(-50%) translateY(120px);
     background: var(--bg-primary);
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px var(--shadow-lg);
+    padding: 13px 18px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
     z-index: 2000;
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    max-width: 90%;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: min(90vw, 380px);
   }
-  
+
   .toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
-  
-  .toast-success {
-    border-left: 4px solid var(--success);
+
+  .toast-success { border-left: 4px solid var(--success); }
+  .toast-info    { border-left: 4px solid var(--info); }
+
+  .toast-icon    { font-size: 16px; flex-shrink: 0; line-height: 1; }
+  .toast-message { color: var(--text-primary); font-size: 14px; font-weight: 500; }
+
+  /* ── Markdown ────────────────────────────────────────────────── */
+  .code-block {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 10px 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.65;
+    white-space: pre;
+    text-align: left;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
   }
-  
-  .toast-info {
-    border-left: 4px solid var(--info);
+
+  [data-theme="dark"] .code-block {
+    background: #0d1117;
+    border-color: #30363d;
   }
-  
-  .toast-icon {
-    font-size: 20px;
+
+  .code-block code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    color: var(--text-secondary);
   }
-  
-  .toast-message {
-    color: var(--text-primary);
+
+  [data-theme="dark"] .code-block code { color: #c9d1d9; }
+
+  .inline-code {
+    font-family: var(--font-mono);
+    font-size: 0.87em;
+    background: rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.22);
+    border-radius: var(--radius-xs);
+    padding: 2px 6px;
+    color: var(--gradient-start);
+    white-space: nowrap;
   }
-  
+
+  /* ── Print ───────────────────────────────────────────────────── */
   @media print {
-    body {
-      background: white;
-      padding: 0;
-    }
-    
+    body { background: white; padding: 0; }
+
     .menu-toggle, .side-menu, .side-menu-overlay,
-    .controls, .waves, .toast, .skip-link {
-      display: none !important;
-    }
-    
-    .container {
-      box-shadow: none;
-      border-radius: 0;
-    }
-    
+    .controls, .toast, .skip-link { display: none !important; }
+
+    .container { box-shadow: none; border-radius: 0; }
+
     .header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    
+
     .question-card {
       page-break-inside: avoid;
       border: 1px solid #ddd;
       margin-bottom: 20px;
+      box-shadow: none;
+      transform: none;
     }
-    
-    .option-btn {
-      border: 1px solid #ddd;
-      background: white !important;
-    }
-    
-    .flag-btn {
-      display: none;
-    }
+
+    .option-btn { border: 1px solid #ddd; background: white !important; }
+    .flag-btn   { display: none; }
   }
-  
+
+  /* ── Mobile ──────────────────────────────────────────────────── */
   @media (max-width: 600px) {
-    body {
-      padding: 0;
-    }
-    
-    .container {
-      border-radius: 0;
-    }
-    
+    body { padding: 0; }
+
+    .container { border-radius: 0; }
+
     .header {
-      padding: 20px;
+      padding: 24px 18px 20px;
     }
-    
-    .header h1 {
-      font-size: 24px;
-    }
-    
-    .header-meta {
-      font-size: 13px;
-      gap: 10px;
-    }
-    
+
+    .header h1 { font-size: 20px; }
+
+    .header-meta > span { font-size: 12px; padding: 4px 10px; }
+
     .quiz-body {
-      padding: 20px;
+      padding: 20px 16px;
     }
-    
-    .question-card {
-      padding: 20px;
-    }
-    
-    .question-text {
-      font-size: 16px;
-    }
-    
-    .option-btn {
-      padding: 18px 20px;
-    }
-    
+
+    .question-card { padding: 18px 16px; }
+
+    .question-text { font-size: 16px; }
+
+    .option-btn { padding: 13px 14px; font-size: 14px; }
+
     .side-menu {
       top: auto;
       bottom: -100%;
       right: 0;
       left: 0;
       width: 100%;
-      height: 70vh;
-      border-radius: 20px 20px 0 0;
-      transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 72vh;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      transition: bottom var(--t-slow);
     }
-    
-    .side-menu.open {
-      bottom: 0;
-      right: 0;
-    }
-    
+
+    .side-menu.open { bottom: 0; right: 0; }
+
     .side-menu::before {
       content: '';
       position: absolute;
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 40px;
+      width: 36px;
       height: 4px;
       background: var(--border-color);
       border-radius: 2px;
     }
-    
-    .nav-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .menu-toggle {
-      width: 45px;
-      height: 45px;
-    }
-    
-    .modal-content {
-      width: 95%;
-      padding: 20px;
-    }
-    
+
+    .nav-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+
+    .menu-toggle { width: 44px; height: 44px; }
+
+    .modal-content { padding: 22px 18px 18px; }
+
     .toast {
-      left: 20px;
-      right: 20px;
-      transform: translateX(0) translateY(100px);
+      left: 16px;
+      right: 16px;
+      transform: translateX(0) translateY(120px);
+      max-width: none;
     }
-    
-    .toast.show {
-      transform: translateX(0) translateY(0);
-    }
-    
-    .controls {
-      padding: 15px;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
+
+    .toast.show { transform: translateX(0) translateY(0); }
+
+    .controls { padding: 14px 16px; gap: 10px; }
+
+    .btn { flex: 1; min-width: 0; }
+
+    .results { padding: 28px 18px; }
+
+    .results-detail { max-width: 100%; }
   }
-  
+
+  /* ── Reduced Motion ──────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -1247,7 +1333,8 @@ export async function exportToQuiz(config, questions) {
       transition-duration: 0.01ms !important;
     }
   }
-  
+
+  /* ── Accessibility ───────────────────────────────────────────── */
   .sr-only {
     position: absolute;
     width: 1px;
@@ -1259,7 +1346,7 @@ export async function exportToQuiz(config, questions) {
     white-space: nowrap;
     border-width: 0;
   }
-  
+
   .live-region {
     position: absolute;
     left: -10000px;
@@ -1301,21 +1388,11 @@ export async function exportToQuiz(config, questions) {
             <div class="toggle-slider"></div>
           </div>
         </div>
-        
-        <div class="toggle-option" id="animationToggle" role="switch" aria-checked="false" tabindex="0">
-          <div class="toggle-label">
-            <span aria-hidden="true">🌊</span>
-            <span>Wave Animation</span>
-          </div>
-          <div class="toggle-switch" id="animationSwitch">
-            <div class="toggle-slider"></div>
-          </div>
-        </div>
       </div>
       
       <div class="menu-section">
         <h3>Actions</h3>
-        <button class="btn btn-secondary" onclick="quizApp.printQuiz()" style="width: 100%;">
+        <button class="btn btn-secondary btn-block" onclick="quizApp.printQuiz()">
           🖨️ Print Quiz
         </button>
       </div>
@@ -1326,19 +1403,6 @@ export async function exportToQuiz(config, questions) {
       </div>
     </div>
   </div>
-  
-  <svg class="waves" id="wavesAnimation" xmlns="http://www.w3.org/2000/svg" 
-       viewBox="0 24 150 28" preserveAspectRatio="none" aria-hidden="true">
-    <defs>
-      <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-    </defs>
-    <g class="parallax">
-      <use href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7)" />
-      <use href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
-      <use href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
-      <use href="#gentle-wave" x="48" y="7" fill="#fff" />
-    </g>
-  </svg>
   
   <div class="container">
     <header class="header">
@@ -1390,12 +1454,15 @@ export async function exportToQuiz(config, questions) {
   <script>
   const questions = ${JSON.stringify(processedQuestions)};
   
+  ${renderMarkdown.toString()}
+  
+  ${gradeEssay.toString()}
+  
   const quizApp = {
     userAnswers: new Array(questions.length).fill(null),
     submitted: false,
     currentQuestion: 0,
     darkMode: false,
-    animationsEnabled: false,
     flaggedQuestions: new Set(),
     quizStartTime: null,
     timerInterval: null,
@@ -1420,13 +1487,10 @@ export async function exportToQuiz(config, questions) {
   
     loadPreferences() {
       const savedTheme = localStorage.getItem('quizTheme');
-      const savedAnimation = localStorage.getItem('quizAnimation');
       
       this.darkMode = savedTheme === 'dark';
-      this.animationsEnabled = savedAnimation === 'true';
       
       this.applyTheme();
-      this.applyAnimation();
     },
   
     applyTheme() {
@@ -1449,28 +1513,6 @@ export async function exportToQuiz(config, questions) {
       localStorage.setItem('quizTheme', this.darkMode ? 'dark' : 'light');
       this.applyTheme();
       this.announceToScreenReader(this.darkMode ? 'Dark mode enabled' : 'Light mode enabled');
-    },
-  
-    applyAnimation() {
-      const waves = document.getElementById('wavesAnimation');
-      const animSwitch = document.getElementById('animationSwitch');
-      
-      if (this.animationsEnabled) {
-        waves.classList.add('active');
-        animSwitch.classList.add('active');
-        document.getElementById('animationToggle').setAttribute('aria-checked', 'true');
-      } else {
-        waves.classList.remove('active');
-        animSwitch.classList.remove('active');
-        document.getElementById('animationToggle').setAttribute('aria-checked', 'false');
-      }
-    },
-  
-    toggleAnimation() {
-      this.animationsEnabled = !this.animationsEnabled;
-      localStorage.setItem('quizAnimation', this.animationsEnabled.toString());
-      this.applyAnimation();
-      this.announceToScreenReader(this.animationsEnabled ? 'Animations enabled' : 'Animations disabled');
     },
   
     saveProgress() {
@@ -1567,18 +1609,14 @@ export async function exportToQuiz(config, questions) {
   
     setupToggles() {
       const darkModeToggle = document.getElementById('darkModeToggle');
-      const animationToggle = document.getElementById('animationToggle');
   
       darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
-      animationToggle.addEventListener('click', () => this.toggleAnimation());
       
-      [darkModeToggle, animationToggle].forEach(toggle => {
-        toggle.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggle.click();
-          }
-        });
+      darkModeToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          darkModeToggle.click();
+        }
       });
     },
   
@@ -1719,8 +1757,9 @@ export async function exportToQuiz(config, questions) {
           </div>
           <div class="model-answer" id="modelAns\${i}">
             <strong>✓ Model Answer:</strong><br>
-            \${this.escapeHTML(q.options[0])}
+            \${renderMarkdown(q.options[0])}
           </div>
+          <div class="essay-score" id="essayScore\${i}"></div>
         \`;
       } else {
         optionsHtml = \`<div class="options">\${
@@ -1735,7 +1774,7 @@ export async function exportToQuiz(config, questions) {
                 aria-label="Option \${letter}: \${this.escapeHTML(opt)}"
               >
                 <span class="option-letter">\${letter}</span>
-                <span>\${this.escapeHTML(opt)}</span>
+                <span>\${renderMarkdown(opt)}</span>
               </button>
             \`;
           }).join("")
@@ -1744,7 +1783,7 @@ export async function exportToQuiz(config, questions) {
   
       const explanationHtml = q.explanation ? 
         \`<div class="explanation" id="exp\${i}">
-          <strong>💡 Explanation:</strong> \${this.escapeHTML(q.explanation)}
+          <strong>💡 Explanation:</strong> \${renderMarkdown(q.explanation)}
         </div>\` : "";
   
       return \`
@@ -1760,7 +1799,7 @@ export async function exportToQuiz(config, questions) {
           </div>
           
           \${this.renderQuestionImage(q.image, i)}
-          <div class="question-text">\${this.escapeHTML(q.q)}</div>
+          <div class="question-text">\${renderMarkdown(q.q)}</div>
           \${optionsHtml}
           \${explanationHtml}
         </div>
@@ -1919,23 +1958,27 @@ export async function exportToQuiz(config, questions) {
         this.submitted = true;
         this.stopTimer();
   
-        let correct = 0;
-        let totalScorable = 0;
+        let mcqCorrect = 0;
+        let mcqTotal = 0;
+        let essayScore = 0;
+        let essayMaxScore = 0;
   
         questions.forEach((q, i) => {
           if (this.isEssayQuestion(q)) {
-            this.handleEssaySubmission(i);
+            const score = this.handleEssaySubmission(i);
+            essayScore += score;
+            essayMaxScore += 5;
           } else {
-            totalScorable++;
+            mcqTotal++;
             const isCorrect = this.handleMCQSubmission(q, i);
-            if (isCorrect) correct++;
+            if (isCorrect) mcqCorrect++;
           }
   
           const exp = document.getElementById(\`exp\${i}\`);
           if (exp) exp.classList.add("show");
         });
   
-        this.showResults(correct, totalScorable);
+        this.showResults(mcqCorrect, mcqTotal, essayScore, essayMaxScore);
         
         submitBtn.classList.remove('loading');
         document.getElementById('reviewBtn').disabled = true;
@@ -1947,14 +1990,28 @@ export async function exportToQuiz(config, questions) {
     },
   
     handleEssaySubmission(qIndex) {
+      const q = questions[qIndex];
+      const userText = this.userAnswers[qIndex] || "";
+  
       const essayEl = document.getElementById(\`essay\${qIndex}\`);
       if (essayEl) {
         essayEl.readOnly = true;
         essayEl.classList.add("disabled");
       }
   
+      const score = gradeEssay(userText, q.options[0]);
+      const stars = "★".repeat(score) + "☆".repeat(5 - score);
+      const scoreEl = document.getElementById(\`essayScore\${qIndex}\`);
+      if (scoreEl) {
+        const scoreClass = score >= 3 ? "correct" : score >= 1 ? "partial" : "wrong";
+        scoreEl.innerHTML = \`<strong>Score: \${score}/5</strong> &nbsp;<span style="color:#f59e0b;font-size:1.15em">\${stars}</span>\`;
+        scoreEl.className = \`essay-score show \${scoreClass}\`;
+      }
+  
       const modelEl = document.getElementById(\`modelAns\${qIndex}\`);
       if (modelEl) modelEl.classList.add("show");
+  
+      return score;
     },
   
     handleMCQSubmission(q, qIndex) {
@@ -1977,9 +2034,33 @@ export async function exportToQuiz(config, questions) {
       return isCorrect;
     },
   
-    showResults(correct, totalScorable) {
-      const percent = totalScorable > 0 ? Math.round((correct / totalScorable) * 100) : 0;
+    showResults(mcqCorrect, mcqTotal, essayScore, essayMaxScore) {
+      const totalScore = mcqCorrect + essayScore;
+      const totalPossible = mcqTotal + essayMaxScore;
+      const percent = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) : 0;
       const passed = percent >= 70;
+  
+      const hasEssay = essayMaxScore > 0;
+      const hasMcq = mcqTotal > 0;
+  
+      let scoreBreakdown = "";
+      if (hasMcq && hasEssay) {
+        const essayPct = Math.round((essayScore / essayMaxScore) * 100);
+        const essayStars = "★".repeat(Math.round(essayScore / essayMaxScore * 5)) + "☆".repeat(5 - Math.round(essayScore / essayMaxScore * 5));
+        scoreBreakdown = \`
+          <p><strong>Total Score:</strong> \${totalScore} / \${totalPossible}</p>
+          <p><strong>MCQ:</strong> \${mcqCorrect} / \${mcqTotal} correct</p>
+          <p><strong>Essays:</strong> \${essayScore} / \${essayMaxScore} pts &nbsp;<span style="color:#f59e0b">\${essayStars}</span></p>
+        \`;
+      } else if (hasEssay) {
+        const essayStars = "★".repeat(Math.round(essayScore / essayMaxScore * 5)) + "☆".repeat(5 - Math.round(essayScore / essayMaxScore * 5));
+        scoreBreakdown = \`
+          <p><strong>Essay Score:</strong> \${essayScore} / \${essayMaxScore} pts</p>
+          <p><strong>Rating:</strong> <span style="color:#f59e0b;font-size:1.15em">\${essayStars}</span></p>
+        \`;
+      } else {
+        scoreBreakdown = \`<p><strong>Score:</strong> \${mcqCorrect} / \${mcqTotal} correct</p>\`;
+      }
       
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = \`
@@ -1988,7 +2069,7 @@ export async function exportToQuiz(config, questions) {
         </div>
         <h2>\${passed ? "🎉 Great Job!" : "📚 Keep Practicing!"}</h2>
         <div class="results-detail">
-          <p><strong>Score:</strong> \${correct} / \${totalScorable} correct</p>
+          \${scoreBreakdown}
           <p><strong>Percentage:</strong> \${percent}%</p>
           <p><strong>Status:</strong> \${passed ? "✓ Passed" : "✗ Not Passed"}</p>
           <p><strong>Time Taken:</strong> \${document.getElementById('timerDisplay').textContent}</p>
@@ -2353,3 +2434,144 @@ const isLocalPath = (url) => {
   // Check if it lacks a protocol (http://, https://, data:)
   return !/^(https?:|data:)/i.test(url);
 };
+
+// ─── Functions embedded into the generated quiz HTML via .toString() ─────────
+// Defined as real module-level functions so .toString() produces clean, valid
+// JS source — completely avoids null-byte / escape-sequence issues that arise
+// when complex regex and template literals are written inside an outer template.
+
+function renderMarkdown(str) {
+  if (str === null || str === undefined) return "";
+  str = String(str);
+  const codeBlocks = [];
+
+  // 1. Extract fenced code blocks
+  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
+    const idx = codeBlocks.length;
+    const escaped = code
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    codeBlocks.push(
+      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
+    );
+    return `MDBLOCK_${idx}_MDEND`;
+  });
+
+  // 2. Escape remaining HTML
+  str = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+  // 3. Inline code
+  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+
+  // 4. Line breaks
+  str = str.replace(/\n/g, "<br>");
+
+  // 5. Restore code blocks
+  str = str.replace(/MDBLOCK_(\d+)_MDEND/g, (_, i) => codeBlocks[parseInt(i)]);
+
+  return str;
+}
+
+function gradeEssay(userInput, modelAnswer) {
+  const normalize = (s) =>
+    String(s || "")
+      .toLowerCase()
+      .replace(/[.,;:!?()\[\]{}\"'\/\\]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const userNorm = normalize(userInput);
+  const modelNorm = normalize(modelAnswer);
+
+  if (!userNorm) return 0;
+
+  const extractNums = (s) => (s.match(/\d+(\.\d+)?/g) || []).map(Number);
+  const modelNums = extractNums(modelNorm);
+  const userNums = extractNums(userNorm);
+  const modelNoNums = modelNorm.replace(/\d+(\.\d+)?/g, "").trim();
+  if (modelNums.length > 0 && modelNoNums.length < 8) {
+    const allMatch = modelNums.every((mn) =>
+      userNums.some((un) => Math.abs(un - mn) / (Math.abs(mn) || 1) < 0.02),
+    );
+    return allMatch ? 5 : userNums.length > 0 ? 1 : 0;
+  }
+
+  const stopWords = new Set([
+    "a",
+    "an",
+    "the",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "shall",
+    "can",
+    "to",
+    "of",
+    "in",
+    "on",
+    "at",
+    "by",
+    "for",
+    "with",
+    "from",
+    "and",
+    "or",
+    "but",
+    "if",
+    "as",
+    "it",
+    "its",
+    "this",
+    "that",
+    "these",
+    "those",
+    "i",
+    "you",
+    "he",
+    "she",
+    "we",
+    "they",
+    "not",
+    "no",
+    "so",
+    "also",
+  ]);
+  const keywords = modelNorm
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !stopWords.has(w));
+
+  if (keywords.length === 0) {
+    return userNorm.includes(modelNorm) || modelNorm.includes(userNorm) ? 5 : 0;
+  }
+
+  const matched = keywords.filter((kw) => userNorm.includes(kw)).length;
+  const ratio = matched / keywords.length;
+
+  if (ratio >= 0.8) return 5;
+  if (ratio >= 0.6) return 4;
+  if (ratio >= 0.4) return 3;
+  if (ratio >= 0.2) return 2;
+  if (matched > 0) return 1;
+  return 0;
+}
