@@ -45,15 +45,6 @@
   transition: all 0.3s ease;
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .notification.glass-toast {
-    background: rgba(30, 30, 30, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
-}
-
 /* =========================
    Inner Content Styling
    ========================= */
@@ -127,14 +118,6 @@
 .close-btn:hover {
   transform: scale(1.1);
   background: #fff;
-}
-
-@media (prefers-color-scheme: dark) {
-  .close-btn {
-    background: rgba(50, 50, 50, 0.9);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #fff;
-  }
 }
 
 /* =========================
@@ -283,4 +266,28 @@
 [data-theme="dark-slate"] .confirmation-overlay,
 [data-theme="dark"] .confirmation-overlay {
   background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .notification.glass-toast {
+  background: rgba(30, 30, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+[data-theme="dark-slate"] .notification.glass-toast {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+[data-theme="dark"] .close-btn {
+  background: rgba(50, 50, 50, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+[data-theme="dark-slate"] .close-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
