@@ -827,7 +827,7 @@ body {
   padding: 0;
   border-radius: 0;
   font-size: inherit;
-  color: var(--color-code, #e2e8f0);
+  color: #000000;
 }
 
 .inline-code {
