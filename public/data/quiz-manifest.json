@@ -511,36 +511,6 @@
       "category": "Operatings Systems"
     },
     {
-      "id": "22GYF6BY",
-      "title": "2020 2021 Final",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020_2021 Final.json",
-      "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-    },
-    {
-      "id": "F2FBKM3G",
-      "title": "2022 2023 Final",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2022_2023 Final.json",
-      "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-    },
-    {
-      "id": "IVRGWRUK",
-      "title": "2023 2024 Final",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2023_2024 Final.json",
-      "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-    },
-    {
-      "id": "NBFAKG6E",
-      "title": "2021 2022 Mid",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2021_2022 Mid.json",
-      "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-    },
-    {
-      "id": "YPXHQWGU",
-      "title": "2024 2025 Final",
-      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2024_2025 Final.json",
-      "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-    },
-    {
       "id": "7IGTGFXT",
       "title": "2  Probability",
       "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/2- Probability.json",
@@ -1554,9 +1524,7 @@
         "Probability and Statistics"
       ],
       "parent": null,
-      "subcategories": [
-        "Probability and Statistics/إمتحانات الدكتور السابقة"
-      ],
+      "subcategories": [],
       "exams": [
         {
           "id": "YAYFLGTG",
@@ -1575,47 +1543,6 @@
           "title": "AI Introduction To Probability",
           "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
           "category": "Probability and Statistics"
-        }
-      ]
-    },
-    "Probability and Statistics/إمتحانات الدكتور السابقة": {
-      "name": "إمتحانات الدكتور السابقة",
-      "path": [
-        "Probability and Statistics",
-        "إمتحانات الدكتور السابقة"
-      ],
-      "parent": "Probability and Statistics",
-      "subcategories": [],
-      "exams": [
-        {
-          "id": "22GYF6BY",
-          "title": "2020 2021 Final",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020_2021 Final.json",
-          "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-        },
-        {
-          "id": "NBFAKG6E",
-          "title": "2021 2022 Mid",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2021_2022 Mid.json",
-          "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-        },
-        {
-          "id": "F2FBKM3G",
-          "title": "2022 2023 Final",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2022_2023 Final.json",
-          "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-        },
-        {
-          "id": "IVRGWRUK",
-          "title": "2023 2024 Final",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2023_2024 Final.json",
-          "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
-        },
-        {
-          "id": "YPXHQWGU",
-          "title": "2024 2025 Final",
-          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2024_2025 Final.json",
-          "category": "Probability and Statistics/إمتحانات الدكتور السابقة"
         }
       ]
     },
