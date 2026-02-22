@@ -1786,20 +1786,17 @@ body {
   color: var(--color-primary);
   text-decoration: none;
   font-weight: 600;
-  transition: opacity 0.2s;
 }
 
 .watermark a:hover {
   text-decoration: underline;
-  opacity: 0.8;
 }
 
 .watermark::before {
-  content: "—";
+  content: "✨";
   font-size: 1.25rem;
   display: inline-flex;
   align-items: center;
-  color: var(--color-text-tertiary);
 }
 
 /* ============================================================================

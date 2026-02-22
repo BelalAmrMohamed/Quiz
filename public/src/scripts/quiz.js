@@ -349,14 +349,28 @@ async function loadExamModule(config) {
 }
 
 async function init() {
-  // Read from localStorage instead of URL parameters
-  examId = localStorage.getItem("quiz_current_id");
+  const params = new URLSearchParams(window.location.search);
+
+  // ── Quiz ID ──────────────────────────────────────────────────────────────
+  // URL param `?id=` takes priority — this is what makes quizzes shareable.
+  // Fall back to localStorage so existing sessions and user-quiz flows
+  // (which use `?type=user`) continue to work without changes.
+  examId = params.get("id")
+    ? decodeURIComponent(params.get("id"))
+    : localStorage.getItem("quiz_current_id");
+
+  // Keep localStorage in sync for the rest of the codebase
+  if (examId) localStorage.setItem("quiz_current_id", examId);
+
+  // ── Quiz Mode ────────────────────────────────────────────────────────────
+  // Mode is intentionally NOT in the URL (links stay mode-agnostic).
+  // Each device/user gets its own mode from their profile / localStorage.
   quizMode = localStorage.getItem("quiz_current_mode") || "exam";
+
   const startTime = localStorage.getItem("quiz_start_time");
 
-  // Also check URL params for backward compatibility with user quizzes
-  const params = new URLSearchParams(window.location.search);
-  const quizType = params.get("type"); // For user-created quizzes
+  // User-created quizzes still use ?type=user (URL-only, unchanged)
+  const quizType = params.get("type");
   const startAt = params.get("startAt");
 
   // Validate quiz data exists

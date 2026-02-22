@@ -4,7 +4,8 @@
 
 Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly web application designed to elevate your understanding, interactive quiz experience. This release marks the foundation of an educational tool tailored for aspiring web developers, students, and programming enthusiasts. Built with modern web technologies, it combines intuitive design with robust functionality to foster learning in a fun, progressive manner.
 
-**Live Demo:** [Quiz](https://basmagi-quiz.vercel.app/)
+- **Vercel Link (Productino):** [منصة إمتحانات بصمجي](https://basmagi-quiz.vercel.app/)
+- **GitHub Pages Link (Testing):** [منصة إمتحانات بصمجي](https://belalamrmohamed.github.io/Quiz)
 
 ## Table of contents
 
@@ -14,7 +15,7 @@ Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly
   - [Live Link](#live-link)
   - [The `Exam` folder's format](#the-exam-folders-format)
   - [How quizzes are formatted](#how-quizzes-are-formatted)
-  - [License](#license)
+  - [License](LICENSE)
   - [Acknowledgments](#acknowledgments)
   - [The purpose of `.nojekyll` :](#the-purpose-of-nojekyll-)
 

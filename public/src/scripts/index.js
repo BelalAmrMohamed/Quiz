@@ -23,10 +23,36 @@ import {
   extractMetadata,
   filterCourses,
   getSubscribedCourses,
-  getCourseItemCount,
   getAvailableYears,
   getAvailableTerms,
 } from "./filterUtils.js";
+
+/**
+ * Recursively count only the actual quiz/exam leaves under a category node.
+ * Subfolders are never counted as quizzes themselves — we recurse into them.
+ *
+ * Example:
+ *   Course (3 exams) + SubA (4 exams) + SubB (4 exams)  →  11  (not 5)
+ *
+ * NOTE: `categoryTree` is a module-level variable populated by initApp(),
+ * so it is always available by the time any card is rendered.
+ */
+function getCourseItemCount(category) {
+  if (!category) return 0;
+
+  // Direct exams on this node
+  let count = Array.isArray(category.exams) ? category.exams.length : 0;
+
+  // Recurse into sub-categories — add their quiz counts, NOT +1 per folder
+  if (Array.isArray(category.subcategories)) {
+    for (const subKey of category.subcategories) {
+      const sub = categoryTree?.[subKey];
+      if (sub) count += getCourseItemCount(sub);
+    }
+  }
+
+  return count;
+}
 
 // Notifications
 import {
@@ -1439,15 +1465,20 @@ function createCategoryCard(
     termBadge.className = "course-meta-badge term";
     termBadge.textContent = `الترم ${courseData.term}`;
 
-    // Only show the faculty if the user didn't set their faculty
-    if (profile.faculty === "All") metaDiv.appendChild(facultyBadge);
+    // Show the faculty if the user didn't set their faculty, or if it's a different faculty than the user's
+    if (profile.faculty === "All" || courseData.faculty != profile.faculty)
+      metaDiv.appendChild(facultyBadge);
 
-    // Only show the year if the user didn't set their year, or is from a different year that the user
-    if (courseData.year != profile.year || profile.year === "All")
+    // Only show year and term if the user didn't set them, or they're different than the user's
+    if (
+      courseData.year != profile.year ||
+      profile.year === "All" ||
+      courseData.term != profile.term ||
+      profile.term === "All"
+    ) {
       metaDiv.appendChild(yearBadge);
-
-    if (courseData.term != profile.term || profile.term === "All")
       metaDiv.appendChild(termBadge);
+    }
 
     card.appendChild(iconDiv);
     card.appendChild(h3);
@@ -1704,17 +1735,18 @@ function isURL_orPath(string) {
 
 function startQuiz(id, mode) {
   try {
-    // Get default mode from user profile if not specified
+    // Resolve the mode; never expose it in the URL so the link stays clean
+    // and shareable without locking the recipient into a specific mode.
     const quizMode =
       mode || userProfile.getProfile().defaultQuizMode || "practice";
 
-    // Store in localStorage instead of URL parameters
+    // Mode + session metadata stay in localStorage (private, per-device)
     localStorage.setItem("quiz_current_mode", quizMode);
-    localStorage.setItem("quiz_current_id", id);
+    localStorage.setItem("quiz_current_id", id); // keep as fallback
     localStorage.setItem("quiz_start_time", Date.now().toString());
 
-    // Navigate with clean URL (no parameters)
-    window.location.href = "quiz.html";
+    // Only the quiz ID travels in the URL → links are shareable
+    window.location.href = `quiz.html?id=${encodeURIComponent(id)}`;
   } catch (error) {
     console.error("Error starting quiz:", error);
     alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
@@ -1807,10 +1839,6 @@ window.addEventListener("appinstalled", () => {
   );
 });
 
-/**
- * Show download popup for user-created quizzes
- * Reuses existing export functions
- */
 function showUserQuizDownloadPopup(quiz) {
   const modal = document.createElement("div");
   modal.className = "modal-overlay";

@@ -101,6 +101,12 @@ body {
   margin: 0;
 }
 
+.watermark a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
 .watermark::before {
   content: "✨";
   font-size: 1.25rem;
