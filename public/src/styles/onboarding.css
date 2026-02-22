@@ -1,13 +1,52 @@
+/* =============================================================================
+   onboarding.css — Mobile-first, fully responsive
+   Strategy:
+     • CSS custom properties for all spacing/typography → single source of truth
+     • clamp() for fluid type that scales between breakpoints without jumps
+     • Mobile-first: base styles = small screen, media queries add complexity
+     • Breakpoints: 480 px | 640 px | 768 px | 1024 px
+     • Reduced-motion support baked in from the start
+   ============================================================================= */
+
+/* ── 1. Design Tokens ───────────────────────────────────────────────────────── */
 :root {
+  /* Brand */
   --primary: #0088cc;
   --primary-dark: #006699;
+
+  /* Surfaces */
   --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --surface: #ffffff;
+
+  /* Text */
   --text-main: #333333;
   --text-secondary: #666666;
+
+  /* Elevation */
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* Shape */
   --radius: 16px;
+  --radius-sm: 8px;
+  --radius-pill: 100px;
+
+  /* Motion */
   --transition: all 0.3s ease;
+
+  /* ── Fluid spacing scale ──────────────────────────────────────────────────
+     Each var interpolates between a min (mobile) and max (desktop) value.
+     Change only these to retune the whole layout.                         */
+  --space-xs: clamp(0.5rem, 1vw, 0.75rem); /*  8px → 12px */
+  --space-sm: clamp(0.75rem, 2vw, 1.25rem); /* 12px → 20px */
+  --space-md: clamp(1rem, 3vw, 1.875rem); /* 16px → 30px */
+  --space-lg: clamp(1.25rem, 4vw, 2.5rem); /* 20px → 40px */
+
+  /* ── Fluid typography ───────────────────────────────────────────────────── */
+  --text-sm: clamp(0.8rem, 1.5vw, 0.9rem);
+  --text-base: clamp(0.9rem, 2vw, 1rem);
+  --text-lg: clamp(1.1rem, 2.5vw, 1.4rem);
+  --text-xl: clamp(1.25rem, 3.5vw, 1.8rem);
 }
 
 [data-theme="dark"] {
@@ -20,77 +59,99 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-* {
+/* ── 2. Reset ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ── 3. Base Body (mobile-first) ────────────────────────────────────────────── */
 body {
   font-family: "Tajawal", "Inter", sans-serif;
+  font-size: var(--text-base);
   background: var(--bg-gradient);
   color: var(--text-main);
   min-height: 100vh;
+  min-height: 100dvh; /* respect mobile address-bar collapse */
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
+  align-items: flex-start; /* avoids clipping on short viewports */
+  padding: var(--space-sm);
   direction: rtl;
 }
 
+/* Centre vertically only when there is room for it */
+@media (min-height: 600px) {
+  body {
+    align-items: center;
+  }
+}
+
+/* ── 4. Wizard Container ────────────────────────────────────────────────────── */
 .wizard-container {
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   width: 100%;
   max-width: 800px;
-  min-height: 500px;
+  /* No min-height on mobile — content decides height */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
-/* Header */
+@media (min-width: 480px) {
+  .wizard-container {
+    min-height: 480px;
+  }
+}
+
+/* ── 5. Wizard Header ───────────────────────────────────────────────────────── */
 .wizard-header {
-  padding: 30px 40px;
+  padding: var(--space-md) var(--space-lg);
   text-align: center;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .wizard-header h1 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-xs);
   color: var(--primary);
+  line-height: 1.25;
 }
 
 .wizard-header p {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
-/* Progress Bar */
+/* ── 6. Progress Dots ───────────────────────────────────────────────────────── */
 .progress-container {
-  padding: 20px 40px 0;
+  padding: var(--space-md) var(--space-lg) 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-xs);
 }
 
 .progress-step {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--text-secondary);
   opacity: 0.3;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
 .progress-step.active {
   background: var(--primary);
   opacity: 1;
-  transform: scale(1.2);
+  transform: scale(1.3);
 }
 
 .progress-step.completed {
@@ -98,16 +159,17 @@ body {
   opacity: 0.6;
 }
 
-/* Steps Content */
+/* ── 7. Wizard Content ──────────────────────────────────────────────────────── */
 .wizard-content {
   flex: 1;
-  padding: 30px 40px;
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   overflow-y: auto;
+  min-width: 0; /* prevents flex blowout */
 }
 
+/* ── 8. Step Panels ─────────────────────────────────────────────────────────── */
 .step-panel {
   display: none;
   animation: fadeIn 0.4s ease forwards;
@@ -117,7 +179,7 @@ body {
 .step-panel.active {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-md);
 }
 
 @keyframes fadeIn {
@@ -131,69 +193,102 @@ body {
   }
 }
 
+/* Honour user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .step-panel {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+  .welcome-icon {
+    animation: none;
+  }
+}
+
 .step-title {
-  font-size: 1.4rem;
-  margin-bottom: 15px;
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-sm);
   text-align: center;
 }
 
-/* Form Elements */
+/* ── 9. Form Elements ───────────────────────────────────────────────────────── */
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .input-group label {
   font-weight: 600;
   color: var(--text-main);
+  font-size: var(--text-base);
 }
 
 .form-input {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
   border: 2px solid rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--text-base);
   transition: var(--transition);
+  width: 100%;
 }
 
 .form-input:focus {
   border-color: var(--primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.15);
 }
 
-/* Cards Grid */
+/* ── 10. Selection Cards Grid ───────────────────────────────────────────────── */
+/* Mobile default: 2 equal columns (fits side-by-side even on 320 px) */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
   width: 100%;
+}
+
+/* Tablet+: let cards breathe naturally */
+@media (min-width: 480px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+}
+
+@media (min-width: 640px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
 }
 
 .selection-card {
   background: rgba(0, 0, 0, 0.03);
   border: 2px solid transparent;
   border-radius: 12px;
-  padding: 15px;
+  padding: var(--space-sm);
   cursor: pointer;
   text-align: center;
   transition: var(--transition);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-xs);
+  min-height: 80px; /* minimum 44 px tap target included */
 }
 
 .selection-card:hover {
   background: rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
 }
-
+.selection-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 .selection-card.selected {
   border-color: var(--primary);
   background: rgba(0, 136, 204, 0.05);
@@ -201,69 +296,78 @@ body {
 }
 
 .card-icon {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
 }
-
 .card-label {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
+/* ── 11. Toggle Switch (global, outside #coursesList) ───────────────────────── */
 .toggle-switch {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: #ccc;
-  border-radius: 34px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.28s ease;
 }
 
 .toggle-switch::after {
   content: "";
   position: absolute;
-  height: 18px;
+  top: 4px;
+  left: 4px;
   width: 18px;
-  left: 3px;
-  bottom: 3px;
+  height: 18px;
   background-color: white;
   border-radius: 50%;
-  transition: 0.3s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 input:checked + .toggle-switch {
   background-color: var(--primary);
 }
-
 input:checked + .toggle-switch::after {
   transform: translateX(20px);
 }
 
-/* Actions */
+/* ── 12. Wizard Actions Bar ─────────────────────────────────────────────────── */
 .wizard-actions {
-  padding: 20px 40px;
+  padding: var(--space-sm) var(--space-lg);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap; /* prevents overflow on very narrow screens */
 }
 
+/* ── 13. Buttons ────────────────────────────────────────────────────────────── */
 .btn {
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  font-size: var(--text-base);
   transition: var(--transition);
   border: none;
+  white-space: nowrap;
+  min-height: 44px; /* WCAG 2.5.5 touch target */
+}
+
+@media (min-width: 480px) {
+  .btn {
+    padding: 0.75rem 1.5rem;
+  }
 }
 
 .btn-secondary {
   background: transparent;
   color: var(--text-secondary);
 }
-
 .btn-secondary:hover {
   background: rgba(0, 0, 0, 0.05);
   color: var(--text-main);
@@ -272,9 +376,8 @@ input:checked + .toggle-switch::after {
 .btn-primary {
   background: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+  box-shadow: var(--shadow-sm);
 }
-
 .btn-primary:hover {
   background: var(--primary-dark);
   transform: translateY(-2px);
@@ -283,19 +386,56 @@ input:checked + .toggle-switch::after {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
+  transform: none !important;
+  box-shadow: none;
 }
 
-/* Welcome Final Step */
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Skip button variant
+   The button carries inline style="position:absolute; top:30px; left:40px"
+   which overlaps the header subtitle on narrow screens.
+   We override those coordinates with !important for small viewports so it
+   tucks into the top corner of the card without touching any other text.   */
+.skip {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 400;
+  font-size: var(--text-sm);
+}
+
+/* ≤ 480 px: pull up into the top-left corner of the card */
+@media (max-width: 480px) {
+  .skip {
+    top: 10px !important;
+    left: 12px !important;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
+/* 481 – 640 px: a bit more room, still tighten from 30 / 40 */
+@media (min-width: 481px) and (max-width: 640px) {
+  .skip {
+    top: 14px !important;
+    left: 20px !important;
+  }
+}
+
+/* ── 14. Welcome / Final Step ───────────────────────────────────────────────── */
 .welcome-step {
   text-align: center;
-  padding: 40px 20px;
+  padding: var(--space-lg) var(--space-md);
 }
 
 .welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  margin-bottom: var(--space-md);
   animation: bounce 2s infinite;
+  display: block;
 }
 
 @keyframes bounce {
@@ -313,21 +453,15 @@ input:checked + .toggle-switch::after {
     transform: translateY(-10px);
   }
 }
-/* =============================================================================
-   TOGGLE FIX — append to the bottom of onboarding.css
-   
-   Root cause: the native <input type="checkbox"> inside .toggle-container was
-   never fully hidden. `opacity:0 + width:0 + height:0` is unreliable — some
-   browsers still paint the native widget chrome. `display:none` is the only
-   guaranteed way to remove it from both layout AND painting.
-   ============================================================================= */
 
-/* 1. Hide the native checkbox completely — no paint, no layout, no interaction */
+/* ── 15. Course List (#coursesList) ─────────────────────────────────────────── */
+
+/* Hide native checkbox — the only reliable cross-browser approach */
 #coursesList .toggle-container input[type="checkbox"] {
   display: none !important;
 }
 
-/* 2. The label itself becomes the click target — needs correct dimensions */
+/* The <label> is the full tap target */
 #coursesList .toggle-container {
   position: relative;
   display: inline-block;
@@ -338,18 +472,16 @@ input:checked + .toggle-switch::after {
   cursor: pointer;
 }
 
-/* 3. Track — stretches to fill the label exactly via inset:0 */
+/* Track */
 #coursesList .toggle-switch {
   position: absolute;
   inset: 0;
-  border-radius: 100px;
-  background: #ccc;
+  border-radius: var(--radius-pill);
   background: var(--color-border, #ccc);
   transition: background 0.28s ease;
-  cursor: pointer;
 }
 
-/* 4. Knob */
+/* Knob — transform-based travel, cannot escape the track */
 #coursesList .toggle-switch::after {
   content: "";
   position: absolute;
@@ -361,31 +493,25 @@ input:checked + .toggle-switch::after {
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Use transform instead of `left` to avoid knob escaping track bounds */
 }
 
-/* 5. Checked state — colour the track (label carries the :has trick isn't
-      needed — the checkbox is still in the DOM, just display:none, so
-      :checked still works as a CSS state hook via the adjacent sibling) */
+/* Checked state — :has() lets us style from the label outward */
 #coursesList .toggle-container:has(input:checked) .toggle-switch {
-  background: #6366f1;
   background: var(--color-primary, #6366f1);
 }
-
 #coursesList .toggle-container:has(input:checked) .toggle-switch::after {
-  /* 52px wide - 20px knob - 4px right margin = 28px travel */
-  transform: translateX(24px);
+  transform: translateX(24px); /* 52px - 20px knob - 4px margin = 28px travel */
 }
 
-/* 6. Course item card layout */
+/* Course cards: single column on mobile, responsive grid above that */
 #coursesList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  max-height: 420px;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+  max-height: 360px;
   overflow-y: auto;
   padding: 4px 2px;
-  margin-top: 12px;
+  margin-top: var(--space-sm);
   scrollbar-width: thin;
   scrollbar-color: var(--color-border, #ddd) transparent;
 }
@@ -398,13 +524,27 @@ input:checked + .toggle-switch::after {
   border-radius: 3px;
 }
 
+@media (min-width: 480px) {
+  #coursesList {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    max-height: 380px;
+  }
+}
+
+@media (min-width: 768px) {
+  #coursesList {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    max-height: 420px;
+  }
+}
+
 #coursesList .course-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px;
-  min-height: 72px;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  min-height: 64px;
   border-radius: 12px;
   border: 2px solid var(--color-border, #e5e7eb);
   background: var(--color-background, #f9fafb);
@@ -423,12 +563,12 @@ input:checked + .toggle-switch::after {
 
 #coursesList .course-info {
   flex: 1;
-  min-width: 0;
-  text-align: right; /* RTL */
+  min-width: 0; /* required for text-overflow: ellipsis */
+  text-align: right;
 }
 
 #coursesList .course-info h4 {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text-primary, #111);
   margin: 0 0 4px;
@@ -438,15 +578,41 @@ input:checked + .toggle-switch::after {
 }
 
 #coursesList .course-details {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--color-text-secondary, #6b7280);
   margin: 0;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
+/* ── 16. Landscape safety (short mobile viewports) ──────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    align-items: flex-start;
+    padding: 8px;
+  }
+  .wizard-header {
+    padding: 10px var(--space-md);
+  }
+  .wizard-header h1 {
+    font-size: var(--text-lg);
+    margin-bottom: 2px;
+  }
+  .wizard-header p {
+    display: none;
+  } /* reclaim vertical space */
+  .progress-container {
+    padding: 8px var(--space-md) 0;
+  }
+  .wizard-content {
+    padding: var(--space-xs) var(--space-md);
+  }
+  .wizard-actions {
+    padding: 8px var(--space-md);
+  }
+  .welcome-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
   #coursesList {
-    grid-template-columns: 1fr;
-    max-height: 380px;
+    max-height: 180px;
   }
 }

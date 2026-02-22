@@ -13,3 +13,6 @@ sw-cache/
 
 # Broken file
 scripts/deploy-production.js
+
+# Context quiz (for AI prompts)
+docs/context-quiz.json

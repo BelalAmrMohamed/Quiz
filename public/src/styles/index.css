@@ -656,6 +656,15 @@ Container
   border-top: 1px solid var(--color-border-light);
   font-size: 0.9375rem;
   font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.watermark p {
+  margin: 0;
 }
 
 .watermark a {
@@ -669,8 +678,10 @@ Container
 }
 
 .watermark::before {
-  content: "✨ ";
+  content: "✨";
   font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Loading State */
@@ -678,11 +689,6 @@ Container
   text-align: center;
   padding: 80px 32px;
   font-size: 1.125rem;
-}
-
-.loading::after {
-  content: "...";
-  animation: dots 1.5s infinite;
 }
 
 /* Empty State */
