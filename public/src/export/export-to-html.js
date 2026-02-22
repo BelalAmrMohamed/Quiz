@@ -5,6 +5,44 @@
 
 import { showNotification } from "../components/notifications.js";
 
+// === Markdown-lite renderer (mirrors quiz.js renderMarkdown) ===
+function renderMarkdown(str) {
+  if (str === null || str === undefined) return "";
+  str = String(str);
+  const codeBlocks = [];
+
+  // 1. Extract fenced code blocks (preserve inner newlines verbatim)
+  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
+    const idx = codeBlocks.length;
+    const escaped = code
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    codeBlocks.push(
+      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
+    );
+    return `\x00CODE${idx}\x00`;
+  });
+
+  // 2. Escape remaining HTML
+  str = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+  // 3. Inline code (single backticks)
+  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+
+  // 4. Newlines → <br>
+  str = str.replace(/\n/g, "<br>");
+
+  // 5. Restore fenced code blocks
+  str = str.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+
+  return str;
+}
+
 export async function exportToHtml(config, questions, userAnswers = []) {
   // Convert local images to base64
   const processedQuestions = await convertImagesToBase64(questions);
@@ -47,6 +85,9 @@ export async function exportToHtml(config, questions, userAnswers = []) {
           .essay-box { background: #2a2a2a; padding: 15px; border-radius: 8px; border-left: 3px solid #f59e0b; margin-top: 10px; }
           .question-image { max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px; border: 1px solid #333; }
           .footer { text-align: center; margin-top: 50px; color: #888; font-size: 0.8rem; border-top: 1px solid #333; padding-top: 20px; }
+          .code-block { background: #0d0d0d; border: 1px solid #444; border-radius: 8px; padding: 12px 16px; margin: 10px 0; overflow-x: auto; font-family: "SF Mono", "Fira Code", Consolas, monospace; font-size: 0.88rem; line-height: 1.6; white-space: pre; text-align: left; }
+          .code-block code { background: none; padding: 0; color: #e2e8f0; font-size: inherit; }
+          .inline-code { font-family: "SF Mono", "Fira Code", Consolas, monospace; font-size: 0.88em; background: rgba(99,102,241,0.15); border: 1px solid #555; border-radius: 4px; padding: 1px 6px; color: #a5b4fc; white-space: nowrap; }
       </style>
   </head>
   <body>
@@ -76,7 +117,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
               <span>${isEssayQuestion(q) ? "Essay" : "MCQ"}</span>
           </div>
           ${q.image ? `<img src="${q.image}" class="question-image" alt="Question Image" onerror="this.alt='[Image not available]'; this.style.border='2px dashed #666';">` : ""}
-          <div class="q-text">${q.q}</div>`;
+          <div class="q-text">${renderMarkdown(q.q)}</div>`;
 
     if (isEssayQuestion(q)) {
       const userText = userAns || "Not answered";
@@ -84,18 +125,18 @@ export async function exportToHtml(config, questions, userAnswers = []) {
         htmlContent += `
           <div class="essay-box" style="border-left: 3px solid #3b82f6;">
               <strong style="color: #60a5fa; display:block; margin-bottom:5px;">Your Answer:</strong>
-              ${userText}
+              ${renderMarkdown(userText)}
           </div>`;
 
       htmlContent += `<div class="essay-box">
               <strong style="color: #f59e0b; display:block; margin-bottom:5px;">Formal Answer / Key Points:</strong>
-              ${q.options[0]}
+              ${renderMarkdown(q.options[0])}
           </div>`;
     } else {
       htmlContent += `<div class="options-list">`;
       q.options.forEach((opt, i) => {
         const letter = String.fromCharCode(65 + i);
-        htmlContent += `<div class="option"><strong>${letter}.</strong> ${opt}</div>`;
+        htmlContent += `<div class="option"><strong>${letter}.</strong> ${renderMarkdown(opt)}</div>`;
       });
       htmlContent += `</div>`;
 
@@ -103,20 +144,20 @@ export async function exportToHtml(config, questions, userAnswers = []) {
       const userLetter = isSkipped ? "" : String.fromCharCode(65 + userAns);
       const userAnswer = isSkipped
         ? "Skipped"
-        : `${userLetter}. ${q.options[userAns]}`;
+        : `${userLetter}. ${renderMarkdown(q.options[userAns])}`;
       const userIcon = isSkipped ? "⚪" : isCorrect ? "✅" : "❌";
 
       if (isResultsMode)
         htmlContent += `<div class="user-answer ${userClass}">${userIcon} Your Answer: ${userAnswer}</div>`;
 
       const correctLetter = String.fromCharCode(65 + q.correct);
-      htmlContent += `<div class="correct-answer">✓ Correct Answer: ${correctLetter}. ${
-        q.options[q.correct]
-      }</div>`;
+      htmlContent += `<div class="correct-answer">✓ Correct Answer: ${correctLetter}. ${renderMarkdown(
+        q.options[q.correct],
+      )}</div>`;
     }
 
     if (q.explanation) {
-      htmlContent += `<div class="explanation"><strong>💡 Explanation:</strong> ${q.explanation}</div>`;
+      htmlContent += `<div class="explanation"><strong>💡 Explanation:</strong> ${renderMarkdown(q.explanation)}</div>`;
     }
 
     htmlContent += `</div>`;

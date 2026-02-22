@@ -15,6 +15,13 @@ const isLocalPath = (url) => {
   return !/^(https?:|data:)/i.test(url);
 };
 
+// Converts \n to markdown line breaks (two trailing spaces + newline).
+// Backtick code blocks and inline code pass through as-is since .md renders them natively.
+const mdLineBreaks = (str) => {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/\n/g, "  \n");
+};
+
 export function exportToMarkdown(config, questions, userAnswers = []) {
   let hasMCQ = false,
     hasTrueFalse = false,
@@ -54,19 +61,19 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
         : `[![Image Can't be Displayed](https://i.postimg.cc/NMdJJNzY/no-image.jpg)](https://postimg.cc/dkTjD9FS)\n\n`;
     }
 
-    markdown += `## Question ${index + 1}: ${q.q}\n${imageLink}\n\n`;
+    markdown += `## Question ${index + 1}: ${mdLineBreaks(q.q)}\n${imageLink}\n\n`;
 
     if (isEssayQuestion(q)) {
       // Only show user answer section if userAnswers was actually passed
       if (isResultsMode) {
         const userText = userAns || "Not answered";
-        markdown += `**Your Answer:**\n\n${userText}\n\n`;
+        markdown += `**Your Answer:**\n\n${mdLineBreaks(userText)}\n\n`;
       }
-      markdown += `**Formal Answer:**\n\n${q.options[0]}\n\n`;
+      markdown += `**Formal Answer:**\n\n${mdLineBreaks(q.options[0])}\n\n`;
     } else {
       q.options.forEach((opt, i) => {
         const letter = String.fromCharCode(48 + i + 1);
-        markdown += `${letter}. ${opt}\n`;
+        markdown += `${letter}. ${mdLineBreaks(opt)}\n`;
       });
       markdown += `\n`;
 
@@ -77,7 +84,9 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
         const userLetter = isSkipped
           ? "Skipped"
           : String.fromCharCode(48 + userAns + 1);
-        const userAnswerText = isSkipped ? "Skipped" : q.options[userAns];
+        const userAnswerText = isSkipped
+          ? "Skipped"
+          : mdLineBreaks(q.options[userAns]);
 
         markdown += `**Your Answer:** ${userLetter}${
           isSkipped ? "" : `. ${userAnswerText}`
@@ -85,12 +94,13 @@ export function exportToMarkdown(config, questions, userAnswers = []) {
       }
 
       const correctLetter = String.fromCharCode(48 + q.correct + 1);
-      markdown += `**Correct Answer:** ${correctLetter}. ${
-        q.options[q.correct]
-      }\n\n`;
+      markdown += `**Correct Answer:** ${correctLetter}. ${mdLineBreaks(
+        q.options[q.correct],
+      )}\n\n`;
     }
 
-    if (q.explanation) markdown += `> **Explanation:**\n${q.explanation}\n\n`;
+    if (q.explanation)
+      markdown += `> **Explanation:**\n${mdLineBreaks(q.explanation)}\n\n`;
     markdown += `---\n\n`;
   });
 
