@@ -365,7 +365,9 @@ async function init() {
   // ── Quiz Mode ────────────────────────────────────────────────────────────
   // Mode is intentionally NOT in the URL (links stay mode-agnostic).
   // Each device/user gets its own mode from their profile / localStorage.
-  quizMode = localStorage.getItem("quiz_current_mode") || "exam";
+  quizMode =
+    localStorage.getItem("quiz_current_mode") ||
+    userProfile.getProfile().defaultQuizMode;
 
   const startTime = localStorage.getItem("quiz_start_time");
 

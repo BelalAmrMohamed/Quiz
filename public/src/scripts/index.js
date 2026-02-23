@@ -157,10 +157,10 @@ const welcomeMessages = [
 const opts = [
   ["./favicon.png", "Quiz (.html)", "quiz"],
   ["./assets/images/HTML_Icon.png", "HTML (.html)", "html"],
-  ["./assets/images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
-  ["./assets/images/word_icon.png", "Word (.docx)", "docx"],
-  ["./assets/images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
   ["./assets/images/mardownIcon.png", "Markdown (.md)", "md"],
+  ["./assets/images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
+  ["./assets/images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
+  ["./assets/images/word_icon.png", "Word (.docx)", "docx"],
 ];
 
 /**
@@ -1735,12 +1735,9 @@ function isURL_orPath(string) {
 
 function startQuiz(id, mode) {
   try {
-    // Resolve the mode; never expose it in the URL so the link stays clean
-    // and shareable without locking the recipient into a specific mode.
     const quizMode =
       mode || userProfile.getProfile().defaultQuizMode || "practice";
 
-    // Mode + session metadata stay in localStorage (private, per-device)
     localStorage.setItem("quiz_current_mode", quizMode);
     localStorage.setItem("quiz_current_id", id); // keep as fallback
     localStorage.setItem("quiz_start_time", Date.now().toString());

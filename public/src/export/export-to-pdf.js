@@ -457,11 +457,12 @@ export async function exportToPdf(config, questions, userAnswers = []) {
      * Sanitizes text - SAFE ASCII only
      */
     const sanitizeText = (text) => {
-      if (!text) return "";
-      let cleaned = String(text).trim();
-      // Remove ALL non-standard characters to prevent encoding issues
-      cleaned = cleaned.replace(/[^\x20-\x7E\n\r\t]/g, "");
-      return cleaned.trim();
+      if (text === null || text === undefined) return "";
+      return String(text)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // strip real control chars only
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .trim();
     };
 
     const isEssayQuestion = (q) => q.options && q.options.length === 1;
