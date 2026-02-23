@@ -5,7 +5,7 @@
 
 import { showNotification } from "../components/notifications.js";
 
-const currentName = localStorage.getItem("username") || "User";
+const userName = localStorage.getItem("username") || "User";
 let docx;
 
 async function loadDocx() {
@@ -84,20 +84,28 @@ export async function exportToWord(config, questions, userAnswers = []) {
       progressBarFill: "FFD700", // Gold
     });
 
-    const documentTitle = sanitizeText(config.title || "Quiz Quest");
-
     // ===========================
     // UTILITY FUNCTIONS
     // ===========================
 
-    function sanitizeText(text) {
-      if (!text) return "";
-      return String(text).trim();
-    }
+    const sanitizeText = (text) => {
+      if (text === null || text === undefined) return "";
+      return String(text)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // strip real control chars only
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .trim();
+    };
 
     function isEssayQuestion(q) {
       return q.options && q.options.length === 1;
     }
+
+    // ===========================
+    // Document Title
+    // ===========================
+
+    const documentTitle = sanitizeText(config.title || "Quiz Quest");
 
     // ===========================
     // IMAGE PROCESSING
@@ -314,7 +322,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
                       alignment: AlignmentType.RIGHT,
                       children: [
                         new TextRun({
-                          text: `🏆 ${currentName}`,
+                          text: `🏆 ${userName}`,
                           bold: true,
                           size: 24,
                           color: COLORS.secondary,
@@ -967,7 +975,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
           alignment: AlignmentType.CENTER,
           children: [
             new TextRun({
-              text: "Crafted by Belal Amr | Page ",
+              text: "منصة إمتحانات بصمجي | Page ",
               size: 18,
               color: COLORS.textLight,
             }),
