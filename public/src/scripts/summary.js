@@ -446,7 +446,10 @@ function renderReview(container, questions, userAnswers) {
               ? "مقبول"
               : score === 1
                 ? "ضعيف"
-                : "لم يُجَب";
+                : userAns?.trim()
+                  ? "صفر"
+                  : "لم يُجَب";
+
       const scoreLabelClass =
         score >= 4
           ? "essay-score-excellent"

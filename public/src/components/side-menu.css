@@ -184,6 +184,15 @@ nav::-webkit-scrollbar-thumb:hover {
     color 0.18s ease;
 }
 
+.menu-item .icon {
+  font-size: 2rem;
+
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 .menu-item:hover {
   background: var(--color-background-secondary, #f5f5f5);
   transform: translateX(-3px); /* RTL: slide left toward content */
