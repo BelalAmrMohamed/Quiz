@@ -288,20 +288,47 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         _psz = size;
       }
     };
+
+    // const setPdfTextColor = (r, g, b) => {
+    //   if (r !== _tR || g !== _tG || b !== _tB) {
+    //     doc.setTextColor(r, g, b);
+    //     _tR = r;
+    //     _tG = g;
+    //     _tB = b;
+    //   }
+    // };
+    // const setPdfFillColor = (r, g, b) => {
+    //   if (r !== _fR || g !== _fG || b !== _fB) {
+    //     doc.setFillColor(r, g, b);
+    //     _fR = r;
+    //     _fG = g;
+    //     _fB = b;
+    //   }
+    // };
+
     const setPdfTextColor = (r, g, b) => {
       if (r !== _tR || g !== _tG || b !== _tB) {
         doc.setTextColor(r, g, b);
         _tR = r;
         _tG = g;
         _tB = b;
+        // Force the next setPdfFillColor to apply
+        _fR = -1;
+        _fG = -1;
+        _fB = -1;
       }
     };
+
     const setPdfFillColor = (r, g, b) => {
       if (r !== _fR || g !== _fG || b !== _fB) {
         doc.setFillColor(r, g, b);
         _fR = r;
         _fG = g;
         _fB = b;
+        // Force the next setPdfTextColor to apply
+        _tR = -1;
+        _tG = -1;
+        _tB = -1;
       }
     };
 
