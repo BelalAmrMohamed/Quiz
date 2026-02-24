@@ -39,6 +39,122 @@
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
 
+    <style>
+        /* Markdown preview panel */
+        .markdown-preview {
+            display: none;
+            margin-top: 6px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: var(--color-bg-secondary, #f4f4f8);
+            border: 1px solid var(--color-border, #e0e0e0);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--color-text, #222);
+        }
+
+        .markdown-preview .code-block {
+            background: var(--color-code-bg, #1e1e2e);
+            color: var(--color-code-text, #cdd6f4);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 6px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .markdown-preview .inline-code {
+            background: var(--color-inline-code-bg, #e8e8f0);
+            color: var(--color-inline-code-text, #c0392b);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        /* Option textarea styling */
+        .option-textarea {
+            width: 100%;
+            resize: none;
+            overflow: hidden;
+            min-height: 36px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border, #ddd);
+            background: var(--color-bg, #fff);
+            color: var(--color-text, #222);
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .option-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary, #6c63ff);
+            box-shadow: 0 0 0 2px var(--color-primary-light, rgba(108, 99, 255, 0.15));
+        }
+
+        /* Download popup grid */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .mode-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--color-border, #e0e0e0);
+            background: var(--color-bg, #fff);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--color-primary, #6c63ff);
+            background: var(--color-bg-secondary, #f4f4f8);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn .icon {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .mode-btn svg {
+            color: var(--color-text-secondary, #666);
+        }
+
+        .close-modal {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border, #ddd);
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary, #666);
+            transition: background 0.2s;
+        }
+
+        .close-modal:hover {
+            background: var(--color-bg-secondary, #f4f4f8);
+        }
+    </style>
+
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
@@ -465,9 +581,30 @@
                         data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
-                <p>الصق محتوى ملف JSON الذي يحتوي على الأسئلة:</p>
-                <textarea id="importTextarea" rows="10" placeholder='[{"q":"...", "options":["..."], "correct":0}]'
-                    aria-label="محتوى الأسئلة للاستيراد"></textarea>
+                <p style="margin-bottom: 12px; font-weight: 600;">📁 استيراد من ملف JSON:</p>
+                <div class="file-upload-area" style="margin-bottom: 20px;">
+                    <label for="importFileInput" class="file-upload-label"
+                        style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed var(--color-border,#ccc);border-radius:8px;cursor:pointer;background:var(--color-bg-secondary,#f8f8f8);">
+                        <i data-lucide="file-up"></i>
+                        <span>اختر ملف JSON (أو عدة ملفات)</span>
+                    </label>
+                    <input type="file" id="importFileInput" accept=".json" multiple style="display:none;"
+                        onchange="document.getElementById('importFileLabel').textContent = this.files.length > 0 ? Array.from(this.files).map(f=>f.name).join(', ') : 'لم يتم اختيار أي ملف'">
+                    <p id="importFileLabel" style="margin-top:6px;font-size:0.85rem;color:var(--color-text-secondary);">
+                        لم يتم اختيار أي ملف</p>
+                </div>
+                <p style="margin-bottom: 8px; font-weight: 600;">📋 أو الصق المحتوى هنا:</p>
+                <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 8px;">يدعم: JSON array
+                    أو كائن JSON أو نص مرقّم (1. سؤال / A. خيار / Correct: A)</p>
+                <textarea id="importTextarea" rows="8" placeholder='[{"q":"...", "options":["..."], "correct":0}]
+أو:
+1. ما هي لغة البرمجة الأسرع؟
+
+A. Python
+B. C++
+
+Correct: B
+Explanation: C++ أسرع من Python.' aria-label="محتوى الأسئلة للاستيراد"></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="processImport()">استيراد</button>

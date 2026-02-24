@@ -1580,6 +1580,7 @@ body {
   font-family: monospace;
   font-size: 0.9rem;
   resize: vertical;
+  direction: ltr;
 }
 
 #importTextarea:focus {
