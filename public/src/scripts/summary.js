@@ -206,6 +206,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const exportPptxBtn = document.getElementById("exportPptxBtn");
   const exportHtmlBtn = document.getElementById("exportHtmlBtn");
   const exportQuizBtn = document.getElementById("exportQuizBtn");
+  const exportJsonBtn = document.getElementById("exportJsonBtn");
+  const exportSourceBtn = document.getElementById("exportSourceBtn");
 
   let examList = [];
   try {
@@ -259,24 +261,121 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.title = `نتائج إمتحان ${config.title}`;
 
+  // Helper for loading state
+  async function withDownloadLoading(buttonEl, asyncFn) {
+    if (!buttonEl) return;
+    const originalHtml = buttonEl.innerHTML;
+    const originalWidth = buttonEl.offsetWidth;
+
+    buttonEl.disabled = true;
+    buttonEl.style.width = `${originalWidth > 0 ? originalWidth : buttonEl.getBoundingClientRect().width}px`;
+    buttonEl.style.justifyContent = "center";
+    buttonEl.innerHTML =
+      '<i data-lucide="loader-circle" class="spin"></i> جاري التحميل...';
+    if (typeof lucide !== "undefined") lucide.createIcons();
+
+    // Allow DOM to update
+    await new Promise((r) => setTimeout(r, 50));
+
+    try {
+      await asyncFn();
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("حدث خطأ أثناء التحميل. حاول مرة أخرى.");
+    } finally {
+      buttonEl.disabled = false;
+      buttonEl.innerHTML = originalHtml;
+      buttonEl.style.width = "";
+    }
+  }
+
   backBtn && (backBtn.onclick = goHome);
   exportMdBtn &&
     (exportMdBtn.onclick = () =>
-      exportToMarkdown(config, questions, result.userAnswers));
+      withDownloadLoading(exportMdBtn, async () =>
+        exportToMarkdown(config, questions, result.userAnswers),
+      ));
   exportPdfBtn &&
-    (exportPdfBtn.onclick = async () =>
-      await exportToPdf(config, questions, result.userAnswers, result));
+    (exportPdfBtn.onclick = () =>
+      withDownloadLoading(
+        exportPdfBtn,
+        async () =>
+          await exportToPdf(config, questions, result.userAnswers, result),
+      ));
   exportWordBtn &&
-    (exportWordBtn.onclick = async () =>
-      await exportToWord(config, questions, result.userAnswers));
+    (exportWordBtn.onclick = () =>
+      withDownloadLoading(
+        exportWordBtn,
+        async () => await exportToWord(config, questions, result.userAnswers),
+      ));
   exportPptxBtn &&
-    (exportPptxBtn.onclick = async () =>
-      await exportToPptx(config, questions, result.userAnswers));
+    (exportPptxBtn.onclick = () =>
+      withDownloadLoading(
+        exportPptxBtn,
+        async () => await exportToPptx(config, questions, result.userAnswers),
+      ));
   exportHtmlBtn &&
     (exportHtmlBtn.onclick = () =>
-      exportToHtml(config, questions, result.userAnswers));
+      withDownloadLoading(exportHtmlBtn, async () =>
+        exportToHtml(config, questions, result.userAnswers),
+      ));
   exportQuizBtn &&
-    (exportQuizBtn.onclick = () => exportToQuiz(config, questions));
+    (exportQuizBtn.onclick = () =>
+      withDownloadLoading(exportQuizBtn, async () =>
+        exportToQuiz(config, questions),
+      ));
+
+  exportJsonBtn &&
+    (exportJsonBtn.onclick = () => {
+      withDownloadLoading(exportJsonBtn, async () => {
+        if (config.path && config.path.endsWith(".json")) {
+          const res = await fetch(config.path);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${config.title || config.id}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else {
+          const exportQuestions = questions.map((q) => {
+            const question = { q: q.q, options: q.options, correct: q.correct };
+            if (q.image && q.image.trim()) question.image = q.image;
+            if (q.explanation && q.explanation.trim())
+              question.explanation = q.explanation;
+            return question;
+          });
+          const payload = { questions: exportQuestions };
+          const fileContent = JSON.stringify(payload, null, 2);
+          const blob = new Blob([fileContent], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${(config.title || "quiz").replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+
+  if (config.path) {
+    fetch(config.path)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.source && exportSourceBtn) {
+          exportSourceBtn.style.display = "flex";
+          exportSourceBtn.onclick = () => {
+            window.open(data.source, "_blank");
+          };
+        }
+      })
+      .catch((e) => console.error("Error fetching for source:", e));
+  }
 
   // ── Score breakdown ────────────────────────────────────────────────────────
   const totalQuestions = questions.length;
