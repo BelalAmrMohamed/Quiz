@@ -35,22 +35,16 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       return;
     }
 
-    // ===========================
-    // VALIDATION
-    // ===========================
-    if (!config || !questions || !Array.isArray(questions)) {
+    if (!config || !questions || !Array.isArray(questions))
       throw new Error(
         "Invalid parameters: config and questions array required",
       );
-    }
-
-    if (!window.jspdf || !window.jspdf.jsPDF) {
+    if (!window.jspdf || !window.jspdf.jsPDF)
       throw new Error("jsPDF library not loaded");
-    }
 
-    // ===========================
-    // INITIALIZATION
-    // ===========================
+    // =========================================================
+    // INIT
+    // =========================================================
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({
       orientation: "portrait",
@@ -58,16 +52,14 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       format: "a4",
       compress: true,
     });
-
     doc.setFont("helvetica");
 
-    // ===========================
-    // GAMIFICATION COLORS
-    // ===========================
+    // =========================================================
+    // COLORS
+    // =========================================================
     const COLORS = Object.freeze({
       primary: [106, 90, 205],
       secondary: [255, 215, 0],
-      accent: [255, 105, 180],
       success: [46, 213, 115],
       error: [255, 71, 87],
       warning: [255, 168, 1],
@@ -78,218 +70,186 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       textDark: [30, 41, 59],
       textLight: [100, 116, 139],
       textWhite: [255, 255, 255],
-      buttonCorrect: [16, 185, 129],
-      buttonWrong: [239, 68, 68],
-      buttonNeutral: [203, 213, 225],
-      progressBarBg: [226, 232, 240],
-      progressBarFill: [255, 215, 0],
-      trophy: [255, 215, 0],
+      btnCorrect: [16, 185, 129],
+      btnWrong: [239, 68, 68],
+      btnNeutral: [203, 213, 225],
+      progressBg: [226, 232, 240],
+      progressFill: [255, 215, 0],
       codeBg: [240, 242, 246],
       codeBorder: [180, 185, 200],
       codeText: [50, 60, 100],
-      inlineCodeBg: [235, 237, 244],
+      inlineCodeBg: [226, 230, 242],
     });
 
-    // ===========================
+    // =========================================================
     // SIZES
-    // ===========================
+    // =========================================================
     const SIZES = Object.freeze({
-      headerHeight: 18,
-      footerHeight: 12,
-      progressBarHeight: 6,
-      cardPadding: 8,
+      headerH: 18,
+      footerH: 12,
+      progressBar: 6,
+      cardPad: 8,
       cardMargin: 6,
-      cardCornerRadius: 3,
-      cardShadowOffset: 0.8,
+      cardCorner: 3,
+      cardShadow: 0.8,
       titleFont: 24,
       headingFont: 16,
-      questionFont: 11,
-      optionFont: 10,
+      qFont: 11,
+      optFont: 10,
       labelFont: 9,
       footerFont: 8,
       codeFont: 9,
-      buttonHeight: 10,
-      buttonPadding: 3,
-      buttonRadius: 2,
-      sectionSpacing: 8,
-      questionSpacing: 12,
-      optionSpacing: 4,
+      btnPad: 3,
+      btnMinH: 10,
+      btnRadius: 2,
+      optGap: 4,
     });
 
-    const MARGINS = Object.freeze({
-      top: 22,
-      right: 12,
-      bottom: 18,
-      left: 12,
-    });
+    const MARGINS = Object.freeze({ top: 22, right: 12, bottom: 18, left: 12 });
+
+    // =========================================================
+    // LAYOUT CONSTANTS
+    // =========================================================
+    const LINE_H = 4.5; // mm per line of text
+    const BASELINE_RATIO = 0.78; // baseline position within a line (fraction from top)
+    const CODE_LINE_H = 5.0; // mm per code line  (9pt courier, ~1.4× leading)
+    const CODE_LABEL_H = 7.0; // mm for "CODE" label area at top of block
+    const CODE_OVERHEAD = CODE_LABEL_H + 3.5; // total vertical overhead in a code box
+    const IC_PAD = 1.0; // inline-code horizontal padding per side (mm)
+    const IC_GAP = 0.6; // gap after inline-code pill (mm)
+    const CARD_TOP_OFF = SIZES.cardPad - 2; // 6mm — visual top inset inside card
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const contentWidth = pageWidth - MARGINS.left - MARGINS.right;
 
-    const MAX_IMAGE_HEIGHT = 50;
-    const MAX_IMAGE_WIDTH = contentWidth - SIZES.cardPadding * 2 - 6;
+    const MAX_IMG_H = 50;
+    const MAX_IMG_W = contentWidth - SIZES.cardPad * 2 - 6;
+
+    // Card content area coordinates (used everywhere for consistency)
+    const CC_X = MARGINS.left + SIZES.cardPad + 3; // 23 mm from left
+    const CC_W = contentWidth - SIZES.cardPad * 2 - 6; // inner width
 
     let currentY = MARGINS.top;
     let currentLevel = 1;
 
-    // ===========================
+    // =========================================================
     // UNICODE / ARABIC DETECTION
-    // ===========================
-
-    /**
-     * Returns true if the string contains Arabic or other non-Latin Unicode chars
-     * that standard jsPDF helvetica cannot render.
-     */
-    const hasNonLatin = (text) => /[^\x00-\xFF]/.test(text);
-    const hasArabic = (text) =>
+    // =========================================================
+    const hasNonLatin = (t) => /[^\x00-\xFF]/.test(t);
+    const hasArabic = (t) =>
       /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(
-        text,
+        t,
       );
 
-    // Track current PDF text color for canvas mirroring
-    let _currentTextColor = COLORS.textDark;
-    const setTextColor = (...rgb) => {
-      _currentTextColor = rgb;
-      doc.setTextColor(...rgb);
-    };
-
-    // ===========================
-    // TEXT SANITIZATION (Unicode-safe)
-    // ===========================
-
-    /**
-     * Sanitize text: keep ALL Unicode (Arabic, etc.),
-     * only strip raw control characters that would corrupt PDF streams.
-     */
+    // =========================================================
+    // TEXT SANITIZATION  (Unicode-safe — strip only raw control chars)
+    // =========================================================
     const sanitizeText = (text) => {
-      if (text === null || text === undefined) return "";
+      if (text == null) return "";
       return String(text)
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // strip real control chars only
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
         .replace(/\r\n/g, "\n")
         .replace(/\r/g, "\n")
         .trim();
     };
 
-    // ===========================
-    // CANVAS-BASED UNICODE TEXT RENDERER
-    // ===========================
-
-    /** DPI multiplier for canvas — higher = crisper text in PDF */
+    // =========================================================
+    // CANVAS MEASUREMENT CACHE  (#7 — avoids creating thousands of canvases)
+    // =========================================================
     const CANVAS_DPR = 3;
-    /** mm → px at our canvas DPI */
-    const mmToPx = (mm) => mm * 3.7795275591 * (CANVAS_DPR / 1);
+    const mmToPx = (mm) => mm * 3.7795275591 * CANVAS_DPR;
 
-    /**
-     * Build a reusable off-screen canvas ctx with the right font.
-     * fontSize is in mm-equivalent points (same as doc.getFontSize()).
-     */
-    const makeCtx = (fontSizePt, bold = false) => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1; // will resize before draw
-      canvas.height = 1;
-      const ctx = canvas.getContext("2d");
-      const pxSize = fontSizePt * 1.3333 * (CANVAS_DPR / 1); // pt → px at DPR
-      ctx.font = `${bold ? "bold " : ""}${pxSize}px Inter, Cairo, Arial, sans-serif`;
-      return { canvas, ctx, pxSize };
+    const _mxCache = new Map();
+    const getMeasureCtx = (fontSizePt, bold = false) => {
+      const key = `${fontSizePt}_${bold}`;
+      if (!_mxCache.has(key)) {
+        const cv = document.createElement("canvas");
+        cv.width = 600;
+        cv.height = 1;
+        const ctx = cv.getContext("2d");
+        const px = fontSizePt * 1.3333 * CANVAS_DPR;
+        ctx.font = `${bold ? "bold " : ""}${px}px Inter, Cairo, Arial, sans-serif`;
+        _mxCache.set(key, { ctx, pxSize: px });
+      }
+      return _mxCache.get(key);
     };
 
-    /**
-     * Word-wrap text into lines that fit within maxWidthMm, measured on canvas.
-     * Works for both Arabic (RTL) and Latin text.
-     */
+    // =========================================================
+    // CANVAS WORD-WRAP  (for Arabic / Unicode paragraphs)
+    // =========================================================
     const wrapTextCanvas = (text, maxWidthMm, fontSizePt, bold = false) => {
-      const { ctx } = makeCtx(fontSizePt, bold);
+      const { ctx } = getMeasureCtx(fontSizePt, bold);
       const maxPx = mmToPx(maxWidthMm);
-
-      // Split by explicit newlines first
-      const paragraphs = text.split("\n");
       const lines = [];
-
-      for (const paragraph of paragraphs) {
-        if (paragraph.trim() === "") {
+      for (const para of text.split("\n")) {
+        if (!para.trim()) {
           lines.push("");
           continue;
         }
-        // word wrap within paragraph
-        const words = paragraph.split(/\s+/);
-        let current = "";
-        for (const word of words) {
-          const test = current ? `${current} ${word}` : word;
-          if (ctx.measureText(test).width > maxPx && current) {
-            lines.push(current);
-            current = word;
-          } else {
-            current = test;
-          }
+        const words = para.split(/\s+/);
+        let cur = "";
+        for (const w of words) {
+          const test = cur ? `${cur} ${w}` : w;
+          if (ctx.measureText(test).width > maxPx && cur) {
+            lines.push(cur);
+            cur = w;
+          } else cur = test;
         }
-        if (current) lines.push(current);
+        if (cur) lines.push(cur);
       }
-
       return lines;
     };
 
-    /**
-     * Render text (potentially Arabic / Unicode) to a canvas and blit it into
-     * the PDF as a PNG image. Returns the height consumed in mm.
-     *
-     * @param {string}   text        – the text to render
-     * @param {number}   x           – left edge in mm
-     * @param {number}   y           – top edge in mm
-     * @param {number}   maxWidthMm  – wrap width in mm
-     * @param {number[]} color       – [r, g, b] text color
-     * @param {number}   fontSizePt  – font size in pt
-     * @param {boolean}  bold
-     * @param {boolean}  rtl         – force right-to-left layout
-     */
+    // =========================================================
+    // UNICODE CANVAS RENDERER
+    // y = top of the image area. Returns height consumed (mm).
+    // =========================================================
     const renderUnicodeText = (
       text,
       x,
       y,
       maxWidthMm,
-      color = COLORS.textDark,
-      fontSizePt = SIZES.optionFont,
+      color,
+      fontSizePt,
       bold = false,
-      rtl = null,
+      rtl = false,
     ) => {
       if (!text) return 0;
-
-      // Auto-detect RTL
-      const isRtl = rtl !== null ? rtl : hasArabic(text);
-
       const lines = wrapTextCanvas(text, maxWidthMm, fontSizePt, bold);
-      if (lines.length === 0) return 0;
-
-      const { canvas, ctx, pxSize } = makeCtx(fontSizePt, bold);
-      const lineHeightPx = pxSize * 1.55;
+      if (!lines.length) return 0;
+      const { pxSize } = getMeasureCtx(fontSizePt, bold);
+      const lineHpx = pxSize * 1.55;
       const widthPx = mmToPx(maxWidthMm);
-      const heightPx = Math.ceil(lines.length * lineHeightPx + pxSize * 0.5);
-
-      canvas.width = widthPx;
-      canvas.height = heightPx;
-
-      // Re-apply font after resize (canvas resets on resize)
+      const heightPx = Math.ceil(lines.length * lineHpx + pxSize * 0.4);
+      const cv = document.createElement("canvas");
+      cv.width = widthPx;
+      cv.height = heightPx;
+      const ctx = cv.getContext("2d");
       ctx.font = `${bold ? "bold " : ""}${pxSize}px Inter, Cairo, Arial, sans-serif`;
-      ctx.direction = isRtl ? "rtl" : "ltr";
-      ctx.textAlign = isRtl ? "right" : "left";
+      ctx.direction = rtl ? "rtl" : "ltr";
+      ctx.textAlign = rtl ? "right" : "left";
       ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-
-      lines.forEach((line, i) => {
-        const textX = isRtl ? widthPx - 1 : 1;
-        ctx.fillText(line, textX, (i + 1) * lineHeightPx - pxSize * 0.15);
-      });
-
-      const imgData = canvas.toDataURL("image/png");
+      lines.forEach((line, i) =>
+        ctx.fillText(
+          line,
+          rtl ? widthPx - 1 : 1,
+          (i + 1) * lineHpx - pxSize * 0.15,
+        ),
+      );
       const heightMm = heightPx / (CANVAS_DPR * 3.7795275591);
-
-      doc.addImage(imgData, "PNG", x, y, maxWidthMm, heightMm);
+      doc.addImage(
+        cv.toDataURL("image/png"),
+        "PNG",
+        x,
+        y,
+        maxWidthMm,
+        heightMm,
+      );
       return heightMm;
     };
 
-    /**
-     * Measure how tall (mm) a block of Unicode text will be.
-     */
-    const measureUnicodeTextHeight = (
+    const measureUnicodeHeight = (
       text,
       maxWidthMm,
       fontSizePt,
@@ -297,50 +257,427 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     ) => {
       if (!text) return 0;
       const lines = wrapTextCanvas(text, maxWidthMm, fontSizePt, bold);
-      const { pxSize } = makeCtx(fontSizePt, bold);
-      const lineHeightPx = pxSize * 1.55;
-      const heightPx = Math.ceil(lines.length * lineHeightPx + pxSize * 0.5);
-      return heightPx / (CANVAS_DPR * 3.7795275591);
+      const { pxSize } = getMeasureCtx(fontSizePt, bold);
+      return (
+        Math.ceil(lines.length * pxSize * 1.55 + pxSize * 0.4) /
+        (CANVAS_DPR * 3.7795275591)
+      );
     };
 
-    // ===========================
-    // SMART TEXT RENDERER
-    // Automatically chooses canvas vs native jsPDF based on content
-    // ===========================
+    // =========================================================
+    // PDF STATE CACHE  (#7 — skip redundant set* calls)
+    // =========================================================
+    let _pfam = "",
+      _psty = "",
+      _psz = 0;
+    let _tR = -1,
+      _tG = -1,
+      _tB = -1;
+    let _fR = -1,
+      _fG = -1,
+      _fB = -1;
 
-    /**
-     * Split text to lines (native jsPDF for ASCII, canvas-measured for Unicode).
-     */
-    const splitLines = (text, maxWidthMm, fontSizePt) => {
-      if (!text) return [];
-      if (hasNonLatin(text)) {
-        return wrapTextCanvas(text, maxWidthMm, fontSizePt);
+    const setPdfFont = (family, style, size) => {
+      if (family !== _pfam || style !== _psty) {
+        doc.setFont(family, style);
+        _pfam = family;
+        _psty = style;
       }
-      doc.setFontSize(fontSizePt);
-      return doc.splitTextToSize(text, maxWidthMm);
+      if (size !== _psz) {
+        doc.setFontSize(size);
+        _psz = size;
+      }
+    };
+    const setPdfTextColor = (r, g, b) => {
+      if (r !== _tR || g !== _tG || b !== _tB) {
+        doc.setTextColor(r, g, b);
+        _tR = r;
+        _tG = g;
+        _tB = b;
+      }
+    };
+    const setPdfFillColor = (r, g, b) => {
+      if (r !== _fR || g !== _fG || b !== _fB) {
+        doc.setFillColor(r, g, b);
+        _fR = r;
+        _fG = g;
+        _fB = b;
+      }
+    };
+
+    // =========================================================
+    // INLINE RUN WORD-WRAP  (#3 #4 #2)
+    //
+    // Turns an array of InlineRun  { type:'text'|'inline-code', content }
+    // into display lines (array of arrays), respecting maxWidthMm.
+    //
+    // Side-effect: sets PDF font state. Always setPdfFont() before rendering.
+    // =========================================================
+    const wrapInlineRuns = (runs, maxWidthMm, fontSizePt, bold = false) => {
+      const getTextW = (t) => {
+        setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+        return doc.getTextWidth(t);
+      };
+      const getCodeW = (t) => {
+        setPdfFont("courier", "normal", fontSizePt);
+        return doc.getTextWidth(t) + IC_PAD * 2 + IC_GAP;
+      };
+
+      // Tokenise all runs into atomic chunks (words / spaces / code pills)
+      const tokens = [];
+      for (const run of runs) {
+        if (run.type === "inline-code") {
+          tokens.push({
+            type: "inline-code",
+            content: run.content,
+            w: getCodeW(run.content),
+          });
+        } else {
+          for (const p of run.content.split(/(\s+)/)) {
+            if (p) tokens.push({ type: "text", content: p, w: getTextW(p) });
+          }
+        }
+      }
+
+      const lines = [];
+      let curLine = [],
+        lineW = 0;
+
+      const flushLine = () => {
+        while (
+          curLine.length &&
+          /^\s+$/.test(curLine[curLine.length - 1].content)
+        )
+          curLine.pop();
+        if (curLine.length) lines.push(curLine);
+        curLine = [];
+        lineW = 0;
+      };
+
+      for (const tok of tokens) {
+        const isWS = tok.type === "text" && /^\s+$/.test(tok.content);
+        if (isWS) {
+          if (curLine.length) {
+            const last = curLine[curLine.length - 1];
+            if (last.type === "text") {
+              last.content += tok.content;
+              last.w += tok.w;
+            } else curLine.push({ ...tok });
+            lineW += tok.w;
+          }
+          continue;
+        }
+        if (curLine.length > 0 && lineW + tok.w > maxWidthMm) flushLine();
+        if (
+          tok.type === "text" &&
+          curLine.length &&
+          curLine[curLine.length - 1].type === "text"
+        ) {
+          curLine[curLine.length - 1].content += tok.content;
+          curLine[curLine.length - 1].w += tok.w;
+        } else {
+          curLine.push({ ...tok });
+        }
+        lineW += tok.w;
+      }
+      flushLine();
+      return lines.length > 0 ? lines : [[]];
+    };
+
+    // =========================================================
+    // INLINE LINE RENDERER
+    // baselineY = actual jsPDF baseline Y coordinate (NOT top-of-line).
+    // Draws inline-code as highlighted pills on the same baseline.
+    // =========================================================
+    const renderInlineLine = (
+      lineTokens,
+      x,
+      baselineY,
+      color,
+      fontSizePt,
+      bold,
+    ) => {
+      let curX = x;
+      for (const tok of lineTokens) {
+        if (tok.type === "inline-code") {
+          setPdfFont("courier", "normal", fontSizePt);
+          const codeW = doc.getTextWidth(tok.content);
+          // Cap height in mm ≈ font_pt × 0.352 × 0.85
+          const capH = fontSizePt * 0.352 * 0.85;
+          const bgH = capH + IC_PAD * 1.8;
+          const bgY = baselineY - capH - IC_PAD * 0.4;
+          setPdfFillColor(...COLORS.inlineCodeBg);
+          doc.roundedRect(curX, bgY, codeW + IC_PAD * 2, bgH, 0.7, 0.7, "F");
+          setPdfTextColor(...COLORS.codeText);
+          doc.text(tok.content, curX + IC_PAD, baselineY);
+          curX += codeW + IC_PAD * 2 + IC_GAP;
+        } else {
+          setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+          setPdfTextColor(...color);
+          doc.text(tok.content, curX, baselineY);
+          curX += doc.getTextWidth(tok.content);
+        }
+      }
+    };
+
+    // =========================================================
+    // MARKDOWN PARSER  (#3 #4)
+    //
+    // Returns Block[]  where Block is one of:
+    //   { type: "code-block",        content: string      }
+    //   { type: "inline-paragraph",  runs:    InlineRun[] }
+    //
+    // InlineRun: { type: "text"|"inline-code", content: string }
+    // =========================================================
+    const parseMarkdown = (text) => {
+      if (!text)
+        return [
+          { type: "inline-paragraph", runs: [{ type: "text", content: "" }] },
+        ];
+
+      const result = [];
+      const codeBlocks = [];
+
+      // 1. Extract fenced code blocks
+      let processed = String(text).replace(/```([\s\S]*?)```/g, (_, code) => {
+        const idx = codeBlocks.length;
+        codeBlocks.push(code.trim());
+        return `\x00CB${idx}\x00`;
+      });
+
+      // 2. Split by code-block placeholders
+      for (const part of processed.split(/(\x00CB\d+\x00)/)) {
+        if (!part) continue;
+        const cbM = part.match(/^\x00CB(\d+)\x00$/);
+        if (cbM) {
+          result.push({ type: "code-block", content: codeBlocks[+cbM[1]] });
+          continue;
+        }
+
+        // 3. Split by newlines → each line = one inline-paragraph
+        for (const line of part.split("\n")) {
+          const runs = [];
+          for (const ip of line.split(/(`[^`\n]+`)/)) {
+            if (!ip) continue;
+            const icM = ip.match(/^`([^`\n]+)`$/);
+            if (icM) runs.push({ type: "inline-code", content: icM[1] });
+            else runs.push({ type: "text", content: ip });
+          }
+          result.push({ type: "inline-paragraph", runs });
+        }
+      }
+
+      return result.length
+        ? result
+        : [{ type: "inline-paragraph", runs: [{ type: "text", content: "" }] }];
     };
 
     /**
-     * Calculate rendered height in mm for a text block.
+     * Prepend a plain-text string into the first inline-paragraph of a segments array.
+     * Used to merge option prefix ("A. ") with option content for correct word-wrap.
      */
-    const calcTextHeight = (
+    const prependText = (prefix, segments) => {
+      if (!segments.length)
+        return [
+          {
+            type: "inline-paragraph",
+            runs: [{ type: "text", content: prefix }],
+          },
+        ];
+      const result = segments.map((s) => ({
+        ...s,
+        runs: s.runs ? [...s.runs] : undefined,
+      }));
+      const idx = result.findIndex((s) => s.type === "inline-paragraph");
+      if (idx === -1) {
+        result.unshift({
+          type: "inline-paragraph",
+          runs: [{ type: "text", content: prefix }],
+        });
+      } else {
+        result[idx] = {
+          ...result[idx],
+          runs: [{ type: "text", content: prefix }, ...result[idx].runs],
+        };
+      }
+      return result;
+    };
+
+    // =========================================================
+    // HEIGHT MEASUREMENT  (must mirror renderSegments exactly)
+    // =========================================================
+    const calcSegmentsHeight = (
+      segments,
+      maxWidthMm,
+      fontSizePt = SIZES.optFont,
+      bold = false,
+    ) => {
+      let h = 0;
+      for (const seg of segments) {
+        if (seg.type === "code-block") {
+          h += seg.content.split("\n").length * CODE_LINE_H + CODE_OVERHEAD + 2;
+        } else {
+          const fullText = seg.runs.map((r) => r.content).join("");
+          if (!fullText.trim()) {
+            h += LINE_H * 0.5;
+            continue;
+          }
+          if (hasNonLatin(fullText)) {
+            h += measureUnicodeHeight(fullText, maxWidthMm, fontSizePt, bold);
+          } else {
+            h +=
+              wrapInlineRuns(seg.runs, maxWidthMm, fontSizePt, bold).length *
+              LINE_H;
+          }
+        }
+      }
+      return Math.max(h, LINE_H);
+    };
+
+    const calcMarkdownHeight = (
       text,
       maxWidthMm,
-      fontSizePt,
-      lineHeightMm = 4.5,
+      fontSizePt = SIZES.optFont,
+      bold = false,
     ) => {
-      if (!text) return 0;
-      if (hasNonLatin(text)) {
-        return measureUnicodeTextHeight(text, maxWidthMm, fontSizePt);
-      }
-      const lines = splitLines(text, maxWidthMm, fontSizePt);
-      return lines.length * lineHeightMm;
+      if (!text) return LINE_H;
+      return calcSegmentsHeight(
+        parseMarkdown(text),
+        maxWidthMm,
+        fontSizePt,
+        bold,
+      );
     };
 
-    /**
-     * Master text render function. Picks native or canvas path automatically.
-     * Returns height consumed in mm.
-     */
+    const calcTextHeight = (text, maxWidthMm, fontSizePt = SIZES.optFont) => {
+      if (!text) return 0;
+      if (hasNonLatin(text))
+        return measureUnicodeHeight(text, maxWidthMm, fontSizePt);
+      setPdfFont("helvetica", "normal", fontSizePt);
+      return doc.splitTextToSize(text, maxWidthMm).length * LINE_H;
+    };
+
+    // =========================================================
+    // CODE BLOCK RENDERER  (#5 — proper line heights, no overlap)
+    // Returns height consumed (mm). y = top of block.
+    // =========================================================
+    const renderCodeBlock = (content, x, y, maxWidthMm) => {
+      const codeLines = content.split("\n");
+      const boxH = codeLines.length * CODE_LINE_H + CODE_OVERHEAD;
+
+      setPdfFillColor(...COLORS.codeBg);
+      doc.roundedRect(x, y, maxWidthMm, boxH, 1.5, 1.5, "F");
+      doc.setDrawColor(...COLORS.codeBorder);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(x, y, maxWidthMm, boxH, 1.5, 1.5, "S");
+
+      // "CODE" label
+      setPdfFont("helvetica", "bold", SIZES.labelFont - 1);
+      setPdfTextColor(...COLORS.codeText);
+      doc.text("CODE", x + 2.5, y + 4.5);
+
+      // Separator
+      doc.setDrawColor(...COLORS.codeBorder);
+      doc.setLineWidth(0.15);
+      doc.line(
+        x + 1.5,
+        y + CODE_LABEL_H - 0.5,
+        x + maxWidthMm - 1.5,
+        y + CODE_LABEL_H - 0.5,
+      );
+
+      // Lines of code
+      setPdfFont("courier", "normal", SIZES.codeFont);
+      setPdfTextColor(...COLORS.codeText);
+      codeLines.forEach((line, i) => {
+        const baselineY = y + CODE_LABEL_H + (i + BASELINE_RATIO) * CODE_LINE_H;
+        if (hasNonLatin(line)) {
+          renderUnicodeText(
+            line,
+            x + 3,
+            y + CODE_LABEL_H + i * CODE_LINE_H,
+            maxWidthMm - 6,
+            COLORS.codeText,
+            SIZES.codeFont,
+            false,
+            false,
+          );
+        } else {
+          doc.text(line, x + 3, baselineY, { maxWidth: maxWidthMm - 6 });
+        }
+      });
+
+      return boxH + 2; // +2 mm gap after block
+    };
+
+    // =========================================================
+    // SEGMENT RENDERER  (core markdown render, mirrors calcSegmentsHeight)
+    // y = top of content area. Returns total height consumed (mm).
+    // =========================================================
+    const renderSegments = (
+      segments,
+      x,
+      y,
+      maxWidthMm,
+      {
+        color = COLORS.textDark,
+        fontSizePt = SIZES.optFont,
+        bold = false,
+      } = {},
+    ) => {
+      let consumed = 0;
+      for (const seg of segments) {
+        if (seg.type === "code-block") {
+          consumed += renderCodeBlock(seg.content, x, y + consumed, maxWidthMm);
+        } else {
+          const fullText = seg.runs.map((r) => r.content).join("");
+          if (!fullText.trim()) {
+            consumed += LINE_H * 0.5;
+            continue;
+          }
+
+          if (hasNonLatin(fullText)) {
+            consumed += renderUnicodeText(
+              fullText,
+              x,
+              y + consumed,
+              maxWidthMm,
+              color,
+              fontSizePt,
+              bold,
+              hasArabic(fullText),
+            );
+          } else {
+            const wrapped = wrapInlineRuns(
+              seg.runs,
+              maxWidthMm,
+              fontSizePt,
+              bold,
+            );
+            for (const lineRuns of wrapped) {
+              renderInlineLine(
+                lineRuns,
+                x,
+                y + consumed + LINE_H * BASELINE_RATIO,
+                color,
+                fontSizePt,
+                bold,
+              );
+              consumed += LINE_H;
+            }
+          }
+        }
+      }
+      return consumed;
+    };
+
+    // Convenience wrapper: parse + render
+    const renderMarkdownBlock = (text, x, y, maxWidthMm, opts = {}) => {
+      if (!text) return 0;
+      return renderSegments(parseMarkdown(text), x, y, maxWidthMm, opts);
+    };
+
+    // Plain text renderer — y = top of content area
     const renderText = (
       text,
       x,
@@ -348,16 +685,12 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       maxWidthMm,
       {
         color = COLORS.textDark,
-        fontSizePt = SIZES.optionFont,
+        fontSizePt = SIZES.optFont,
         bold = false,
-        lineHeightMm = 4.5,
-        align = "left",
       } = {},
     ) => {
       if (!text) return 0;
-
-      if (hasNonLatin(text)) {
-        const isRtl = hasArabic(text);
+      if (hasNonLatin(text))
         return renderUnicodeText(
           text,
           x,
@@ -366,256 +699,43 @@ export async function exportToPdf(config, questions, userAnswers = []) {
           color,
           fontSizePt,
           bold,
-          isRtl,
+          hasArabic(text),
         );
-      }
-
-      // Native jsPDF path (ASCII/Latin)
-      doc.setFontSize(fontSizePt);
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.setTextColor(...color);
+      setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+      setPdfTextColor(...color);
       const lines = doc.splitTextToSize(text, maxWidthMm);
-      doc.text(lines, x, y, { align });
-      return lines.length * lineHeightMm;
+      const baselineY = y + LINE_H * BASELINE_RATIO;
+      lines.forEach((l, i) => doc.text(l, x, baselineY + i * LINE_H));
+      return lines.length * LINE_H;
     };
 
-    // ===========================
-    // MARKDOWN PARSER
-    // ===========================
-
-    /**
-     * Parse markdown-lite into segments:
-     *   { type: 'text' | 'inline-code' | 'code-block', content: string }
-     *
-     * Matches the quiz page's renderMarkdown() logic exactly.
-     */
-    const parseMarkdown = (text) => {
-      if (!text) return [{ type: "text", content: "" }];
-      const segments = [];
-
-      // Step 1: Extract fenced code blocks first
-      const codeBlocks = [];
-      let processed = String(text).replace(/```([\s\S]*?)```/g, (_, code) => {
-        const idx = codeBlocks.length;
-        codeBlocks.push(code.trim());
-        return `\x00CODEBLOCK${idx}\x00`;
-      });
-
-      // Step 2: Split on placeholders and inline backticks
-      const parts = processed.split(/(\x00CODEBLOCK\d+\x00|`[^`\n]+`)/);
-
-      for (const part of parts) {
-        if (!part) continue;
-
-        const blockMatch = part.match(/^\x00CODEBLOCK(\d+)\x00$/);
-        if (blockMatch) {
-          segments.push({
-            type: "code-block",
-            content: codeBlocks[parseInt(blockMatch[1])],
-          });
-          continue;
-        }
-
-        const inlineMatch = part.match(/^`([^`\n]+)`$/);
-        if (inlineMatch) {
-          segments.push({ type: "inline-code", content: inlineMatch[1] });
-          continue;
-        }
-
-        // Plain text — handle \n as actual line breaks
-        segments.push({ type: "text", content: part });
-      }
-
-      return segments;
-    };
-
-    /**
-     * Calculate total height consumed by rendering a markdown string.
-     * Must mirror renderMarkdownBlock exactly.
-     */
-    const calcMarkdownHeight = (
-      text,
-      x,
-      maxWidthMm,
-      fontSizePt = SIZES.optionFont,
-    ) => {
-      if (!text) return 0;
-      const segments = parseMarkdown(text);
-      let totalHeight = 0;
-
-      for (const seg of segments) {
-        if (seg.type === "code-block") {
-          const codeLineH = 4.2;
-          const lines = seg.content.split("\n");
-          totalHeight += lines.length * codeLineH + 8; // padding
-        } else if (seg.type === "inline-code") {
-          // Inline: rendered as part of surrounding line; minimal extra height
-          totalHeight += calcTextHeight(
-            `[${seg.content}]`,
-            maxWidthMm,
-            fontSizePt,
-          );
-        } else {
-          // Normal text (may contain \n)
-          totalHeight += calcTextHeight(seg.content, maxWidthMm, fontSizePt);
-        }
-      }
-
-      return Math.max(totalHeight, 4);
-    };
-
-    /**
-     * Render a markdown-lite string into the PDF.
-     * Returns the total height consumed in mm.
-     *
-     * Supported:
-     *   ``` ... ```  → code block (gray box, courier-like styling)
-     *   `...`        → inline code (highlighted label)
-     *   \n           → line break
-     */
-    const renderMarkdownBlock = (
-      text,
-      x,
-      y,
-      maxWidthMm,
-      {
-        color = COLORS.textDark,
-        fontSizePt = SIZES.optionFont,
-        bold = false,
-      } = {},
-    ) => {
-      if (!text) return 0;
-      const segments = parseMarkdown(text);
-      let consumed = 0;
-      const boxWidth = maxWidthMm;
-
-      for (const seg of segments) {
-        // ── Code block ──────────────────────────────────────────────
-        if (seg.type === "code-block") {
-          const codeLineH = 4.2;
-          const codeLines = seg.content.split("\n");
-          const codeInnerH = codeLines.length * codeLineH;
-          const boxH = codeInnerH + 8;
-
-          // Background
-          doc.setFillColor(...COLORS.codeBg);
-          doc.roundedRect(x, y + consumed, boxWidth, boxH, 1.5, 1.5, "F");
-
-          // Border
-          doc.setDrawColor(...COLORS.codeBorder);
-          doc.setLineWidth(0.3);
-          doc.roundedRect(x, y + consumed, boxWidth, boxH, 1.5, 1.5, "S");
-
-          // Label
-          doc.setFontSize(SIZES.labelFont - 1);
-          doc.setFont("helvetica", "bold");
-          doc.setTextColor(...COLORS.codeText);
-          doc.text("CODE", x + 2.5, y + consumed + 3.5);
-
-          // Code text (courier for monospace feel)
-          doc.setFontSize(SIZES.codeFont);
-          doc.setFont("courier", "normal");
-          doc.setTextColor(...COLORS.codeText);
-
-          codeLines.forEach((line, i) => {
-            const lineY = y + consumed + 6 + i * codeLineH;
-            if (hasNonLatin(line)) {
-              renderUnicodeText(
-                line,
-                x + 3,
-                lineY - codeLineH * 0.2,
-                boxWidth - 6,
-                COLORS.codeText,
-                SIZES.codeFont,
-                false,
-                false,
-              );
-            } else {
-              doc.text(line, x + 3, lineY, {
-                maxWidth: boxWidth - 6,
-              });
-            }
-          });
-
-          consumed += boxH + 2;
-
-          // ── Inline code ─────────────────────────────────────────────
-        } else if (seg.type === "inline-code") {
-          const label = `\u2022 ${seg.content}`;
-          const labelH = calcTextHeight(label, boxWidth - 8, fontSizePt);
-          const boxH = labelH + 4;
-
-          doc.setFillColor(...COLORS.inlineCodeBg);
-          doc.roundedRect(x + 1, y + consumed, boxWidth - 2, boxH, 1, 1, "F");
-
-          doc.setFontSize(fontSizePt);
-          doc.setFont("courier", "normal");
-          doc.setTextColor(...COLORS.codeText);
-
-          if (hasNonLatin(seg.content)) {
-            renderUnicodeText(
-              seg.content,
-              x + 3,
-              y + consumed + 1.5,
-              boxWidth - 6,
-              COLORS.codeText,
-              fontSizePt,
-            );
-          } else {
-            doc.text(seg.content, x + 3, y + consumed + labelH * 0.6 + 1, {
-              maxWidth: boxWidth - 6,
-            });
-          }
-
-          doc.setFont("helvetica", bold ? "bold" : "normal");
-          consumed += boxH + 1.5;
-
-          // ── Normal text ─────────────────────────────────────────────
-        } else {
-          const segText = seg.content;
-          if (!segText) continue;
-
-          const h = renderText(segText, x, y + consumed, boxWidth, {
-            color,
-            fontSizePt,
-            bold,
-            lineHeightMm: 4.5,
-          });
-          consumed += h;
-        }
-      }
-
-      return consumed;
-    };
-
-    // ===========================
-    // ESSAY GRADER (mirrors quiz.js gradeEssay)
-    // ===========================
+    // =========================================================
+    // ESSAY GRADER  (mirrors quiz.js gradeEssay exactly)
+    // =========================================================
     const gradeEssay = (userInput, modelAnswer) => {
-      const normalize = (s) =>
+      const norm = (s) =>
         String(s || "")
           .toLowerCase()
           .replace(/[.,;:!?()\[\]{}"'\/\\]/g, " ")
           .replace(/\s+/g, " ")
           .trim();
-
-      const userNorm = normalize(userInput);
-      const modelNorm = normalize(modelAnswer);
-
-      if (!userNorm) return 0;
-
-      const extractNums = (s) => (s.match(/\d+(\.\d+)?/g) || []).map(Number);
-      const modelNums = extractNums(modelNorm);
-      const userNums = extractNums(userNorm);
-      const modelNoNums = modelNorm.replace(/\d+(\.\d+)?/g, "").trim();
-      if (modelNums.length > 0 && modelNoNums.length < 8) {
-        const allMatch = modelNums.every((mn) =>
-          userNums.some((un) => Math.abs(un - mn) / (Math.abs(mn) || 1) < 0.02),
-        );
-        return allMatch ? 5 : userNums.length > 0 ? 1 : 0;
+      const u = norm(userInput),
+        m = norm(modelAnswer);
+      if (!u) return 0;
+      const nums = (s) => (s.match(/\d+(\.\d+)?/g) || []).map(Number);
+      const mn = nums(m),
+        un = nums(u),
+        mNoN = m.replace(/\d+(\.\d+)?/g, "").trim();
+      if (mn.length > 0 && mNoN.length < 8) {
+        return mn.every((n) =>
+          un.some((k) => Math.abs(k - n) / (Math.abs(n) || 1) < 0.02),
+        )
+          ? 5
+          : un.length > 0
+            ? 1
+            : 0;
       }
-
-      const stopWords = new Set([
+      const stop = new Set([
         "a",
         "an",
         "the",
@@ -660,33 +780,26 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         "from",
         "into",
       ]);
-
-      const getKeywords = (s) =>
-        s.split(/\s+/).filter((w) => w.length > 2 && !stopWords.has(w));
-
-      const modelKw = getKeywords(modelNorm);
-      if (modelKw.length === 0) {
-        const sim =
-          userNorm.length > 0
-            ? Math.min(userNorm.length, modelNorm.length) /
-              Math.max(userNorm.length, modelNorm.length)
-            : 0;
+      const kw = (s) =>
+        s.split(/\s+/).filter((w) => w.length > 2 && !stop.has(w));
+      const mk = kw(m);
+      if (!mk.length) {
+        const sim = u.length
+          ? Math.min(u.length, m.length) / Math.max(u.length, m.length)
+          : 0;
         return Math.round(sim * 5);
       }
-
-      const userKw = new Set(getKeywords(userNorm));
-      const matchCount = modelKw.filter(
-        (kw) =>
-          userKw.has(kw) ||
-          [...userKw].some(
-            (uk) =>
-              (uk.includes(kw) || kw.includes(uk)) &&
-              Math.min(uk.length, kw.length) > 3,
-          ),
-      ).length;
-
-      const ratio = matchCount / modelKw.length;
-
+      const uk = new Set(kw(u));
+      const ratio =
+        mk.filter(
+          (k) =>
+            uk.has(k) ||
+            [...uk].some(
+              (x) =>
+                (x.includes(k) || k.includes(x)) &&
+                Math.min(x.length, k.length) > 3,
+            ),
+        ).length / mk.length;
       if (ratio >= 0.85) return 5;
       if (ratio >= 0.65) return 4;
       if (ratio >= 0.45) return 3;
@@ -695,132 +808,108 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       return 0;
     };
 
-    // ===========================
-    // IMAGE HANDLING UTILITIES
-    // ===========================
-
-    const getDataUrl = async (url) => {
-      return new Promise((resolve, reject) => {
+    // =========================================================
+    // IMAGE UTILITIES
+    // =========================================================
+    const getDataUrl = (url) =>
+      new Promise((res, rej) => {
         const img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
-          resolve(canvas.toDataURL("image/png"));
+          const cv = document.createElement("canvas");
+          cv.width = img.width;
+          cv.height = img.height;
+          cv.getContext("2d").drawImage(img, 0, 0);
+          res(cv.toDataURL("image/png"));
         };
-        img.onerror = () => reject(new Error("Failed to load image"));
+        img.onerror = () => rej(new Error("Failed to load image"));
         img.src = url;
       });
-    };
 
-    const svgToDataUrl = async (svgString) => {
-      return new Promise((resolve, reject) => {
+    const svgToDataUrl = (svgStr) =>
+      new Promise((res, rej) => {
         const img = new Image();
-        const blob = new Blob([svgString], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(
+          new Blob([svgStr], { type: "image/svg+xml" }),
+        );
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width || 800;
-          canvas.height = img.height || 600;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
+          const cv = document.createElement("canvas");
+          cv.width = img.width || 800;
+          cv.height = img.height || 600;
+          cv.getContext("2d").drawImage(img, 0, 0);
           URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL("image/png"));
+          res(cv.toDataURL("image/png"));
         };
         img.onerror = () => {
           URL.revokeObjectURL(url);
-          reject(new Error("Failed to convert SVG"));
+          rej(new Error("SVG conversion failed"));
         };
         img.src = url;
       });
-    };
 
-    const getConstrainedDimensions = (
-      imgWidth,
-      imgHeight,
-      maxWidth,
-      maxHeight,
-    ) => {
-      const aspectRatio = imgWidth / imgHeight;
-      let width = maxWidth;
-      let height = width / aspectRatio;
-      if (height > maxHeight) {
-        height = maxHeight;
-        width = height * aspectRatio;
+    const constrainDims = (w, h, mw, mh) => {
+      const ar = w / h;
+      let nw = mw,
+        nh = nw / ar;
+      if (nh > mh) {
+        nh = mh;
+        nw = nh * ar;
       }
-      return { width, height };
+      return { width: nw, height: nh };
     };
 
-    const processImage = async (imageSource) => {
+    const processImage = async (src) => {
       try {
-        let imageData = imageSource;
-        const isSvg =
-          imageSource.includes("<svg") ||
-          imageSource.includes("data:image/svg+xml");
-
-        if (isSvg) {
-          if (imageSource.startsWith("data:image/svg+xml")) {
-            const svgString = decodeURIComponent(imageSource.split(",")[1]);
-            imageData = await svgToDataUrl(svgString);
-          } else if (imageSource.includes("<svg")) {
-            imageData = await svgToDataUrl(imageSource);
-          }
-        } else if (!imageSource.startsWith("data:")) {
-          imageData = await getDataUrl(imageSource);
+        let data = src;
+        const svg = src.includes("<svg") || src.includes("data:image/svg+xml");
+        if (svg) {
+          data = src.startsWith("data:image/svg+xml")
+            ? await svgToDataUrl(decodeURIComponent(src.split(",")[1]))
+            : await svgToDataUrl(src);
+        } else if (!src.startsWith("data:")) {
+          data = await getDataUrl(src);
         }
-
         const img = new Image();
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = imageData;
+        await new Promise((r, j) => {
+          img.onload = r;
+          img.onerror = j;
+          img.src = data;
         });
-
-        const { width: constrainedWidth, height: constrainedHeight } =
-          getConstrainedDimensions(
-            img.width,
-            img.height,
-            MAX_IMAGE_WIDTH * 3.78,
-            MAX_IMAGE_HEIGHT * 3.78,
-          );
-
+        const { width, height } = constrainDims(
+          img.width,
+          img.height,
+          MAX_IMG_W * 3.78,
+          MAX_IMG_H * 3.78,
+        );
         return {
-          data: imageData,
-          width: constrainedWidth / 3.78,
-          height: constrainedHeight / 3.78,
+          data,
+          width: width / 3.78,
+          height: height / 3.78,
           success: true,
         };
-      } catch (err) {
-        console.warn("Failed to process image:", err);
+      } catch {
         return { success: false };
       }
     };
 
-    // ===========================
+    // =========================================================
     // DECORATIVE HELPERS
-    // ===========================
-
+    // =========================================================
     const drawBackgroundPattern = () => {
-      doc.setFillColor(...COLORS.pageBg);
+      setPdfFillColor(...COLORS.pageBg);
       doc.rect(0, 0, pageWidth, pageHeight, "F");
-
+      // Diagonal lines (#7: 18mm spacing, was 12mm)
       doc.setDrawColor(220, 220, 230);
       doc.setLineWidth(0.15);
-      for (let i = -pageHeight; i < pageWidth + pageHeight; i += 12) {
+      for (let i = -pageHeight; i < pageWidth + pageHeight; i += 18)
         doc.line(i, 0, i + pageHeight, pageHeight);
-      }
-
-      doc.setFillColor(215, 215, 225);
-      for (let x = 10; x < pageWidth; x += 15) {
-        for (let y = 10; y < pageHeight; y += 15) {
-          doc.circle(x, y, 0.3, "F");
-        }
-      }
-
-      doc.setFillColor(230, 230, 240);
+      // Dots (#7: 22mm spacing, was 15mm)
+      setPdfFillColor(215, 215, 225);
+      for (let dx = 10; dx < pageWidth; dx += 22)
+        for (let dy = 10; dy < pageHeight; dy += 22)
+          doc.circle(dx, dy, 0.3, "F");
+      // Corners
+      setPdfFillColor(230, 230, 240);
       doc.triangle(0, 0, 15, 0, 0, 15, "F");
       doc.triangle(pageWidth, 0, pageWidth - 15, 0, pageWidth, 15, "F");
       doc.triangle(0, pageHeight, 15, pageHeight, 0, pageHeight - 15, "F");
@@ -835,266 +924,213 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       );
     };
 
-    const drawCard = (x, y, width, height) => {
-      doc.setFillColor(200, 200, 210);
+    const drawCard = (x, y, w, h) => {
+      setPdfFillColor(200, 200, 210);
       doc.roundedRect(
-        x + SIZES.cardShadowOffset,
-        y + SIZES.cardShadowOffset,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
+        x + SIZES.cardShadow,
+        y + SIZES.cardShadow,
+        w,
+        h,
+        SIZES.cardCorner,
+        SIZES.cardCorner,
         "F",
       );
-      doc.setFillColor(...COLORS.cardBg);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
-        "F",
-      );
+      setPdfFillColor(...COLORS.cardBg);
+      doc.roundedRect(x, y, w, h, SIZES.cardCorner, SIZES.cardCorner, "F");
       doc.setDrawColor(...COLORS.cardBorder);
       doc.setLineWidth(0.4);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.cardCornerRadius,
-        SIZES.cardCornerRadius,
-        "S",
-      );
+      doc.roundedRect(x, y, w, h, SIZES.cardCorner, SIZES.cardCorner, "S");
     };
 
-    const drawButton = (x, y, width, height, isCorrect, isWrong) => {
-      let bgColor = COLORS.buttonNeutral;
-      let borderColor = COLORS.buttonNeutral;
-      let textColor = COLORS.textDark;
-
-      if (isCorrect) {
-        bgColor = COLORS.buttonCorrect;
-        borderColor = COLORS.buttonCorrect;
-        textColor = COLORS.textWhite;
-      } else if (isWrong) {
-        bgColor = COLORS.buttonWrong;
-        borderColor = COLORS.buttonWrong;
-        textColor = COLORS.textWhite;
-      }
-
-      doc.setFillColor(180, 180, 190);
+    const drawButton = (x, y, w, h, isCorrect, isWrong) => {
+      const bg = isCorrect
+        ? COLORS.btnCorrect
+        : isWrong
+          ? COLORS.btnWrong
+          : COLORS.btnNeutral;
+      const tc = isCorrect || isWrong ? COLORS.textWhite : COLORS.textDark;
+      setPdfFillColor(180, 180, 190);
       doc.roundedRect(
         x + 0.4,
         y + 0.4,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
+        w,
+        h,
+        SIZES.btnRadius,
+        SIZES.btnRadius,
         "F",
       );
-      doc.setFillColor(...bgColor);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
-        "F",
-      );
-      doc.setDrawColor(...borderColor);
+      setPdfFillColor(...bg);
+      doc.roundedRect(x, y, w, h, SIZES.btnRadius, SIZES.btnRadius, "F");
+      doc.setDrawColor(...bg);
       doc.setLineWidth(0.6);
-      doc.roundedRect(
-        x,
-        y,
-        width,
-        height,
-        SIZES.buttonRadius,
-        SIZES.buttonRadius,
-        "S",
-      );
-
-      return textColor;
+      doc.roundedRect(x, y, w, h, SIZES.btnRadius, SIZES.btnRadius, "S");
+      return tc;
     };
 
-    const drawProgressBar = (x, y, width, height, percentage) => {
-      doc.setFillColor(...COLORS.progressBarBg);
-      doc.roundedRect(x, y, width, height, 1.5, 1.5, "F");
-      const fillWidth = (width * percentage) / 100;
-      if (fillWidth > 0) {
-        doc.setFillColor(...COLORS.progressBarFill);
-        doc.roundedRect(x, y, fillWidth, height, 1.5, 1.5, "F");
+    const drawProgressBar = (x, y, w, h, pct) => {
+      setPdfFillColor(...COLORS.progressBg);
+      doc.roundedRect(x, y, w, h, 1.5, 1.5, "F");
+      const fw = (w * pct) / 100;
+      if (fw > 0) {
+        setPdfFillColor(...COLORS.progressFill);
+        doc.roundedRect(x, y, fw, h, 1.5, 1.5, "F");
       }
       doc.setDrawColor(...COLORS.primary);
       doc.setLineWidth(0.25);
-      doc.roundedRect(x, y, width, height, 1.5, 1.5, "S");
+      doc.roundedRect(x, y, w, h, 1.5, 1.5, "S");
     };
 
     const isEssayQuestion = (q) => q.options && q.options.length === 1;
 
-    // ===========================
-    // HEADER & FOOTER
-    // ===========================
+    const getQuestionStatus = (question, userAns, isEssay) => {
+      if (isEssay) return { statusText: "ESSAY" };
+      if (userAns === undefined || userAns === null)
+        return { statusText: "SKIPPED" };
+      return userAns === question.correct
+        ? { statusText: "CORRECT" }
+        : { statusText: "WRONG" };
+    };
 
+    // =========================================================
+    // HEADER / FOOTER
+    // =========================================================
     const addGameHeader = () => {
       drawBackgroundPattern();
-
-      doc.setFillColor(...COLORS.primary);
-      doc.rect(0, 0, pageWidth, SIZES.headerHeight, "F");
+      setPdfFillColor(...COLORS.primary);
+      doc.rect(0, 0, pageWidth, SIZES.headerH, "F");
       doc.setDrawColor(...COLORS.secondary);
       doc.setLineWidth(1.5);
-      doc.line(0, SIZES.headerHeight - 1, pageWidth, SIZES.headerHeight - 1);
+      doc.line(0, SIZES.headerH - 1, pageWidth, SIZES.headerH - 1);
 
-      doc.setFontSize(SIZES.headingFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.textWhite);
-
-      const headerTitle = sanitizeText(config.title || "Quiz Quest");
-      if (hasNonLatin(headerTitle)) {
+      const title = sanitizeText(config.title || "Quiz Quest");
+      if (hasNonLatin(title)) {
         renderUnicodeText(
-          headerTitle,
+          title,
           MARGINS.left,
-          5,
+          4,
           contentWidth * 0.65,
           COLORS.textWhite,
           SIZES.headingFont,
           true,
-          hasArabic(headerTitle),
+          hasArabic(title),
         );
       } else {
-        doc.text(headerTitle, MARGINS.left, 11);
+        setPdfFont("helvetica", "bold", SIZES.headingFont);
+        setPdfTextColor(...COLORS.textWhite);
+        doc.text(title, MARGINS.left, 11);
       }
 
-      // User name (right side)
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      const nameText = sanitizeText(currentName);
-      if (hasNonLatin(nameText)) {
+      const name = sanitizeText(currentName);
+      if (hasNonLatin(name)) {
         renderUnicodeText(
-          nameText,
+          name,
           pageWidth - MARGINS.right - contentWidth * 0.3,
-          5,
+          4,
           contentWidth * 0.3,
           COLORS.textWhite,
           12,
           true,
-          hasArabic(nameText),
+          hasArabic(name),
         );
       } else {
-        const nameWidth = doc.getTextWidth(nameText);
-        doc.text(nameText, pageWidth - MARGINS.right - nameWidth, 11);
+        setPdfFont("helvetica", "bold", 12);
+        setPdfTextColor(...COLORS.textWhite);
+        doc.text(name, pageWidth - MARGINS.right - doc.getTextWidth(name), 11);
       }
-
-      currentY = SIZES.headerHeight + 6;
+      currentY = SIZES.headerH + 6;
     };
 
-    const addGameFooter = (isLastPage = false) => {
-      const footerY = pageHeight - SIZES.footerHeight;
+    // #8: Arabic watermark
+    const WATERMARK_W = 52;
+    const WATERMARK_TEXT = "منصة إمتحانات بصمجي";
 
-      doc.setFillColor(240, 242, 245);
-      doc.rect(0, footerY - 2, pageWidth, SIZES.footerHeight + 2, "F");
+    const addGameFooter = (isLastPage = false) => {
+      const fy = pageHeight - SIZES.footerH;
+      setPdfFillColor(240, 242, 245);
+      doc.rect(0, fy - 2, pageWidth, SIZES.footerH + 2, "F");
       doc.setDrawColor(...COLORS.secondary);
       doc.setLineWidth(0.8);
-      doc.line(0, footerY - 2, pageWidth, footerY - 2);
+      doc.line(0, fy - 2, pageWidth, fy - 2);
 
-      doc.setFontSize(SIZES.footerFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
-      doc.text(`Page ${currentLevel}`, MARGINS.left, footerY + 4);
+      setPdfFont("helvetica", "bold", SIZES.footerFont);
+      setPdfTextColor(...COLORS.primary);
+      doc.text(`Page ${currentLevel}`, MARGINS.left, fy + 4);
 
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textLight);
-      doc.text("Crafted by Belal Amr", pageWidth - MARGINS.right, footerY + 4, {
-        align: "right",
-      });
+      // Arabic watermark via canvas (#8)
+      renderUnicodeText(
+        WATERMARK_TEXT,
+        pageWidth - MARGINS.right - WATERMARK_W,
+        fy - 1,
+        WATERMARK_W,
+        COLORS.textLight,
+        SIZES.footerFont,
+        false,
+        true,
+      );
 
       if (!isLastPage) {
-        const dotY = footerY + 3.5;
-        const dotSpacing = 3.5;
-        const totalDots = 5;
-        const startX = pageWidth / 2 - (totalDots * dotSpacing) / 2;
-        for (let i = 0; i < totalDots; i++) {
-          doc.setFillColor(
-            ...(i < currentLevel ? COLORS.primary : COLORS.progressBarBg),
+        const dotY = fy + 3.5,
+          dotSp = 3.5,
+          nDots = 5;
+        const startX = pageWidth / 2 - (nDots * dotSp) / 2;
+        for (let i = 0; i < nDots; i++) {
+          setPdfFillColor(
+            ...(i < currentLevel ? COLORS.primary : COLORS.progressBg),
           );
-          doc.circle(startX + i * dotSpacing, dotY, 0.7, "F");
+          doc.circle(startX + i * dotSp, dotY, 0.7, "F");
         }
       }
     };
 
-    const checkPageBreak = (requiredHeight) => {
-      if (
-        currentY + requiredHeight >
-        pageHeight - MARGINS.bottom - SIZES.footerHeight
-      ) {
-        addGameFooter();
-        doc.addPage();
-        currentLevel++;
-        addGameHeader();
-        return true;
-      }
-      return false;
-    };
-
-    // ===========================
-    // SCORE CALCULATION
-    // ===========================
-
+    // =========================================================
+    // SCORE CALCULATION + PAGE
+    // =========================================================
     const calculateScore = () => {
       let correct = 0,
         wrong = 0,
         skipped = 0,
         essayCount = 0,
         totalScorable = 0;
-
       questions.forEach((q, i) => {
-        const userAns = userAnswers[i];
         if (isEssayQuestion(q)) {
           essayCount++;
-        } else {
-          totalScorable++;
-          if (userAns === undefined || userAns === null) {
-            skipped++;
-          } else if (userAns === q.correct) {
-            correct++;
-          } else {
-            wrong++;
-          }
+          return;
         }
+        totalScorable++;
+        const a = userAnswers[i];
+        if (a === undefined || a === null) skipped++;
+        else if (a === q.correct) correct++;
+        else wrong++;
       });
-
-      const percentage =
+      const pct =
         totalScorable > 0 ? Math.round((correct / totalScorable) * 100) : 0;
-      const isPassing = percentage >= 70;
-
       return {
         correct,
         wrong,
         skipped,
         essayCount,
         totalScorable,
-        percentage,
-        isPassing,
+        percentage: pct,
+        isPassing: pct >= 70,
       };
     };
 
     const scoreData = calculateScore();
 
-    // ===========================
-    // RENDER SCORE PAGE
-    // ===========================
+    const isResultsMode =
+      userAnswers &&
+      (Array.isArray(userAnswers)
+        ? userAnswers.length > 0
+        : Object.keys(userAnswers).length > 0);
 
     const renderScorePage = () => {
       addGameHeader();
-
-      const cardY = currentY;
-      const cardHeight = 85;
-      drawCard(MARGINS.left, cardY, contentWidth, cardHeight);
+      const cardY = currentY,
+        cardH = 85;
+      drawCard(MARGINS.left, cardY, contentWidth, cardH);
 
       currentY = cardY + 5;
-      doc.setFillColor(...COLORS.primary);
+      setPdfFillColor(...COLORS.primary);
       doc.roundedRect(
         MARGINS.left + 12,
         currentY,
@@ -1104,40 +1140,40 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         2,
         "F",
       );
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.titleFont);
-      doc.setFont("helvetica", "bold");
+      setPdfFont("helvetica", "bold", SIZES.titleFont);
+      setPdfTextColor(...COLORS.textWhite);
       doc.text("QUIZ COMPLETE!", pageWidth / 2, currentY + 9, {
         align: "center",
       });
       currentY += 22;
 
-      const circleY = currentY + 13;
-      const radius = 18;
-      doc.setFillColor(...COLORS.secondary);
+      const circleY = currentY + 13,
+        radius = 18;
+      setPdfFillColor(...COLORS.secondary);
       doc.circle(pageWidth / 2, circleY, radius + 1.5, "F");
-      doc.setFillColor(
+      setPdfFillColor(
         ...(scoreData.isPassing ? COLORS.success : COLORS.warning),
       );
       doc.circle(pageWidth / 2, circleY, radius, "F");
-
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
+      setPdfFont("helvetica", "bold", 22);
+      setPdfTextColor(...COLORS.textWhite);
       doc.text(`${scoreData.percentage}%`, pageWidth / 2, circleY + 2, {
         align: "center",
       });
       currentY = circleY + radius + 10;
 
-      doc.setFontSize(18);
-      doc.setTextColor(...COLORS.primary);
-      const message = scoreData.isPassing ? "LEGENDARY!" : "KEEP GRINDING!";
-      doc.text(message, pageWidth / 2, currentY, { align: "center" });
+      setPdfFont("helvetica", "bold", 18);
+      setPdfTextColor(...COLORS.primary);
+      doc.text(
+        scoreData.isPassing ? "LEGENDARY!" : "KEEP GRINDING!",
+        pageWidth / 2,
+        currentY,
+        { align: "center" },
+      );
       currentY += 9;
 
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
+      setPdfFont("helvetica", "normal", SIZES.qFont);
+      setPdfTextColor(...COLORS.textDark);
       doc.text(
         `Score: ${scoreData.correct} / ${scoreData.totalScorable}`,
         pageWidth / 2,
@@ -1146,8 +1182,8 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       );
       currentY += 5;
 
-      doc.setFontSize(SIZES.optionFont);
-      doc.setTextColor(...COLORS.textLight);
+      setPdfFont("helvetica", "normal", SIZES.optFont);
+      setPdfTextColor(...COLORS.textLight);
       doc.text(
         `Correct: ${scoreData.correct}  Wrong: ${scoreData.wrong}  Skipped: ${scoreData.skipped}`,
         pageWidth / 2,
@@ -1155,20 +1191,18 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         { align: "center" },
       );
 
-      currentY = cardY + cardHeight + 10;
-
-      const progressY = currentY;
+      currentY = cardY + cardH + 10;
       drawProgressBar(
         MARGINS.left + 18,
-        progressY,
+        currentY,
         contentWidth - 36,
-        SIZES.progressBarHeight,
+        SIZES.progressBar,
         scoreData.percentage,
       );
-      currentY = progressY + SIZES.progressBarHeight + 3;
+      currentY += SIZES.progressBar + 3;
 
-      doc.setFontSize(SIZES.labelFont);
-      doc.setTextColor(...COLORS.textLight);
+      setPdfFont("helvetica", "normal", SIZES.labelFont);
+      setPdfTextColor(...COLORS.textLight);
       doc.text(`${scoreData.percentage}% Complete`, pageWidth / 2, currentY, {
         align: "center",
       });
@@ -1185,536 +1219,384 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       currentY += 8;
     };
 
-    // ===========================
-    // Mode detection
-    // ===========================
-    const isResultsMode =
-      userAnswers &&
-      (Array.isArray(userAnswers)
-        ? userAnswers.length > 0
-        : Object.keys(userAnswers).length > 0);
-
     if (isResultsMode) renderScorePage();
     else addGameHeader();
 
-    // ===========================
-    // RENDER QUESTIONS
-    // ===========================
+    // =========================================================
+    // SECTION-BASED QUESTION RENDERING  (#1 #2 #6)
+    //
+    // Each Section = { height: mm, render: (topY) => void }
+    // Heights are measured first; render closures are pure / stateless.
+    // =========================================================
 
-    const getQuestionStatus = (question, userAns, isEssay) => {
-      if (isEssay) {
-        return { statusText: "ESSAY", statusColor: COLORS.warning };
-      }
-      const isSkipped = userAns === undefined || userAns === null;
-      if (isSkipped) {
-        return { statusText: "SKIPPED", statusColor: COLORS.textLight };
-      }
-      const isCorrect = userAns === question.correct;
-      return isCorrect
-        ? { statusText: "CORRECT", statusColor: COLORS.success }
-        : { statusText: "WRONG", statusColor: COLORS.error };
-    };
-
-    // ─────────────────────────────────────────────────────────────────
-    // ESSAY ANSWER RENDERER
-    // Dynamically sizes boxes based on actual content height.
-    // Shows graded score with stars when in results mode.
-    // ─────────────────────────────────────────────────────────────────
-    const renderEssayAnswer = (question, userAns) => {
-      const userText = sanitizeText(userAns || "Not answered");
-      const formalAnswer = sanitizeText(question.options[0]);
-      const boxWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-      const innerWidth = boxWidth - 6;
-      const textX = MARGINS.left + SIZES.cardPadding + 4.5;
-
-      // ── Essay score (only in results mode) ────────────────────────
-      if (isResultsMode && userAns && String(userAns).trim()) {
-        const essayScore = gradeEssay(userAns, question.options[0]);
-        const filledStars = "★".repeat(essayScore);
-        const emptyStars = "☆".repeat(5 - essayScore);
-        const starsLabel = `${filledStars}${emptyStars}`;
-        const scoreLabel = `Score: ${essayScore} / 5`;
-
-        // Score badge box
-        const scoreBadgeH = 10;
-        const badgeColor =
-          essayScore >= 3
-            ? COLORS.success
-            : essayScore > 0
-              ? COLORS.warning
-              : COLORS.error;
-
-        doc.setFillColor(...badgeColor);
-        doc.roundedRect(
-          MARGINS.left + SIZES.cardPadding + 3,
-          currentY,
-          boxWidth,
-          scoreBadgeH,
-          1.5,
-          1.5,
-          "F",
-        );
-
-        // Score text
-        doc.setFontSize(SIZES.optionFont);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...COLORS.textWhite);
-        doc.text(scoreLabel, textX, currentY + 3.5);
-
-        // Stars (rendered as canvas since ★☆ are Unicode)
-        renderUnicodeText(
-          starsLabel,
-          textX + 28,
-          currentY + 0.5,
-          boxWidth - 34,
-          COLORS.textWhite,
-          SIZES.optionFont + 1,
-          false,
-          false, // LTR stars
-        );
-
-        currentY += scoreBadgeH + 3;
-      }
-
-      // ── User answer box ───────────────────────────────────────────
-      if (isResultsMode) {
-        const userTextH = calcTextHeight(
-          userText,
-          innerWidth,
-          SIZES.optionFont,
-          4.5,
-        );
-        const boxH = Math.max(userTextH + 10, 16);
-
-        doc.setFillColor(245, 247, 250);
-        doc.roundedRect(
-          MARGINS.left + SIZES.cardPadding + 3,
-          currentY,
-          boxWidth,
-          boxH,
-          1.5,
-          1.5,
-          "F",
-        );
-
-        doc.setFontSize(SIZES.labelFont);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...COLORS.primary);
-        doc.text("YOUR ANSWER:", textX, currentY + 4);
-
-        renderText(userText, textX, currentY + 8, innerWidth, {
-          color: COLORS.textDark,
-          fontSizePt: SIZES.optionFont,
-        });
-
-        currentY += boxH + 2;
-      }
-
-      // ── Formal / correct answer box ───────────────────────────────
-      const formalH = calcMarkdownHeight(
-        formalAnswer,
-        MARGINS.left + SIZES.cardPadding + 4.5,
-        innerWidth,
-        SIZES.optionFont,
-      );
-      const formalBoxH = Math.max(formalH + 10, 16);
-
-      doc.setFillColor(240, 253, 244);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        formalBoxH,
-        1.5,
-        1.5,
-        "F",
-      );
-
-      doc.setFontSize(SIZES.labelFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.success);
-      doc.text("CORRECT ANSWER:", textX, currentY + 4);
-
-      renderMarkdownBlock(formalAnswer, textX, currentY + 8, innerWidth, {
-        color: COLORS.textDark,
-        fontSizePt: SIZES.optionFont,
-      });
-
-      currentY += formalBoxH + 3;
-    };
-
-    // ─────────────────────────────────────────────────────────────────
-    // MCQ OPTIONS RENDERER
-    // Dynamically sizes each option button based on wrapped text height.
-    // ─────────────────────────────────────────────────────────────────
-    const renderMultipleChoiceOptions = (question, userAns) => {
-      const buttonWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-      const innerWidth = buttonWidth - SIZES.buttonPadding * 2;
-
-      question.options.forEach((opt, optIndex) => {
-        const isUserAns = optIndex === userAns;
-        const isCorrectAns = optIndex === question.correct;
-        const sanitizedOption = sanitizeText(opt);
-
-        const prefix = String.fromCharCode(65 + optIndex);
-        let marker = "";
-        if (isCorrectAns) marker = "> ";
-        else if (isUserAns && !isCorrectAns) marker = "X ";
-        const displayText = `${marker}${prefix}. ${sanitizedOption}`;
-
-        // ── Dynamic button height ──────────────────────────────────
-        const textH = calcMarkdownHeight(
-          sanitizedOption,
-          MARGINS.left + SIZES.cardPadding + 3 + SIZES.buttonPadding,
-          innerWidth,
-          SIZES.optionFont,
-        );
-        // Account for prefix label (always 1 line of labelFont)
-        const btnH = Math.max(
-          textH + SIZES.buttonPadding * 2 + 2,
-          SIZES.buttonHeight,
-        );
-
-        const buttonX = MARGINS.left + SIZES.cardPadding + 3;
-        const buttonY = currentY;
-
-        const textColor = drawButton(
-          buttonX,
-          buttonY,
-          buttonWidth,
-          btnH,
-          isCorrectAns,
-          isUserAns && !isCorrectAns,
-        );
-
-        // Prefix label (A. / B. etc.)
-        doc.setFontSize(SIZES.optionFont);
-        doc.setFont("helvetica", isCorrectAns ? "bold" : "normal");
-        doc.setTextColor(...textColor);
-
-        const prefixLabel = `${marker}${prefix}.`;
-
-        if (hasNonLatin(displayText)) {
-          // For non-Latin: render prefix then option text via canvas
-          renderUnicodeText(
-            `${prefixLabel} ${sanitizedOption}`,
-            buttonX + SIZES.buttonPadding,
-            buttonY + SIZES.buttonPadding * 0.5,
-            innerWidth,
-            textColor,
-            SIZES.optionFont,
-            isCorrectAns,
-            hasArabic(sanitizedOption),
-          );
-        } else {
-          // Render markdown-aware option text
-          doc.text(
-            prefixLabel,
-            buttonX + SIZES.buttonPadding,
-            buttonY + btnH / 2 + 1.2,
-          );
-          renderMarkdownBlock(
-            sanitizedOption,
-            buttonX + SIZES.buttonPadding + doc.getTextWidth(prefixLabel) + 1.5,
-            buttonY + SIZES.buttonPadding,
-            innerWidth - doc.getTextWidth(prefixLabel) - 2,
-            {
-              color: textColor,
-              fontSizePt: SIZES.optionFont,
-              bold: isCorrectAns,
-            },
-          );
-        }
-
-        currentY += btnH + SIZES.optionSpacing;
-      });
-
-      currentY += 3;
-    };
-
-    // ─────────────────────────────────────────────────────────────────
-    // EXPLANATION RENDERER
-    // ─────────────────────────────────────────────────────────────────
-    const renderExplanation = (question) => {
-      if (!question.explanation) return;
-      const expText = sanitizeText(question.explanation);
-      const boxWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-      const innerWidth = boxWidth - 6;
-      const textX = MARGINS.left + SIZES.cardPadding + 4.5;
-
-      const contentH = calcMarkdownHeight(
-        expText,
-        textX,
-        innerWidth,
-        SIZES.optionFont,
-      );
-      const boxHeight = Math.max(contentH + 9, 14);
-
-      doc.setFillColor(255, 251, 235);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        boxHeight,
-        1.5,
-        1.5,
-        "F",
-      );
-
-      doc.setDrawColor(...COLORS.warning);
-      doc.setLineWidth(0.4);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        boxWidth,
-        boxHeight,
-        1.5,
-        1.5,
-        "S",
-      );
-
-      doc.setFontSize(SIZES.labelFont);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.warning);
-      doc.text("EXPLANATION:", textX, currentY + 4);
-
-      renderMarkdownBlock(expText, textX, currentY + 7, innerWidth, {
-        color: COLORS.textDark,
-        fontSizePt: SIZES.optionFont,
-      });
-
-      currentY += boxHeight + 3;
-    };
-
-    // ─────────────────────────────────────────────────────────────────
-    // MAIN QUESTION RENDERER
-    // ─────────────────────────────────────────────────────────────────
-    const renderQuestion = async (question, index) => {
+    /**
+     * Build an ordered array of Section objects for one question.
+     * All heights pre-computed; closures capture what they need.
+     */
+    const measureQuestionSections = (question, qIndex, userAns, imageInfo) => {
+      const sections = [];
       const isEssay = isEssayQuestion(question);
-      const userAns = userAnswers[index];
-      const questionText = sanitizeText(question.q);
+      const qText = sanitizeText(question.q);
+      const BW = CC_W; // box / button width
+      const IW = BW - 3; // inner text width (small left inset)
 
-      // Process image
-      let imageInfo = null;
-      if (question.image) {
-        imageInfo = await processImage(question.image);
-      }
+      const { statusText } = getQuestionStatus(question, userAns, isEssay);
 
-      // ── Pre-calculate card height ──────────────────────────────────
-      let cardContentHeight = 15; // header strip
+      // ── Section 1: Header strip ───────────────────────────────────
+      sections.push({
+        height: 15, // 8mm strip + 7mm gap
+        render: (y) => {
+          setPdfFillColor(...COLORS.primary);
+          doc.roundedRect(
+            MARGINS.left + SIZES.cardPad,
+            y,
+            contentWidth - SIZES.cardPad * 2,
+            8,
+            2,
+            2,
+            "F",
+          );
+          setPdfFont("helvetica", "bold", SIZES.qFont);
+          setPdfTextColor(...COLORS.textWhite);
+          doc.text(
+            `Question #${qIndex + 1}`,
+            MARGINS.left + SIZES.cardPad + 2.5,
+            y + 5.5,
+          );
+          if (isResultsMode) {
+            setPdfFont("helvetica", "normal", SIZES.optFont);
+            doc.text(
+              statusText,
+              pageWidth - MARGINS.right - SIZES.cardPad - 2.5,
+              y + 5.5,
+              { align: "right" },
+            );
+          }
+        },
+      });
 
+      // ── Section 2: Image (if present) ────────────────────────────
       if (imageInfo && imageInfo.success) {
-        cardContentHeight += imageInfo.height + 5;
-      }
-
-      // Question text height
-      const qMaxWidth = contentWidth - SIZES.cardPadding * 2 - 6;
-      const qHeight = calcMarkdownHeight(
-        questionText,
-        MARGINS.left + SIZES.cardPadding + 3,
-        qMaxWidth,
-        SIZES.questionFont,
-      );
-      cardContentHeight += qHeight + 5;
-
-      // Options height
-      if (isEssay) {
-        // Star rating badge (if results mode + answered)
-        if (isResultsMode && userAns && String(userAns).trim()) {
-          cardContentHeight += 13; // score badge + gap
-        }
-        // User answer box
-        if (isResultsMode) {
-          const userTextH = calcTextHeight(
-            sanitizeText(userAns || "Not answered"),
-            qMaxWidth - 6,
-            SIZES.optionFont,
-          );
-          cardContentHeight += Math.max(userTextH + 10, 16) + 2;
-        }
-        // Formal answer box
-        const formalH = calcMarkdownHeight(
-          sanitizeText(question.options[0]),
-          MARGINS.left + SIZES.cardPadding + 4.5,
-          qMaxWidth - 6,
-          SIZES.optionFont,
-        );
-        cardContentHeight += Math.max(formalH + 10, 16) + 3;
-      } else {
-        // MCQ: sum up dynamic button heights
-        question.options.forEach((opt) => {
-          const optText = sanitizeText(opt);
-          const optH = calcMarkdownHeight(
-            optText,
-            MARGINS.left + SIZES.cardPadding + 3 + SIZES.buttonPadding,
-            qMaxWidth - SIZES.buttonPadding * 2,
-            SIZES.optionFont,
-          );
-          cardContentHeight +=
-            Math.max(optH + SIZES.buttonPadding * 2 + 2, SIZES.buttonHeight) +
-            SIZES.optionSpacing;
+        const { width: iW, height: iH } = imageInfo;
+        sections.push({
+          height: iH + 5,
+          render: (y) => {
+            try {
+              doc.addImage(
+                imageInfo.data,
+                "PNG",
+                CC_X + (CC_W - iW) / 2,
+                y,
+                iW,
+                iH,
+              );
+            } catch (e) {
+              console.error("addImage failed", e);
+            }
+          },
         });
-        cardContentHeight += 3;
       }
 
-      // Explanation height
+      // ── Section 3: Question text ──────────────────────────────────
+      const qSegs = parseMarkdown(qText);
+      const qContentH = calcSegmentsHeight(qSegs, BW, SIZES.qFont);
+      sections.push({
+        height: qContentH + 5,
+        render: (y) => {
+          renderSegments(qSegs, CC_X, y, BW, {
+            color: COLORS.textDark,
+            fontSizePt: SIZES.qFont,
+          });
+        },
+      });
+
+      // ── Section 4a: MCQ options ───────────────────────────────────
+      if (!isEssay) {
+        question.options.forEach((opt, optIndex) => {
+          const isUserAns = optIndex === userAns;
+          const isCorrectAns = optIndex === question.correct;
+          const rawOpt = sanitizeText(opt);
+          const letter = String.fromCharCode(65 + optIndex);
+          const marker = isCorrectAns ? "> " : isUserAns ? "X " : "";
+          const prefix = `${marker}${letter}. `;
+          const isLast = optIndex === question.options.length - 1;
+
+          // Merge prefix + option for unified word-wrap (#2 alignment fix)
+          const optSegs = prependText(prefix, parseMarkdown(rawOpt));
+          const optTextH = calcSegmentsHeight(
+            optSegs,
+            BW - SIZES.btnPad * 2,
+            SIZES.optFont,
+            isCorrectAns,
+          );
+          const btnH = Math.max(optTextH + SIZES.btnPad * 2, SIZES.btnMinH);
+          const sectionH = btnH + SIZES.optGap + (isLast ? 3 : 0);
+
+          // Capture loop variables for closure
+          const _segs = optSegs;
+          const _btnH = btnH;
+          const _corr = isCorrectAns;
+          const _user = isUserAns;
+
+          sections.push({
+            height: sectionH,
+            render: (y) => {
+              const tc = drawButton(CC_X, y, BW, _btnH, _corr, _user && !_corr);
+              renderSegments(
+                _segs,
+                CC_X + SIZES.btnPad,
+                y + SIZES.btnPad,
+                BW - SIZES.btnPad * 2,
+                { color: tc, fontSizePt: SIZES.optFont, bold: _corr },
+              );
+            },
+          });
+        });
+      }
+
+      // ── Section 4b: Essay sections ────────────────────────────────
+      if (isEssay) {
+        const formalText = sanitizeText(question.options[0]);
+
+        // Score badge (results mode + answered)
+        if (isResultsMode && userAns && String(userAns).trim()) {
+          const score = gradeEssay(userAns, question.options[0]);
+          const stars = "★".repeat(score) + "☆".repeat(5 - score);
+          const label = `Score: ${score} / 5`;
+          const badgeC =
+            score >= 3
+              ? COLORS.success
+              : score > 0
+                ? COLORS.warning
+                : COLORS.error;
+          const _score = score,
+            _stars = stars,
+            _label = label,
+            _badgeC = badgeC;
+
+          sections.push({
+            height: 13, // 10mm badge + 3mm gap
+            render: (y) => {
+              setPdfFillColor(..._badgeC);
+              doc.roundedRect(CC_X, y, BW, 10, 1.5, 1.5, "F");
+              setPdfFont("helvetica", "bold", SIZES.optFont);
+              setPdfTextColor(...COLORS.textWhite);
+              doc.text(_label, CC_X + 2, y + 3.5);
+              renderUnicodeText(
+                _stars,
+                CC_X + 30,
+                y + 0.5,
+                BW - 32,
+                COLORS.textWhite,
+                SIZES.optFont + 1,
+                false,
+                false,
+              );
+            },
+          });
+        }
+
+        // User answer box (results mode)
+        if (isResultsMode) {
+          const userText = sanitizeText(userAns || "Not answered");
+          const uContentH = calcTextHeight(userText, IW, SIZES.optFont);
+          const uBoxH = Math.max(uContentH + 10, 16);
+          const _uText = userText,
+            _uBoxH = uBoxH;
+
+          sections.push({
+            height: uBoxH + 2,
+            render: (y) => {
+              setPdfFillColor(245, 247, 250);
+              doc.roundedRect(CC_X, y, BW, _uBoxH, 1.5, 1.5, "F");
+              setPdfFont("helvetica", "bold", SIZES.labelFont);
+              setPdfTextColor(...COLORS.primary);
+              doc.text("YOUR ANSWER:", CC_X + 1.5, y + 4);
+              renderText(_uText, CC_X + 1.5, y + 7, IW, {
+                color: COLORS.textDark,
+                fontSizePt: SIZES.optFont,
+              });
+            },
+          });
+        }
+
+        // Formal / correct answer box
+        const fSegs = parseMarkdown(formalText);
+        const fContentH = calcSegmentsHeight(fSegs, IW, SIZES.optFont);
+        const fBoxH = Math.max(fContentH + 10, 16);
+        const _fSegs = fSegs,
+          _fBoxH = fBoxH;
+
+        sections.push({
+          height: fBoxH + 3,
+          render: (y) => {
+            setPdfFillColor(240, 253, 244);
+            doc.roundedRect(CC_X, y, BW, _fBoxH, 1.5, 1.5, "F");
+            setPdfFont("helvetica", "bold", SIZES.labelFont);
+            setPdfTextColor(...COLORS.success);
+            doc.text("CORRECT ANSWER:", CC_X + 1.5, y + 4);
+            renderSegments(_fSegs, CC_X + 1.5, y + 7, IW, {
+              color: COLORS.textDark,
+              fontSizePt: SIZES.optFont,
+            });
+          },
+        });
+      }
+
+      // ── Section 5: Explanation ────────────────────────────────────
       if (question.explanation) {
         const expText = sanitizeText(question.explanation);
-        const expH = calcMarkdownHeight(
-          expText,
-          MARGINS.left + SIZES.cardPadding + 4.5,
-          qMaxWidth - 6,
-          SIZES.optionFont,
-        );
-        cardContentHeight += Math.max(expH + 9, 14) + 3;
+        const eSegs = parseMarkdown(expText);
+        const eContentH = calcSegmentsHeight(eSegs, IW, SIZES.optFont);
+        const eBoxH = Math.max(eContentH + 9, 14);
+        const _eSegs = eSegs,
+          _eBoxH = eBoxH;
+
+        sections.push({
+          height: eBoxH + 3,
+          render: (y) => {
+            setPdfFillColor(255, 251, 235);
+            doc.roundedRect(CC_X, y, BW, _eBoxH, 1.5, 1.5, "F");
+            doc.setDrawColor(...COLORS.warning);
+            doc.setLineWidth(0.4);
+            doc.roundedRect(CC_X, y, BW, _eBoxH, 1.5, 1.5, "S");
+            setPdfFont("helvetica", "bold", SIZES.labelFont);
+            setPdfTextColor(...COLORS.warning);
+            doc.text("EXPLANATION:", CC_X + 1.5, y + 4);
+            renderSegments(_eSegs, CC_X + 1.5, y + 7, IW, {
+              color: COLORS.textDark,
+              fontSizePt: SIZES.optFont,
+            });
+          },
+        });
       }
 
-      const totalCardHeight = cardContentHeight + SIZES.cardPadding * 2;
-
-      const maxCardHeight =
-        pageHeight -
-        MARGINS.top -
-        MARGINS.bottom -
-        SIZES.footerHeight -
-        SIZES.headerHeight;
-
-      if (totalCardHeight > maxCardHeight) {
-        if (currentY > MARGINS.top + SIZES.headerHeight) {
-          checkPageBreak(totalCardHeight);
-        }
-      } else {
-        checkPageBreak(totalCardHeight + SIZES.cardMargin);
-      }
-
-      // ── Draw card ──────────────────────────────────────────────────
-      const cardY = currentY;
-      drawCard(MARGINS.left, cardY, contentWidth, totalCardHeight);
-
-      currentY = cardY + SIZES.cardPadding - 2;
-      const headerY = currentY;
-
-      // Card header strip
-      doc.setFillColor(...COLORS.primary);
-      doc.roundedRect(
-        MARGINS.left + SIZES.cardPadding,
-        headerY,
-        contentWidth - SIZES.cardPadding * 2,
-        8,
-        2,
-        2,
-        "F",
-      );
-
-      // Question number
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "bold");
-      doc.text(
-        `Question #${index + 1}`,
-        MARGINS.left + SIZES.cardPadding + 2.5,
-        headerY + 5.5,
-      );
-
-      // Status badge (results mode)
-      const { statusText } = getQuestionStatus(question, userAns, isEssay);
-      if (isResultsMode) {
-        doc.setTextColor(...COLORS.textWhite);
-        doc.setFontSize(SIZES.optionFont);
-        doc.text(
-          statusText,
-          pageWidth - MARGINS.right - SIZES.cardPadding - 2.5,
-          headerY + 5.5,
-          { align: "right" },
-        );
-      }
-
-      currentY = headerY + 15;
-
-      // ── Image ──────────────────────────────────────────────────────
-      if (imageInfo && imageInfo.success) {
-        const imageX =
-          MARGINS.left +
-          SIZES.cardPadding +
-          3 +
-          (contentWidth - SIZES.cardPadding * 2 - 6 - imageInfo.width) / 2;
-        try {
-          doc.addImage(
-            imageInfo.data,
-            "PNG",
-            imageX,
-            currentY,
-            imageInfo.width,
-            imageInfo.height,
-          );
-          currentY += imageInfo.height + 5;
-        } catch (e) {
-          console.error("Failed to add image to PDF", e);
-          showNotification("Failed to add image to PDF", `${e}`, "error");
-        }
-      }
-
-      // ── Question text (with markdown) ──────────────────────────────
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textDark);
-
-      const qConsumed = renderMarkdownBlock(
-        questionText,
-        MARGINS.left + SIZES.cardPadding + 3,
-        currentY,
-        qMaxWidth,
-        { color: COLORS.textDark, fontSizePt: SIZES.questionFont },
-      );
-      currentY += qConsumed + 5;
-
-      // ── Options ────────────────────────────────────────────────────
-      if (isEssay) {
-        renderEssayAnswer(question, userAns);
-      } else {
-        renderMultipleChoiceOptions(question, userAns);
-      }
-
-      // ── Explanation ────────────────────────────────────────────────
-      renderExplanation(question);
-
-      currentY = cardY + totalCardHeight + SIZES.cardMargin;
+      return sections;
     };
 
-    // Render all questions
+    /**
+     * Group sections into per-page arrays.
+     * startY: initial Y on the current page.
+     * Returns Section[][] (one inner array per page).
+     */
+    const groupSectionsIntoPages = (sections, startY) => {
+      // Reserve card margin so the card + margin fits before footer
+      const maxY =
+        pageHeight - MARGINS.bottom - SIZES.footerH - SIZES.cardMargin;
+      const freshY = MARGINS.top + SIZES.headerH + 6;
+
+      const groups = [];
+      let curY = startY,
+        group = [];
+
+      for (const sec of sections) {
+        if (group.length > 0 && curY + sec.height > maxY) {
+          groups.push(group);
+          group = [];
+          curY = freshY;
+        }
+        group.push(sec);
+        curY += sec.height;
+      }
+      if (group.length > 0) groups.push(group);
+      return groups;
+    };
+
+    /**
+     * Render one question. Handles any length via section-based multi-page flow.
+     */
+    const renderQuestion = async (question, qIndex) => {
+      const userAns = userAnswers[qIndex];
+      const imageInfo = imageCache.get(qIndex) ?? null;
+      const sections = measureQuestionSections(
+        question,
+        qIndex,
+        userAns,
+        imageInfo,
+      );
+
+      // If very little space remains, start fresh page before grouping
+      const MIN_USEFUL = 42; // mm
+      const pageBottom = pageHeight - MARGINS.bottom - SIZES.footerH;
+      if (pageBottom - currentY < MIN_USEFUL) {
+        addGameFooter();
+        doc.addPage();
+        currentLevel++;
+        addGameHeader();
+      }
+
+      const pageGroups = groupSectionsIntoPages(sections, currentY);
+
+      for (let gi = 0; gi < pageGroups.length; gi++) {
+        if (gi > 0) {
+          addGameFooter();
+          doc.addPage();
+          currentLevel++;
+          addGameHeader();
+        }
+
+        const group = pageGroups[gi];
+        const groupH = group.reduce((s, sec) => s + sec.height, 0);
+        const cardH = groupH + SIZES.cardPad * 2;
+        const cardY = currentY;
+
+        drawCard(MARGINS.left, cardY, contentWidth, cardH);
+
+        let secY = cardY + CARD_TOP_OFF;
+        for (const sec of group) {
+          sec.render(secY);
+          secY += sec.height;
+        }
+
+        currentY = cardY + cardH + SIZES.cardMargin;
+      }
+    };
+
+    // =========================================================
+    // PARALLEL IMAGE PRE-LOADING  (#7 — no sequential awaits)
+    // =========================================================
+    const imageCache = new Map();
+    await Promise.all(
+      questions.map(async (q, i) => {
+        if (q.image) {
+          const info = await processImage(q.image);
+          if (info.success) imageCache.set(i, info);
+        }
+      }),
+    );
+
+    // =========================================================
+    // RENDER ALL QUESTIONS
+    // =========================================================
     for (const [index, question] of questions.entries()) {
       await renderQuestion(question, index);
     }
 
-    // ===========================
+    // =========================================================
     // FINAL CTA PAGE
-    // ===========================
-
+    // =========================================================
     const renderCTAPage = () => {
       addGameFooter();
       doc.addPage();
       currentLevel++;
       addGameHeader();
 
-      const cardHeight = 55;
-      const cardY = currentY + 18;
-      drawCard(MARGINS.left + 8, cardY, contentWidth - 16, cardHeight);
+      const cardH = 55,
+        cardY = currentY + 18;
+      drawCard(MARGINS.left + 8, cardY, contentWidth - 16, cardH);
       currentY = cardY + 12;
 
-      doc.setFontSize(32);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
+      setPdfFont("helvetica", "bold", 32);
+      setPdfTextColor(...COLORS.primary);
       doc.text("End", pageWidth / 2, currentY, { align: "center" });
       currentY += 14;
 
-      doc.setFontSize(20);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...COLORS.primary);
+      setPdfFont("helvetica", "bold", 20);
       doc.text("READY FOR MORE?", pageWidth / 2, currentY, { align: "center" });
       currentY += 8;
 
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...COLORS.textLight);
+      setPdfFont("helvetica", "normal", SIZES.qFont);
+      setPdfTextColor(...COLORS.textLight);
       doc.text(
         "Continue your journey with more challenges!",
         pageWidth / 2,
@@ -1723,22 +1605,20 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       );
       currentY += 10;
 
-      const buttonWidth = contentWidth - 50;
-      const buttonX = MARGINS.left + 25;
-      const buttonY = currentY;
-      doc.setFillColor(...COLORS.primary);
-      doc.roundedRect(buttonX, buttonY, buttonWidth, 12, 2.5, 2.5, "F");
-      doc.setTextColor(...COLORS.textWhite);
-      doc.setFontSize(SIZES.questionFont);
-      doc.setFont("helvetica", "bold");
-      doc.text("PLAY MORE QUIZZES", pageWidth / 2, buttonY + 7.5, {
+      const bX = MARGINS.left + 25,
+        bY = currentY,
+        bW = contentWidth - 50;
+      setPdfFillColor(...COLORS.primary);
+      doc.roundedRect(bX, bY, bW, 12, 2.5, 2.5, "F");
+      setPdfFont("helvetica", "bold", SIZES.qFont);
+      setPdfTextColor(...COLORS.textWhite);
+      doc.text("PLAY MORE QUIZZES", pageWidth / 2, bY + 7.5, {
         align: "center",
       });
       currentY += 25;
 
-      doc.setFontSize(18);
-      doc.setTextColor(...COLORS.info);
-      doc.setFont("helvetica", "bold");
+      setPdfFont("helvetica", "bold", 18);
+      setPdfTextColor(...COLORS.info);
       doc.text("https://basmagi-quiz.vercel.app/", pageWidth / 2, currentY, {
         align: "center",
       });
@@ -1748,19 +1628,17 @@ export async function exportToPdf(config, questions, userAnswers = []) {
 
     renderCTAPage();
 
-    // ===========================
-    // SAVE PDF
-    // ===========================
+    // =========================================================
+    // SAVE
+    // =========================================================
     const filename = `${sanitizeText(config.title || "quiz")}.pdf`;
     doc.save(filename);
     console.log(`PDF exported: ${filename}`);
-
     showNotification(
       "PDF file downloaded.",
       "You have it now",
       "./assets/images/PDF_Icon.png",
     );
-
     return { success: true, filename };
   } catch (error) {
     console.error("PDF Export Error:", error);
