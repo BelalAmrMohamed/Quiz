@@ -643,7 +643,11 @@ function handleSearchResults(results, context, isReset = false) {
   try {
     // When the search bar is closed, restore the full root view without filtering
     if (isReset) {
-      renderRootCategories();
+      if (context === "userQuizzes") {
+        renderUserQuizzesView();
+      } else {
+        renderRootCategories();
+      }
       return;
     }
 
@@ -651,6 +655,8 @@ function handleSearchResults(results, context, isReset = false) {
       handleCourseSearchResults(results);
     } else if (context === "quizzes") {
       handleQuizSearchResults(results);
+    } else if (context === "userQuizzes") {
+      handleUserQuizSearchResults(results);
     }
   } catch (error) {
     console.error("Error handling search results:", error);
@@ -690,6 +696,83 @@ function handleQuizSearchResults(results) {
     renderQuizSearchResults(results);
   } catch (error) {
     console.error("Error handling quiz search results:", error);
+  }
+}
+
+/**
+ * Handle user quiz search results
+ */
+function handleUserQuizSearchResults(results) {
+  try {
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const actionsBar = document.createElement("div");
+    actionsBar.style.cssText = `
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    `;
+
+    const createBtn = document.createElement("a");
+    createBtn.href = "create-quiz.html";
+    createBtn.textContent = "➕ إنشاء اختبار جديد";
+    createBtn.className = "btn btn-primary";
+    createBtn.setAttribute("aria-label", "إنشاء اختبار جديد");
+    createBtn.style.cssText = `
+        display: inline-block;
+        padding: 12px 24px;
+        background: var(--gradient-success);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.2s;
+        margin-left: auto;
+    `;
+    createBtn.onmouseover = () => {
+      createBtn.style.transform = "translateY(-2px)";
+    };
+    createBtn.onmouseout = () => {
+      createBtn.style.transform = "translateY(0)";
+    };
+
+    actionsBar.appendChild(createBtn);
+    container.appendChild(actionsBar);
+
+    if (!results || results.length === 0) {
+      const emptyState = document.createElement("div");
+      emptyState.setAttribute("role", "status");
+      emptyState.style.cssText = `
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--color-surface);
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        color: var(--color-text-primary);
+      `;
+      emptyState.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;" aria-hidden="true">📝</div>
+        <h3 style="margin-bottom: 10px;">لا توجد نتائج بحث</h3>
+      `;
+      container.appendChild(emptyState);
+    } else {
+      const allUserQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+      results.forEach((quiz) => {
+        const originalIndex = allUserQuizzes.findIndex((q) => q.id === quiz.id);
+        const quizCard = createUserQuizCard(
+          quiz,
+          originalIndex !== -1 ? originalIndex : 0,
+        );
+        container.appendChild(quizCard);
+      });
+    }
+  } catch (error) {
+    console.error("Error handling user quiz search results:", error);
   }
 }
 
@@ -1023,11 +1106,6 @@ function renderUserQuizzesView() {
     navigationStack.push({ name: "إمتحاناتك" });
     updateBreadcrumb();
 
-    // Update search context (hide search in user quizzes view)
-    if (searchManager) {
-      searchManager.container.style.display = "none";
-    }
-
     // Update Title & Clear Container
     if (title) title.textContent = "إمتحاناتك";
     if (!container) return;
@@ -1036,6 +1114,12 @@ function renderUserQuizzesView() {
     container.className = "grid-container";
 
     const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+
+    // Update search context for user quizzes
+    if (searchManager) {
+      searchManager.container.style.display = ""; // Reset inline hide
+      searchManager.setUserQuizzesContext(userQuizzes);
+    }
 
     // 1. Create 'Create New Quiz' Button (Always visible at top)
     const actionsBar = document.createElement("div");
@@ -1241,7 +1325,7 @@ function createUserQuizCard(quiz, index) {
   };
 
   const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "🗑️";
+  deleteBtn.innerHTML += `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
   deleteBtn.type = "button";
   deleteBtn.setAttribute("aria-label", `حذف اختبار ${quiz.title}`);
   deleteBtn.style.cssText = `
@@ -1282,8 +1366,28 @@ function createUserQuizCard(quiz, index) {
     showUserQuizDownloadPopup(quiz);
   };
 
+  const editBtn = document.createElement("button");
+  editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>`;
+  editBtn.type = "button";
+  editBtn.setAttribute("aria-label", `تعديل اختبار ${quiz.title}`);
+  editBtn.style.cssText = `
+    padding: 10px 14px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  `;
+  editBtn.onclick = (e) => {
+    e.stopPropagation();
+    window.location.href = `create-quiz.html?edit=${encodeURIComponent(quiz.id)}`;
+  };
+
   actions.appendChild(playBtn);
   actions.appendChild(downloadBtn);
+  actions.appendChild(editBtn);
   actions.appendChild(deleteBtn);
   card.appendChild(actions);
 
@@ -1522,8 +1626,7 @@ function createExamCard(exam) {
     startQuiz(exam.id);
   };
 
-  const onDownloadOption = async (format, modalEl) => {
-    modalEl.remove();
+  const onDownloadOption = async (format) => {
     const config = {
       id: exam.id,
       title: exam.title || exam.id,
@@ -1627,10 +1730,59 @@ function createExamCard(exam) {
       b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true"><strong>${label}</strong>`;
       b.onclick = (ev) => {
         ev.stopPropagation();
-        onDownloadOption(format, modal);
+        withDownloadLoading(b, () => onDownloadOption(format)).then(() =>
+          modal.remove(),
+        );
       };
       grid.appendChild(b);
     });
+
+    const jsonBtn = document.createElement("button");
+    jsonBtn.className = "mode-btn";
+    jsonBtn.type = "button";
+    jsonBtn.setAttribute("aria-label", `Download JSON (.json)`);
+    jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
+    jsonBtn.onclick = (ev) => {
+      ev.stopPropagation();
+      withDownloadLoading(jsonBtn, async () => {
+        try {
+          const res = await fetch(exam.path);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${exam.title || exam.id}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          console.error("JSON Error:", e);
+          alert("فشل تنزيل ملف JSON");
+        }
+      }).then(() => modal.remove());
+    };
+    grid.appendChild(jsonBtn);
+
+    fetch(exam.path)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.source) {
+          const sourceBtn = document.createElement("button");
+          sourceBtn.className = "mode-btn";
+          sourceBtn.type = "button";
+          sourceBtn.setAttribute("aria-label", `Download Source`);
+          sourceBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-to-line-icon lucide-arrow-down-to-line"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg><strong>Download Source</strong>`;
+          sourceBtn.onclick = (ev) => {
+            ev.stopPropagation();
+            window.open(data.source, "_blank");
+            modal.remove();
+          };
+          grid.appendChild(sourceBtn);
+        }
+      })
+      .catch((e) => console.error("Error fetching for source:", e));
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-modal";
@@ -1711,6 +1863,29 @@ function updateBreadcrumb() {
       renderCategory(parent);
     };
     breadcrumb.setAttribute("aria-label", `الرجوع إلى ${parentName}  ←`);
+  }
+}
+
+/**
+ * Wrapper for download buttons to show loading state
+ */
+async function withDownloadLoading(buttonEl, asyncFn) {
+  const originalHtml = buttonEl.innerHTML;
+  const originalWidth = buttonEl.offsetWidth;
+
+  buttonEl.disabled = true;
+  buttonEl.style.width = `${originalWidth > 0 ? originalWidth : buttonEl.getBoundingClientRect().width}px`;
+  buttonEl.style.justifyContent = "center";
+  buttonEl.innerHTML =
+    '<i data-lucide="loader-circle" class="spin"></i> جاري التحميل...';
+  if (typeof lucide !== "undefined") lucide.createIcons();
+
+  try {
+    await asyncFn();
+  } finally {
+    buttonEl.disabled = false;
+    buttonEl.innerHTML = originalHtml;
+    buttonEl.style.width = "";
   }
 }
 
@@ -1865,8 +2040,6 @@ function showUserQuizDownloadPopup(quiz) {
   const questions = quiz.questions;
 
   const onDownloadOption = async (format) => {
-    modal.remove();
-
     try {
       switch (format) {
         case "quiz":
@@ -1902,10 +2075,47 @@ function showUserQuizDownloadPopup(quiz) {
     b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true"><strong>${label}</strong>`;
     b.onclick = (ev) => {
       ev.stopPropagation();
-      onDownloadOption(format);
+      withDownloadLoading(b, () => onDownloadOption(format)).then(() =>
+        modal.remove(),
+      );
     };
     grid.appendChild(b);
   });
+
+  const jsonBtn = document.createElement("button");
+  jsonBtn.className = "mode-btn";
+  jsonBtn.type = "button";
+  jsonBtn.setAttribute("aria-label", `Download JSON (.json)`);
+  jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
+  jsonBtn.onclick = (ev) => {
+    ev.stopPropagation();
+    withDownloadLoading(jsonBtn, async () => {
+      try {
+        const exportQuestions = quiz.questions.map((q) => {
+          const question = { q: q.q, options: q.options, correct: q.correct };
+          if (q.image && q.image.trim()) question.image = q.image;
+          if (q.explanation && q.explanation.trim())
+            question.explanation = q.explanation;
+          return question;
+        });
+        const payload = { questions: exportQuestions };
+        const fileContent = JSON.stringify(payload, null, 2);
+        const blob = new Blob([fileContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${quiz.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("JSON Error:", e);
+        alert("فشل تنزيل ملف JSON");
+      }
+    }).then(() => modal.remove());
+  };
+  grid.appendChild(jsonBtn);
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";

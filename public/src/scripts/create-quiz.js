@@ -25,13 +25,21 @@ let bulkModeActive = false;
 let selectedQuestions = new Set();
 let currentFilter = "all";
 let isTemplatesPanelOpen = false;
+let editingQuizId = null;
 
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadDraftFromLocalStorage();
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get("edit");
+  if (editId) {
+    editingQuizId = editId;
+    loadQuizFromLocalStorage(editId);
+  } else {
+    loadDraftFromLocalStorage();
+  }
   updateEmptyState();
   setupEventListeners();
   setupKeyboardShortcuts();
@@ -1225,6 +1233,49 @@ function loadDraftFromLocalStorage() {
   }
 }
 
+function loadQuizFromLocalStorage(quizId) {
+  try {
+    const userQuizzes = JSON.parse(
+      localStorage.getItem("user_quizzes") || "[]",
+    );
+    const quiz = userQuizzes.find((q) => q.id === quizId);
+
+    if (quiz) {
+      const headerTitle = document.querySelector(".header h1");
+      if (headerTitle) headerTitle.textContent = "تعديل الاختبار";
+      document.title = "تعديل الاختبار - منصة بصمجي";
+
+      quizData.title = quiz.title || "";
+      document.getElementById("quizTitle").value = quizData.title;
+      updateCharCount("titleCharCount", quizData.title.length, 100);
+
+      quizData.description = quiz.description || "";
+      document.getElementById("quizDescription").value = quizData.description;
+      updateCharCount("descCharCount", quizData.description.length, 500);
+
+      if (quiz.questions && quiz.questions.length > 0) {
+        quizData.questions = quiz.questions;
+        questionIdCounter = Math.max(...quiz.questions.map((q) => q.id), 0);
+      }
+
+      // Always clear and re-render everything
+      const container = document.getElementById("questionsContainer");
+      if (container) container.innerHTML = "";
+      quizData.questions.forEach((question) => {
+        renderQuestion(question);
+      });
+
+      showNotification("أهلاً بك", "تم تحميل الاختبار للتعديل", "success");
+    } else {
+      showNotification("خطأ", "لم يتم العثور على الاختبار", "error");
+      setTimeout(() => (window.location.href = "index.html"), 1500);
+    }
+  } catch (error) {
+    console.error("Error loading quiz for edit:", error);
+    showNotification("خطأ", "حدث خطأ أثناء تحميل الاختبار", "error");
+  }
+}
+
 // ============================================================================
 // SAVE TO USER QUIZZES
 // ============================================================================
@@ -1253,6 +1304,32 @@ function saveToUserQuizzes(quizToSave) {
     return quizId;
   } catch (error) {
     console.error("Error saving quiz:", error);
+    return null;
+  }
+}
+
+function updateInUserQuizzes(quizId, quizToSave) {
+  try {
+    const existingQuizzes = JSON.parse(
+      localStorage.getItem("user_quizzes") || "[]",
+    );
+
+    const quizIndex = existingQuizzes.findIndex((q) => q.id === quizId);
+    if (quizIndex === -1) return null;
+
+    existingQuizzes[quizIndex] = {
+      ...existingQuizzes[quizIndex],
+      title: quizToSave.title,
+      description: quizToSave.description,
+      questions: quizToSave.questions,
+      lastEditedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
+
+    return quizId;
+  } catch (error) {
+    console.error("Error updating quiz:", error);
     return null;
   }
 }
@@ -1337,7 +1414,12 @@ window.saveLocally = function () {
   showLoading("جاري الحفظ...");
 
   setTimeout(() => {
-    const quizId = saveToUserQuizzes(quizData);
+    let quizId;
+    if (editingQuizId) {
+      quizId = updateInUserQuizzes(editingQuizId, quizData);
+    } else {
+      quizId = saveToUserQuizzes(quizData);
+    }
     hideLoading();
 
     if (quizId) {
@@ -1346,6 +1428,9 @@ window.saveLocally = function () {
         'يمكنك العثور عليه في "إمتحاناتك"',
         "success",
       );
+      if (editingQuizId) {
+        setTimeout(() => (window.location.href = "index.html"), 1000);
+      }
     } else {
       showNotification("خطأ", "فشل حفظ الاختبار", "error");
     }

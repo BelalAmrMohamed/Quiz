@@ -19,7 +19,8 @@ export class SearchManager {
     this.allCourses = [];
     this.filteredCourses = [];
     this.categoryTree = null;
-    this.currentContext = null; // 'courses' or 'quizzes'
+    this.userQuizzes = [];
+    this.currentContext = null; // 'courses' or 'quizzes' or 'userQuizzes'
 
     this.searchConfig = {
       debounceDelay: 300,
@@ -105,26 +106,37 @@ export class SearchManager {
     } else {
       // Inside a course — search for quizzes
       const currentCategory = navStack[navStack.length - 1];
-      const hasExams =
-        currentCategory &&
-        ((currentCategory.exams && currentCategory.exams.length > 0) ||
-          (currentCategory.quizzes && currentCategory.quizzes.length > 0));
 
-      this.currentContext = "quizzes";
-
-      if (hasExams) {
+      if (currentCategory.name === "إمتحاناتك") {
+        this.currentContext = "userQuizzes";
         if (this.elements.searchInput) {
-          this.elements.searchInput.placeholder = "ابحث عن اختبار...";
+          this.elements.searchInput.placeholder = "ابحث في اختباراتك...";
         }
         if (this.elements.headerSearchBtn) {
           this.elements.headerSearchBtn.style.display = "flex";
         }
       } else {
-        // No exams — hide the trigger button and close the bar if open
-        if (this.elements.headerSearchBtn) {
-          this.elements.headerSearchBtn.style.display = "none";
+        const hasExams =
+          currentCategory &&
+          ((currentCategory.exams && currentCategory.exams.length > 0) ||
+            (currentCategory.quizzes && currentCategory.quizzes.length > 0));
+
+        this.currentContext = "quizzes";
+
+        if (hasExams) {
+          if (this.elements.searchInput) {
+            this.elements.searchInput.placeholder = "ابحث عن اختبار...";
+          }
+          if (this.elements.headerSearchBtn) {
+            this.elements.headerSearchBtn.style.display = "flex";
+          }
+        } else {
+          // No exams — hide the trigger button and close the bar if open
+          if (this.elements.headerSearchBtn) {
+            this.elements.headerSearchBtn.style.display = "none";
+          }
+          this.closeSearchBar();
         }
-        this.closeSearchBar();
       }
     }
 
@@ -203,6 +215,8 @@ export class SearchManager {
       this.searchCourses();
     } else if (this.currentContext === "quizzes") {
       this.searchQuizzes();
+    } else if (this.currentContext === "userQuizzes") {
+      this.searchUserQuizzes();
     }
   }
 
@@ -287,6 +301,36 @@ export class SearchManager {
     }
   }
 
+  // NEW: Search User Quizzes
+  searchUserQuizzes() {
+    if (!this.userQuizzes || this.userQuizzes.length === 0) {
+      if (this.onSearchCallback) this.onSearchCallback([], "userQuizzes");
+      return;
+    }
+
+    let results = this.userQuizzes;
+
+    // Apply search query filter
+    if (
+      this.filters.searchQuery &&
+      this.filters.searchQuery.length >= this.searchConfig.minSearchLength
+    ) {
+      results = this.filterUserQuizzesBySearchQuery(results);
+      this.addToSearchHistory(this.filters.searchQuery);
+    }
+
+    this.updateUI(results);
+
+    if (this.onSearchCallback) {
+      this.onSearchCallback(results, "userQuizzes");
+    }
+  }
+
+  setUserQuizzesContext(quizzes) {
+    this.userQuizzes = quizzes;
+    this.currentContext = "userQuizzes";
+  }
+
   /**
    * Recursively collect every exam from a category node AND all its subcategory nodes.
    *
@@ -364,6 +408,20 @@ export class SearchManager {
         quiz.category || "", // e.g. "Computer Network/أسئلة الدكتورة"
         quiz._sourceCategoryName || "", // human-readable subfolder name injected by collectAllExams
       ]
+        .join(" ")
+        .toLowerCase();
+
+      // All terms must match (AND logic)
+      return terms.every((term) => searchableText.includes(term));
+    });
+  }
+
+  filterUserQuizzesBySearchQuery(quizzes) {
+    const query = this.filters.searchQuery.toLowerCase().trim();
+    const terms = query.split(/\s+/);
+
+    return quizzes.filter((quiz) => {
+      const searchableText = [quiz.title || "", quiz.description || ""]
         .join(" ")
         .toLowerCase();
 
