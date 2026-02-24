@@ -1428,7 +1428,7 @@ async function deleteUserQuiz(quizId, index) {
   try {
     if (
       !(await confirmationNotification(
-        "Are you sure you want to delete this quiz? This cannot be undone.",
+        "هل أنت متأكد من مسح الإمتحان؟ لا يمكن إسترداده",
       ))
     ) {
       return;
@@ -1886,6 +1886,7 @@ async function withDownloadLoading(buttonEl, asyncFn) {
     buttonEl.disabled = false;
     buttonEl.innerHTML = originalHtml;
     buttonEl.style.width = "";
+    buttonEl.style.justifyContent = "";
   }
 }
 

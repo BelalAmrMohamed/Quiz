@@ -286,6 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       buttonEl.disabled = false;
       buttonEl.innerHTML = originalHtml;
       buttonEl.style.width = "";
+      buttonEl.style.justifyContent = "";
     }
   }
 
