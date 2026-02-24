@@ -542,7 +542,30 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       let h = 0;
       for (const seg of segments) {
         if (seg.type === "code-block") {
-          h += seg.content.split("\n").length * CODE_LINE_H + CODE_OVERHEAD + 2;
+          const codeLines = seg.content.split("\n");
+          let blockLinesH = 0;
+          for (const line of codeLines) {
+            if (!line.trim()) {
+              blockLinesH += CODE_LINE_H;
+              continue;
+            }
+            if (hasNonLatin(line)) {
+              blockLinesH += Math.max(
+                CODE_LINE_H,
+                measureUnicodeHeight(
+                  line,
+                  maxWidthMm - 6,
+                  SIZES.codeFont,
+                  false,
+                ),
+              );
+            } else {
+              setPdfFont("courier", "normal", SIZES.codeFont);
+              const wrapped = doc.splitTextToSize(line, maxWidthMm - 6);
+              blockLinesH += wrapped.length * CODE_LINE_H;
+            }
+          }
+          h += blockLinesH + CODE_OVERHEAD + 2;
         } else {
           const fullText = seg.runs.map((r) => r.content).join("");
           if (!fullText.trim()) {
@@ -590,7 +613,26 @@ export async function exportToPdf(config, questions, userAnswers = []) {
     // =========================================================
     const renderCodeBlock = (content, x, y, maxWidthMm) => {
       const codeLines = content.split("\n");
-      const boxH = codeLines.length * CODE_LINE_H + CODE_OVERHEAD;
+
+      let blockLinesH = 0;
+      for (const line of codeLines) {
+        if (!line.trim()) {
+          blockLinesH += CODE_LINE_H;
+          continue;
+        }
+        if (hasNonLatin(line)) {
+          blockLinesH += Math.max(
+            CODE_LINE_H,
+            measureUnicodeHeight(line, maxWidthMm - 6, SIZES.codeFont, false),
+          );
+        } else {
+          setPdfFont("courier", "normal", SIZES.codeFont);
+          const wrapped = doc.splitTextToSize(line, maxWidthMm - 6);
+          blockLinesH += wrapped.length * CODE_LINE_H;
+        }
+      }
+
+      const boxH = blockLinesH + CODE_OVERHEAD;
 
       setPdfFillColor(...COLORS.codeBg);
       doc.roundedRect(x, y, maxWidthMm, boxH, 1.5, 1.5, "F");
@@ -616,21 +658,34 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       // Lines of code
       setPdfFont("courier", "normal", SIZES.codeFont);
       setPdfTextColor(...COLORS.codeText);
-      codeLines.forEach((line, i) => {
-        const baselineY = y + CODE_LABEL_H + (i + BASELINE_RATIO) * CODE_LINE_H;
+
+      let curYOffset = CODE_LABEL_H;
+      codeLines.forEach((line) => {
+        if (!line.trim()) {
+          curYOffset += CODE_LINE_H;
+          return;
+        }
+
         if (hasNonLatin(line)) {
-          renderUnicodeText(
+          const usedH = renderUnicodeText(
             line,
             x + 3,
-            y + CODE_LABEL_H + i * CODE_LINE_H,
+            y + curYOffset,
             maxWidthMm - 6,
             COLORS.codeText,
             SIZES.codeFont,
             false,
             false,
           );
+          curYOffset += Math.max(CODE_LINE_H, usedH);
         } else {
-          doc.text(line, x + 3, baselineY, { maxWidth: maxWidthMm - 6 });
+          setPdfFont("courier", "normal", SIZES.codeFont);
+          const wrappedLines = doc.splitTextToSize(line, maxWidthMm - 6);
+          wrappedLines.forEach((wl) => {
+            const baselineY = y + curYOffset + BASELINE_RATIO * CODE_LINE_H;
+            doc.text(wl, x + 3, baselineY);
+            curYOffset += CODE_LINE_H;
+          });
         }
       });
 
