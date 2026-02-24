@@ -20,24 +20,33 @@
     },
 
     {
-      "q": "What is the output of the following code?\n```\nconst arr = [1, 2, 3];\nconst result = arr.map(x => x * 2).filter(x => x > 3);\nconsole.log(result);\n```",
-      "options": ["[2, 4, 6]", "[4, 6]", "[6]", "[2, 4]"],
+      "q": "```A company manufactures an electronic device to be used\nin a very wide temperature range. The company knows that \nincreased temperature shortens the lifetime of the device, \nand a study is therefore performed in which the lifetime is determined as a function of \ntemperature. The following data is found:```\nc) Find the coefficient of correlation `r`.",
+      "image": "./assets/quiz-media/final-2023-2024.jpg",
+      "options": [
+        "Using the following data (n = 9):\n\n1. Summary Statistics:\n- Σx = 450\n- Σy = 1,691\n- Σx² = 28,500\n- Σy² = 489,857\n- Σxy = 52,670\n\n2. Formula:\nr = [ n(Σxy) - (Σx)(Σy) ] / √[ [nΣx² - (Σx)²] [nΣy² - (Σy)²] ]\n\n3. Substitution:\n- Numerator: (9 × 52,670) - (450 × 1,691) = 474,030 - 760,950 = -286,920\n- Denominator (x-part): 9(28,500) - (450)² = 256,500 - 202,500 = 54,000\n- Denominator (y-part): 9(489,857) - (1,691)² = 4,408,713 - 2,859,481 = 1,549,232\n\n4. Final Calculation:\nr = -286,920 / √(54,000 × 1,549,232)\nr = -286,920 / 289,237.84\nr ≈ -0.992"
+      ],
+      "correct": 0,
+      "explanation": "The correlation coefficient r measures the strength and direction of the linear relationship. Using the formula r = (n*ΣXY - ΣX*ΣY) / √([n*ΣX² - (ΣX)²] * [n*ΣY² - (ΣY)²]), and substituting the values from the data table (n=9, ΣX=450, ΣY=1691, ΣX²=28500, ΣY²=489857, ΣXY=52670), we find r ≈ -0.992. This indicates a very strong negative linear correlation between temperature and lifetime."
+    },
+
+    {
+      "q": "Based on the diagram below, Which is a picture from wikimedia, it's also an svg image. Based on it, identify the type of network topology shown.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/d/d0/StarNetwork.svg",
+      "options": [
+        "Bus Topology",
+        "Star Topology",
+        "Ring Topology",
+        "Mesh Topology"
+      ],
       "correct": 1,
-      "explanation": "Step by step:\n1. `map(x => x * 2)` transforms `[1, 2, 3]` → `[2, 4, 6]`\n2. `filter(x => x > 3)` keeps only values greater than 3 → `[4, 6]`\n\nSo `result` is `[4, 6]`."
+      "explanation": "This is a Star Topology where all devices connect to a central hub or switch."
     },
 
     {
-      "q": "A network has the IP address `192.168.1.0` with a subnet mask of `255.255.255.0`. How many usable host addresses are available?",
-      "options": ["256", "255", "254", "128"],
-      "correct": 2,
-      "explanation": "A `/24` subnet (255.255.255.0) gives 2^8 = 256 total addresses.\n\nSubtract 2 reserved addresses:\n- `192.168.1.0` — Network address\n- `192.168.1.255` — Broadcast address\n\nResult: **254** usable host addresses."
-    },
-
-    {
-      "q": "What is the time complexity of binary search on a sorted array of n elements?",
-      "options": ["O(n)", "O(n²)", "O(log n)", "O(n log n)"],
-      "correct": 2,
-      "explanation": "Binary search works by halving the search space with each comparison.\n\nStarting with n elements:\n- Step 1: n/2 elements remain\n- Step 2: n/4 elements remain\n- Step k: n/2^k elements remain\n\nWe stop when 1 element remains: n/2^k = 1 → k = log₂(n)\n\nTherefore the time complexity is **O(log n)**."
+      "q": "If `A ⊂ B`, Then `P(A|B)` =",
+      "options": ["P(B|A)", "P(A)", "P(B)", "None of them"],
+      "correct": 3,
+      "explanation": "Since A ⊂ B, we know A ∩ B = A. By the definition of conditional probability: P(A|B) = P(A ∩ B) / P(B) = P(A) / P(B). This expression P(A)/P(B) does not match any of the listed options, so the correct answer is 'None of them'."
     },
 
     {
