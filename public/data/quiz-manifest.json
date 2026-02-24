@@ -511,6 +511,12 @@
       "category": "Operatings Systems"
     },
     {
+      "id": "AI7Y6NOP",
+      "title": "Lecture 1 Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات على المحاضرات/Lecture 1 quiz.json",
+      "category": "Probability and Statistics/إمتحانات على المحاضرات"
+    },
+    {
       "id": "7IGTGFXT",
       "title": "2  Probability",
       "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/2- Probability.json",
@@ -1524,7 +1530,9 @@
         "Probability and Statistics"
       ],
       "parent": null,
-      "subcategories": [],
+      "subcategories": [
+        "Probability and Statistics/إمتحانات على المحاضرات"
+      ],
       "exams": [
         {
           "id": "YAYFLGTG",
@@ -1543,6 +1551,23 @@
           "title": "AI Introduction To Probability",
           "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/AI Introduction to Probability.json",
           "category": "Probability and Statistics"
+        }
+      ]
+    },
+    "Probability and Statistics/إمتحانات على المحاضرات": {
+      "name": "إمتحانات على المحاضرات",
+      "path": [
+        "Probability and Statistics",
+        "إمتحانات على المحاضرات"
+      ],
+      "parent": "Probability and Statistics",
+      "subcategories": [],
+      "exams": [
+        {
+          "id": "AI7Y6NOP",
+          "title": "Lecture 1 Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات على المحاضرات/Lecture 1 quiz.json",
+          "category": "Probability and Statistics/إمتحانات على المحاضرات"
         }
       ]
     },
