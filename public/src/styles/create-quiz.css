@@ -1646,7 +1646,7 @@ body {
 }
 
 .modal-footer {
-  padding: 20px 30px;
+  padding: 10px;
   border-top: 2px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
@@ -1798,6 +1798,14 @@ body {
   font-size: 1.25rem;
   display: inline-flex;
   align-items: center;
+}
+
+/* ============================================================================
+   Ltr
+   ============================================================================ */
+
+.ltr {
+  direction: ltr;
 }
 
 /* ============================================================================
@@ -2033,4 +2041,731 @@ body {
     box-shadow: none;
     border: 1px solid #ddd;
   }
+}
+
+/* ============================================================================
+   INLINE MARKDOWN EDITOR
+   ============================================================================ */
+
+.md-editor-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Rendered view (default / read mode) */
+.md-rendered {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  cursor: text;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+  word-break: break-word;
+  position: relative;
+}
+
+.md-rendered::after {
+  content: "✏️";
+  position: absolute;
+  bottom: 6px;
+  left: 10px;
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.md-rendered:hover {
+  border-color: var(--color-primary);
+  background: var(--color-background);
+}
+
+.md-rendered:hover::after {
+  opacity: 0.4;
+}
+
+.md-rendered:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.md-placeholder {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.md-empty {
+  background: var(--color-background);
+}
+
+/* Edit panel: textarea + live preview stacked */
+.md-edit-panel {
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  background: var(--color-background);
+}
+
+/* Raw textarea (in edit mode) */
+.md-source {
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px dashed var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  box-sizing: border-box;
+  display: block;
+  overflow: hidden;
+}
+
+.md-source:focus {
+  outline: none;
+}
+
+/* Live preview panel (below textarea while editing) */
+.md-live-preview {
+  display: none;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+}
+
+.md-live-preview:not(:empty) {
+  display: block;
+}
+
+.md-live-preview-inner {
+  padding: 2px 0;
+}
+
+/* Label above live preview */
+.md-edit-panel:has(.md-live-preview:not(:empty)) .md-source {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+/* Code inside rendered/preview markdown */
+.md-rendered .code-block,
+.md-live-preview .code-block,
+.preview-question .code-block {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+.md-rendered .inline-code,
+.md-live-preview .inline-code,
+.preview-question .inline-code,
+.option-md-wrap .inline-code {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.88em;
+  font-style: normal;
+}
+
+/* ============================================================================
+   OPTION MD EDITOR — compact single-line style
+   ============================================================================ */
+
+.option-md-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.option-md-wrap .md-rendered {
+  min-height: 36px;
+  padding: 6px 10px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.option-md-wrap .md-rendered::after {
+  display: none;
+}
+
+.option-md-wrap .md-edit-panel {
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.option-md-wrap .md-source {
+  min-height: 36px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.option-md-wrap .md-live-preview {
+  font-size: 0.88rem;
+  padding: 6px 10px;
+}
+
+/* ============================================================================
+   QUESTION CARD — COLLAPSED
+   ============================================================================ */
+
+/* Hide body when collapsed */
+.question-card.collapsed .question-body {
+  display: none;
+}
+
+.question-card.collapsed {
+  padding: 0;
+}
+
+.question-card.collapsed .question-header {
+  border-bottom: none;
+  border-radius: 10px;
+  margin-bottom: 0;
+  cursor: pointer;
+  padding: 14px 20px;
+}
+
+/* Question number row */
+.question-number {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.q-label {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.q-preview {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ============================================================================
+   QUESTION BODY WRAPPER
+   ============================================================================ */
+.question-body {
+  padding-top: 4px;
+}
+
+/* ============================================================================
+   DOWNLOAD MODAL — 3-column grid
+   ============================================================================ */
+
+.dl-modal-card {
+  max-width: 520px;
+  width: 95vw;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dl-modal-card .modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dl-subtitle {
+  padding: 0 24px;
+  margin: 12px 0 4px;
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+}
+
+.dl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px 24px 24px;
+}
+
+.dl-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 16px 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    transform 0.18s,
+    box-shadow 0.18s;
+  font-family: inherit;
+}
+
+.dl-option-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.dl-option-btn:active {
+  transform: translateY(0);
+}
+
+.dl-icon {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.dl-label {
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.dl-sublabel {
+  font-size: 0.7rem;
+  color: var(--color-text-tertiary);
+}
+
+/* ============================================================================
+   IMPORT MODAL — DRAG & DROP ZONE
+   ============================================================================ */
+
+.import-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 20px;
+  border-radius: 10px;
+  border: 2px dashed var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  text-align: center;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+  cursor: default;
+}
+
+.import-dropzone.drag-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.import-dropzone p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.import-file-label {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  margin: 2px 0 0;
+  min-height: 1.2em;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+/* ============================================================================
+   MODAL HEADER — close button fix
+   ============================================================================ */
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.modal-header .close-btn {
+  flex-shrink: 0;
+  margin-right: 20px;
+  margin-top: 20px;
+  margin-left: 0;
+}
+
+/* ============================================================================
+   DARK / DARK-SLATE THEME OVERRIDES
+   ============================================================================ */
+
+/* Backgrounds */
+[data-theme="dark"] body,
+[data-theme="dark-slate"] body {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .question-card,
+[data-theme="dark-slate"] .question-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .question-header,
+[data-theme="dark-slate"] .question-header {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark-slate"] .card,
+[data-theme="dark"] .action-bar,
+[data-theme="dark-slate"] .action-bar,
+[data-theme="dark"] .stats-card,
+[data-theme="dark-slate"] .stats-card,
+[data-theme="dark"] .questions-section,
+[data-theme="dark-slate"] .questions-section {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Inputs */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .search-box input,
+[data-theme="dark"] .filter-controls select,
+[data-theme="dark-slate"] .form-group input,
+[data-theme="dark-slate"] .form-group textarea,
+[data-theme="dark-slate"] .search-box input,
+[data-theme="dark-slate"] .filter-controls select {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+/* Md editor */
+[data-theme="dark"] .md-rendered,
+[data-theme="dark-slate"] .md-rendered {
+  background: var(--color-background);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .md-rendered:hover,
+[data-theme="dark-slate"] .md-rendered:hover {
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .md-edit-panel,
+[data-theme="dark-slate"] .md-edit-panel {
+  background: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .md-source,
+[data-theme="dark-slate"] .md-source {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .md-live-preview,
+[data-theme="dark-slate"] .md-live-preview {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .md-rendered .inline-code,
+[data-theme="dark-slate"] .md-rendered .inline-code,
+[data-theme="dark"] .md-live-preview .inline-code,
+[data-theme="dark-slate"] .md-live-preview .inline-code,
+[data-theme="dark"] .option-md-wrap .inline-code,
+[data-theme="dark-slate"] .option-md-wrap .inline-code {
+  background: rgba(203, 166, 247, 0.15);
+  color: #cba6f7;
+}
+
+/* Options */
+[data-theme="dark"] .option-item,
+[data-theme="dark-slate"] .option-item {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .option-item.correct,
+[data-theme="dark-slate"] .option-item.correct {
+  background: var(--color-success-light);
+}
+
+/* Collapsible */
+[data-theme="dark"] .collapsible-header,
+[data-theme="dark-slate"] .collapsible-header {
+  color: var(--color-text-secondary);
+}
+
+/* Templates */
+[data-theme="dark"] .templates-panel,
+[data-theme="dark-slate"] .templates-panel {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .template-card,
+[data-theme="dark-slate"] .template-card {
+  background: var(--color-background);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .template-card:hover,
+[data-theme="dark-slate"] .template-card:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark-slate"] .btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .btn-collapse,
+[data-theme="dark-slate"] .btn-collapse {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .btn-action,
+[data-theme="dark-slate"] .btn-action {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .btn-icon,
+[data-theme="dark-slate"] .btn-icon {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .btn-bulk,
+[data-theme="dark-slate"] .btn-bulk {
+  background: var(--color-surface);
+}
+
+/* Stat items */
+[data-theme="dark"] .stat-item,
+[data-theme="dark-slate"] .stat-item {
+  background: var(--color-background);
+  border-color: var(--color-border);
+}
+
+/* Shortcuts */
+[data-theme="dark"] .shortcut-item,
+[data-theme="dark-slate"] .shortcut-item {
+  background: var(--color-background);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .shortcut-item kbd,
+[data-theme="dark-slate"] .shortcut-item kbd {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+/* Modals */
+[data-theme="dark"] .modal-card,
+[data-theme="dark-slate"] .modal-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark-slate"] .modal-header {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .modal-footer,
+[data-theme="dark-slate"] .modal-footer {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .modal-body p,
+[data-theme="dark-slate"] .modal-body p {
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] #importTextarea,
+[data-theme="dark-slate"] #importTextarea {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+/* Download popup */
+[data-theme="dark"] .dl-option-btn,
+[data-theme="dark-slate"] .dl-option-btn {
+  background: var(--color-background);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .dl-option-btn:hover,
+[data-theme="dark-slate"] .dl-option-btn:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .dl-sublabel,
+[data-theme="dark-slate"] .dl-sublabel {
+  color: var(--color-text-tertiary);
+}
+
+/* Import dropzone */
+[data-theme="dark"] .import-dropzone,
+[data-theme="dark-slate"] .import-dropzone {
+  background: var(--color-background);
+  border-color: var(--color-border);
+}
+
+/* Preview */
+[data-theme="dark"] .preview-question,
+[data-theme="dark-slate"] .preview-question {
+  background: var(--color-background);
+  border-left-color: var(--color-primary);
+}
+
+[data-theme="dark"] .preview-options li,
+[data-theme="dark-slate"] .preview-options li {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .preview-options li.correct,
+[data-theme="dark-slate"] .preview-options li.correct {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+[data-theme="dark"] .preview-explanation,
+[data-theme="dark-slate"] .preview-explanation {
+  background: var(--color-primary-light);
+  color: var(--color-text-primary);
+}
+
+/* Bulk actions */
+[data-theme="dark"] .bulk-actions-bar,
+[data-theme="dark-slate"] .bulk-actions-bar {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* Add option btn */
+[data-theme="dark"] .add-option-btn,
+[data-theme="dark-slate"] .add-option-btn {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Shortcuts panel */
+[data-theme="dark"] .shortcuts-panel,
+[data-theme="dark-slate"] .shortcuts-panel {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Image loading/error */
+[data-theme="dark"] .image-loading,
+[data-theme="dark-slate"] .image-loading {
+  background: var(--color-background);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* Header */
+[data-theme="dark"] .header,
+[data-theme="dark-slate"] .header {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Empty state hint */
+[data-theme="dark"] .empty-hint kbd,
+[data-theme="dark-slate"] .empty-hint kbd {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.progress-bar-container {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* ============================================================================
+   FORM SECTION ENHANCEMENTS
+   ============================================================================ */
+
+/* Make question card hover effect not apply when collapsed */
+.question-card.collapsed:hover {
+  transform: none;
+}
+
+/* Smooth transition for question body */
+.question-body {
+  animation: fadeIn 0.15s ease;
+}
+
+/* Override original collapsed selector — we use .question-body now */
+.question-card.collapsed .form-group:not(:first-child),
+.question-card.collapsed .collapsible-section {
+  display: block; /* reset — .question-body handles visibility */
 }

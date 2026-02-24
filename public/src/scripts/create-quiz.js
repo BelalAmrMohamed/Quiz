@@ -49,7 +49,7 @@ function renderMarkdown(str) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
     codeBlocks.push(
-      `<pre class="code-block"><code class="lang-${lang || "plain"}">${escaped.trim()}</code></pre>`,
+      `<pre class="code-block ltr"><code class="lang-${lang || "plain"}">${escaped.trim()}</code></pre>`,
     );
     return `\x00CODE${idx}\x00`;
   });
@@ -73,9 +73,10 @@ function renderMarkdown(str) {
 
 /**
  * Build the HTML for an inline markdown editor field.
- * Shows rendered markdown by default; clicking switches to raw textarea.
+ * Default state: shows rendered markdown (click to edit).
+ * Edit state: shows textarea + live preview panel below.
  */
-function mdEditorHtml(id, value, placeholder, rows = 3) {
+function mdEditorHtml(id, value, placeholder, rows = 2) {
   const safeValue = (value || "").replace(/\\n/g, "\n");
   const rendered = safeValue.trim() ? renderMarkdown(safeValue) : "";
   const escaped = safeValue
@@ -85,78 +86,122 @@ function mdEditorHtml(id, value, placeholder, rows = 3) {
   return `
     <div class="md-editor-wrap" id="wrap-${id}">
       <div
-        class="md-rendered${!rendered ? " md-empty" : ""}"
+        class="md-rendered${!rendered ? " md-empty" : ""} ltr"
         id="rendered-${id}"
         onclick="activateMdEditor('${id}')"
-        onkeydown="if(event.key==='Enter')activateMdEditor('${id}')"
+        onkeydown="if(event.key==='Enter'||event.key===' ')activateMdEditor('${id}')"
         tabindex="0"
-        role="textbox"
-        aria-multiline="true"
-        aria-label="${placeholder.replace(/'/g, "\\'")}"
+        role="button"
+        aria-label="انقر للتعديل: ${placeholder.replace(/"/g, "&quot;")}"
       >${rendered || `<span class="md-placeholder">${placeholder}</span>`}</div>
-      <textarea
-        class="md-source"
-        id="${id}"
-        rows="${rows}"
-        placeholder="${placeholder}"
-        style="display:none;"
-      >${escaped}</textarea>
+      <div class="md-edit-panel ltr" id="editpanel-${id}" style="display:none;">
+        <textarea
+          class="md-source ltr"
+          id="${id}"
+          rows="${rows}"
+          placeholder="${placeholder}"
+        >${escaped}</textarea>
+        <div class="md-live-preview ltr" id="livepreview-${id}">${rendered ? `<div class="md-live-preview-inner">${rendered}</div>` : ""}</div>
+      </div>
     </div>`;
 }
 
 /** Switch a markdown editor field into edit mode */
 window.activateMdEditor = function (id) {
-  const rendered = document.getElementById(`rendered-${id}`);
+  const renderedDiv = document.getElementById(`rendered-${id}`);
+  const editPanel = document.getElementById(`editpanel-${id}`);
   const source = document.getElementById(id);
-  if (!rendered || !source) return;
-  rendered.style.display = "none";
-  source.style.display = "block";
+  if (!renderedDiv || !editPanel || !source) return;
+  renderedDiv.style.display = "none";
+  editPanel.style.display = "block";
+  // Auto-size textarea
+  autoResizeMdSource(source);
   source.focus();
   source.setSelectionRange(source.value.length, source.value.length);
 };
 
-/** Wire up blur → render, input → sync, and ``` shortcut for an md editor */
+function autoResizeMdSource(ta) {
+  ta.style.height = "auto";
+  ta.style.height = Math.max(ta.scrollHeight, 60) + "px";
+}
+
+/** Wire up all md-editor events: live preview, blur→render, auto-resize, ``` shortcut */
 function setupMdEditor(id, onChange) {
   const source = document.getElementById(id);
-  const rendered = document.getElementById(`rendered-${id}`);
-  if (!source || !rendered) return;
+  const renderedDiv = document.getElementById(`rendered-${id}`);
+  const editPanel = document.getElementById(`editpanel-${id}`);
+  const livePreview = document.getElementById(`livepreview-${id}`);
+  if (!source || !renderedDiv || !editPanel) return;
 
-  const refreshRendered = () => {
+  const refreshLivePreview = () => {
+    if (!livePreview) return;
     const val = source.value;
     if (val.trim()) {
-      rendered.innerHTML = renderMarkdown(val);
-      rendered.classList.remove("md-empty");
+      livePreview.innerHTML = `<div class="md-live-preview-inner">${renderMarkdown(val)}</div>`;
+      livePreview.style.display = "block";
     } else {
-      rendered.innerHTML = `<span class="md-placeholder">${source.placeholder}</span>`;
-      rendered.classList.add("md-empty");
+      livePreview.innerHTML = "";
+      livePreview.style.display = "none";
     }
   };
 
-  source.addEventListener("blur", () => {
-    refreshRendered();
-    rendered.style.display = "block";
-    source.style.display = "none";
-  });
+  const refreshRenderedDiv = () => {
+    const val = source.value;
+    if (val.trim()) {
+      renderedDiv.innerHTML = renderMarkdown(val);
+      renderedDiv.classList.remove("md-empty");
+    } else {
+      renderedDiv.innerHTML = `<span class="md-placeholder">${source.placeholder}</span>`;
+      renderedDiv.classList.add("md-empty");
+    }
+  };
 
+  // Live preview + auto-resize on every keystroke
   source.addEventListener("input", () => {
+    autoResizeMdSource(source);
+    refreshLivePreview();
     if (onChange) onChange(source.value);
   });
 
-  // Triple-backtick + Enter → wrap in code block
+  // On blur: collapse edit panel, show rendered view
+  source.addEventListener("blur", () => {
+    // Small delay so clicks inside livePreview don't immediately close
+    setTimeout(() => {
+      if (document.activeElement === source) return;
+      refreshRenderedDiv();
+      editPanel.style.display = "none";
+      renderedDiv.style.display = "block";
+    }, 150);
+  });
+
+  // Triple-backtick + Enter → insert code block
   source.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter") return;
-    const val = source.value;
-    const pos = source.selectionStart;
-    if (pos >= 3 && val.slice(pos - 3, pos) === "```") {
+    if (e.key === "Enter") {
+      const val = source.value;
+      const pos = source.selectionStart;
+      if (pos >= 3 && val.slice(pos - 3, pos) === "```") {
+        e.preventDefault();
+        const before = val.slice(0, pos);
+        const after = val.slice(pos);
+        const insertion = "\n\n```";
+        source.value = before + insertion + after;
+        source.setSelectionRange(pos + 1, pos + 1);
+        source.dispatchEvent(new Event("input"));
+        return;
+      }
+    }
+    // Tab → insert 2 spaces
+    if (e.key === "Tab") {
       e.preventDefault();
-      const before = val.slice(0, pos);
-      const after = val.slice(pos);
-      const insertion = "\n\n```";
-      source.value = before + insertion + after;
-      source.setSelectionRange(pos + 1, pos + 1);
-      source.dispatchEvent(new Event("input"));
+      const pos = source.selectionStart;
+      source.value =
+        source.value.slice(0, pos) + "  " + source.value.slice(pos);
+      source.setSelectionRange(pos + 2, pos + 2);
     }
   });
+
+  // Initial live preview
+  refreshLivePreview();
 }
 
 // ============================================================================
@@ -506,7 +551,7 @@ function renderQuestion(question, insertAtIndex = null) {
                     <div class="form-group">
                         <label>رابط الصورة</label>
                         <input 
-                            type="url" 
+                            type="url" class="ltr"
                             id="question-image-${question.id}" 
                             placeholder="https://example.com/image.jpg"
                             value="${escapeHtml(question.image || "")}"
@@ -526,7 +571,7 @@ function renderQuestion(question, insertAtIndex = null) {
                 <div class="collapsible-content" id="content-explanation-${question.id}">
                     <div class="form-group">
                         <label>شرح الإجابة الصحيحة</label>
-                        ${mdEditorHtml(`question-explanation-${question.id}`, question.explanation || "", "قدم تفسيرًا للإجابة الصحيحة...", 3)}
+                        ${mdEditorHtml(`question-explanation-${question.id}`, question.explanation || "", "قدم تفسيرًا للإجابة الصحيحة", 3)}
                     </div>
                 </div>
             </div>
@@ -1545,11 +1590,10 @@ window.exportQuiz = function () {
           exportToMarkdown(config, exportQuestions);
           break;
         case "json": {
-          const payload = {
-            title: quizData.title,
-            description: quizData.description,
-            questions: exportQuestions,
-          };
+          const jsonMeta = { title: quizData.title };
+          if (quizData.description?.trim())
+            jsonMeta.description = quizData.description;
+          const payload = { meta: jsonMeta, questions: exportQuestions };
           const blob = new Blob([JSON.stringify(payload, null, 2)], {
             type: "application/json",
           });
@@ -1565,7 +1609,6 @@ window.exportQuiz = function () {
         }
       }
       hideLoading();
-      showNotification("تم التحميل!", "تم تصدير الاختبار بنجاح", "success");
     } catch (err) {
       hideLoading();
       console.error("Export error:", err);
@@ -1699,9 +1742,11 @@ window.emailQuizToDeveloper = function () {
       return question;
     });
 
+    const meta = { title: quizData.title };
+    if (quizData.description?.trim()) meta.description = quizData.description;
+
     const payload = {
-      title: quizData.title,
-      description: quizData.description,
+      meta,
       questions: exportQuestions,
     };
     const fileContent = JSON.stringify(payload, null, 2);
@@ -1739,9 +1784,11 @@ window.sendToWhatsApp = function () {
     return question;
   });
 
+  const meta = { title: quizData.title };
+  if (quizData.description?.trim()) meta.description = quizData.description;
+
   const payload = {
-    title: quizData.title,
-    description: quizData.description,
+    meta,
     questions: exportQuestions,
   };
   const fileContent = JSON.stringify(payload, null, 2);
