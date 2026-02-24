@@ -40,118 +40,376 @@
     <link rel="stylesheet" href="src/components/notifications.css">
 
     <style>
-        /* Markdown preview panel */
-        .markdown-preview {
-            display: none;
-            margin-top: 6px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            background: var(--color-bg-secondary, #f4f4f8);
-            border: 1px solid var(--color-border, #e0e0e0);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--color-text, #222);
+        /* =====================================================
+         INLINE MARKDOWN EDITOR
+         ===================================================== */
+        .md-editor-wrap {
+            position: relative;
+            width: 100%;
         }
 
-        .markdown-preview .code-block {
-            background: var(--color-code-bg, #1e1e2e);
-            color: var(--color-code-text, #cdd6f4);
-            border-radius: 6px;
+        /* The rendered view (default state) */
+        .md-rendered {
+            min-height: 42px;
             padding: 10px 14px;
-            margin: 6px 0;
+            border-radius: 8px;
+            border: 1.5px solid var(--color-border, #e0e0e0);
+            background: var(--color-surface, #fff);
+            color: var(--color-text, #1a1a1a);
+            cursor: text;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            transition: border-color 0.18s, box-shadow 0.18s;
+            word-break: break-word;
+        }
+
+        .md-rendered:hover {
+            border-color: var(--color-primary, #6c63ff);
+        }
+
+        .md-rendered:focus {
+            outline: none;
+            border-color: var(--color-primary, #6c63ff);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+        }
+
+        .md-placeholder {
+            color: var(--color-text-secondary, #999);
+            font-style: italic;
+        }
+
+        .md-empty {
+            background: var(--color-surface, #fff);
+        }
+
+        /* The raw textarea (edit state) */
+        .md-source {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1.5px solid var(--color-primary, #6c63ff);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+            background: var(--color-surface, #fff);
+            color: var(--color-text, #1a1a1a);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.18s;
+        }
+
+        .md-source:focus {
+            outline: none;
+        }
+
+        /* Code inside rendered markdown */
+        .md-rendered .code-block,
+        .preview-question .code-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0;
             overflow-x: auto;
             font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 0.85rem;
+            line-height: 1.5;
         }
 
-        .markdown-preview .inline-code {
-            background: var(--color-inline-code-bg, #e8e8f0);
-            color: var(--color-inline-code-text, #c0392b);
+        .md-rendered .inline-code,
+        .preview-question .inline-code {
+            background: var(--color-inline-code-bg, rgba(108, 99, 255, 0.1));
+            color: var(--color-primary, #6c63ff);
             border-radius: 4px;
-            padding: 1px 5px;
+            padding: 1px 6px;
             font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 0.85em;
+            font-size: 0.88em;
+            font-style: normal;
         }
 
-        /* Option textarea styling */
-        .option-textarea {
-            width: 100%;
-            resize: none;
+        [data-theme="dark"] .md-rendered .inline-code,
+        [data-theme="dark-slate"] .md-rendered .inline-code {
+            background: rgba(203, 166, 247, 0.15);
+            color: #cba6f7;
+        }
+
+        /* Theme-aware rendered view */
+        [data-theme="dark"] .md-rendered,
+        [data-theme="dark-slate"] .md-rendered {
+            background: var(--color-surface, #1e1e2e);
+            border-color: var(--color-border, #313244);
+            color: var(--color-text, #cdd6f4);
+        }
+
+        [data-theme="dark"] .md-source,
+        [data-theme="dark-slate"] .md-source {
+            background: var(--color-surface, #1e1e2e);
+            color: var(--color-text, #cdd6f4);
+            border-color: var(--color-primary, #cba6f7);
+        }
+
+        /* =====================================================
+         QUESTION CARD — COLLAPSED STATE
+         ===================================================== */
+        .question-card.collapsed .question-body {
+            display: none;
+        }
+
+        .question-card.collapsed {
+            padding-bottom: 0;
+        }
+
+        .question-card.collapsed .question-header {
+            border-bottom: none;
+            border-radius: inherit;
+            cursor: pointer;
+        }
+
+        .q-preview {
+            font-size: 0.82rem;
+            color: var(--color-text-secondary, #888);
+            font-weight: 400;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .q-label {
+            font-weight: 600;
+        }
+
+        /* =====================================================
+         OPTIONS
+         ===================================================== */
+        .option-md-wrap {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .option-md-wrap .md-rendered {
             min-height: 36px;
             padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid var(--color-border, #ddd);
-            background: var(--color-bg, #fff);
-            color: var(--color-text, #222);
-            font-family: inherit;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            transition: border-color 0.2s;
-            box-sizing: border-box;
+            font-size: 0.9rem;
         }
 
-        .option-textarea:focus {
-            outline: none;
-            border-color: var(--color-primary, #6c63ff);
-            box-shadow: 0 0 0 2px var(--color-primary-light, rgba(108, 99, 255, 0.15));
+        .option-md-wrap .md-source {
+            min-height: 36px;
+            padding: 6px 10px;
+            font-size: 0.9rem;
         }
 
-        /* Download popup grid */
-        .mode-grid {
+        /* =====================================================
+         DOWNLOAD POPUP MODAL
+         ===================================================== */
+        .download-modal-overlay .modal-card,
+        .dl-modal-card {
+            max-width: 520px;
+            width: 95%;
+            padding: 28px;
+        }
+
+        .dl-subtitle {
+            color: var(--color-text-secondary, #888);
+            margin: 4px 0 20px;
+            font-size: 0.9rem;
+        }
+
+        .dl-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin: 16px 0;
+            margin-bottom: 8px;
         }
 
-        .mode-btn {
+        .dl-option-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 18px 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--color-border, #e0e0e0);
+            background: var(--color-surface, #fff);
+            color: var(--color-text, #222);
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+        }
+
+        .dl-option-btn:hover {
+            border-color: var(--color-primary, #6c63ff);
+            background: var(--color-surface-secondary, #f4f4fa);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .dl-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .dl-label {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .dl-sublabel {
+            font-size: 0.72rem;
+            color: var(--color-text-secondary, #888);
+        }
+
+        [data-theme="dark"] .dl-option-btn,
+        [data-theme="dark-slate"] .dl-option-btn {
+            background: var(--color-surface, #1e1e2e);
+            border-color: var(--color-border, #313244);
+            color: var(--color-text, #cdd6f4);
+        }
+
+        [data-theme="dark"] .dl-option-btn:hover,
+        [data-theme="dark-slate"] .dl-option-btn:hover {
+            background: var(--color-surface-secondary, #2a2a3d);
+        }
+
+        /* =====================================================
+         IMPORT MODAL — DRAG & DROP ZONE
+         ===================================================== */
+        .import-dropzone {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            padding: 16px 12px;
-            border-radius: 10px;
-            border: 2px solid var(--color-border, #e0e0e0);
-            background: var(--color-bg, #fff);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
+            padding: 28px 20px;
+            border-radius: 12px;
+            border: 2px dashed var(--color-border, #d0d0d0);
+            background: var(--color-surface-secondary, #f8f8fc);
+            color: var(--color-text-secondary, #888);
             text-align: center;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: default;
         }
 
-        .mode-btn:hover {
+        .import-dropzone.drag-active {
             border-color: var(--color-primary, #6c63ff);
-            background: var(--color-bg-secondary, #f4f4f8);
-            transform: translateY(-2px);
+            background: rgba(108, 99, 255, 0.06);
+            color: var(--color-primary, #6c63ff);
         }
 
-        .mode-btn .icon {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-        }
-
-        .mode-btn svg {
-            color: var(--color-text-secondary, #666);
-        }
-
-        .close-modal {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            border-radius: 8px;
-            border: 1px solid var(--color-border, #ddd);
-            background: transparent;
-            cursor: pointer;
+        .import-dropzone p {
+            margin: 0;
             font-size: 0.9rem;
-            color: var(--color-text-secondary, #666);
-            transition: background 0.2s;
         }
 
-        .close-modal:hover {
-            background: var(--color-bg-secondary, #f4f4f8);
+        .import-file-label {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary, #888);
+            margin: 0;
+            min-height: 1.2em;
+        }
+
+        [data-theme="dark"] .import-dropzone,
+        [data-theme="dark-slate"] .import-dropzone {
+            background: var(--color-surface, #1e1e2e);
+            border-color: var(--color-border, #313244);
+        }
+
+        /* Modal header — ensure close button doesn't overflow */
+        .modal-card .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--color-border, #e0e0e0);
+            position: relative;
+        }
+
+        .modal-header .close-btn,
+        .modal-header button.close-btn {
+            flex-shrink: 0;
+            position: static !important;
+            top: auto !important;
+            right: auto !important;
+            margin-left: auto;
+        }
+
+        /* Theme-aware modal card */
+        [data-theme="dark"] .modal-card,
+        [data-theme="dark-slate"] .modal-card {
+            background: var(--color-surface, #1e1e2e);
+            color: var(--color-text, #cdd6f4);
+            border-color: var(--color-border, #313244);
+        }
+
+        [data-theme="dark"] .modal-overlay,
+        [data-theme="dark-slate"] .modal-overlay {
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        /* Theme-aware question cards */
+        [data-theme="dark"] .question-card,
+        [data-theme="dark-slate"] .question-card {
+            background: var(--color-surface, #1e1e2e);
+            border-color: var(--color-border, #313244);
+            color: var(--color-text, #cdd6f4);
+        }
+
+        [data-theme="dark"] .question-header,
+        [data-theme="dark-slate"] .question-header {
+            background: var(--color-surface-secondary, #181825);
+            border-color: var(--color-border, #313244);
+        }
+
+        /* Theme-aware action bar & cards */
+        [data-theme="dark"] .action-bar,
+        [data-theme="dark-slate"] .action-bar,
+        [data-theme="dark"] .stats-card,
+        [data-theme="dark-slate"] .stats-card,
+        [data-theme="dark"] .card,
+        [data-theme="dark-slate"] .card {
+            background: var(--color-surface, #1e1e2e);
+            border-color: var(--color-border, #313244);
+            color: var(--color-text, #cdd6f4);
+        }
+
+        /* Theme-aware inputs */
+        [data-theme="dark"] input[type="text"],
+        [data-theme="dark"] input[type="url"],
+        [data-theme="dark"] textarea,
+        [data-theme="dark-slate"] input[type="text"],
+        [data-theme="dark-slate"] input[type="url"],
+        [data-theme="dark-slate"] textarea {
+            background: var(--color-surface, #1e1e2e);
+            color: var(--color-text, #cdd6f4);
+            border-color: var(--color-border, #313244);
+        }
+
+        [data-theme="dark"] input:focus,
+        [data-theme="dark"] textarea:focus,
+        [data-theme="dark-slate"] input:focus,
+        [data-theme="dark-slate"] textarea:focus {
+            border-color: var(--color-primary, #cba6f7);
+            box-shadow: 0 0 0 3px rgba(203, 166, 247, 0.15);
+        }
+
+        /* Theme-aware collapsible section headers */
+        [data-theme="dark"] .collapsible-header,
+        [data-theme="dark-slate"] .collapsible-header {
+            background: var(--color-surface-secondary, #181825);
+            color: var(--color-text, #cdd6f4);
+            border-color: var(--color-border, #313244);
+        }
+
+        /* Theme-aware option items */
+        [data-theme="dark"] .option-item,
+        [data-theme="dark-slate"] .option-item {
+            background: var(--color-surface-secondary, #181825);
+            border-color: var(--color-border, #313244);
         }
     </style>
 
@@ -581,22 +839,26 @@
                         data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 12px; font-weight: 600;">📁 استيراد من ملف JSON:</p>
-                <div class="file-upload-area" style="margin-bottom: 20px;">
-                    <label for="importFileInput" class="file-upload-label"
-                        style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed var(--color-border,#ccc);border-radius:8px;cursor:pointer;background:var(--color-bg-secondary,#f8f8f8);">
-                        <i data-lucide="file-up"></i>
-                        <span>اختر ملف JSON (أو عدة ملفات)</span>
+                <!-- Drag & Drop Zone -->
+                <div id="importDropzone" class="import-dropzone">
+                    <i data-lucide="file-up" style="width:32px;height:32px;opacity:0.5;"></i>
+                    <p>اسحب وأفلت ملفات JSON أو TXT هنا</p>
+                    <label for="importFileInput" class="btn btn-secondary" style="cursor:pointer;margin-top:8px;">
+                        أو اختر ملفات
                     </label>
-                    <input type="file" id="importFileInput" accept=".json" multiple style="display:none;"
-                        onchange="document.getElementById('importFileLabel').textContent = this.files.length > 0 ? Array.from(this.files).map(f=>f.name).join(', ') : 'لم يتم اختيار أي ملف'">
-                    <p id="importFileLabel" style="margin-top:6px;font-size:0.85rem;color:var(--color-text-secondary);">
-                        لم يتم اختيار أي ملف</p>
+                    <input type="file" id="importFileInput" accept=".json,.txt" multiple style="display:none;" onchange="
+                            var names = Array.from(this.files).map(function(f){return f.name;}).join(', ');
+                            document.getElementById('importFileLabel').textContent = names || 'لم يتم اختيار أي ملف';
+                        ">
+                    <p id="importFileLabel" class="import-file-label">لم يتم اختيار أي ملف</p>
                 </div>
-                <p style="margin-bottom: 8px; font-weight: 600;">📋 أو الصق المحتوى هنا:</p>
-                <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 8px;">يدعم: JSON array
-                    أو كائن JSON أو نص مرقّم (1. سؤال / A. خيار / Correct: A)</p>
-                <textarea id="importTextarea" rows="8" placeholder='[{"q":"...", "options":["..."], "correct":0}]
+
+                <!-- Paste Area -->
+                <p style="font-weight:600;margin:16px 0 6px;">أو الصق المحتوى:</p>
+                <p style="font-size:0.82rem;color:var(--color-text-secondary);margin-bottom:8px;">
+                    يدعم: JSON · مصفوفة JSON · نص مرقّم (1. سؤال / A. خيار / Correct: A / Explanation: ...)
+                </p>
+                <textarea id="importTextarea" rows="7" placeholder='[{"q":"ما هو ناتج 2+2?","options":["3","4","5"],"correct":1}]
 أو:
 1. ما هي لغة البرمجة الأسرع؟
 
@@ -607,7 +869,7 @@ Correct: B
 Explanation: C++ أسرع من Python.' aria-label="محتوى الأسئلة للاستيراد"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="processImport()">استيراد</button>
+                <button class="btn btn-primary" onclick="processImport()"><i data-lucide="upload"></i> استيراد</button>
                 <button class="btn btn-secondary" onclick="closeImportModal()">إلغاء</button>
             </div>
         </div>
