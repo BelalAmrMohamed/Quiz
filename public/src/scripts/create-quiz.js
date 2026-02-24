@@ -35,25 +35,25 @@ let isTemplatesPanelOpen = false;
 let editingQuizId = null;
 
 // ============================================================================
-// MARKDOWN RENDERER
+// MARKDOWN & INLINE EDITOR SYSTEM
 // ============================================================================
 
 function renderMarkdown(str) {
   if (!str) return "";
   const codeBlocks = [];
-  // 1. Extract fenced code blocks
-  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
+  // 1. Extract fenced code blocks first
+  str = str.replace(/```([\w]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
     const idx = codeBlocks.length;
     const escaped = code
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
     codeBlocks.push(
-      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
+      `<pre class="code-block"><code class="lang-${lang || "plain"}">${escaped.trim()}</code></pre>`,
     );
     return `\x00CODE${idx}\x00`;
   });
-  // 2. Escape HTML
+  // 2. Escape HTML in remaining text
   str = str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -61,54 +61,100 @@ function renderMarkdown(str) {
     .replace(/"/g, "&quot;");
   // 3. Inline code
   str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
-  // 4. Bold
+  // 4. Bold and italic
+  str = str.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
   str = str.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  // 5. Italic
-  str = str.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  // 6. Newlines -> <br>
+  str = str.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  // 5. Newlines → <br>
   str = str.replace(/\n/g, "<br>");
-  // 7. Restore code blocks
+  // 6. Restore code blocks
   return str.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
 }
 
-// Attach live markdown preview to a textarea
-function attachMarkdownPreview(textarea, previewId) {
-  const preview = document.getElementById(previewId);
-  if (!preview) return;
+/**
+ * Build the HTML for an inline markdown editor field.
+ * Shows rendered markdown by default; clicking switches to raw textarea.
+ */
+function mdEditorHtml(id, value, placeholder, rows = 3) {
+  const safeValue = (value || "").replace(/\\n/g, "\n");
+  const rendered = safeValue.trim() ? renderMarkdown(safeValue) : "";
+  const escaped = safeValue
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return `
+    <div class="md-editor-wrap" id="wrap-${id}">
+      <div
+        class="md-rendered${!rendered ? " md-empty" : ""}"
+        id="rendered-${id}"
+        onclick="activateMdEditor('${id}')"
+        onkeydown="if(event.key==='Enter')activateMdEditor('${id}')"
+        tabindex="0"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="${placeholder.replace(/'/g, "\\'")}"
+      >${rendered || `<span class="md-placeholder">${placeholder}</span>`}</div>
+      <textarea
+        class="md-source"
+        id="${id}"
+        rows="${rows}"
+        placeholder="${placeholder}"
+        style="display:none;"
+      >${escaped}</textarea>
+    </div>`;
+}
 
-  const updatePreview = () => {
-    const val = textarea.value;
+/** Switch a markdown editor field into edit mode */
+window.activateMdEditor = function (id) {
+  const rendered = document.getElementById(`rendered-${id}`);
+  const source = document.getElementById(id);
+  if (!rendered || !source) return;
+  rendered.style.display = "none";
+  source.style.display = "block";
+  source.focus();
+  source.setSelectionRange(source.value.length, source.value.length);
+};
+
+/** Wire up blur → render, input → sync, and ``` shortcut for an md editor */
+function setupMdEditor(id, onChange) {
+  const source = document.getElementById(id);
+  const rendered = document.getElementById(`rendered-${id}`);
+  if (!source || !rendered) return;
+
+  const refreshRendered = () => {
+    const val = source.value;
     if (val.trim()) {
-      preview.innerHTML = renderMarkdown(val);
-      preview.style.display = "block";
+      rendered.innerHTML = renderMarkdown(val);
+      rendered.classList.remove("md-empty");
     } else {
-      preview.innerHTML = "";
-      preview.style.display = "none";
+      rendered.innerHTML = `<span class="md-placeholder">${source.placeholder}</span>`;
+      rendered.classList.add("md-empty");
     }
   };
 
-  textarea.addEventListener("input", updatePreview);
-  // Initial render
-  updatePreview();
-}
+  source.addEventListener("blur", () => {
+    refreshRendered();
+    rendered.style.display = "block";
+    source.style.display = "none";
+  });
 
-// Triple-backtick + Enter shortcut: wrap cursor in a code block
-function attachBacktickShortcut(textarea) {
-  textarea.addEventListener("keydown", (e) => {
+  source.addEventListener("input", () => {
+    if (onChange) onChange(source.value);
+  });
+
+  // Triple-backtick + Enter → wrap in code block
+  source.addEventListener("keydown", (e) => {
     if (e.key !== "Enter") return;
-    const val = textarea.value;
-    const pos = textarea.selectionStart;
-    // Check if the last 3 chars before cursor are ```
+    const val = source.value;
+    const pos = source.selectionStart;
     if (pos >= 3 && val.slice(pos - 3, pos) === "```") {
       e.preventDefault();
       const before = val.slice(0, pos);
       const after = val.slice(pos);
       const insertion = "\n\n```";
-      textarea.value = before + insertion + after;
-      // Place cursor between the two ``` blocks
-      const newPos = pos + 1; // right after the first newline, inside the block
-      textarea.setSelectionRange(newPos, newPos);
-      textarea.dispatchEvent(new Event("input"));
+      source.value = before + insertion + after;
+      source.setSelectionRange(pos + 1, pos + 1);
+      source.dispatchEvent(new Event("input"));
     }
   });
 }
@@ -331,8 +377,9 @@ window.addQuestion = function () {
     const questionCard = document.getElementById(`question-${questionId}`);
     if (questionCard) {
       questionCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      const textarea = questionCard.querySelector("textarea");
-      if (textarea) textarea.focus();
+      // Activate the question text md editor so user can type immediately
+      const questionTextId = `question-text-${questionId}`;
+      activateMdEditor(questionTextId);
     }
   }, 100);
 };
@@ -414,13 +461,14 @@ function renderQuestion(question, insertAtIndex = null) {
   }
 
   questionCard.innerHTML = `
-        <div class="question-header">
-            <span class="question-number">
-                ${bulkModeActive ? `<input type="checkbox" class="question-select-checkbox" onchange="handleQuestionSelect(event, ${question.id})">` : ""}
-                <span class="drag-handle" title="اسحب لإعادة الترتيب"><i data-lucide="grip-vertical"></i></span>
-                سؤال ${questionNumber}
+        <div class="question-header" onclick="handleHeaderClick(event, ${question.id})">
+            <span class="question-number" id="qnum-${question.id}">
+                ${bulkModeActive ? `<input type="checkbox" class="question-select-checkbox" onchange="handleQuestionSelect(event, ${question.id})" onclick="event.stopPropagation()">` : ""}
+                <span class="drag-handle" title="اسحب لإعادة الترتيب" onclick="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
+                <span class="q-label">سؤال ${questionNumber}</span>
+                <span class="q-preview" id="qpreview-${question.id}"></span>
             </span>
-            <div class="question-actions">
+            <div class="question-actions" onclick="event.stopPropagation()">
                 <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
                     <i data-lucide="unfold-vertical"></i>
                 </button>
@@ -433,63 +481,53 @@ function renderQuestion(question, insertAtIndex = null) {
             </div>
         </div>
         
-        <div class="form-group">
-            <label>نصّ السؤال *</label>
-            <textarea 
-                id="question-text-${question.id}" 
-                rows="3" 
-                placeholder="أدخل سؤالك هنا..."
-                required
-                aria-required="true"
-            >${escapeHtml(question.q.replace(/\\n/g, "\n"))}</textarea>
-            <div class="markdown-preview" id="md-preview-q-${question.id}"></div>
-        </div>
-        
-        <div class="form-group">
-            <label>الإختيارات (إختيار واحد = سؤال مقالي)</label>
-            <div id="options-container-${question.id}" class="options-list">
-                ${renderOptions(question)}
+        <div class="question-body">
+            <div class="form-group">
+                <label>نصّ السؤال *</label>
+                ${mdEditorHtml(`question-text-${question.id}`, question.q, "أدخل سؤالك هنا...", 3)}
             </div>
-            <button class="add-option-btn" onclick="addOption(${question.id})">
-                <i data-lucide="plus"></i> إضافة خيار
-            </button>
-        </div>
-        
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
-                <h4><i data-lucide="image"></i> صورة (اختيارية)</h4>
-                <span class="collapsible-toggle" id="toggle-image-${question.id}"><i data-lucide="chevron-down"></i></span>
-            </div>
-            <div class="collapsible-content" id="content-image-${question.id}">
-                <div class="form-group">
-                    <label>رابط الصورة</label>
-                    <input 
-                        type="url" 
-                        id="question-image-${question.id}" 
-                        placeholder="https://example.com/image.jpg"
-                        value="${escapeHtml(question.image || "")}"
-                        aria-describedby="image-help-${question.id}"
-                    />
-                    <small id="image-help-${question.id}">أدخل رابط الصورة (يجب أن يبدأ بـ http:// أو https://)</small>
+            
+            <div class="form-group">
+                <label>الإختيارات (إختيار واحد = سؤال مقالي)</label>
+                <div id="options-container-${question.id}" class="options-list">
+                    ${renderOptions(question)}
                 </div>
-                <div id="image-preview-${question.id}" class="image-preview-container"></div>
+                <button class="add-option-btn" onclick="addOption(${question.id})">
+                    <i data-lucide="plus"></i> إضافة خيار
+                </button>
             </div>
-        </div>
-        
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
-                <h4><i data-lucide="lightbulb"></i> الشرح (اختياري)</h4>
-                <span class="collapsible-toggle" id="toggle-explanation-${question.id}"><i data-lucide="chevron-down"></i></span>
+            
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
+                    <h4><i data-lucide="image"></i> صورة (اختيارية)</h4>
+                    <span class="collapsible-toggle" id="toggle-image-${question.id}"><i data-lucide="chevron-down"></i></span>
+                </div>
+                <div class="collapsible-content" id="content-image-${question.id}">
+                    <div class="form-group">
+                        <label>رابط الصورة</label>
+                        <input 
+                            type="url" 
+                            id="question-image-${question.id}" 
+                            placeholder="https://example.com/image.jpg"
+                            value="${escapeHtml(question.image || "")}"
+                            aria-describedby="image-help-${question.id}"
+                        />
+                        <small id="image-help-${question.id}">أدخل رابط الصورة (يجب أن يبدأ بـ http:// أو https://)</small>
+                    </div>
+                    <div id="image-preview-${question.id}" class="image-preview-container"></div>
+                </div>
             </div>
-            <div class="collapsible-content" id="content-explanation-${question.id}">
-                <div class="form-group">
-                    <label>شرح الإجابة الصحيحة</label>
-                    <textarea 
-                        id="question-explanation-${question.id}" 
-                        rows="3" 
-                        placeholder="قدم تفسيرًا للإجابة الصحيحة..."
-                    >${escapeHtml((question.explanation || "").replace(/\\n/g, "\n"))}</textarea>
-                    <div class="markdown-preview" id="md-preview-exp-${question.id}"></div>
+            
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
+                    <h4><i data-lucide="lightbulb"></i> الشرح (اختياري)</h4>
+                    <span class="collapsible-toggle" id="toggle-explanation-${question.id}"><i data-lucide="chevron-down"></i></span>
+                </div>
+                <div class="collapsible-content" id="content-explanation-${question.id}">
+                    <div class="form-group">
+                        <label>شرح الإجابة الصحيحة</label>
+                        ${mdEditorHtml(`question-explanation-${question.id}`, question.explanation || "", "قدم تفسيرًا للإجابة الصحيحة...", 3)}
+                    </div>
                 </div>
             </div>
         </div>
@@ -509,13 +547,6 @@ function renderQuestion(question, insertAtIndex = null) {
   setupQuestionEventListeners(question.id);
   setupDragAndDrop(questionCard);
 
-  // Auto-resize option textareas after render
-  setTimeout(() => {
-    questionCard.querySelectorAll(".option-textarea").forEach((ta) => {
-      autoResizeTextarea(ta);
-    });
-  }, 0);
-
   // Load image preview if exists
   if (question.image) {
     updateImagePreview(question.id, question.image);
@@ -525,47 +556,54 @@ function renderQuestion(question, insertAtIndex = null) {
   if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
+// Click on header area (but not buttons/drag) collapses the card
+window.handleHeaderClick = function (e, questionId) {
+  // Only collapse if clicking directly on header/label, not child interactive elements
+  if (
+    e.target.closest(".question-actions") ||
+    e.target.closest(".drag-handle") ||
+    e.target.closest(".question-select-checkbox") ||
+    e.target.tagName === "BUTTON" ||
+    e.target.tagName === "INPUT"
+  )
+    return;
+  toggleQuestionCollapse(questionId);
+};
+
 window.toggleQuestionCollapse = function (questionId) {
   const card = document.getElementById(`question-${questionId}`);
   if (!card) return;
-
   card.classList.toggle("collapsed");
 
   const isCollapsed = card.classList.contains("collapsed");
-  const numberSpan = card.querySelector(".question-number");
+  const qPreview = document.getElementById(`qpreview-${questionId}`);
 
-  if (isCollapsed) {
+  if (isCollapsed && qPreview) {
+    // Get question text from state or fallback to textarea
     const question = quizData.questions.find((q) => q.id === questionId);
-    const previewText = question && question.q
-      ? ": " + question.q.slice(0, 80) + (question.q.length > 80 ? "..." : "")
+    const textarea = document.getElementById(`question-text-${questionId}`);
+    const rawText =
+      (question && question.q) || (textarea && textarea.value) || "";
+    const preview = rawText
+      .replace(/\n/g, " ")
+      .replace(/```[\s\S]*?```/g, "[كود]")
+      .replace(/`/g, "")
+      .trim();
+    qPreview.textContent = preview
+      ? ": " + preview.slice(0, 70) + (preview.length > 70 ? "…" : "")
       : "";
-    // Update number span to show preview (preserve drag handle)
-    const dragHandle = numberSpan.querySelector(".drag-handle");
-    const checkbox = numberSpan.querySelector(".question-select-checkbox");
-    const questionIndex = quizData.questions.findIndex((q) => q.id === questionId) + 1;
-    numberSpan.innerHTML = "";
-    if (checkbox) numberSpan.appendChild(checkbox);
-    if (dragHandle) numberSpan.appendChild(dragHandle);
-    const textNode = document.createTextNode(`سؤال ${questionIndex}${previewText}`);
-    numberSpan.appendChild(textNode);
-  } else {
-    // Restore normal header (without preview text)
-    updateQuestionNumbers();
+  } else if (qPreview) {
+    qPreview.textContent = "";
   }
 };
 
 function setupQuestionEventListeners(questionId) {
-  const questionTextarea = document.getElementById(
-    `question-text-${questionId}`,
+  // Question text: inline md editor
+  setupMdEditor(`question-text-${questionId}`, (val) =>
+    updateQuestionData(questionId, "q", val),
   );
-  if (questionTextarea) {
-    questionTextarea.addEventListener("input", (e) => {
-      updateQuestionData(questionId, "q", e.target.value);
-    });
-    attachMarkdownPreview(questionTextarea, `md-preview-q-${questionId}`);
-    attachBacktickShortcut(questionTextarea);
-  }
 
+  // Image input
   const imageInput = document.getElementById(`question-image-${questionId}`);
   if (imageInput) {
     imageInput.addEventListener(
@@ -577,16 +615,13 @@ function setupQuestionEventListeners(questionId) {
     );
   }
 
-  const explanationTextarea = document.getElementById(
-    `question-explanation-${questionId}`,
+  // Explanation: inline md editor
+  setupMdEditor(`question-explanation-${questionId}`, (val) =>
+    updateQuestionData(questionId, "explanation", val),
   );
-  if (explanationTextarea) {
-    explanationTextarea.addEventListener("input", (e) => {
-      updateQuestionData(questionId, "explanation", e.target.value);
-    });
-    attachMarkdownPreview(explanationTextarea, `md-preview-exp-${questionId}`);
-    attachBacktickShortcut(explanationTextarea);
-  }
+
+  // Option md editors are set up after rerenderOptions via setupOptionMdEditors
+  setupOptionMdEditors(questionId);
 }
 
 function updateImagePreview(questionId, imageUrl) {
@@ -628,16 +663,11 @@ function updateQuestionData(questionId, field, value) {
 
 function updateQuestionNumbers() {
   quizData.questions.forEach((question, index) => {
-    const questionCard = document.getElementById(`question-${question.id}`);
-    if (questionCard) {
-      const numberSpan = questionCard.querySelector(".question-number");
-      if (numberSpan) {
-        const dragHandle = numberSpan.querySelector(".drag-handle");
-        numberSpan.innerHTML = `سؤال ${index + 1}`;
-        if (dragHandle) {
-          numberSpan.insertBefore(dragHandle, numberSpan.firstChild);
-        }
-      }
+    const qLabel = document
+      .getElementById(`question-${question.id}`)
+      ?.querySelector(".q-label");
+    if (qLabel) {
+      qLabel.textContent = `سؤال ${index + 1}`;
     }
   });
 }
@@ -730,8 +760,9 @@ function rerenderAllQuestions() {
 
 function renderOptions(question) {
   return question.options
-    .map(
-      (option, index) => `
+    .map((option, index) => {
+      const optId = `option-text-${question.id}-${index}`;
+      return `
         <div class="option-item ${question.correct === index ? "correct" : ""}" id="option-${question.id}-${index}">
             <input 
                 type="radio" 
@@ -742,53 +773,34 @@ function renderOptions(question) {
                 title="تحديد كإجابة صحيحة"
                 aria-label="تحديد الخيار ${index + 1} كإجابة صحيحة"
             />
-            <textarea 
-                class="option-input option-textarea" 
-                placeholder="إختيار ${index + 1}"
-                oninput="updateOption(${question.id}, ${index}, this.value); autoResizeTextarea(this);"
-                required
-                rows="1"
-                aria-label="نص الخيار ${index + 1}"
-            >${escapeHtml(option.replace(/\\n/g, "\n"))}</textarea>
+            <div class="option-md-wrap">
+                ${mdEditorHtml(optId, option, `إختيار ${index + 1}`, 1)}
+            </div>
             ${
               question.options.length > 1
-                ? `
-                <button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}">
-                    <i data-lucide="x"></i>
-                </button>
-            `
+                ? `<button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}"><i data-lucide="x"></i></button>`
                 : ""
             }
         </div>
-    `,
-    )
+      `;
+    })
     .join("");
 }
 
-window.addOption = function (questionId) {
+function setupOptionMdEditors(questionId) {
   const question = quizData.questions.find((q) => q.id === questionId);
-  if (question) {
-    question.options.push("");
-    rerenderOptions(questionId);
-    updateStatistics();
-    autosave();
-  }
-};
-
-window.removeOption = function (questionId, optionIndex) {
-  const question = quizData.questions.find((q) => q.id === questionId);
-  if (question && question.options.length > 1) {
-    question.options.splice(optionIndex, 1);
-
-    if (question.correct >= question.options.length) {
-      question.correct = question.options.length - 1;
-    }
-
-    rerenderOptions(questionId);
-    updateStatistics();
-    autosave();
-  }
-};
+  if (!question) return;
+  question.options.forEach((_, index) => {
+    const optId = `option-text-${questionId}-${index}`;
+    setupMdEditor(optId, (val) => {
+      const q = quizData.questions.find((q) => q.id === questionId);
+      if (q) {
+        q.options[index] = val;
+        autosave();
+      }
+    });
+  });
+}
 
 window.updateOption = function (questionId, optionIndex, value) {
   const question = quizData.questions.find((q) => q.id === questionId);
@@ -815,14 +827,34 @@ function rerenderOptions(questionId) {
     );
     if (container) {
       container.innerHTML = renderOptions(question);
-      // Auto-resize all option textareas
-      container.querySelectorAll(".option-textarea").forEach((ta) => {
-        autoResizeTextarea(ta);
-      });
+      setupOptionMdEditors(questionId);
       if (typeof lucide !== "undefined") lucide.createIcons();
     }
   }
 }
+
+window.addOption = function (questionId) {
+  const question = quizData.questions.find((q) => q.id === questionId);
+  if (question) {
+    question.options.push("");
+    rerenderOptions(questionId);
+    updateStatistics();
+    autosave();
+  }
+};
+
+window.removeOption = function (questionId, optionIndex) {
+  const question = quizData.questions.find((q) => q.id === questionId);
+  if (question && question.options.length > 1) {
+    question.options.splice(optionIndex, 1);
+    if (question.correct >= question.options.length) {
+      question.correct = question.options.length - 1;
+    }
+    rerenderOptions(questionId);
+    updateStatistics();
+    autosave();
+  }
+};
 
 // ============================================================================
 // COLLAPSIBLE SECTIONS
@@ -860,13 +892,16 @@ function handleSearch(e) {
 
   let visibleCount = 0;
   questionCards.forEach((card) => {
-    const questionText = card.querySelector("textarea").value.toLowerCase();
+    // Read from the md-source textarea (the raw text field)
+    const sourceTextarea = card.querySelector(".md-source");
+    const questionText = (
+      sourceTextarea ? sourceTextarea.value : ""
+    ).toLowerCase();
     const matches = questionText.includes(searchTerm);
     card.style.display = matches ? "block" : "none";
     if (matches) visibleCount++;
   });
 
-  // Show message if no results
   if (visibleCount === 0 && searchTerm) {
     showNotification(
       "لا توجد نتائج",
@@ -939,13 +974,19 @@ window.sortQuestions = function (type = "alpha") {
 
   cards.sort((a, b) => {
     if (type === "alpha") {
-      const textA = a.querySelector("textarea").value.toLowerCase();
-      const textB = b.querySelector("textarea").value.toLowerCase();
+      const textA = (
+        a.querySelector(".md-source") ||
+        a.querySelector("textarea") || { value: "" }
+      ).value.toLowerCase();
+      const textB = (
+        b.querySelector(".md-source") ||
+        b.querySelector("textarea") || { value: "" }
+      ).value.toLowerCase();
       return textA.localeCompare(textB, "ar");
     } else if (type === "recent") {
       const idA = parseInt(a.dataset.questionId);
       const idB = parseInt(b.dataset.questionId);
-      return idB - idA; // Most recent first
+      return idB - idA;
     }
     return 0;
   });
@@ -990,6 +1031,7 @@ window.toggleBulkMode = function () {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.className = "question-select-checkbox";
+        checkbox.onclick = (e) => e.stopPropagation();
         checkbox.onchange = (e) =>
           handleQuestionSelect(e, parseInt(card.dataset.questionId));
 
@@ -1242,8 +1284,7 @@ window.addQuestionFromTemplate = function (templateType) {
     const questionCard = document.getElementById(`question-${questionId}`);
     if (questionCard) {
       questionCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      const textarea = questionCard.querySelector("textarea");
-      if (textarea) textarea.focus();
+      activateMdEditor(`question-text-${questionId}`);
 
       // Auto-open image section if image template
       if (templateType === "image") {
@@ -1280,18 +1321,10 @@ function autosave() {
 
   autosaveTimeout = setTimeout(() => {
     try {
-      // Normalize actual newlines in textarea values back to \n strings for storage
-      const questionsToSave = quizData.questions.map((q) => ({
-        ...q,
-        q: q.q,  // already stored as-is (with real newlines)
-        options: q.options,
-        explanation: q.explanation,
-      }));
-
       const dataToSave = {
         title: quizData.title,
         description: quizData.description,
-        questions: questionsToSave,
+        questions: quizData.questions,
         lastModified: new Date().toISOString(),
       };
 
@@ -1472,7 +1505,6 @@ function updateInUserQuizzes(quizId, quizToSave) {
 
 window.exportQuiz = function () {
   const errors = validateQuiz();
-
   if (errors.length > 0) {
     showNotification(
       "خطأ في التحقق",
@@ -1482,24 +1514,15 @@ window.exportQuiz = function () {
     return;
   }
 
-  // Build the config and questions arrays for export modules
-  const config = {
-    title: quizData.title,
-    description: quizData.description,
-  };
-
+  const config = { title: quizData.title, description: quizData.description };
   const exportQuestions = quizData.questions.map((q) => {
-    const question = {
-      q: q.q,
-      options: q.options,
-      correct: q.correct,
-    };
-    if (q.image && q.image.trim()) question.image = q.image;
-    if (q.explanation && q.explanation.trim()) question.explanation = q.explanation;
-    return question;
+    const out = { q: q.q, options: q.options, correct: q.correct };
+    if (q.image?.trim()) out.image = q.image;
+    if (q.explanation?.trim()) out.explanation = q.explanation;
+    return out;
   });
 
-  const handleExport = async (format) => {
+  const doExport = async (format) => {
     showLoading("جاري التصدير...");
     try {
       switch (format) {
@@ -1522,8 +1545,14 @@ window.exportQuiz = function () {
           exportToMarkdown(config, exportQuestions);
           break;
         case "json": {
-          const payload = { title: quizData.title, description: quizData.description, questions: exportQuestions };
-          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          const payload = {
+            title: quizData.title,
+            description: quizData.description,
+            questions: exportQuestions,
+          };
+          const blob = new Blob([JSON.stringify(payload, null, 2)], {
+            type: "application/json",
+          });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -1536,7 +1565,7 @@ window.exportQuiz = function () {
         }
       }
       hideLoading();
-      showNotification("تم التحميل!", "تم تحميل الملف بنجاح", "success");
+      showNotification("تم التحميل!", "تم تصدير الاختبار بنجاح", "success");
     } catch (err) {
       hideLoading();
       console.error("Export error:", err);
@@ -1544,82 +1573,55 @@ window.exportQuiz = function () {
     }
   };
 
-  // Build download popup
+  // Build popup modal
   const modal = document.createElement("div");
-  modal.className = "modal-overlay";
+  modal.className = "modal-overlay download-modal-overlay";
   modal.setAttribute("role", "dialog");
   modal.setAttribute("aria-modal", "true");
-  modal.setAttribute("aria-labelledby", "downloadModalTitle");
-
-  const modalCard = document.createElement("div");
-  modalCard.className = "modal-card";
-
-  const h2 = document.createElement("h2");
-  h2.id = "downloadModalTitle";
-  h2.innerHTML = `<i data-lucide="download"></i> تحميل الإمتحان`;
-
-  const p = document.createElement("p");
-  p.textContent = "اختر صيغة التحميل";
-
-  const grid = document.createElement("div");
-  grid.className = "mode-grid";
-  grid.setAttribute("role", "group");
-  grid.setAttribute("aria-label", "خيارات التحميل");
 
   const downloadOpts = [
-    ["./favicon.png", "Quiz (.html)", "quiz"],
-    ["./assets/images/HTML_Icon.png", "HTML (.html)", "html"],
-    ["./assets/images/mardownIcon.png", "Markdown (.md)", "md"],
-    ["./assets/images/PDF_Icon.png", "PDF (.pdf)", "pdf"],
-    ["./assets/images/pptx_icon.png", "PowerPoint (.pptx)", "pptx"],
-    ["./assets/images/word_icon.png", "Word (.docx)", "docx"],
+    { icon: "🎯", label: "Quiz", sublabel: "(.html)", format: "quiz" },
+    { icon: "🌐", label: "HTML", sublabel: "(.html)", format: "html" },
+    { icon: "📄", label: "Markdown", sublabel: "(.md)", format: "md" },
+    { icon: "📕", label: "PDF", sublabel: "(.pdf)", format: "pdf" },
+    { icon: "📊", label: "PowerPoint", sublabel: "(.pptx)", format: "pptx" },
+    { icon: "📝", label: "Word", sublabel: "(.docx)", format: "docx" },
+    { icon: "{ }", label: "JSON", sublabel: "(.json)", format: "json" },
   ];
 
-  downloadOpts.forEach(([icon, label, format]) => {
-    const b = document.createElement("button");
-    b.className = "mode-btn";
-    b.type = "button";
-    b.setAttribute("aria-label", `تنزيل كـ ${label}`);
-    // Try icon image, fall back gracefully
-    b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true" onerror="this.style.display='none'"><strong>${label}</strong>`;
-    b.onclick = (ev) => {
-      ev.stopPropagation();
-      modal.remove();
-      handleExport(format);
-    };
-    grid.appendChild(b);
-  });
+  const optionsHtml = downloadOpts
+    .map(
+      ({ icon, label, sublabel, format }) => `
+    <button class="dl-option-btn" data-format="${format}" aria-label="تنزيل كـ ${label}">
+      <span class="dl-icon">${icon}</span>
+      <span class="dl-label">${label}</span>
+      <span class="dl-sublabel">${sublabel}</span>
+    </button>
+  `,
+    )
+    .join("");
 
-  // JSON button
-  const jsonBtn = document.createElement("button");
-  jsonBtn.className = "mode-btn";
-  jsonBtn.type = "button";
-  jsonBtn.setAttribute("aria-label", "تنزيل JSON (.json)");
-  jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
-  jsonBtn.onclick = (ev) => {
-    ev.stopPropagation();
-    modal.remove();
-    handleExport("json");
-  };
-  grid.appendChild(jsonBtn);
+  modal.innerHTML = `
+    <div class="modal-card dl-modal-card">
+      <div class="modal-header">
+        <h2><i data-lucide="download"></i> تحميل الإمتحان</h2>
+        <button class="close-btn dl-close" aria-label="إغلاق"><i data-lucide="x"></i></button>
+      </div>
+      <p class="dl-subtitle">اختر صيغة التحميل</p>
+      <div class="dl-grid">${optionsHtml}</div>
+    </div>
+  `;
 
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "close-modal";
-  closeBtn.type = "button";
-  closeBtn.textContent = "إلغاء";
-  closeBtn.setAttribute("aria-label", "إغلاق النافذة");
-  closeBtn.onclick = () => modal.remove();
-
-  // Close on backdrop click
+  modal.querySelector(".dl-close").onclick = () => modal.remove();
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.remove();
   });
-
-  modalCard.appendChild(h2);
-  modalCard.appendChild(p);
-  modalCard.appendChild(grid);
-  modalCard.appendChild(closeBtn);
-  modal.appendChild(modalCard);
+  modal.querySelectorAll(".dl-option-btn").forEach((btn) => {
+    btn.onclick = () => {
+      modal.remove();
+      doExport(btn.dataset.format);
+    };
+  });
 
   document.body.appendChild(modal);
   if (typeof lucide !== "undefined") lucide.createIcons();
@@ -1782,17 +1784,17 @@ window.previewQuiz = function () {
   quizData.questions.forEach((q, index) => {
     html += `
       <div class="preview-question">
-        <h4>السؤال ${index + 1}: ${escapeHtml(q.q)}</h4>
+        <h4>السؤال ${index + 1}: ${renderMarkdown(q.q)}</h4>
         ${q.image ? `<img src="${escapeHtml(q.image)}" class="preview-image" alt="صورة السؤال" onerror="this.style.display='none'">` : ""}
         <ul class="preview-options">
           ${q.options
             .map(
               (opt, i) =>
-                `<li class="${i === q.correct ? "correct" : ""}">${escapeHtml(opt)}${i === q.correct ? " ✓" : ""}</li>`,
+                `<li class="${i === q.correct ? "correct" : ""}">${renderMarkdown(opt)}${i === q.correct ? " ✓" : ""}</li>`,
             )
             .join("")}
         </ul>
-        ${q.explanation ? `<div class="preview-explanation"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;margin-left:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> ${escapeHtml(q.explanation)}</div>` : ""}
+        ${q.explanation ? `<div class="preview-explanation"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;margin-left:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> ${renderMarkdown(q.explanation)}</div>` : ""}
       </div>
     `;
   });
@@ -1813,6 +1815,7 @@ window.closePreview = function () {
 window.importQuestions = function () {
   const modal = document.getElementById("importModal");
   modal.style.display = "flex";
+  setupImportDropzone();
 };
 
 window.closeImportModal = function () {
@@ -1825,14 +1828,55 @@ window.closeImportModal = function () {
   if (fileLabel) fileLabel.textContent = "لم يتم اختيار أي ملف";
 };
 
+function setupImportDropzone() {
+  const dropzone = document.getElementById("importDropzone");
+  if (!dropzone || dropzone.dataset.dropReady) return;
+  dropzone.dataset.dropReady = "1";
+
+  dropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.classList.add("drag-active");
+  });
+  dropzone.addEventListener("dragleave", () =>
+    dropzone.classList.remove("drag-active"),
+  );
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("drag-active");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const fileInput = document.getElementById("importFileInput");
+      // Can't set files directly, so read them here
+      handleDroppedFiles(files);
+    }
+  });
+}
+
+function handleDroppedFiles(files) {
+  const label = document.getElementById("importFileLabel");
+  if (label) {
+    label.textContent = Array.from(files)
+      .map((f) => f.name)
+      .join(", ");
+  }
+  // Store for processImport — use a module-level variable
+  window._droppedImportFiles = files;
+}
+
 window.processImport = async function () {
   const textarea = document.getElementById("importTextarea");
   const fileInput = document.getElementById("importFileInput");
   const content = textarea.value.trim();
-  const files = fileInput ? fileInput.files : null;
+  const files =
+    window._droppedImportFiles ||
+    (fileInput && fileInput.files.length > 0 ? fileInput.files : null);
 
   if (!content && (!files || files.length === 0)) {
-    showNotification("خطأ", "الرجاء إدخال محتوى أو اختيار ملف للاستيراد", "error");
+    showNotification(
+      "خطأ",
+      "الرجاء إدخال محتوى أو اختيار ملف للاستيراد",
+      "error",
+    );
     return;
   }
 
@@ -1840,51 +1884,80 @@ window.processImport = async function () {
 
   try {
     let allImportedQuestions = [];
-    let importedCount = 0;
+    let savedQuizzesCount = 0;
 
     // Process file uploads
     if (files && files.length > 0) {
       for (const file of files) {
         const text = await file.text();
-        const parsed = parseImportContent(text, file.name.replace(/\.json$/, ""));
-        if (parsed.questions) {
-          allImportedQuestions = allImportedQuestions.concat(parsed.questions);
-          // If has meta, save as separate quiz in user_quizzes
-          if (parsed.meta) {
-            const existingQuizzes = JSON.parse(localStorage.getItem("user_quizzes") || "[]");
-            const quizId = `user_quiz_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-            existingQuizzes.push({
-              id: quizId,
-              title: parsed.meta.title || file.name.replace(/\.json$/, ""),
-              description: parsed.meta.description || "",
-              questions: parsed.questions,
-              createdAt: new Date().toISOString(),
-              author: "Imported",
-            });
-            localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
-            importedCount++;
+        // Derive default title from filename
+        const defaultTitle = file.name
+          .replace(/\.(json|txt)$/i, "")
+          .replace(/[-_]/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+
+        const parsed = parseImportContent(text, defaultTitle);
+        allImportedQuestions = allImportedQuestions.concat(parsed.questions);
+
+        // If meta found, save as a separate quiz in library
+        if (parsed.meta) {
+          const existingQuizzes = JSON.parse(
+            localStorage.getItem("user_quizzes") || "[]",
+          );
+          const quizId = `user_quiz_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+          existingQuizzes.push({
+            id: quizId,
+            title: parsed.meta.title || defaultTitle,
+            description: parsed.meta.description || "",
+            questions: parsed.questions,
+            createdAt: new Date().toISOString(),
+            author: "Imported",
+          });
+          localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
+          savedQuizzesCount++;
+        }
+
+        // Also apply title to current quiz if blank
+        if (!quizData.title && parsed.meta) {
+          quizData.title = parsed.meta.title || defaultTitle;
+          quizData.description = parsed.meta.description || "";
+          const titleEl = document.getElementById("quizTitle");
+          const descEl = document.getElementById("quizDescription");
+          if (titleEl) {
+            titleEl.value = quizData.title;
+            updateCharCount("titleCharCount", quizData.title.length, 100);
+          }
+          if (descEl) {
+            descEl.value = quizData.description;
+            updateCharCount("descCharCount", quizData.description.length, 500);
           }
         }
       }
+      // Clear dropped files
+      window._droppedImportFiles = null;
     }
 
     // Process pasted content
     if (content) {
       const parsed = parseImportContent(content);
-      if (parsed.questions) {
-        allImportedQuestions = allImportedQuestions.concat(parsed.questions);
-        if (parsed.meta && !quizData.title) {
-          quizData.title = parsed.meta.title || "";
-          quizData.description = parsed.meta.description || "";
-          const titleEl = document.getElementById("quizTitle");
-          const descEl = document.getElementById("quizDescription");
-          if (titleEl) titleEl.value = quizData.title;
-          if (descEl) descEl.value = quizData.description;
+      allImportedQuestions = allImportedQuestions.concat(parsed.questions);
+      if (!quizData.title && parsed.meta) {
+        quizData.title = parsed.meta.title || "";
+        quizData.description = parsed.meta.description || "";
+        const titleEl = document.getElementById("quizTitle");
+        const descEl = document.getElementById("quizDescription");
+        if (titleEl) {
+          titleEl.value = quizData.title;
+          updateCharCount("titleCharCount", quizData.title.length, 100);
+        }
+        if (descEl) {
+          descEl.value = quizData.description;
+          updateCharCount("descCharCount", quizData.description.length, 500);
         }
       }
     }
 
-    // Add all questions to current quiz
+    // Add questions to current quiz
     allImportedQuestions.forEach((q) => {
       const questionId = ++questionIdCounter;
       const question = {
@@ -1907,12 +1980,12 @@ window.processImport = async function () {
     hideLoading();
     closeImportModal();
 
-    const msg = allImportedQuestions.length > 0
-      ? `تم استيراد ${allImportedQuestions.length} سؤال` +
-        (importedCount > 0 ? ` وحفظ ${importedCount} اختبار في مكتبتك` : "")
-      : "تم الاستيراد";
-    showNotification("تم الاستيراد!", msg, "success");
-
+    const parts = [];
+    if (allImportedQuestions.length > 0)
+      parts.push(`استيراد ${allImportedQuestions.length} سؤال`);
+    if (savedQuizzesCount > 0)
+      parts.push(`حفظ ${savedQuizzesCount} اختبار في المكتبة`);
+    showNotification("تم الاستيراد!", parts.join(" و") || "اكتمل", "success");
   } catch (error) {
     hideLoading();
     console.error("Import error:", error);
@@ -1920,89 +1993,120 @@ window.processImport = async function () {
   }
 };
 
-// Parse import content (JSON or numbered text format)
+/** Parse a string as JSON array/object OR numbered text format */
 function parseImportContent(content, defaultTitle = "") {
   const trimmed = content.trim();
 
-  // Try JSON first
+  // --- JSON ---
   if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
     try {
       if (trimmed.startsWith("{")) {
-        const data = JSON.parse(content);
-        const questions = Array.isArray(data.questions) ? data.questions : null;
-        const meta = data.meta || (data.title ? { title: data.title, description: data.description || "" } : null);
-        if (!questions && !Array.isArray(data)) throw new Error("لا توجد أسئلة");
-        return { questions: questions || data, meta };
+        const data = JSON.parse(trimmed);
+        const questions = Array.isArray(data.questions)
+          ? data.questions
+          : Array.isArray(data)
+            ? data
+            : null;
+        const meta =
+          data.meta ||
+          (data.title
+            ? { title: data.title, description: data.description || "" }
+            : defaultTitle
+              ? { title: defaultTitle }
+              : null);
+        if (!questions) throw new Error("لا توجد أسئلة في البيانات");
+        return { questions, meta };
       } else {
-        const questions = JSON.parse(content);
+        const questions = JSON.parse(trimmed);
         if (!Array.isArray(questions)) throw new Error("ليست مصفوفة");
-        return { questions, meta: defaultTitle ? { title: defaultTitle } : null };
+        const meta = defaultTitle ? { title: defaultTitle } : null;
+        return { questions, meta };
       }
     } catch (e) {
       throw new Error("JSON غير صحيح: " + e.message);
     }
   }
 
-  // Try numbered text format:
+  // --- Numbered text format ---
   // 1. Question text
-  // A. option
-  // B. option
+  // A. option / B. option
   // Correct: A
   // Explanation: ...
   const questions = [];
-  const blocks = trimmed.split(/\n(?=\d+\.)/);
+  const blocks = trimmed.split(/(?=^\d+\.)/m);
 
   for (const block of blocks) {
-    const lines = block.trim().split("\n").map((l) => l.trim()).filter(Boolean);
-    if (lines.length === 0) continue;
+    const lines = block
+      .trim()
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (!lines.length) continue;
 
-    // First line: "1. Question text"
-    const firstLineMatch = lines[0].match(/^\d+\.\s*(.*)/);
-    if (!firstLineMatch) continue;
+    const firstMatch = lines[0].match(/^\d+\.\s*(.*)/);
+    if (!firstMatch) continue;
 
-    const q = firstLineMatch[1].trim();
+    let q = firstMatch[1].trim();
+    // Collect multi-line question text until first option
+    let lineIdx = 1;
+    while (
+      lineIdx < lines.length &&
+      !lines[lineIdx].match(/^[A-Eأ-ي][.)]\s*/)
+    ) {
+      if (
+        lines[lineIdx].match(
+          /^(?:Correct|الصحيح|الإجابة|Explanation|الشرح)\s*[:\-]/i,
+        )
+      )
+        break;
+      q += "\n" + lines[lineIdx];
+      lineIdx++;
+    }
+
     const options = [];
     const optionLetters = [];
     let correct = 0;
     let explanation = "";
 
-    for (let i = 1; i < lines.length; i++) {
+    for (let i = lineIdx; i < lines.length; i++) {
       const line = lines[i];
-
-      // Option line: A. text or A) text
       const optMatch = line.match(/^([A-Eأ-ي])[.)]\s*(.*)/);
       if (optMatch) {
-        optionLetters.push(optMatch[1]);
+        optionLetters.push(optMatch[1].toUpperCase());
         options.push(optMatch[2].trim());
         continue;
       }
 
-      // Correct answer line
-      const correctMatch = line.match(/^(?:Correct|الصحيح|الإجابة)\s*[:\-]\s*(.+)/i);
+      const correctMatch = line.match(
+        /^(?:Correct|الصحيح|الإجابة الصحيحة|Answer)\s*[:\-]\s*(.+)/i,
+      );
       if (correctMatch) {
         const letter = correctMatch[1].trim().charAt(0).toUpperCase();
-        const idx = optionLetters.findIndex((l) => l.toUpperCase() === letter);
+        const idx = optionLetters.indexOf(letter);
         correct = idx >= 0 ? idx : 0;
         continue;
       }
 
-      // Explanation line
-      const expMatch = line.match(/^(?:Explanation|الشرح|شرح)\s*[:\-]\s*(.*)/i);
+      const expMatch = line.match(
+        /^(?:Explanation|الشرح|شرح|Reason)\s*[:\-]\s*(.*)/i,
+      );
       if (expMatch) {
         explanation = expMatch[1].trim();
         continue;
       }
     }
 
-    if (q && options.length > 0) {
-      questions.push({ q, options, correct, explanation });
-    }
+    if (q)
+      questions.push({
+        q: q.trim(),
+        options: options.length ? options : [""],
+        correct,
+        explanation,
+      });
   }
 
-  if (questions.length === 0) {
-    throw new Error("التنسيق غير مدعوم. الرجاء لصق JSON أو نص بتنسيق مرقّم.");
-  }
-
+  if (!questions.length)
+    throw new Error("التنسيق غير مدعوم. الرجاء لصق JSON أو نص مرقّم.");
   return { questions, meta: defaultTitle ? { title: defaultTitle } : null };
 }
 
@@ -2051,11 +2155,6 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
-
-window.autoResizeTextarea = function (textarea) {
-  textarea.style.height = "auto";
-  textarea.style.height = textarea.scrollHeight + "px";
-};
 
 function debounce(func, wait) {
   let timeout;
