@@ -1,7 +1,7 @@
 // src/scripts/exportToPdf.js
 // Downloads the quiz as a PDF file (.pdf)
 // Deals with the export from both main page and results/summary page
-// `jsPDF` library used, included in the html. See => "summary.html"
+// `jsPDF` library used, included in here `loadPdfLib`
 
 import { showNotification } from "../components/notifications.js";
 
@@ -21,7 +21,12 @@ const loadPdfLib = () =>
     document.head.appendChild(s);
   });
 
-export async function exportToPdf(config, questions, userAnswers = []) {
+export async function exportToPdf(
+  config,
+  questions,
+  userAnswers = [],
+  result = {},
+) {
   try {
     try {
       await loadPdfLib();
@@ -1172,26 +1177,36 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         wrong = 0,
         skipped = 0,
         essayCount = 0,
-        totalScorable = 0;
+        essayScoreTotal = 0,
+        essayMaxTotal = 0,
+        mcqTotal = 0;
       questions.forEach((q, i) => {
         if (isEssayQuestion(q)) {
           essayCount++;
+          essayScoreTotal += gradeEssay(userAnswers[i], q.options[0]);
+          essayMaxTotal += 5;
           return;
         }
-        totalScorable++;
+        mcqTotal++;
         const a = userAnswers[i];
         if (a === undefined || a === null) skipped++;
-        else if (a === q.correct) correct++;
+        else if (a === (q.correct ?? q.answer)) correct++;
         else wrong++;
       });
+      const totalPoints = correct + essayScoreTotal;
+      const maxPoints = mcqTotal + essayMaxTotal;
       const pct =
-        totalScorable > 0 ? Math.round((correct / totalScorable) * 100) : 0;
+        maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
       return {
         correct,
         wrong,
         skipped,
         essayCount,
-        totalScorable,
+        essayScoreTotal,
+        essayMaxTotal,
+        mcqTotal,
+        totalPoints,
+        maxPoints,
         percentage: pct,
         isPassing: pct >= 70,
       };
@@ -1206,11 +1221,31 @@ export async function exportToPdf(config, questions, userAnswers = []) {
         : Object.keys(userAnswers).length > 0);
 
     const renderScorePage = () => {
+      // ── Gather extra result metadata (safe fallbacks) ──────────────
+      const timeElapsed = result.timeElapsed ?? 0;
+      const points = result.gamification?.pointsEarned ?? 0;
+      const newBadges = result.gamification?.newBadges ?? [];
+      const timeStr = `${Math.floor(timeElapsed / 60)}m ${timeElapsed % 60}s`;
+
+      // ── Dynamically compute card height ───────────────────────────
+      // Traced from actual rendering geometry:
+      // cardY+5 → title banner(12) → currentY = cardY+27
+      // circle center at cardY+40, radius=18 → currentY = cardY+64
+      // motivational text ≈ 10mm → cardY+74
+      // total score (7mm) → cardY+81
+      // conditional rows added below
+      // time (3gap + 8) = 11mm, bottom room = 8mm → base ends at cardY+100
+      let cardH = 100; // base: title + circle + motive + score + time + bottom
+      if (scoreData.mcqTotal > 0) cardH += 11; // MCQ pills: 7mm + 4mm gap
+      if (scoreData.essayCount > 0) cardH += 13; // Essay row: 9mm + 4mm gap
+      if (points > 0) cardH += 11; // Points pill: 7mm + 4mm gap
+      if (newBadges.length > 0) cardH += 7 + newBadges.length * 8; // Badges
+
       addGameHeader();
-      const cardY = currentY,
-        cardH = 85;
+      const cardY = currentY;
       drawCard(MARGINS.left, cardY, contentWidth, cardH);
 
+      // ── Title banner ──────────────────────────────────────────────
       currentY = cardY + 5;
       setPdfFillColor(...COLORS.primary);
       doc.roundedRect(
@@ -1229,6 +1264,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       });
       currentY += 22;
 
+      // ── Percentage circle ─────────────────────────────────────────
       const circleY = currentY + 13,
         radius = 18;
       setPdfFillColor(...COLORS.secondary);
@@ -1242,38 +1278,204 @@ export async function exportToPdf(config, questions, userAnswers = []) {
       doc.text(`${scoreData.percentage}%`, pageWidth / 2, circleY + 2, {
         align: "center",
       });
-      currentY = circleY + radius + 10;
+      currentY = circleY + radius + 6;
 
-      setPdfFont("helvetica", "bold", 18);
-      setPdfTextColor(...COLORS.primary);
-      doc.text(
-        scoreData.isPassing ? "LEGENDARY!" : "KEEP GRINDING!",
-        pageWidth / 2,
-        currentY,
-        { align: "center" },
-      );
-      currentY += 9;
+      // ── Motivational line ─────────────────────────────────────────
+      // Note: render WITHOUT rtl=true so the canvas image left-anchors and
+      // can be properly centered. Arabic letters still render correctly on
+      // canvas without explicit RTL direction (browser handles bidi).
+      const isArabicName = hasArabic(currentName);
+      const motiveText = scoreData.isPassing
+        ? isArabicName
+          ? `احسنت يا ${currentName}!`
+          : `LEGENDARY, ${currentName}!`
+        : isArabicName
+          ? `استمر في المذاكرة يا ${currentName}`
+          : `KEEP GRINDING, ${currentName}!`;
+      if (hasNonLatin(motiveText)) {
+        // Measure actual text width so we can create a tight canvas and
+        // centre it on the page. This avoids left-shift from an oversized box.
+        const { ctx: mCtx, pxSize: mPx } = getMeasureCtx(13, true);
+        const textPxW = mCtx.measureText(motiveText).width;
+        const motiveW = Math.min(
+          textPxW / (CANVAS_DPR * 3.7795275591) + 2, // tight fit + 2mm pad
+          contentWidth * 0.9, // safety cap
+        );
+        const motiveX = pageWidth / 2 - motiveW / 2;
+        const mh = renderUnicodeText(
+          motiveText,
+          motiveX,
+          currentY,
+          motiveW,
+          COLORS.primary,
+          13,
+          true,
+          false,
+        );
+        currentY += mh + 4;
+      } else {
+        setPdfFont("helvetica", "bold", 14);
+        setPdfTextColor(...COLORS.primary);
+        doc.text(motiveText, pageWidth / 2, currentY + 5, { align: "center" });
+        currentY += 10;
+      }
 
-      setPdfFont("helvetica", "normal", SIZES.qFont);
+      // ── Total score line ──────────────────────────────────────────
+      setPdfFont("helvetica", "bold", SIZES.qFont);
       setPdfTextColor(...COLORS.textDark);
       doc.text(
-        `Score: ${scoreData.correct} / ${scoreData.totalScorable}`,
+        `Total Score: ${scoreData.totalPoints} / ${scoreData.maxPoints}`,
         pageWidth / 2,
         currentY,
         { align: "center" },
       );
-      currentY += 5;
+      currentY += 7;
 
+      // ── MCQ breakdown (only if MCQ questions exist) ───────────────
+      if (scoreData.mcqTotal > 0) {
+        const bx = MARGINS.left + 6;
+        const bw = (contentWidth - 12) / 3;
+        const pillH = 7;
+        const midY = currentY + pillH / 2; // vertical text centre
+
+        setPdfFont("helvetica", "bold", SIZES.labelFont);
+
+        // Correct pill
+        setPdfFillColor(...COLORS.btnCorrect);
+        doc.roundedRect(bx, currentY, bw - 2, pillH, 1.5, 1.5, "F");
+        setPdfTextColor(...COLORS.textWhite);
+        doc.text(`Correct ${scoreData.correct}`, bx + (bw - 2) / 2, midY, {
+          align: "center",
+          baseline: "middle",
+        });
+
+        // Wrong pill
+        setPdfFillColor(...COLORS.btnWrong);
+        doc.roundedRect(bx + bw, currentY, bw - 2, pillH, 1.5, 1.5, "F");
+        setPdfTextColor(...COLORS.textWhite);
+        doc.text(`Wrong ${scoreData.wrong}`, bx + bw + (bw - 2) / 2, midY, {
+          align: "center",
+          baseline: "middle",
+        });
+
+        // Skipped pill
+        setPdfFillColor(...COLORS.progressBg);
+        doc.roundedRect(bx + bw * 2, currentY, bw - 2, pillH, 1.5, 1.5, "F");
+        setPdfTextColor(...COLORS.textLight);
+        doc.text(
+          `Skipped ${scoreData.skipped}`,
+          bx + bw * 2 + (bw - 2) / 2,
+          midY,
+          { align: "center", baseline: "middle" },
+        );
+
+        currentY += pillH + 4;
+      }
+
+      // ── Essay row (only if essay questions exist) ─────────────────
+      if (scoreData.essayCount > 0) {
+        const avgStars = Math.round(
+          scoreData.essayScoreTotal / scoreData.essayCount,
+        );
+        const stars = "\u2605".repeat(avgStars) + "\u2606".repeat(5 - avgStars);
+        const essayLabel = `Essay: ${scoreData.essayScoreTotal} / ${scoreData.essayMaxTotal}`;
+        const rowH = 9;
+        const rowY = currentY;
+
+        // Row background
+        setPdfFillColor(240, 253, 244);
+        doc.roundedRect(
+          MARGINS.left + 6,
+          rowY,
+          contentWidth - 12,
+          rowH,
+          1.5,
+          1.5,
+          "F",
+        );
+        doc.setDrawColor(...COLORS.success);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(
+          MARGINS.left + 6,
+          rowY,
+          contentWidth - 12,
+          rowH,
+          1.5,
+          1.5,
+          "S",
+        );
+
+        // Essay label (left-aligned)
+        setPdfFont("helvetica", "bold", SIZES.labelFont);
+        setPdfTextColor(...COLORS.success);
+        doc.text(essayLabel, MARGINS.left + 10, rowY + rowH / 2 - 0.5, {
+          baseline: "middle",
+        });
+
+        // Stars centred in the right half of the row via canvas
+        const starsW = 28; // fixed width for 5 star glyphs
+        const starsX = pageWidth / 2 - starsW / 2;
+        renderUnicodeText(
+          stars,
+          starsX,
+          rowY + 0.5,
+          starsW,
+          COLORS.warning,
+          SIZES.optFont + 2,
+          false,
+          false,
+        );
+        currentY += rowH + 4;
+      }
+
+      // ── Time line ─────────────────────────────────────────────────
+      currentY += 3; // breathing room above time
       setPdfFont("helvetica", "normal", SIZES.optFont);
       setPdfTextColor(...COLORS.textLight);
-      doc.text(
-        `Correct: ${scoreData.correct}  Wrong: ${scoreData.wrong}  Skipped: ${scoreData.skipped}`,
-        pageWidth / 2,
-        currentY,
-        { align: "center" },
-      );
+      doc.text(`Time: ${timeStr}`, pageWidth / 2, currentY + 2, {
+        align: "center",
+      });
+      currentY += 8;
 
-      currentY = cardY + cardH + 10;
+      // ── Points pill (only if non-zero) ───────────────────────────
+      if (points > 0) {
+        const pillW = 38,
+          pillH = 7;
+        const pillX = pageWidth / 2 - pillW / 2;
+        setPdfFillColor(...COLORS.secondary);
+        doc.roundedRect(pillX, currentY - 1, pillW, pillH, 3, 3, "F");
+        setPdfFont("helvetica", "bold", SIZES.labelFont);
+        setPdfTextColor(...COLORS.textDark);
+        doc.text(`+ ${points} Points`, pageWidth / 2, currentY + 3.5, {
+          align: "center",
+        });
+        currentY += 9;
+      }
+
+      // ── Badges section (only if any earned) ───────────────────────
+      if (newBadges.length > 0) {
+        setPdfFont("helvetica", "bold", SIZES.labelFont);
+        setPdfTextColor(...COLORS.primary);
+        doc.text("Badges Earned:", MARGINS.left + 6, currentY + 1);
+        currentY += 5;
+        for (const badge of newBadges) {
+          const badgeText = `${badge.icon}  ${badge.title}`;
+          renderUnicodeText(
+            badgeText,
+            MARGINS.left + 8,
+            currentY,
+            contentWidth - 16,
+            COLORS.primary,
+            SIZES.optFont,
+            false,
+            false,
+          );
+          currentY += 7;
+        }
+      }
+
+      // ── Progress bar (below card) ─────────────────────────────────
+      currentY = cardY + cardH + 8;
       drawProgressBar(
         MARGINS.left + 18,
         currentY,
@@ -1463,7 +1665,7 @@ export async function exportToPdf(config, questions, userAnswers = []) {
               doc.roundedRect(CC_X, y, BW, 10, 1.5, 1.5, "F");
               setPdfFont("helvetica", "bold", SIZES.optFont);
               setPdfTextColor(...COLORS.textWhite);
-              doc.text(_label, CC_X + 2, y + 3.5);
+              doc.text(_label, CC_X + 2, y + 5, { baseline: "middle" });
               renderUnicodeText(
                 _stars,
                 CC_X + 30,

@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       exportToMarkdown(config, questions, result.userAnswers));
   exportPdfBtn &&
     (exportPdfBtn.onclick = async () =>
-      await exportToPdf(config, questions, result.userAnswers));
+      await exportToPdf(config, questions, result.userAnswers, result));
   exportWordBtn &&
     (exportWordBtn.onclick = async () =>
       await exportToWord(config, questions, result.userAnswers));

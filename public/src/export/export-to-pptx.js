@@ -3,17 +3,6 @@
 // Deals with the export from both main page and results/summary page
 // `PptxGenJS` library used, included in this file.
 
-/**
- * =====================================================
- * EXPORT TO PPTX - PROFESSIONAL QUIZ PRESENTATION (V3)
- * =====================================================
- *
- * IMPROVEMENTS:
- * - Improved Text Padding (using `inset` instead of `margin`)
- * - Enhanced UI/UX (Modern color palette, background shapes, improved typography)
- * - visual polish for Header/Footer
- */
-
 import { showNotification } from "../components/notifications.js";
 
 let pptxgen;
