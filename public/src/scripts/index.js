@@ -1310,7 +1310,7 @@ function playUserQuiz(quiz) {
 
     // Navigate to quiz page with special parameter
     const mode = userProfile.getDefaultQuizMode();
-    window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=${encodeURIComponent(mode)}&type=user`;
+    window.location.href = `quiz.html?id=${encodeURIComponent(quiz.id)}&type=user`;
   } catch (error) {
     console.error("Error playing user quiz:", error);
     alert("حدث خطأ أثناء بدء الاختبار. حاول مرة أخرى.");
@@ -1519,8 +1519,7 @@ function createExamCard(exam) {
   btn.setAttribute("aria-label", `بدء اختبار ${exam.title || exam.id}`);
   btn.onclick = (ev) => {
     ev.stopPropagation();
-    const mode = userProfile.getDefaultQuizMode();
-    startQuiz(exam.id, mode);
+    startQuiz(exam.id);
   };
 
   const onDownloadOption = async (format, modalEl) => {
@@ -1733,13 +1732,8 @@ function isURL_orPath(string) {
   }
 }
 
-function startQuiz(id, mode) {
+function startQuiz(id) {
   try {
-    const quizMode =
-      mode || userProfile.getProfile().defaultQuizMode || "practice";
-
-    localStorage.setItem("quiz_current_mode", quizMode);
-    localStorage.setItem("quiz_current_id", id); // keep as fallback
     localStorage.setItem("quiz_start_time", Date.now().toString());
 
     // Only the quiz ID travels in the URL → links are shareable

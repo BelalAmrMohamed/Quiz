@@ -355,19 +355,12 @@ async function init() {
   // URL param `?id=` takes priority — this is what makes quizzes shareable.
   // Fall back to localStorage so existing sessions and user-quiz flows
   // (which use `?type=user`) continue to work without changes.
-  examId = params.get("id")
-    ? decodeURIComponent(params.get("id"))
-    : localStorage.getItem("quiz_current_id");
-
-  // Keep localStorage in sync for the rest of the codebase
-  if (examId) localStorage.setItem("quiz_current_id", examId);
+  examId = decodeURIComponent(params.get("id"));
 
   // ── Quiz Mode ────────────────────────────────────────────────────────────
   // Mode is intentionally NOT in the URL (links stay mode-agnostic).
   // Each device/user gets its own mode from their profile / localStorage.
-  quizMode =
-    localStorage.getItem("quiz_current_mode") ||
-    userProfile.getProfile().defaultQuizMode;
+  quizMode = userProfile.getProfile().defaultQuizMode;
 
   const startTime = localStorage.getItem("quiz_start_time");
 
@@ -389,8 +382,6 @@ async function init() {
     const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
     if (now - parseInt(startTime) > maxSessionAge) {
       console.warn("Quiz session expired");
-      localStorage.removeItem("quiz_current_mode");
-      localStorage.removeItem("quiz_current_id");
       localStorage.removeItem("quiz_start_time");
       alert("انتهت صلاحية الجلسة. يرجى بدء الاختبار من جديد.");
       window.location.href = "index.html";
@@ -1258,8 +1249,6 @@ async function finish(skipconfirmationNotification) {
   gameEngine.clearFlags(examId);
 
   // Clear quiz session data
-  localStorage.removeItem("quiz_current_mode");
-  localStorage.removeItem("quiz_current_id");
   localStorage.removeItem("quiz_start_time");
 
   window.location.href = "summary.html";
@@ -1338,9 +1327,6 @@ async function exit(skipconfirmationNotification) {
 
   localStorage.removeItem(`quiz_state_${examId}`);
 
-  // Clear quiz session data
-  localStorage.removeItem("quiz_current_mode");
-  localStorage.removeItem("quiz_current_id");
   localStorage.removeItem("quiz_start_time");
 
   window.location.href = "index.html";
