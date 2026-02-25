@@ -11,6 +11,10 @@ import { exportToPdf } from "../export/export-to-pdf.js";
 import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
+import {
+  extractTextFromFile,
+  parseImportContent,
+} from "./quiz-processor.js";
 
 const phoneNumber = "201118482193";
 const emailAddress = "belalamrofficial@gmail.com";
@@ -42,14 +46,14 @@ function renderMarkdown(str) {
   if (!str) return "";
   const codeBlocks = [];
   // 1. Extract fenced code blocks first
-  str = str.replace(/```([\w]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
     const idx = codeBlocks.length;
     const escaped = code
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
     codeBlocks.push(
-      `<pre class="code-block ltr"><code class="lang-${lang || "plain"}">${escaped.trim()}</code></pre>`,
+      `<pre class="code-block ltr"><code>${escaped.trim()}</code></pre>`,
     );
     return `\x00CODE${idx}\x00`;
   });
@@ -179,13 +183,23 @@ function setupMdEditor(id, onChange) {
     if (e.key === "Enter") {
       const val = source.value;
       const pos = source.selectionStart;
-      if (pos >= 3 && val.slice(pos - 3, pos) === "```") {
+      const before = val.slice(0, pos);
+      const after = val.slice(pos);
+      const lineStart = before.lastIndexOf("\n") + 1;
+      const currentLine = before.slice(lineStart);
+
+      // Only trigger when the current line is exactly ``` and
+      // there is no closing fence later in the text (avoid firing inside/after a closed block)
+      if (
+        currentLine.trim() === "```" &&
+        !/```/.test(after)
+      ) {
         e.preventDefault();
-        const before = val.slice(0, pos);
-        const after = val.slice(pos);
         const insertion = "\n\n```";
         source.value = before + insertion + after;
-        source.setSelectionRange(pos + 1, pos + 1);
+        // Place cursor on the empty line between the two fences
+        const newPos = before.length + 1;
+        source.setSelectionRange(newPos, newPos);
         source.dispatchEvent(new Event("input"));
         return;
       }
@@ -1058,14 +1072,22 @@ window.toggleExpand = function () {
 };
 
 window.expandAll = function () {
-  document.querySelectorAll(".question-card").forEach((card) => {
-    card.classList.remove("collapsed");
+  document.querySelectorAll(".question-card.collapsed").forEach((card) => {
+    const id = parseInt(card.dataset.questionId);
+    if (!Number.isNaN(id)) {
+      window.toggleQuestionCollapse(id);
+    }
   });
 };
 
 window.collapseAll = function () {
   document.querySelectorAll(".question-card").forEach((card) => {
-    card.classList.add("collapsed");
+    if (!card.classList.contains("collapsed")) {
+      const id = parseInt(card.dataset.questionId);
+      if (!Number.isNaN(id)) {
+        window.toggleQuestionCollapse(id);
+      }
+    }
   });
 };
 
@@ -1416,6 +1438,34 @@ function updateAutosaveIndicator(status) {
   }
 }
 
+// Ensure all loaded questions have stable numeric IDs before rendering
+function normalizeQuestionsWithIds(questions) {
+  let maxId = 0;
+  const normalized = questions.map((q) => {
+    let idNum = Number(q.id);
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      idNum = maxId + 1;
+    }
+    if (idNum > maxId) {
+      maxId = idNum;
+    }
+    return {
+      ...q,
+      id: idNum,
+    };
+  });
+
+  // Fallback for legacy data with no IDs at all
+  if (maxId === 0 && normalized.length > 0) {
+    normalized.forEach((q, index) => {
+      q.id = index + 1;
+    });
+    maxId = normalized.length;
+  }
+
+  return { questions: normalized, maxId };
+}
+
 function loadDraftFromLocalStorage() {
   try {
     const saved = localStorage.getItem("quiz_draft");
@@ -1435,13 +1485,16 @@ function loadDraftFromLocalStorage() {
       }
 
       if (data.questions && data.questions.length > 0) {
-        quizData.questions = data.questions;
-        questionIdCounter = Math.max(...data.questions.map((q) => q.id));
+        const { questions, maxId } = normalizeQuestionsWithIds(
+          data.questions,
+        );
+        quizData.questions = questions;
+        questionIdCounter = maxId;
 
         const container = document.getElementById("questionsContainer");
         container.innerHTML = "";
 
-        data.questions.forEach((question) => {
+        questions.forEach((question) => {
           renderQuestion(question);
         });
 
@@ -1477,8 +1530,9 @@ function loadQuizFromLocalStorage(quizId) {
       updateCharCount("descCharCount", quizData.description.length, 500);
 
       if (quiz.questions && quiz.questions.length > 0) {
-        quizData.questions = quiz.questions;
-        questionIdCounter = Math.max(...quiz.questions.map((q) => q.id), 0);
+        const { questions, maxId } = normalizeQuestionsWithIds(quiz.questions);
+        quizData.questions = questions;
+        questionIdCounter = maxId;
       }
 
       // Always clear and re-render everything
@@ -1987,117 +2041,6 @@ window.toggleSearchBar = function () {
   }
 };
 
-// ============================================================================
-// DOCUMENT TEXT EXTRACTION (PDF, DOCX, PPTX)
-// ============================================================================
-
-/**
- * Dynamically load a script from CDN.
- */
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-      return;
-    }
-    const s = document.createElement("script");
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
-/**
- * Extract raw text from a File object.
- * Supports: .json, .txt (plain read), .pdf (pdf.js), .docx (JSZip+XML), .pptx (JSZip+XML)
- */
-async function extractTextFromFile(file) {
-  const name = file.name.toLowerCase();
-  if (name.endsWith(".json") || name.endsWith(".txt")) {
-    return file.text();
-  }
-  if (name.endsWith(".pdf")) {
-    return extractTextFromPdf(file);
-  }
-  if (name.endsWith(".docx")) {
-    return extractTextFromDocx(file);
-  }
-  if (name.endsWith(".pptx")) {
-    return extractTextFromPptx(file);
-  }
-  return file.text();
-}
-
-async function extractTextFromPdf(file) {
-  await loadScript(
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-  );
-  const pdfjsLib = window["pdfjs-dist/build/pdf"];
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  let fullText = "";
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const tc = await page.getTextContent();
-    fullText += tc.items.map((item) => item.str).join(" ") + "\n";
-  }
-  return fullText;
-}
-
-async function extractTextFromDocx(file) {
-  await loadScript(
-    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
-  );
-  const JSZip = window.JSZip;
-  const arrayBuffer = await file.arrayBuffer();
-  const zip = await JSZip.loadAsync(arrayBuffer);
-  const docXml = zip.file("word/document.xml");
-  if (!docXml) throw new Error("ملف DOCX غير صحيح: لا يوجد document.xml");
-  const xmlText = await docXml.async("string");
-  // Strip XML tags and decode entities
-  return xmlText
-    .replace(/<w:p[ >]/g, "\n<w:p>")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-async function extractTextFromPptx(file) {
-  await loadScript(
-    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
-  );
-  const JSZip = window.JSZip;
-  const arrayBuffer = await file.arrayBuffer();
-  const zip = await JSZip.loadAsync(arrayBuffer);
-  let fullText = "";
-  const slideFiles = Object.keys(zip.files)
-    .filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f))
-    .sort((a, b) => {
-      const na = parseInt(a.match(/\d+/)[0]);
-      const nb = parseInt(b.match(/\d+/)[0]);
-      return na - nb;
-    });
-  for (const slideFile of slideFiles) {
-    const xmlText = await zip.file(slideFile).async("string");
-    const text = xmlText
-      .replace(/<a:p[ >]/g, "\n")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&amp;/g, "&")
-      .trim();
-    if (text) fullText += text + "\n";
-  }
-  return fullText.trim();
-}
-
 window.processImport = async function () {
   const textarea = document.getElementById("importTextarea");
   const fileInput = document.getElementById("importFileInput");
@@ -2251,134 +2194,6 @@ window.processImport = async function () {
     showNotification("خطأ في الاستيراد", error.message, "error");
   }
 };
-
-/** Parse a string as JSON array/object OR numbered text format */
-function parseImportContent(content, defaultTitle = "") {
-  const trimmed = content.trim();
-
-  // --- JSON ---
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-    try {
-      if (trimmed.startsWith("{")) {
-        const data = JSON.parse(trimmed);
-        const questions = Array.isArray(data.questions)
-          ? data.questions
-          : Array.isArray(data)
-            ? data
-            : null;
-        const meta =
-          data.meta ||
-          (data.title
-            ? { title: data.title, description: data.description || "" }
-            : defaultTitle
-              ? { title: defaultTitle }
-              : null);
-        if (!questions) throw new Error("لا توجد أسئلة في البيانات");
-        return { questions, meta };
-      } else {
-        const questions = JSON.parse(trimmed);
-        if (!Array.isArray(questions)) throw new Error("ليست مصفوفة");
-        const meta = defaultTitle ? { title: defaultTitle } : null;
-        return { questions, meta };
-      }
-    } catch (e) {
-      throw new Error("JSON غير صحيح: " + e.message);
-    }
-  }
-
-  // --- Numbered text format ---
-  // 1. Question text
-  // A. option / B) option / a. option / - option
-  // Correct: A
-  // Explanation: ...
-  const questions = [];
-  const blocks = trimmed.split(/(?=^\d+\.)/m);
-
-  for (const block of blocks) {
-    const lines = block
-      .trim()
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    if (!lines.length) continue;
-
-    const firstMatch = lines[0].match(/^\d+\.\s*(.*)/);
-    if (!firstMatch) continue;
-
-    let q = firstMatch[1].trim();
-    // Collect multi-line question text until first option
-    let lineIdx = 1;
-    while (
-      lineIdx < lines.length &&
-      !lines[lineIdx].match(/^(?:[A-Eا-ي][.)]\s*|-\s+)/)
-    ) {
-      if (
-        lines[lineIdx].match(
-          /^(?:Correct|الصحيح|الإجابة|Explanation|الشرح)\s*[:\-]/i,
-        )
-      )
-        break;
-      q += "\n" + lines[lineIdx];
-      lineIdx++;
-    }
-
-    const options = [];
-    const optionLetters = [];
-    let correct = 0;
-    let explanation = "";
-    let dashOptionIndex = 0; // for dash-style options
-
-    for (let i = lineIdx; i < lines.length; i++) {
-      const line = lines[i];
-      // Match: A) / A. / a) / a. (case-insensitive)
-      const optMatch = line.match(/^([A-Eا-ي])[.)]\s*(.*)/i);
-      if (optMatch) {
-        optionLetters.push(optMatch[1].toUpperCase());
-        options.push(optMatch[2].trim());
-        continue;
-      }
-      // Match: - option text (dash-prefixed)
-      const dashMatch = line.match(/^-\s+(.*)/);
-      if (dashMatch) {
-        const letter = String.fromCharCode(65 + dashOptionIndex); // A, B, C...
-        optionLetters.push(letter);
-        options.push(dashMatch[1].trim());
-        dashOptionIndex++;
-        continue;
-      }
-
-      const correctMatch = line.match(
-        /^(?:Correct|الصحيح|الإجابة الصحيحة|Answer)\s*[:\-]\s*(.+)/i,
-      );
-      if (correctMatch) {
-        const letter = correctMatch[1].trim().charAt(0).toUpperCase();
-        const idx = optionLetters.indexOf(letter);
-        correct = idx >= 0 ? idx : 0;
-        continue;
-      }
-
-      const expMatch = line.match(
-        /^(?:Explanation|الشرح|شرح|Reason)\s*[:\-]\s*(.*)/i,
-      );
-      if (expMatch) {
-        explanation = expMatch[1].trim();
-        continue;
-      }
-    }
-
-    if (q)
-      questions.push({
-        q: q.trim(),
-        options: options.length ? options : [""],
-        correct,
-        explanation,
-      });
-  }
-
-  if (!questions.length)
-    throw new Error("التنسيق غير مدعوم. الرجاء لصق JSON أو نص مرقّم.");
-  return { questions, meta: defaultTitle ? { title: defaultTitle } : null };
-}
 
 // ============================================================================
 // RESET PAGE
