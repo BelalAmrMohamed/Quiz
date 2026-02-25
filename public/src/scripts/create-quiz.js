@@ -1046,14 +1046,12 @@ window.expandAll = function () {
   document.querySelectorAll(".question-card").forEach((card) => {
     card.classList.remove("collapsed");
   });
-  showNotification("تم التوسيع", "تم توسيع جميع الأسئلة", "info");
 };
 
 window.collapseAll = function () {
   document.querySelectorAll(".question-card").forEach((card) => {
     card.classList.add("collapsed");
   });
-  showNotification("تم الطي", "تم طي جميع الأسئلة", "info");
 };
 
 // ============================================================================
@@ -1622,21 +1620,61 @@ window.exportQuiz = function () {
   modal.setAttribute("role", "dialog");
   modal.setAttribute("aria-modal", "true");
 
+  {
+    /* <img src="${icon}" alt="" class="icon" aria-hidden="true"></img> */
+  }
+
   const downloadOpts = [
-    { icon: "🎯", label: "Quiz", sublabel: "(.html)", format: "quiz" },
-    { icon: "🌐", label: "HTML", sublabel: "(.html)", format: "html" },
-    { icon: "📄", label: "Markdown", sublabel: "(.md)", format: "md" },
-    { icon: "📕", label: "PDF", sublabel: "(.pdf)", format: "pdf" },
-    { icon: "📊", label: "PowerPoint", sublabel: "(.pptx)", format: "pptx" },
-    { icon: "📝", label: "Word", sublabel: "(.docx)", format: "docx" },
-    { icon: "{ }", label: "JSON", sublabel: "(.json)", format: "json" },
+    {
+      icon: "./favicon.png",
+      label: "Quiz",
+      sublabel: "(.html)",
+      format: "quiz",
+    },
+    {
+      icon: "./assets/images/HTML_Icon.png",
+      label: "HTML",
+      sublabel: "(.html)",
+      format: "html",
+    },
+    {
+      icon: "./assets/images/mardownIcon.png",
+      label: "Markdown",
+      sublabel: "(.md)",
+      format: "md",
+    },
+    {
+      icon: "./assets/images/PDF_Icon.png",
+      label: "PDF",
+      sublabel: "(.pdf)",
+      format: "pdf",
+    },
+    {
+      icon: "./assets/images/pptx_icon.png",
+      label: "PowerPoint",
+      sublabel: "(.pptx)",
+      format: "pptx",
+    },
+    {
+      icon: "./assets/images/word_icon.png",
+      label: "Word",
+      sublabel: "(.docx)",
+      format: "docx",
+    },
+    {
+      icon: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg>`,
+      label: "JSON",
+      sublabel: "(.json)",
+      format: "json",
+    },
   ];
 
   const optionsHtml = downloadOpts
     .map(
       ({ icon, label, sublabel, format }) => `
     <button class="dl-option-btn" data-format="${format}" aria-label="تنزيل كـ ${label}">
-      <span class="dl-icon">${icon}</span>
+    ${format === "json" ? icon : `<img style="max-width: 70px; max-height: 70px;" src="${icon}" alt="context icon" aria-hidden="true"></img>`}
+       
       <span class="dl-label">${label}</span>
       <span class="dl-sublabel">${sublabel}</span>
     </button>
