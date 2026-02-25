@@ -517,7 +517,7 @@ function renderQuestion(question, insertAtIndex = null) {
                 <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
                     <i data-lucide="unfold-vertical"></i>
                 </button>
-                <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="نسخ السؤال">
+                <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="مضاعفة السؤال">
                     <i data-lucide="copy"></i>
                 </button>
                 <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="حذف السؤال">
@@ -635,7 +635,7 @@ window.toggleQuestionCollapse = function (questionId) {
       .replace(/`/g, "")
       .trim();
     qPreview.textContent = preview
-      ? ": " + preview.slice(0, 70) + (preview.length > 70 ? "…" : "")
+      ? ": " + preview.slice(0, 25) + (preview.length > 25 ? "…" : "")
       : "";
   } else if (qPreview) {
     qPreview.textContent = "";
@@ -971,47 +971,47 @@ window.clearSearch = function () {
   }
 };
 
-window.filterQuestions = function () {
-  const filter = document.getElementById("questionFilter").value;
-  currentFilter = filter;
-  const questionCards = document.querySelectorAll(".question-card");
+// window.filterQuestions = function () {
+//   const filter = document.getElementById("questionFilter").value;
+//   currentFilter = filter;
+//   const questionCards = document.querySelectorAll(".question-card");
 
-  let visibleCount = 0;
-  questionCards.forEach((card) => {
-    const questionId = parseInt(card.dataset.questionId);
-    const question = quizData.questions.find((q) => q.id === questionId);
+//   let visibleCount = 0;
+//   questionCards.forEach((card) => {
+//     const questionId = parseInt(card.dataset.questionId);
+//     const question = quizData.questions.find((q) => q.id === questionId);
 
-    let shouldShow = true;
+//     let shouldShow = true;
 
-    switch (filter) {
-      case "with-images":
-        shouldShow = question.image && question.image.trim() !== "";
-        break;
-      case "with-explanations":
-        shouldShow = question.explanation && question.explanation.trim() !== "";
-        break;
-      case "mcq":
-        shouldShow = question.options.length > 1;
-        break;
-      case "essay":
-        shouldShow = question.options.length === 1;
-        break;
-      case "incomplete":
-        shouldShow =
-          !question.q ||
-          question.q.trim() === "" ||
-          question.options.some((opt) => !opt || opt.trim() === "");
-        break;
-      default:
-        shouldShow = true;
-    }
+//     switch (filter) {
+//       case "with-images":
+//         shouldShow = question.image && question.image.trim() !== "";
+//         break;
+//       case "with-explanations":
+//         shouldShow = question.explanation && question.explanation.trim() !== "";
+//         break;
+//       case "mcq":
+//         shouldShow = question.options.length > 1;
+//         break;
+//       case "essay":
+//         shouldShow = question.options.length === 1;
+//         break;
+//       case "incomplete":
+//         shouldShow =
+//           !question.q ||
+//           question.q.trim() === "" ||
+//           question.options.some((opt) => !opt || opt.trim() === "");
+//         break;
+//       default:
+//         shouldShow = true;
+//     }
 
-    card.style.display = shouldShow ? "block" : "none";
-    if (shouldShow) visibleCount++;
-  });
+//     card.style.display = shouldShow ? "block" : "none";
+//     if (shouldShow) visibleCount++;
+//   });
 
-  showNotification("تم التصفية", `عرض ${visibleCount} سؤال`, "info");
-};
+//   showNotification("تم التصفية", `عرض ${visibleCount} سؤال`, "info");
+// };
 
 window.sortQuestions = function (type = "alpha") {
   const container = document.getElementById("questionsContainer");
@@ -1040,6 +1040,21 @@ window.sortQuestions = function (type = "alpha") {
 
   const sortName = type === "alpha" ? "أبجديًا" : "حسب الأحدث";
   showNotification("تم الترتيب", `تم ترتيب الأسئلة ${sortName}`, "success");
+};
+
+window.toggleExpand = function () {
+  const cards = document.querySelectorAll(".question-card");
+  if (cards.length === 0) return;
+
+  const allCollapsed = Array.from(cards).every((card) =>
+    card.classList.contains("collapsed"),
+  );
+
+  if (allCollapsed) {
+    window.expandAll();
+  } else {
+    window.collapseAll();
+  }
 };
 
 window.expandAll = function () {
@@ -1948,6 +1963,183 @@ function handleDroppedFiles(files) {
   window._droppedImportFiles = files;
 }
 
+// ============================================================================
+// SEARCH BAR TOGGLE
+// ============================================================================
+
+window.toggleSearchBar = function () {
+  const searchBar = document.getElementById("searchBarCollapse");
+  const toggleBtn = document.getElementById("searchToggleBtn");
+  if (!searchBar) return;
+  const isOpen = searchBar.style.display !== "none";
+  searchBar.style.display = isOpen ? "none" : "block";
+  if (toggleBtn) {
+    toggleBtn.setAttribute("aria-expanded", String(!isOpen));
+    toggleBtn.classList.toggle("active", !isOpen);
+  }
+  if (!isOpen) {
+    // focus the input when opening
+    const input = document.getElementById("questionSearch");
+    if (input) setTimeout(() => input.focus(), 50);
+  } else {
+    // clear search when closing
+    clearSearch();
+  }
+};
+
+// ============================================================================
+// CONTACT OVERLAY
+// ============================================================================
+
+window.openContactOverlay = function () {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) {
+    overlay.style.display = "flex";
+    if (typeof lucide !== "undefined") lucide.createIcons();
+  }
+};
+
+window.closeContactOverlay = function () {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) overlay.style.display = "none";
+};
+
+window.contactViaWhatsApp = function () {
+  window.open(`https://wa.me/${phoneNumber}`, "_blank");
+  closeContactOverlay();
+};
+
+window.contactViaTelegram = function () {
+  window.open("https://t.me/BelalAmrMohamed", "_blank");
+  closeContactOverlay();
+};
+
+window.contactViaEmail = function () {
+  window.location.href = `mailto:${emailAddress}`;
+  closeContactOverlay();
+};
+
+// Close overlay on backdrop click
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeContactOverlay();
+    });
+  }
+});
+
+// ============================================================================
+// DOCUMENT TEXT EXTRACTION (PDF, DOCX, PPTX)
+// ============================================================================
+
+/**
+ * Dynamically load a script from CDN.
+ */
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+/**
+ * Extract raw text from a File object.
+ * Supports: .json, .txt (plain read), .pdf (pdf.js), .docx (JSZip+XML), .pptx (JSZip+XML)
+ */
+async function extractTextFromFile(file) {
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".json") || name.endsWith(".txt")) {
+    return file.text();
+  }
+  if (name.endsWith(".pdf")) {
+    return extractTextFromPdf(file);
+  }
+  if (name.endsWith(".docx")) {
+    return extractTextFromDocx(file);
+  }
+  if (name.endsWith(".pptx")) {
+    return extractTextFromPptx(file);
+  }
+  return file.text();
+}
+
+async function extractTextFromPdf(file) {
+  await loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+  );
+  const pdfjsLib = window["pdfjs-dist/build/pdf"];
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    fullText += tc.items.map((item) => item.str).join(" ") + "\n";
+  }
+  return fullText;
+}
+
+async function extractTextFromDocx(file) {
+  await loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+  );
+  const JSZip = window.JSZip;
+  const arrayBuffer = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  const docXml = zip.file("word/document.xml");
+  if (!docXml) throw new Error("ملف DOCX غير صحيح: لا يوجد document.xml");
+  const xmlText = await docXml.async("string");
+  // Strip XML tags and decode entities
+  return xmlText
+    .replace(/<w:p[ >]/g, "\n<w:p>")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function extractTextFromPptx(file) {
+  await loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+  );
+  const JSZip = window.JSZip;
+  const arrayBuffer = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  let fullText = "";
+  const slideFiles = Object.keys(zip.files)
+    .filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f))
+    .sort((a, b) => {
+      const na = parseInt(a.match(/\d+/)[0]);
+      const nb = parseInt(b.match(/\d+/)[0]);
+      return na - nb;
+    });
+  for (const slideFile of slideFiles) {
+    const xmlText = await zip.file(slideFile).async("string");
+    const text = xmlText
+      .replace(/<a:p[ >]/g, "\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .trim();
+    if (text) fullText += text + "\n";
+  }
+  return fullText.trim();
+}
+
 window.processImport = async function () {
   const textarea = document.getElementById("importTextarea");
   const fileInput = document.getElementById("importFileInput");
@@ -1970,22 +2162,46 @@ window.processImport = async function () {
   try {
     let allImportedQuestions = [];
     let savedQuizzesCount = 0;
+    const multipleFiles = files && files.length > 1;
 
     // Process file uploads
     if (files && files.length > 0) {
       for (const file of files) {
-        const text = await file.text();
+        let text;
+        try {
+          text = await extractTextFromFile(file);
+        } catch (extractErr) {
+          console.warn(`Could not extract text from ${file.name}:`, extractErr);
+          showNotification(
+            "تحذير",
+            `تعذّر قراءة ${file.name}: ${extractErr.message}`,
+            "error",
+          );
+          continue;
+        }
+
         // Derive default title from filename
         const defaultTitle = file.name
-          .replace(/\.(json|txt)$/i, "")
+          .replace(/\.(json|txt|pdf|docx|pptx)$/i, "")
           .replace(/[-_]/g, " ")
           .replace(/\b\w/g, (c) => c.toUpperCase());
 
-        const parsed = parseImportContent(text, defaultTitle);
+        let parsed;
+        try {
+          parsed = parseImportContent(text, defaultTitle);
+        } catch (parseErr) {
+          showNotification(
+            "تحذير",
+            `${file.name}: ${parseErr.message}`,
+            "error",
+          );
+          continue;
+        }
+
         allImportedQuestions = allImportedQuestions.concat(parsed.questions);
 
-        // If meta found, save as a separate quiz in library
-        if (parsed.meta) {
+        // Auto-save to library only when importing multiple files
+        if (multipleFiles && parsed.meta) {
           const existingQuizzes = JSON.parse(
             localStorage.getItem("user_quizzes") || "[]",
           );
@@ -2002,7 +2218,7 @@ window.processImport = async function () {
           savedQuizzesCount++;
         }
 
-        // Also apply title to current quiz if blank
+        // Apply title to current quiz if blank
         if (!quizData.title && parsed.meta) {
           quizData.title = parsed.meta.title || defaultTitle;
           quizData.description = parsed.meta.description || "";
@@ -2114,7 +2330,7 @@ function parseImportContent(content, defaultTitle = "") {
 
   // --- Numbered text format ---
   // 1. Question text
-  // A. option / B. option
+  // A. option / B) option / a. option / - option
   // Correct: A
   // Explanation: ...
   const questions = [];
@@ -2136,7 +2352,7 @@ function parseImportContent(content, defaultTitle = "") {
     let lineIdx = 1;
     while (
       lineIdx < lines.length &&
-      !lines[lineIdx].match(/^[A-Eأ-ي][.)]\s*/)
+      !lines[lineIdx].match(/^(?:[A-Eا-ي][.)]\s*|-\s+)/)
     ) {
       if (
         lines[lineIdx].match(
@@ -2152,13 +2368,24 @@ function parseImportContent(content, defaultTitle = "") {
     const optionLetters = [];
     let correct = 0;
     let explanation = "";
+    let dashOptionIndex = 0; // for dash-style options
 
     for (let i = lineIdx; i < lines.length; i++) {
       const line = lines[i];
-      const optMatch = line.match(/^([A-Eأ-ي])[.)]\s*(.*)/);
+      // Match: A) / A. / a) / a. (case-insensitive)
+      const optMatch = line.match(/^([A-Eا-ي])[.)]\s*(.*)/i);
       if (optMatch) {
         optionLetters.push(optMatch[1].toUpperCase());
         options.push(optMatch[2].trim());
+        continue;
+      }
+      // Match: - option text (dash-prefixed)
+      const dashMatch = line.match(/^-\s+(.*)/);
+      if (dashMatch) {
+        const letter = String.fromCharCode(65 + dashOptionIndex); // A, B, C...
+        optionLetters.push(letter);
+        options.push(dashMatch[1].trim());
+        dashOptionIndex++;
         continue;
       }
 

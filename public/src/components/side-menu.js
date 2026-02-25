@@ -73,6 +73,20 @@
       themeManager.applyTheme(btn.dataset.theme);
     });
   });
+
+  // ── Contact Developer button ──────────────────────────────────────────────
+  const contactDevBtn = document.getElementById("contactDevBtn");
+  if (contactDevBtn) {
+    contactDevBtn.addEventListener("click", () => {
+      closeMenu();
+      // Allow menu close animation to finish before showing overlay
+      setTimeout(() => {
+        if (typeof window.openContactOverlay === "function") {
+          window.openContactOverlay();
+        }
+      }, 150);
+    });
+  }
 })();
 
 // Initialize Lucide icons (covers side-menu icons + any page-level icons)
