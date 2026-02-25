@@ -1727,7 +1727,7 @@ function createExamCard(exam) {
       b.className = "mode-btn";
       b.type = "button";
       b.setAttribute("aria-label", `تنزيل كـ ${label}`);
-      b.innerHTML = `<img src="${icon}" alt="" class="icon" aria-hidden="true"><strong>${label}</strong>`;
+      b.innerHTML = `<img src="${icon}" alt="context icon" class="icon" aria-hidden="true"><strong>${label}</strong>`;
       b.onclick = (ev) => {
         ev.stopPropagation();
         withDownloadLoading(b, () => onDownloadOption(format)).then(() =>
