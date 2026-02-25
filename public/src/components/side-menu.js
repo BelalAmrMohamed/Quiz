@@ -98,3 +98,45 @@ if (typeof lucide !== "undefined") {
     if (typeof lucide !== "undefined") lucide.createIcons();
   });
 }
+
+// ============================================================================
+// CONTACT OVERLAY
+// ============================================================================
+
+window.openContactOverlay = function () {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) {
+    overlay.style.display = "flex";
+    if (typeof lucide !== "undefined") lucide.createIcons();
+  }
+};
+
+window.closeContactOverlay = function () {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) overlay.style.display = "none";
+};
+
+window.contactViaWhatsApp = function () {
+  window.open(`https://wa.me/${phoneNumber}`, "_blank");
+  closeContactOverlay();
+};
+
+window.contactViaTelegram = function () {
+  window.open("https://t.me/BelalAmrMohamed", "_blank");
+  closeContactOverlay();
+};
+
+window.contactViaEmail = function () {
+  window.location.href = `mailto:${emailAddress}`;
+  closeContactOverlay();
+};
+
+// Close overlay on backdrop click
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("contactDevOverlay");
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeContactOverlay();
+    });
+  }
+});
