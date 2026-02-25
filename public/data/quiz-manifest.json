@@ -631,6 +631,12 @@
       "category": "Server Lab"
     },
     {
+      "id": "3YMB3NAE",
+      "title": "Lecture 2   40 MCQs",
+      "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 2 - 40 MCQs.json",
+      "category": "System Analysis"
+    },
+    {
       "id": "6FWYH3H3",
       "title": "Lecture 1 Quiz",
       "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 quiz.json",
@@ -1613,6 +1619,12 @@
           "id": "6FWYH3H3",
           "title": "Lecture 1 Quiz",
           "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 1 quiz.json",
+          "category": "System Analysis"
+        },
+        {
+          "id": "3YMB3NAE",
+          "title": "Lecture 2   40 MCQs",
+          "path": "../../data/quizzes/Computer Science/2/2/System Analysis/Lecture 2 - 40 MCQs.json",
           "category": "System Analysis"
         },
         {
