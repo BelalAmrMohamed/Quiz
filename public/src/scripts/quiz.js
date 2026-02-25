@@ -234,7 +234,7 @@ function renderMarkdown(str) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
     codeBlocks.push(
-      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
+      `<div class="code-block-wrapper"><button class="copy-code-btn" onclick="window.copyCodeBlock(this)" title="نسخ الكود"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg></button><pre class="code-block" dir="ltr"><code>${escaped.trim()}</code></pre></div>`,
     );
     return `\x00CODE${idx}\x00`;
   });
@@ -553,6 +553,93 @@ async function init() {
         updateMenuActionButtons();
       }
     };
+
+    window.shareQuestion = async () => {
+      // close menu first
+      const closeBtn = document.getElementById("closeMenuBtn");
+      if (closeBtn) closeBtn.click();
+
+      const questionCard =
+        quizStyle === "vertical"
+          ? document.getElementById(`q-${currentIdx}`)
+          : document.querySelector(".question-card");
+      if (!questionCard) return;
+
+      try {
+        if (!window.html2canvas) {
+          showNotification("جاري التجهيز", "يتم تحضير الصورة للمشاركة", "info");
+          await new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src =
+              "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        // hide buttons temporarily for the screenshot
+        const actions = questionCard.querySelector(".question-actions");
+        if (actions) actions.style.display = "none";
+        const checkBtn = questionCard.querySelector(".check-answer-btn");
+        if (checkBtn) checkBtn.style.display = "none";
+
+        const canvas = await html2canvas(questionCard, {
+          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          scale: 2,
+        });
+
+        // restore buttons
+        if (actions) actions.style.display = "";
+        if (checkBtn) checkBtn.style.display = "";
+
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], "question-share.png", {
+            type: "image/png",
+          });
+          if (
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({ files: [file] })
+          ) {
+            await navigator.share({
+              files: [file],
+              title: "سؤال من الإمتحان",
+              text: "تحدى نفسك في هذا السؤال!",
+            });
+          } else {
+            // fallback download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Basmagi Quiz Question.png";
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification("تم", "تم تحميل صورة السؤال", "success");
+          }
+        });
+      } catch (e) {
+        console.error("Error sharing question", e);
+        showNotification("خطأ", "حدث خطأ أثناء محاولة مشاركة السؤال", "error");
+      }
+    };
+
+    window.copyCodeBlock = (btn) => {
+      const wrapper = btn.closest(".code-block-wrapper");
+      if (!wrapper) return;
+      const codeEl = wrapper.querySelector("code");
+      if (!codeEl) return;
+
+      navigator.clipboard.writeText(codeEl.innerText).then(() => {
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>`;
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    };
     window.jumpToQuestion = (idx) => {
       currentIdx = idx;
       saveStateDebounced();
@@ -576,6 +663,8 @@ async function init() {
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
+        // Prevent enter action if confirmation notification is showing
+        if (document.querySelector(".confirmation-overlay.show")) return;
         const activeElement = document.activeElement;
         if (activeElement && activeElement.tagName === "TEXTAREA") return;
         e.preventDefault();

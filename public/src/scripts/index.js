@@ -6,6 +6,7 @@
 import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
 import { SearchManager } from "./search-manager.js";
+import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
 
 let categoryTree = null;
 let searchManager = null;
@@ -52,6 +53,14 @@ function getCourseItemCount(category) {
   }
 
   return count;
+}
+
+function formatArabicQuestionCount(count) {
+  if (!count || count === 0) return "لا أسئلة";
+  if (count === 1) return "سؤال واحد";
+  if (count === 2) return "سؤالين";
+  if (count >= 3 && count <= 10) return `${count} أسئلة`;
+  return `${count} سؤال`;
 }
 
 // Notifications
@@ -1111,7 +1120,7 @@ function renderUserQuizzesView() {
     if (!container) return;
 
     container.innerHTML = "";
-    container.className = "grid-container";
+    container.className = "grid-container user-quizzes-drop-zone";
 
     const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
 
@@ -1157,6 +1166,13 @@ function renderUserQuizzesView() {
     actionsBar.appendChild(createBtn);
     container.appendChild(actionsBar);
 
+    // Inline create-quiz card (always visible in this view)
+    const inlineCreateCard = createInlineCreateQuizCard();
+    container.appendChild(inlineCreateCard);
+
+    // Ensure drag-and-drop import is enabled for this section
+    setupUserQuizzesDropZone();
+
     // 2. Grid for Quizzes
     if (userQuizzes.length === 0) {
       // Empty state
@@ -1189,6 +1205,278 @@ function renderUserQuizzesView() {
       container.innerHTML = `<p style="color:red" role="alert">Error loading quizzes.</p>`;
     }
   }
+}
+
+function setupUserQuizzesDropZone() {
+  const dropContainer = document.getElementById("contentArea");
+  if (!dropContainer || dropContainer.dataset.userQuizzesDropReady === "1")
+    return;
+
+  dropContainer.dataset.userQuizzesDropReady = "1";
+
+  dropContainer.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropContainer.classList.add("user-quizzes-drag-over");
+  });
+
+  dropContainer.addEventListener("dragleave", (e) => {
+    if (e.target === dropContainer) {
+      dropContainer.classList.remove("user-quizzes-drag-over");
+    }
+  });
+
+  dropContainer.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    dropContainer.classList.remove("user-quizzes-drag-over");
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (!files.length) return;
+    await handleUserQuizzesDrop(files);
+  });
+}
+
+async function handleUserQuizzesDrop(files) {
+  const allowedExts = [".txt", ".docx", ".pdf", ".pptx", ".json"];
+  const validFiles = [];
+  const invalidNames = [];
+
+  files.forEach((file) => {
+    const lower = file.name.toLowerCase();
+    if (allowedExts.some((ext) => lower.endsWith(ext))) {
+      validFiles.push(file);
+    } else {
+      invalidNames.push(file.name);
+    }
+  });
+
+  if (invalidNames.length) {
+    showNotification(
+      "ملفات غير مدعومة",
+      `بعض الملفات تم تجاهلها:\n${invalidNames.join(", ")}`,
+      "warning",
+    );
+  }
+
+  if (!validFiles.length) return;
+
+  const existingQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+  let importedCount = 0;
+
+  for (const file of validFiles) {
+    let text;
+    try {
+      text = await extractTextFromFile(file);
+    } catch (err) {
+      console.error("Import extract error:", err);
+      showNotification(
+        "خطأ في القراءة",
+        `تعذّر قراءة ${file.name}: ${err.message}`,
+        "error",
+      );
+      continue;
+    }
+
+    const defaultTitle = file.name
+      .replace(/\.(json|txt|pdf|docx|pptx)$/i, "")
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+    let parsed;
+    try {
+      parsed = parseImportContent(text, defaultTitle);
+    } catch (err) {
+      console.error("Import parse error:", err);
+      showNotification(
+        "خطأ في التنسيق",
+        `${file.name}: ${err.message}`,
+        "error",
+      );
+      continue;
+    }
+
+    if (!parsed.questions || !parsed.questions.length) continue;
+
+    const quizId = `user_quiz_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 7)}`;
+
+    existingQuizzes.push({
+      id: quizId,
+      title: parsed.meta?.title || defaultTitle,
+      description: parsed.meta?.description || "",
+      questions: parsed.questions,
+      createdAt: new Date().toISOString(),
+      author: "Imported",
+    });
+    importedCount++;
+  }
+
+  if (importedCount > 0) {
+    const quizCountText =
+      importedCount === 1
+        ? "إمتحان واحد"
+        : importedCount === 2
+          ? "إمتحانان"
+          : importedCount > 2 && importedCount < 11
+            ? `${importedCount} إمتحانات`
+            : `${importedCount} إمتحان`;
+
+    setInStorage("user_quizzes", JSON.stringify(existingQuizzes));
+    showNotification(
+      "تم الإنشاء",
+      `تم إنشاء ${quizCountText} في "إمتحاناتك"`,
+      "success",
+    );
+    renderUserQuizzesView();
+  }
+}
+
+function createInlineCreateQuizCard() {
+  const card = document.createElement("div");
+  card.className = "exam-card user-create-quiz-card";
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", "إنشاء إمتحان جديد من نص");
+
+  const icon = document.createElement("div");
+  icon.className = "icon";
+  icon.textContent = "➕";
+  icon.setAttribute("aria-hidden", "true");
+
+  const titleEl = document.createElement("h3");
+  titleEl.textContent = "إنشاء إمتحان جديد";
+
+  const desc = document.createElement("p");
+  desc.textContent =
+    'الصق أسئلة الإمتحان كنص وسيتم تحويلها تلقائيًا إلى كويز داخل "إمتحاناتك".';
+
+  card.appendChild(icon);
+  card.appendChild(titleEl);
+  card.appendChild(desc);
+
+  const open = () => openInlineCreateQuizModal();
+  card.onclick = open;
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+    }
+  });
+
+  return card;
+}
+
+function openInlineCreateQuizModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "inlineCreateQuizTitle");
+
+  const modalCard = document.createElement("div");
+  modalCard.className = "modal-card";
+  modalCard.innerHTML = `
+    <h2 id="inlineCreateQuizTitle">إنشاء إمتحان جديد</h2>
+    <p style="margin-bottom:16px;">الصق أو اكتب أسئلة الإمتحان في الحقل التالي، وسنحوّلها تلقائيًا إلى كويز داخل "إمتحاناتك".</p>
+    <div class="form-group">
+      <label for="inlineQuizTitle">عنوان الإمتحان</label>
+      <input type="text" id="inlineQuizTitle" placeholder="مثال: Arrays in C++" />
+    </div>
+    <div class="form-group">
+      <label for="inlineQuizContent">محتوى الإمتحان</label>
+      <textarea id="inlineQuizContent" rows="8" placeholder="1. السؤال الأول...\nA. اختيار 1\nB. اختيار 2\n\nCorrect: A\n\nExplanation: ..."></textarea>
+    </div>
+    <div class="profile-actions">
+      <button type="button" class="profile-btn secondary" id="inlineQuizCancel">إلغاء</button>
+      <button type="button" class="profile-btn primary" id="inlineQuizCreate">إنشاء</button>
+    </div>
+  `;
+
+  overlay.appendChild(modalCard);
+  document.body.appendChild(overlay);
+
+  const titleInput = modalCard.querySelector("#inlineQuizTitle");
+  const contentInput = modalCard.querySelector("#inlineQuizContent");
+  const cancelBtn = modalCard.querySelector("#inlineQuizCancel");
+  const createBtn = modalCard.querySelector("#inlineQuizCreate");
+
+  const close = () => {
+    overlay.remove();
+  };
+
+  cancelBtn.onclick = close;
+
+  createBtn.onclick = async () => {
+    const title = (titleInput.value || "").trim();
+    const content = (contentInput.value || "").trim();
+    if (!title || !content) {
+      showNotification(
+        "بيانات ناقصة",
+        "الرجاء إدخال العنوان والمحتوى.",
+        "warning",
+      );
+      return;
+    }
+
+    let parsed;
+    try {
+      parsed = parseImportContent(content, title);
+    } catch (err) {
+      showNotification("خطأ في التنسيق", err.message, "error");
+      return;
+    }
+
+    if (!parsed.questions || !parsed.questions.length) {
+      showNotification(
+        "لا توجد أسئلة",
+        "لم يتم العثور على أسئلة صالحة في المحتوى.",
+        "error",
+      );
+      return;
+    }
+
+    const quizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+    const quizId = `user_quiz_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 7)}`;
+
+    quizzes.push({
+      id: quizId,
+      title: parsed.meta?.title || title,
+      description: parsed.meta?.description || "",
+      questions: parsed.questions,
+      createdAt: new Date().toISOString(),
+      author: "User Created",
+    });
+
+    setInStorage("user_quizzes", JSON.stringify(quizzes));
+    close();
+    showNotification(
+      "تم الإنشاء",
+      'تم إنشاء الإمتحان وإضافته إلى "إمتحاناتك"',
+      "success",
+    );
+    renderUserQuizzesView();
+  };
+
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+      document.removeEventListener("keydown", escHandler);
+    }
+  };
+  document.addEventListener("keydown", escHandler);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      close();
+      document.removeEventListener("keydown", escHandler);
+    }
+  });
+
+  setTimeout(() => {
+    titleInput.focus();
+  }, 50);
 }
 
 /**
@@ -1614,6 +1902,10 @@ function createExamCard(exam) {
   const h = document.createElement("h3");
   h.textContent = exam.title || exam.id;
 
+  const questionCountLine = document.createElement("p");
+  questionCountLine.className = "exam-question-count";
+  questionCountLine.textContent = "";
+
   const btn = document.createElement("button");
   btn.className = "start-btn";
   btn.type = "button";
@@ -1831,7 +2123,23 @@ function createExamCard(exam) {
   btnWrap.appendChild(downloadBtn);
 
   card.appendChild(h);
+  card.appendChild(questionCountLine);
   card.appendChild(btnWrap);
+
+  // Lazy-load question count for platform quizzes (JSON-based exams)
+  if (exam.path && exam.path.toLowerCase().endsWith(".json")) {
+    (async () => {
+      try {
+        const res = await fetch(exam.path);
+        if (!res.ok) return;
+        const data = await res.json();
+        const count = Array.isArray(data.questions) ? data.questions.length : 0;
+        questionCountLine.textContent = formatArabicQuestionCount(count);
+      } catch (e) {
+        // Silently ignore count errors
+      }
+    })();
+  }
 
   return card;
 }

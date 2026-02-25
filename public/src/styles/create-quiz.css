@@ -2255,6 +2255,9 @@ body {
   max-width: 260px;
   display: inline-block;
   vertical-align: middle;
+   /* Push preview to the left side of the header while keeping text LTR */
+  margin-left: auto;
+  text-align: left;
 }
 
 /* ============================================================================
