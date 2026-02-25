@@ -67,7 +67,7 @@ export function showNotification(title, message = "", type = "info") {
         <strong>${escapeHtml(title)}</strong>
         <p>${escapeHtml(message)}</p>
       </div>
-      <button class="close-btn">×</button>
+      <button class="close-btn-notification">×</button>
     </div>
   `;
 
@@ -84,7 +84,7 @@ export function showNotification(title, message = "", type = "info") {
   }, 5000);
 
   // B. Manual Close Button
-  const closeBtn = toast.querySelector(".close-btn");
+  const closeBtn = toast.querySelector(".close-btn-notification");
   closeBtn.addEventListener("click", () => {
     clearTimeout(autoDismissTimeout); // Stop the auto-timer
     removeToast(toast); // Remove immediately

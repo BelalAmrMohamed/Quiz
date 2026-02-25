@@ -509,19 +509,19 @@ function renderQuestion(question, insertAtIndex = null) {
         <div class="question-header" onclick="handleHeaderClick(event, ${question.id})">
             <span class="question-number" id="qnum-${question.id}">
                 ${bulkModeActive ? `<input type="checkbox" class="question-select-checkbox" onchange="handleQuestionSelect(event, ${question.id})" onclick="event.stopPropagation()">` : ""}
-                <span class="drag-handle" title="اسحب لإعادة الترتيب" onclick="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
+                <span class="drag-handle" title="اسحب لإعادة الترتيب" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></span>
                 <span class="q-label">سؤال ${questionNumber}</span>
-                <span class="q-preview" id="qpreview-${question.id}"></span>
+                <span class="q-preview ltr" id="qpreview-${question.id}"></span>
             </span>
             <div class="question-actions" onclick="event.stopPropagation()">
                 <button class="btn-icon btn-collapse" onclick="toggleQuestionCollapse(${question.id})" title="طي/توسيع السؤال">
-                    <i data-lucide="unfold-vertical"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-unfold-vertical-icon lucide-unfold-vertical"><path d="M12 22v-6"/><path d="M12 8V2"/><path d="M4 12H2"/><path d="M10 12H8"/><path d="M16 12h-2"/><path d="M22 12h-2"/><path d="m15 19-3 3-3-3"/><path d="m15 5-3-3-3 3"/></svg>
                 </button>
                 <button class="btn-icon btn-duplicate" onclick="duplicateQuestion(${question.id})" title="مضاعفة السؤال">
-                    <i data-lucide="copy"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 </button>
                 <button class="btn-icon btn-delete" onclick="removeQuestion(${question.id})" title="حذف السؤال">
-                    <i data-lucide="trash-2"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
             </div>
         </div>
@@ -538,14 +538,14 @@ function renderQuestion(question, insertAtIndex = null) {
                     ${renderOptions(question)}
                 </div>
                 <button class="add-option-btn" onclick="addOption(${question.id})">
-                    <i data-lucide="plus"></i> إضافة خيار
+                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg> إضافة خيار
                 </button>
             </div>
             
             <div class="collapsible-section">
                 <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'image')">
-                    <h4><i data-lucide="image"></i> صورة (اختيارية)</h4>
-                    <span class="collapsible-toggle" id="toggle-image-${question.id}"><i data-lucide="chevron-down"></i></span>
+                    <h4><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-icon lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> صورة (اختيارية)</h4>
+                    <span class="collapsible-toggle" id="toggle-image-${question.id}"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></span>
                 </div>
                 <div class="collapsible-content" id="content-image-${question.id}">
                     <div class="form-group">
@@ -565,8 +565,8 @@ function renderQuestion(question, insertAtIndex = null) {
             
             <div class="collapsible-section">
                 <div class="collapsible-header" onclick="toggleCollapsible(${question.id}, 'explanation')">
-                    <h4><i data-lucide="lightbulb"></i> الشرح (اختياري)</h4>
-                    <span class="collapsible-toggle" id="toggle-explanation-${question.id}"><i data-lucide="chevron-down"></i></span>
+                    <h4><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb-icon lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> الشرح (اختياري)</h4>
+                    <span class="collapsible-toggle" id="toggle-explanation-${question.id}"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></span>
                 </div>
                 <div class="collapsible-content" id="content-explanation-${question.id}">
                     <div class="form-group">
@@ -635,7 +635,7 @@ window.toggleQuestionCollapse = function (questionId) {
       .replace(/`/g, "")
       .trim();
     qPreview.textContent = preview
-      ? ": " + preview.slice(0, 25) + (preview.length > 25 ? "…" : "")
+      ? preview.slice(0, 40) + (preview.length > 40 ? "…" : "")
       : "";
   } else if (qPreview) {
     qPreview.textContent = "";
@@ -681,7 +681,7 @@ function updateImagePreview(questionId, imageUrl) {
   }
 
   previewContainer.innerHTML =
-    '<div class="image-loading"><i data-lucide="loader-circle" class="spin"></i> جاري تحميل الصورة...</div>';
+    '<div class="image-loading"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle-icon lucide-loader-circle"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> جاري تحميل الصورة...</div>';
 
   const img = new Image();
   img.onload = function () {
@@ -689,7 +689,7 @@ function updateImagePreview(questionId, imageUrl) {
   };
   img.onerror = function () {
     previewContainer.innerHTML =
-      '<div class="image-error"><i data-lucide="image-off"></i> فشل تحميل الصورة. تحقق من الرابط.</div>';
+      '<div class="image-error"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-off-icon lucide-image-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg> فشل تحميل الصورة. تحقق من الرابط.</div>';
     if (typeof lucide !== "undefined") lucide.createIcons();
   };
   img.src = imageUrl;
@@ -823,7 +823,7 @@ function renderOptions(question) {
             </div>
             ${
               question.options.length > 1
-                ? `<button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}"><i data-lucide="x"></i></button>`
+                ? `<button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`
                 : ""
             }
         </div>
@@ -1700,8 +1700,8 @@ window.exportQuiz = function () {
   modal.innerHTML = `
     <div class="modal-card dl-modal-card">
       <div class="modal-header">
-        <h2><i data-lucide="download"></i> تحميل الإمتحان</h2>
-        <button class="close-btn dl-close" aria-label="إغلاق"><i data-lucide="x"></i></button>
+        <h2><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg> تحميل الإمتحان</h2>
+        <button class="close-btn dl-close" aria-label="إغلاق"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <p class="dl-subtitle">اختر صيغة التحميل</p>
       <div class="dl-grid">${optionsHtml}</div>
@@ -1894,7 +1894,7 @@ window.previewQuiz = function () {
             )
             .join("")}
         </ul>
-        ${q.explanation ? `<div class="preview-explanation"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;margin-left:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> ${renderMarkdown(q.explanation)}</div>` : ""}
+        ${q.explanation ? `<div class="preview-explanation"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;margin-left:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> ${renderMarkdown(q.explanation)}</div>` : ""}
       </div>
     `;
   });
@@ -1986,48 +1986,6 @@ window.toggleSearchBar = function () {
     clearSearch();
   }
 };
-
-// ============================================================================
-// CONTACT OVERLAY
-// ============================================================================
-
-window.openContactOverlay = function () {
-  const overlay = document.getElementById("contactDevOverlay");
-  if (overlay) {
-    overlay.style.display = "flex";
-    if (typeof lucide !== "undefined") lucide.createIcons();
-  }
-};
-
-window.closeContactOverlay = function () {
-  const overlay = document.getElementById("contactDevOverlay");
-  if (overlay) overlay.style.display = "none";
-};
-
-window.contactViaWhatsApp = function () {
-  window.open(`https://wa.me/${phoneNumber}`, "_blank");
-  closeContactOverlay();
-};
-
-window.contactViaTelegram = function () {
-  window.open("https://t.me/BelalAmrMohamed", "_blank");
-  closeContactOverlay();
-};
-
-window.contactViaEmail = function () {
-  window.location.href = `mailto:${emailAddress}`;
-  closeContactOverlay();
-};
-
-// Close overlay on backdrop click
-document.addEventListener("DOMContentLoaded", () => {
-  const overlay = document.getElementById("contactDevOverlay");
-  if (overlay) {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) closeContactOverlay();
-    });
-  }
-});
 
 // ============================================================================
 // DOCUMENT TEXT EXTRACTION (PDF, DOCX, PPTX)

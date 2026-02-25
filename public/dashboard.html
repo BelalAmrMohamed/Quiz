@@ -94,14 +94,40 @@
             </div>
 
             <nav role="navigation" aria-label="روابط التنقل">
-                <a href="index.html" class="menu-item"><i data-lucide="house"></i> الصفحة الرئيسية</a>
-                <a href="dashboard.html" class="menu-item active"><i data-lucide="layout-dashboard"></i> اللائحة</a>
-                <a href="create-quiz.html" class="menu-item"><i data-lucide="pencil"></i> إنشاء إمتحانات</a>
+                <a href="index.html" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-house-icon lucide-house">
+                        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                        <path
+                            d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg> الصفحة الرئيسية</a>
+                <a href="dashboard.html" class="menu-item active"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                        height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gauge-icon lucide-gauge">
+                        <path d="m12 14 4-4" />
+                        <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+                    </svg> اللائحة</a>
+                <a href="create-quiz.html" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                        height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-pencil-line-icon lucide-pencil-line">
+                        <path d="M13 21h8" />
+                        <path d="m15 5 4 4" />
+                        <path
+                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                    </svg> إنشاء إمتحانات</a>
 
                 <div class="menu-divider" role="separator"></div>
 
                 <a href="settings.html" class="menu-item">
-                    <span aria-hidden="true"><i data-lucide="settings"></i></span> الإعدادات
+                    <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-settings-icon lucide-settings">
+                            <path
+                                d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg></span> الإعدادات
                 </a>
 
                 <div class="menu-divider" role="separator" aria-hidden="true"></div>
@@ -114,25 +140,66 @@
 
                 <div class="theme-controls-section">
                     <div class="theme-section-header">
-                        <span><i data-lucide="palette"></i></span> الخلفية
+                        <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-palette-icon lucide-palette">
+                                <path
+                                    d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
+                                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+                            </svg></span> الخلفية
                     </div>
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
                         <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="circle"></i></span>
+                            <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-circle-icon lucide-circle">
+                                    <circle cx="12" cy="12" r="10" />
+                                </svg></span>
                             <span class="theme-btn-label">السوداء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="moon"></i></span>
+                            <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-moon-icon lucide-moon">
+                                    <path
+                                        d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+                                </svg></span>
                             <span class="theme-btn-label">الزرقاء</span>
                         </button>
                         <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
-                            <span class="theme-btn-icon" aria-hidden="true"><i data-lucide="sun"></i></span>
+                            <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-sun-icon lucide-sun">
+                                    <circle cx="12" cy="12" r="4" />
+                                    <path d="M12 2v2" />
+                                    <path d="M12 20v2" />
+                                    <path d="m4.93 4.93 1.41 1.41" />
+                                    <path d="m17.66 17.66 1.41 1.41" />
+                                    <path d="M2 12h2" />
+                                    <path d="M20 12h2" />
+                                    <path d="m6.34 17.66-1.41 1.41" />
+                                    <path d="m19.07 4.93-1.41 1.41" />
+                                </svg></span>
                             <span class="theme-btn-label">البيضاء</span>
                         </button>
                     </div>
 
                     <div class="animation-section-header">
-                        <span><i data-lucide="sparkles"></i></span> الرسوم المتحركة
+                        <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-sparkles-icon lucide-sparkles">
+                                <path
+                                    d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+                                <path d="M20 2v4" />
+                                <path d="M22 4h-4" />
+                                <circle cx="4" cy="20" r="2" />
+                            </svg></span> الرسوم المتحركة
                     </div>
                     <label class="animation-toggle-container">
                         <span class="animation-toggle-label">تفعيل الرسوم</span>
@@ -140,11 +207,25 @@
                             checked aria-label="تفعيل الرسوم المتحركة">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text"><i data-lucide="lightbulb"></i> عطّل الرسوم لتحسين الأداء على الأجهزة
+                    <p class="theme-info-text"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-lightbulb-icon lucide-lightbulb">
+                            <path
+                                d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                            <path d="M9 18h6" />
+                            <path d="M10 22h4" />
+                        </svg> عطّل الرسوم لتحسين الأداء على الأجهزة
                         الضعيفة</p>
 
                     <div class="menu-divider" role="separator"></div>
-                    <button class="menu-item install-app" data-action="installApp"><i data-lucide="smartphone"></i>
+                    <button class="menu-item install-app" data-action="installApp"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-smartphone-icon lucide-smartphone">
+                            <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                            <path d="M12 18h.01" />
+                        </svg>
                         تثبيت التطبيق</button>
                 </div>
             </nav>
