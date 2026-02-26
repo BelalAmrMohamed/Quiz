@@ -4,8 +4,12 @@
 //
 // POST /api/upload-quiz
 // Headers: Authorization: Bearer <token>
-// Body:    { category, subject, subfolder?, quiz: {...} }
-// 201:     { success: true, id, path }
+// Body:    { college, year, term, subject, subfolder?, quiz: {...} }
+//
+// Path stored as: College/Year/Term/Subject[/Subfolder]
+// This matches the codebase structure under public/data/quizzes/
+//
+// 201: { success: true, id, path }
 // =============================================================================
 
 import { createClient } from "@supabase/supabase-js";
@@ -30,13 +34,23 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "غير مصرح" });
   }
 
-  // ── 2. Validate body ───────────────────────────────────────────────────────
-  const { category, subject, subfolder, quiz } = req.body || {};
+  // ── 2. Extract & validate fields ───────────────────────────────────────────
+  const { college, year, term, subject, subfolder, quiz } = req.body || {};
 
+  // Validate each path segment
   try {
-    validatePath(category, subject, subfolder);
+    validatePath(college, subject, subfolder);
   } catch (e) {
     return res.status(400).json({ error: e.message });
+  }
+
+  // Year must be "1" or "2"
+  if (!["1", "2"].includes(String(year))) {
+    return res.status(400).json({ error: "INVALID_PATH: year must be 1 or 2" });
+  }
+  // Term must be "1" or "2"
+  if (!["1", "2"].includes(String(term))) {
+    return res.status(400).json({ error: "INVALID_PATH: term must be 1 or 2" });
   }
 
   let cleanQuiz;
@@ -46,8 +60,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: e.message });
   }
 
-  // ── 3. Build path + filename ───────────────────────────────────────────────
-  const pathParts = [category.trim(), subject.trim()];
+  // ── 3. Build path matching codebase structure ──────────────────────────────
+  // Format: College/Year/Term/Subject[/Subfolder]
+  const pathParts = [
+    college.trim(),
+    String(year),
+    String(term),
+    subject.trim(),
+  ];
   if (subfolder?.trim()) pathParts.push(subfolder.trim());
   const fullPath = pathParts.join("/");
 
@@ -76,7 +96,7 @@ export default async function handler(req, res) {
     .from("quizzes")
     .insert({
       path: fullPath,
-      category: category.trim(),
+      category: college.trim(), // "category" column = college name
       subject: subject.trim(),
       subfolder: subfolder?.trim() || null,
       title: cleanQuiz.title,

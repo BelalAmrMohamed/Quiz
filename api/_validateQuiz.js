@@ -112,20 +112,28 @@ export function validateQuizPayload(raw) {
  * @param {string} subject
  * @param {string|undefined} subfolder
  */
-export function validatePath(category, subject, subfolder) {
-  if (!category || typeof category !== "string" || !category.trim()) {
-    throw new Error("MISSING_PATH: category is required");
+/**
+ * Validates path components for a quiz upload.
+ * Accepts either (category, subject, subfolder) or (college, subject, subfolder) —
+ * both map to the same validation logic.
+ */
+export function validatePath(categoryOrCollege, subject, subfolder) {
+  if (
+    !categoryOrCollege ||
+    typeof categoryOrCollege !== "string" ||
+    !categoryOrCollege.trim()
+  ) {
+    throw new Error("MISSING_PATH: college/category is required");
   }
   if (!subject || typeof subject !== "string" || !subject.trim()) {
     throw new Error("MISSING_PATH: subject is required");
   }
 
-  const parts = [category, subject, subfolder].filter(Boolean);
+  const parts = [categoryOrCollege, subject, subfolder].filter(Boolean);
   for (const part of parts) {
     if (!SAFE_PATH_REGEX.test(part)) {
       throw new Error(`INVALID_PATH: "${part}" contains disallowed characters`);
     }
-    // Block traversal patterns explicitly
     if (part.includes("..") || part.includes("//")) {
       throw new Error(`INVALID_PATH: traversal pattern detected`);
     }
