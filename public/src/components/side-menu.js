@@ -103,6 +103,9 @@ if (typeof lucide !== "undefined") {
 // CONTACT OVERLAY
 // ============================================================================
 
+const phoneNumber = "201118482193";
+const emailAddress = "belalamrofficial@gmail.com";
+
 window.openContactOverlay = function () {
   const overlay = document.getElementById("contactDevOverlay");
   if (overlay) {
