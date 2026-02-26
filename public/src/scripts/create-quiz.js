@@ -11,13 +11,7 @@ import { exportToPdf } from "../export/export-to-pdf.js";
 import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
-import {
-  extractTextFromFile,
-  parseImportContent,
-} from "./quiz-processor.js";
-
-const phoneNumber = "201118482193";
-const emailAddress = "belalamrofficial@gmail.com";
+import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -190,10 +184,7 @@ function setupMdEditor(id, onChange) {
 
       // Only trigger when the current line is exactly ``` and
       // there is no closing fence later in the text (avoid firing inside/after a closed block)
-      if (
-        currentLine.trim() === "```" &&
-        !/```/.test(after)
-      ) {
+      if (currentLine.trim() === "```" && !/```/.test(after)) {
         e.preventDefault();
         const insertion = "\n\n```";
         source.value = before + insertion + after;
@@ -1485,9 +1476,7 @@ function loadDraftFromLocalStorage() {
       }
 
       if (data.questions && data.questions.length > 0) {
-        const { questions, maxId } = normalizeQuestionsWithIds(
-          data.questions,
-        );
+        const { questions, maxId } = normalizeQuestionsWithIds(data.questions);
         quizData.questions = questions;
         questionIdCounter = maxId;
 
@@ -1817,96 +1806,6 @@ window.saveLocally = function () {
       showNotification("خطأ", "فشل حفظ الاختبار", "error");
     }
   }, 500);
-};
-
-// ============================================================================
-// EMAIL TO DEVELOPER
-// ============================================================================
-
-window.emailQuizToDeveloper = function () {
-  const errors = validateQuiz();
-
-  if (errors.length > 0) {
-    showNotification(
-      "خطأ في التحقق",
-      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
-      "error",
-    );
-    return;
-  }
-
-  try {
-    showNotification(
-      "جاري الإرسال...",
-      "سيتم فتح تطبيق البريد الإلكتروني",
-      "info",
-    );
-
-    const exportQuestions = quizData.questions.map((q) => {
-      const question = { q: q.q, options: q.options, correct: q.correct };
-      if (q.image?.trim()) question.image = q.image;
-      if (q.explanation?.trim()) question.explanation = q.explanation;
-      return question;
-    });
-
-    const meta = { title: quizData.title };
-    if (quizData.description?.trim()) meta.description = quizData.description;
-
-    const payload = {
-      meta,
-      questions: exportQuestions,
-    };
-    const fileContent = JSON.stringify(payload, null, 2);
-
-    const encodedBody = encodeURIComponent(fileContent);
-    const mailtoLink = `mailto:${emailAddress}?subject=New Quiz Submission - ${encodeURIComponent(quizData.title)}&body=${encodedBody}`;
-
-    window.location.href = mailtoLink;
-  } catch (error) {
-    console.error("Error submitting quiz:", error);
-    showNotification("خطأ", "فشل إرسال الاختبار", "error");
-  }
-};
-
-// ============================================================================
-// WHATSAPP INTEGRATION
-// ============================================================================
-
-window.sendToWhatsApp = function () {
-  const errors = validateQuiz();
-
-  if (errors.length > 0) {
-    showNotification(
-      "خطأ في التحقق",
-      "الرجاء إصلاح الأخطاء التالية:\n\n" + errors.join("\n"),
-      "error",
-    );
-    return;
-  }
-
-  const exportQuestions = quizData.questions.map((q) => {
-    const question = { q: q.q, options: q.options, correct: q.correct };
-    if (q.image?.trim()) question.image = q.image;
-    if (q.explanation?.trim()) question.explanation = q.explanation;
-    return question;
-  });
-
-  const meta = { title: quizData.title };
-  if (quizData.description?.trim()) meta.description = quizData.description;
-
-  const payload = {
-    meta,
-    questions: exportQuestions,
-  };
-  const fileContent = JSON.stringify(payload, null, 2);
-
-  const message = `*New Quiz Submission*\n\n*Title:* ${quizData.title}\n*Description:* ${quizData.description || "N/A"}\n*Questions:* ${quizData.questions.length}\n*Created:* ${new Date().toLocaleString()}\n\n${fileContent}`;
-
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-
-  window.open(whatsappUrl, "_blank");
-
-  showNotification("جاري فتح واتساب...", "+20 111 848 21 93", "info");
 };
 
 // ============================================================================
