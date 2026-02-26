@@ -1,79 +1,110 @@
 // =============================================================================
 // public/src/scripts/adminAuth.js
-// Admin authentication module.
 //
-// Keeps the JWT in a module-scoped variable (JavaScript memory only).
-// The token NEVER touches localStorage, sessionStorage, or cookies.
-// It evaporates automatically when the tab is closed or refreshed.
-//
-// sessionStorage.__admin_hint is set ONLY as a cosmetic UI hint to show
-// the upload button — it is NOT trusted for any security decision.
-// The real auth check always happens server-side.
+// WHY sessionStorage (not pure memory):
+//   The original design stored the JWT only in a JS module variable.
+//   That works within a single page but is wiped the moment the browser
+//   navigates to a new URL (sign-in.html → index.html is a full reload).
+//   sessionStorage survives same-tab navigation, is automatically cleared
+//   when the tab closes, and cannot be read from other tabs or origins.
+//   Real security still lives on the server — every request is re-validated
+//   cryptographically regardless of what sessionStorage holds.
 // =============================================================================
 
-/** @type {string|null} */
-let _adminToken = null;
+const SESSION_KEY = "__bq_adm"; // intentionally opaque key name
+
+// ── Restore token on module load ─────────────────────────────────────────────
+// Runs once when this module is first imported on any page.
+let _token = null;
+
+(function restoreFromSession() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw || raw === "null" || raw === "undefined") return;
+    // Sanity-check: a JWT is exactly 3 base64url segments separated by dots
+    if (/^[\w\-]+\.[\w\-]+\.[\w\-]+$/.test(raw)) {
+      _token = raw;
+    } else {
+      sessionStorage.removeItem(SESSION_KEY); // corrupt — discard
+    }
+  } catch (_) {
+    // sessionStorage blocked in some browsers/modes — degrade gracefully
+  }
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Attempts to sign in with the given Admin ID.
- * On success, stores the JWT in module memory and sets a cosmetic session hint.
+ * Authenticates with the server using the given Admin ID.
+ * On success the JWT is stored in sessionStorage so it survives
+ * navigation from sign-in.html → index.html.
  *
  * @param {string} adminId
- * @returns {Promise<void>} Resolves on success, rejects with an Error on failure
+ * @throws {Error} with Arabic message on failure
  */
 export async function signIn(adminId) {
-  const res = await fetch("/api/auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ adminId }),
-  });
+  let res;
+  try {
+    res = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminId }),
+    });
+  } catch (networkErr) {
+    throw new Error("تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت.");
+  }
+
+  let body = {};
+  try {
+    body = await res.json();
+  } catch (_) {}
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
     throw new Error(body.error || "فشل تسجيل الدخول");
   }
 
-  const { token } = await res.json();
-  if (!token) throw new Error("استجابة غير صالحة من الخادم");
+  const { token } = body;
+  if (!token || typeof token !== "string") {
+    throw new Error("استجابة غير متوقعة من الخادم");
+  }
 
-  _adminToken = token;
-
-  // Cosmetic hint only — survives page refresh within the same tab session
-  // but the real token is gone on refresh (user must re-authenticate)
-  sessionStorage.setItem("__admin_hint", "1");
+  _token = token;
+  try {
+    sessionStorage.setItem(SESSION_KEY, token);
+  } catch (_) {}
 }
 
 /**
- * Returns the current in-memory JWT, or null if not authenticated.
+ * Returns the current JWT or null if not authenticated.
+ * Always checks sessionStorage as a fallback in case the module
+ * was re-imported after navigation.
  * @returns {string|null}
  */
 export function getToken() {
-  return _adminToken;
+  if (_token) return _token;
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (raw && raw !== "null") {
+      _token = raw;
+      return raw;
+    }
+  } catch (_) {}
+  return null;
 }
 
 /**
- * Returns true if an admin token is currently held in memory.
- * NOTE: This is NOT a security check — always verify on the server.
+ * Returns true if a token is available (in memory or sessionStorage).
+ * NOT a security check — server validates on every request.
  * @returns {boolean}
  */
 export function isAdminAuthenticated() {
-  return !!_adminToken;
+  return !!getToken();
 }
 
-/**
- * Checks the cosmetic session storage hint.
- * Used only to decide whether to show UI elements on page load —
- * the user will still need to re-authenticate if they refreshed.
- * @returns {boolean}
- */
-export function hasAdminSessionHint() {
-  return sessionStorage.getItem("__admin_hint") === "1";
-}
-
-/**
- * Signs the admin out: clears the in-memory token and cosmetic hint.
- */
+/** Clears token from memory and sessionStorage. */
 export function signOut() {
-  _adminToken = null;
-  sessionStorage.removeItem("__admin_hint");
+  _token = null;
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch (_) {}
 }

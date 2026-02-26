@@ -1,16 +1,18 @@
 // =============================================================================
 // scripts/sync-quizzes.js
-// Pulls un-synced quizzes from Supabase, writes them into public/data/quizzes/,
-// marks them as synced in the DB, then regenerates the quiz manifest.
+// Pulls un-synced quizzes from Supabase → writes JSON files → rebuilds manifest.
 //
 // Usage:
-//   node scripts/sync-quizzes.js              ← Pull + write + manifest regen
-//   node scripts/sync-quizzes.js --dry-run    ← Preview only, no files written
-//   node scripts/sync-quizzes.js --delete-synced  ← Also delete synced rows (reclaim space)
-//   node scripts/sync-quizzes.js --all        ← Sync ALL rows (including already-synced)
+//   node scripts/sync-quizzes.js                 ← sync un-synced rows
+//   node scripts/sync-quizzes.js --dry-run        ← preview only
+//   node scripts/sync-quizzes.js --all            ← sync ALL rows (re-sync)
+//   node scripts/sync-quizzes.js --delete-synced  ← also delete synced rows
+//   node scripts/sync-quizzes.js --status         ← just show DB row counts
 //
-// Requires: .env.local or environment variables:
-//   SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Add to package.json:
+//   "sync:quizzes":       "node scripts/sync-quizzes.js",
+//   "sync:quizzes:clean": "node scripts/sync-quizzes.js --delete-synced",
+//   "sync:status":        "node scripts/sync-quizzes.js --status"
 // =============================================================================
 
 import { createClient } from "@supabase/supabase-js";
@@ -19,174 +21,190 @@ import path from "path";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 
-// ── Load .env.local ──────────────────────────────────────────────────────────
-// We do this manually to avoid requiring dotenv as a runtime dep
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.resolve(__dirname, "../.env.local");
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, "utf-8");
-  for (const line of envContent.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const idx = trimmed.indexOf("=");
-    if (idx === -1) continue;
-    const key = trimmed.slice(0, idx).trim();
-    const val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
-    if (!process.env[key]) process.env[key] = val;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, "..");
+
+// ── Load .env.local manually (no dotenv dep needed) ──────────────────────────
+function loadEnv() {
+  const candidates = [path.join(ROOT, ".env.local"), path.join(ROOT, ".env")];
+  for (const p of candidates) {
+    if (!fs.existsSync(p)) continue;
+    for (const line of fs.readFileSync(p, "utf-8").split("\n")) {
+      const t = line.trim();
+      if (!t || t.startsWith("#")) continue;
+      const eq = t.indexOf("=");
+      if (eq === -1) continue;
+      const key = t.slice(0, eq).trim();
+      const val = t
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
+      if (!process.env[key]) process.env[key] = val;
+    }
+    break; // use the first found
   }
 }
+loadEnv();
 
-// ── Validate env ─────────────────────────────────────────────────────────────
+// ── Validate env ──────────────────────────────────────────────────────────────
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY } = process.env;
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("❌  Missing SUPABASE_URL or SUPABASE_SERVICE_KEY.");
-  console.error("    Set them in .env.local or your environment.");
+  console.error(red("❌  Missing SUPABASE_URL or SUPABASE_SERVICE_KEY."));
+  console.error(
+    dim("    Add them to .env.local or set as environment variables."),
+  );
   process.exit(1);
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-// ── Config ───────────────────────────────────────────────────────────────────
-const QUIZZES_DIR = path.resolve(__dirname, "../public/data/quizzes");
+const QUIZZES_DIR = path.join(ROOT, "public", "data", "quizzes");
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
 const DELETE_SYNCED = args.includes("--delete-synced");
 const SYNC_ALL = args.includes("--all");
+const STATUS_ONLY = args.includes("--status");
 
-// ── Colors for terminal output ────────────────────────────────────────────────
-const c = {
-  green:  (s) => `\x1b[32m${s}\x1b[0m`,
-  yellow: (s) => `\x1b[33m${s}\x1b[0m`,
-  red:    (s) => `\x1b[31m${s}\x1b[0m`,
-  cyan:   (s) => `\x1b[36m${s}\x1b[0m`,
-  bold:   (s) => `\x1b[1m${s}\x1b[0m`,
-  dim:    (s) => `\x1b[2m${s}\x1b[0m`,
-};
+// ── Terminal colors ───────────────────────────────────────────────────────────
+const green = (s) => `\x1b[32m${s}\x1b[0m`;
+const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
+const red = (s) => `\x1b[31m${s}\x1b[0m`;
+const cyan = (s) => `\x1b[36m${s}\x1b[0m`;
+const bold = (s) => `\x1b[1m${s}\x1b[0m`;
+const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 
-// ── Main ─────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log(`\n${c.bold("🔄  Supabase → Codebase Quiz Sync")}`);
-  if (DRY_RUN) console.log(c.yellow("   [DRY RUN — no files will be written]\n"));
+  console.log(`\n${bold("🔄  بصمجي Quiz Sync — Supabase → Codebase")}`);
+  if (DRY_RUN) console.log(yellow("   [DRY RUN — no files will be written]\n"));
 
-  // 1. Fetch rows
+  // Status mode — just show counts and exit
+  if (STATUS_ONLY) {
+    return await showStatus();
+  }
+
+  // Fetch rows
   let query = supabase
     .from("quizzes")
-    .select("id, path, category, subject, subfolder, filename, data")
+    .select("id, path, category, subject, subfolder, filename, data, synced_at")
     .order("created_at", { ascending: true });
 
-  if (!SYNC_ALL) {
-    query = query.is("synced_at", null); // only un-synced
-  }
+  if (!SYNC_ALL) query = query.is("synced_at", null);
 
-  const { data: quizzes, error } = await query;
+  const { data: rows, error } = await query;
   if (error) {
-    console.error(c.red(`❌  Supabase fetch failed: ${error.message}`));
+    console.error(red(`❌  Supabase fetch failed: ${error.message}`));
     process.exit(1);
   }
-
-  if (!quizzes || quizzes.length === 0) {
-    console.log(c.green("✅  Nothing to sync. All quizzes are already in the codebase.\n"));
+  if (!rows?.length) {
+    console.log(
+      green("✅  Nothing to sync — all quizzes are already in the codebase.\n"),
+    );
+    await showStatus();
     return;
   }
 
-  console.log(c.cyan(`📦  Found ${quizzes.length} quiz(zes) to sync.\n`));
-
-  // 2. Row count info
-  const { count } = await supabase
-    .from("quizzes")
-    .select("*", { count: "exact", head: true });
-  console.log(c.dim(`   Total rows in Supabase: ${count}`));
-  console.log(c.dim(`   Quizzes dir: ${QUIZZES_DIR}\n`));
+  console.log(cyan(`📦  Found ${rows.length} quiz(zes) to sync.\n`));
+  await showStatus();
+  console.log();
 
   const syncedIds = [];
-  let written = 0;
-  let skipped = 0;
+  let written = 0,
+    skipped = 0;
 
-  for (const quiz of quizzes) {
-    // Build directory path from path field
-    // path looks like "Computer Science/2/2/Artificial Intelligence"
-    const dirPath = path.join(QUIZZES_DIR, ...quiz.path.split("/"));
+  for (const row of rows) {
+    // row.path is like "Computer Science/2/2/Artificial Intelligence"
+    const segments = row.path.split("/");
+    const dirPath = path.join(QUIZZES_DIR, ...segments);
 
-    // Safety: ensure the resolved path stays inside QUIZZES_DIR
-    const resolved = path.resolve(dirPath);
-    if (!resolved.startsWith(path.resolve(QUIZZES_DIR))) {
-      console.warn(c.red(`   ⚠️  SKIPPED (path traversal detected): ${quiz.path}`));
+    // Security: block path traversal
+    if (!path.resolve(dirPath).startsWith(path.resolve(QUIZZES_DIR))) {
+      console.warn(red(`   ⚠️  SKIPPED (traversal): ${row.path}`));
       skipped++;
       continue;
     }
 
-    const filePath = path.join(dirPath, quiz.filename);
-    const relativePath = path.relative(path.resolve(__dirname, ".."), filePath);
+    const filePath = path.join(dirPath, row.filename);
+    const relPath = path.relative(ROOT, filePath);
 
-    // Check for existing file
     if (fs.existsSync(filePath) && !SYNC_ALL) {
-      console.log(c.yellow(`   ⏭  Already exists: ${relativePath}`));
-      syncedIds.push(quiz.id); // mark as synced anyway
+      console.log(yellow(`   ⏭  Exists: ${relPath}`));
+      syncedIds.push(row.id);
       skipped++;
       continue;
     }
 
     if (DRY_RUN) {
-      console.log(c.cyan(`   [DRY RUN] Would write: ${relativePath}`));
+      console.log(cyan(`   [DRY RUN] Would write: ${relPath}`));
       written++;
       continue;
     }
 
-    // Create directories recursively
     fs.mkdirSync(dirPath, { recursive: true });
-
-    // Write the quiz JSON
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify(quiz.data, null, 2),
-      "utf-8"
-    );
-    console.log(c.green(`   ✅  Written: ${relativePath}`));
-    syncedIds.push(quiz.id);
+    fs.writeFileSync(filePath, JSON.stringify(row.data, null, 2), "utf-8");
+    console.log(green(`   ✅  ${relPath}`));
+    syncedIds.push(row.id);
     written++;
   }
 
-  console.log(`\n   Written: ${c.green(written)}  |  Skipped: ${c.yellow(skipped)}\n`);
+  console.log(`\n   Written: ${green(written)}  Skipped: ${yellow(skipped)}\n`);
 
   if (DRY_RUN) {
-    console.log(c.yellow("   [DRY RUN complete — no changes made]\n"));
+    console.log(yellow("   [DRY RUN complete]\n"));
     return;
   }
 
-  // 3. Mark synced in Supabase
-  if (syncedIds.length > 0) {
-    console.log(`🏷️   Marking ${syncedIds.length} row(s) as synced in Supabase...`);
-    const { error: updateErr } = await supabase
+  // Mark as synced
+  if (syncedIds.length) {
+    console.log(`🏷️   Marking ${syncedIds.length} row(s) as synced...`);
+    const { error: ue } = await supabase
       .from("quizzes")
       .update({ synced_at: new Date().toISOString() })
       .in("id", syncedIds);
-
-    if (updateErr) {
-      console.warn(c.yellow(`   ⚠️  Could not update synced_at: ${updateErr.message}`));
-    } else {
-      console.log(c.green("   ✅  Marked as synced.\n"));
-    }
+    if (ue) console.warn(yellow(`   ⚠️  Could not mark synced: ${ue.message}`));
+    else console.log(green("   ✅  Marked.\n"));
   }
 
-  // 4. Regenerate manifest
+  // Regenerate manifest
   console.log("🔁  Regenerating quiz manifest...");
   try {
-    execSync("node scripts/generate-quiz-manifest.js", { stdio: "inherit" });
-    console.log(c.green("   ✅  Manifest regenerated.\n"));
-  } catch (err) {
-    console.error(c.red(`   ❌  Manifest generation failed: ${err.message}`));
-    console.error("       Run manually: node scripts/generate-quiz-manifest.js");
+    execSync("node scripts/generate-quiz-manifest.js", {
+      stdio: "inherit",
+      cwd: ROOT,
+    });
+    console.log(green("   ✅  Manifest done.\n"));
+  } catch (e) {
+    console.error(red(`   ❌  Manifest failed: ${e.message}`));
+    console.error(
+      "       Run manually: node scripts/generate-quiz-manifest.js",
+    );
   }
 
-  // 5. Delete synced rows (optional)
   if (DELETE_SYNCED) {
     await deleteSynced();
   } else {
-    console.log(c.dim("   💡  Tip: To reclaim Supabase space after committing to Git, run:"));
-    console.log(c.dim("       node scripts/sync-quizzes.js --delete-synced\n"));
+    console.log(dim("   💡  After committing to Git, reclaim Supabase space:"));
+    console.log(dim("       node scripts/sync-quizzes.js --delete-synced\n"));
   }
 
-  console.log(c.bold(c.green("🎉  Sync complete!\n")));
+  console.log(bold(green("🎉  Sync complete!\n")));
+}
+
+async function showStatus() {
+  const { count: total } = await supabase
+    .from("quizzes")
+    .select("*", { count: "exact", head: true });
+  const { count: pending } = await supabase
+    .from("quizzes")
+    .select("*", { count: "exact", head: true })
+    .is("synced_at", null);
+  const { count: synced } = await supabase
+    .from("quizzes")
+    .select("*", { count: "exact", head: true })
+    .not("synced_at", "is", null);
+  console.log(
+    `   ${bold("Supabase:")} ${cyan(total ?? "?")} total  |  ${yellow(pending ?? "?")} pending  |  ${green(synced ?? "?")} synced`,
+  );
 }
 
 async function deleteSynced() {
@@ -195,15 +213,14 @@ async function deleteSynced() {
     .from("quizzes")
     .delete({ count: "exact" })
     .not("synced_at", "is", null);
-
-  if (error) {
-    console.error(c.red(`   ❌  Delete failed: ${error.message}`));
-  } else {
-    console.log(c.green(`   ✅  Deleted ${count ?? "?"} synced row(s). Space reclaimed.\n`));
-  }
+  if (error) console.error(red(`   ❌  ${error.message}`));
+  else
+    console.log(
+      green(`   ✅  Deleted ${count ?? "?"} rows. Space reclaimed.\n`),
+    );
 }
 
-main().catch((err) => {
-  console.error(c.red(`\n❌  Unexpected error: ${err.message}`));
+main().catch((e) => {
+  console.error(red(`\n❌  ${e.message}`));
   process.exit(1);
 });

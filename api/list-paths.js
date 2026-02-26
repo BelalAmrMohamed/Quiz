@@ -1,29 +1,29 @@
 // =============================================================================
 // api/list-paths.js
-// Returns existing categories, subjects, and subfolders from the database.
-// Used by the admin upload modal to populate smart dropdowns.
+// Returns existing categories / subjects / subfolders for the upload modal.
 //
 // GET /api/list-paths
 // Headers: Authorization: Bearer <token>
-// Response 200: { paths: { [category]: { [subject]: string[] } } }
+// 200: { paths: { [category]: { [subject]: string[] } } }
 // =============================================================================
 
 import { createClient } from "@supabase/supabase-js";
-import { requireAdmin, applyCors } from "./_middleware.js";
+import { requireAdmin, applyCors, handleAuthError } from "./_middleware.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_SERVICE_KEY,
 );
 
 export default async function handler(req, res) {
-  applyCors(res);
+  applyCors(req, res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).end();
 
   try {
     requireAdmin(req);
-  } catch (e) {
+  } catch (err) {
+    if (handleAuthError(err, res)) return;
     return res.status(401).json({ error: "غير مصرح" });
   }
 
@@ -33,28 +33,25 @@ export default async function handler(req, res) {
     .order("category", { ascending: true });
 
   if (error) {
-    console.error("[list-paths] Supabase error:", error);
+    console.error("[list-paths] Supabase error:", error.message);
     return res.status(500).json({ error: "فشل تحميل المسارات" });
   }
 
-  // Build a nested map: { category -> { subject -> Set<subfolder> } }
+  // Group into { category -> { subject -> Set<subfolder> } }
   const map = {};
   for (const row of data) {
-    const cat = row.category;
-    const sub = row.subject;
-    const folder = row.subfolder;
-
-    if (!map[cat]) map[cat] = {};
-    if (!map[cat][sub]) map[cat][sub] = new Set();
-    if (folder) map[cat][sub].add(folder);
+    if (!map[row.category]) map[row.category] = {};
+    if (!map[row.category][row.subject])
+      map[row.category][row.subject] = new Set();
+    if (row.subfolder) map[row.category][row.subject].add(row.subfolder);
   }
 
-  // Serialize Sets to sorted arrays for JSON
+  // Serialize Sets → sorted arrays
   const paths = {};
   for (const [cat, subjects] of Object.entries(map)) {
     paths[cat] = {};
     for (const [sub, folders] of Object.entries(subjects)) {
-      paths[cat][sub] = [...folders].sort((a, b) => a.localeCompare(b));
+      paths[cat][sub] = [...folders].sort((a, b) => a.localeCompare(b, "ar"));
     }
   }
 
