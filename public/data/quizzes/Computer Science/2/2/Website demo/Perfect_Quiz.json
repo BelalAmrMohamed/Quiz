@@ -1,0 +1,28 @@
+{
+  "id": "user_quiz_1772145535762_0ikbp",
+  "title": "Perfect Quiz",
+  "author": "Imported",
+  "createdAt": "2026-02-26T22:38:55.762Z",
+  "questions": [
+    {
+      "q": "What is something\na. Option 1",
+      "correct": 0,
+      "options": [
+        "Option 2",
+        "Option 3",
+        "Option 4",
+        "Option 5"
+      ],
+      "explanation": "Somewhy"
+    },
+    {
+      "q": "Which of the following languages is easier? `Python or C++`",
+      "correct": 0,
+      "options": [
+        "Python."
+      ],
+      "explanation": ""
+    }
+  ],
+  "description": ""
+}

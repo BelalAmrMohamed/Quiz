@@ -661,6 +661,18 @@
       "category": "Website demo"
     },
     {
+      "id": "42S2UGEU",
+      "title": "Perfect Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Website demo/Perfect_Quiz.json",
+      "category": "Website demo"
+    },
+    {
+      "id": "44P3E7KS",
+      "title": "Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Website demo/Quiz.json",
+      "category": "Website demo"
+    },
+    {
       "id": "4OBRHDOR",
       "title": "Test Quiz",
       "path": "../../data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
@@ -1647,6 +1659,18 @@
       "parent": null,
       "subcategories": [],
       "exams": [
+        {
+          "id": "42S2UGEU",
+          "title": "Perfect Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Website demo/Perfect_Quiz.json",
+          "category": "Website demo"
+        },
+        {
+          "id": "44P3E7KS",
+          "title": "Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Website demo/Quiz.json",
+          "category": "Website demo"
+        },
         {
           "id": "4OBRHDOR",
           "title": "Test Quiz",

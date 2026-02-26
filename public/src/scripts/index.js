@@ -1171,9 +1171,9 @@ function renderUserQuizzesView() {
     if (!isAdminAuthenticated()) {
       const adminSignInBtn = document.createElement("a");
       adminSignInBtn.href = "sign-in.html";
-      adminSignInBtn.textContent = "🔐 دخول المشرف";
+      adminSignInBtn.textContent = "🔐 دخول المشرفين";
       adminSignInBtn.className = "btn";
-      adminSignInBtn.setAttribute("aria-label", "دخول لوحة المشرف");
+      adminSignInBtn.setAttribute("aria-label", "لوحة دخول المشرفين");
       adminSignInBtn.style.cssText =
         "display: inline-block;       padding: 10px 18px;       background: var(--color-background-secondary);       border: 1.5px solid var(--color-border);       color: var(--color-text-secondary);       text-decoration: none;       border-radius: 8px;       font-weight: 600;       font-size: 0.88rem;       transition: all 0.2s;       margin-left: 10px;";
       adminSignInBtn.onmouseover = () => {
