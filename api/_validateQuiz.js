@@ -22,11 +22,13 @@ const ALLOWED_TOP_KEYS = new Set([
 
 const ALLOWED_QUESTION_KEYS = new Set([
   "id",
+  "q",
   "question",
   "text",
   "type",
   "options",
   "choices",
+  "correct",
   "answer",
   "correctAnswer",
   "explanation",
@@ -94,7 +96,7 @@ export function validateQuizPayload(raw) {
         throw new Error(`INVALID_QUESTION[${i}]: unknown key "${key}"`);
       }
     }
-    const text = q.question || q.text;
+    const text = q.q || q.question || q.text;
     if (!text || typeof text !== "string" || !text.trim()) {
       throw new Error(`INVALID_QUESTION[${i}]: missing question text`);
     }
