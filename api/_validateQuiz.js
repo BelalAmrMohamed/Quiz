@@ -17,6 +17,7 @@ const ALLOWED_TOP_KEYS = new Set([
   "updatedAt",
   "version",
   "tags",
+  "author",
 ]);
 
 const ALLOWED_QUESTION_KEYS = new Set([
