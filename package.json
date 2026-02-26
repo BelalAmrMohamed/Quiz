@@ -4,6 +4,8 @@
   "description": "Vanilla JS examination platform with quiz creation and export features",
   "type": "module",
   "scripts": {
+    "sync:quizzes": "node scripts/sync-quizzes.js",
+    "sync:quizzes:clean": "node scripts/sync-quizzes.js --delete-synced",
     "dev": "npx http-server public -p 8080 -o",
     "generate-manifest": "node scripts/generate-quiz-manifest.js",
     "migrate-quiz-to-json": "node scripts/migrate-quiz-data-to-json.js",
@@ -23,5 +25,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "jsonwebtoken": "^9.0.3"
   }
 }

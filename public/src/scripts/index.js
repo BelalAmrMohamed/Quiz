@@ -18,6 +18,8 @@ import { exportToPdf } from "../export/export-to-pdf.js";
 import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
+import { createUploadButton } from "./adminUpload.js";
+import { isAdminAuthenticated, hasAdminSessionHint } from "./adminAuth.js";
 
 // Helper utilities
 import {
@@ -1164,6 +1166,27 @@ function renderUserQuizzesView() {
     };
 
     actionsBar.appendChild(createBtn);
+
+    // Admin sign-in / sign-out button (only show if not already authenticated)
+    if (!isAdminAuthenticated()) {
+      const adminSignInBtn = document.createElement("a");
+      adminSignInBtn.href = "sign-in.html";
+      adminSignInBtn.textContent = "🔐 دخول المشرف";
+      adminSignInBtn.className = "btn";
+      adminSignInBtn.setAttribute("aria-label", "دخول لوحة المشرف");
+      adminSignInBtn.style.cssText =
+        "display: inline-block;       padding: 10px 18px;       background: var(--color-background-secondary);       border: 1.5px solid var(--color-border);       color: var(--color-text-secondary);       text-decoration: none;       border-radius: 8px;       font-weight: 600;       font-size: 0.88rem;       transition: all 0.2s;       margin-left: 10px;";
+      adminSignInBtn.onmouseover = () => {
+        adminSignInBtn.style.borderColor = "var(--color-primary)";
+        adminSignInBtn.style.color = "var(--color-primary)";
+      };
+      adminSignInBtn.onmouseout = () => {
+        adminSignInBtn.style.borderColor = "var(--color-border)";
+        adminSignInBtn.style.color = "var(--color-text-secondary)";
+      };
+      actionsBar.appendChild(adminSignInBtn);
+    }
+
     container.appendChild(actionsBar);
 
     // Inline create-quiz card (always visible in this view)
@@ -1677,6 +1700,19 @@ function createUserQuizCard(quiz, index) {
   actions.appendChild(downloadBtn);
   actions.appendChild(editBtn);
   actions.appendChild(deleteBtn);
+
+  // ── Admin Upload Button (visible only to authenticated admins) ──────────
+  // isAdminAuthenticated() checks the in-memory token — no server call needed here.
+  // hasAdminSessionHint() checks sessionStorage as a fallback for UI hint.
+  if (isAdminAuthenticated() || hasAdminSessionHint()) {
+    const uploadRow = document.createElement("div");
+    uploadRow.style.cssText =
+      "margin-top: 10px; display: flex; justify-content: flex-end;";
+    const uploadBtn = createUploadButton(quiz);
+    uploadRow.appendChild(uploadBtn);
+    card.appendChild(uploadRow);
+  }
+
   card.appendChild(actions);
 
   // Hover effects
