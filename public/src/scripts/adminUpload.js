@@ -4,13 +4,14 @@
 //
 // Step 1 — Path selection:
 //   • College    → fixed list from MANIFEST_TREE (read-only, no creation)
-//   • Year       → 1 or 2  (auto-populated from manifest for chosen college+subject)
-//   • Term       → 1 or 2  (auto-populated from manifest for chosen college+subject)
+//   • Year       → (auto-populated from manifest for chosen college+subject) Shouldn't be changalbe
+//   • Term       → (auto-populated from manifest for chosen college+subject) Shouldn't be changalbe
 //   • Subject    → from manifest for selected college + "➕ إنشاء مادة جديدة"
 //   • Subfolder  → existing subfolders from manifest + "➕ إنشاء مجلد فرعي جديد" + none
 //
 // Step 2 — Preview path + quiz details
 // Step 3 — Upload confirmation + success/error
+// The `upload-to-db-btn` looks missed up until it gets clicked.
 // =============================================================================
 
 import { getToken, isAdminAuthenticated, signOut } from "./adminAuth.js";
@@ -668,6 +669,7 @@ function closeModal() {
 
 // ─── Public exports ───────────────────────────────────────────────────────────
 export function createUploadButton(quiz) {
+  injectStyles();
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "upload-to-db-btn";

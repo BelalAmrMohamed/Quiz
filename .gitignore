@@ -16,3 +16,5 @@ scripts/deploy-production.js
 
 # Context quiz (for AI prompts)
 docs/context-quiz.json
+.vercel
+.env*.local

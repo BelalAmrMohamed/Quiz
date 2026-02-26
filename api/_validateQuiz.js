@@ -6,6 +6,7 @@
 
 const MAX_SIZE_BYTES = 50_000; // 50 KB hard cap per quiz file
 const ALLOWED_TOP_KEYS = new Set([
+  "id",
   "title",
   "description",
   "subject",
