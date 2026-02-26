@@ -1,6 +1,6 @@
 // scripts/map.js
-// Run this in the terminal: node scripts/map.js
 // The generated file will be in: docs/context-map.txt
+// > node scripts/map.js
 
 const fs = require("fs");
 const path = require("path");
@@ -9,20 +9,15 @@ const path = require("path");
 
 // Files/Folders to ignore
 const IGNORE_NAMES = [
-  // ".git",
-  // ".vscode",
-  // "Exams",
-  // "images",
-  // "LICENSE",
-  // "README.md",
-  // "_config.yml",
-  // "favicon.png",
-  // "manifest.json",
-  // "robots.txt",
-  // "sitemap.xml",
-  // "service-worker.js",
-  // "Context Map.txt",
-  // "google0c1df2c3df22a824.html",
+  ".git",
+  ".vscode",
+  "quizzes",
+  "images",
+  "LICENSE",
+  "README.md",
+  "_config.yml",
+  "Context Map.txt",
+  "google0c1df2c3df22a824.html",
 ];
 
 // Extensions to ignore
