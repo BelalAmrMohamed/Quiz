@@ -108,3 +108,12 @@ export function signOut() {
     sessionStorage.removeItem(SESSION_KEY);
   } catch (_) {}
 }
+
+/**
+ * Alias kept for backwards-compatibility with index.js imports.
+ * isAdminAuthenticated() already covers this — both check the same token.
+ * @returns {boolean}
+ */
+export function hasAdminSessionHint() {
+  return isAdminAuthenticated();
+}
