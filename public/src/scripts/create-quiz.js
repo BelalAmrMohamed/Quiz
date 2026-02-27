@@ -1725,13 +1725,19 @@ window.exportQuiz = function () {
       sublabel: "(.json)",
       format: "json",
     },
+    {
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+      label: "نسخ",
+      sublabel: "(نص)",
+      format: "copy",
+    },
   ];
 
   const optionsHtml = downloadOpts
     .map(
       ({ icon, label, sublabel, format }) => `
     <button class="dl-option-btn" data-format="${format}" aria-label="تنزيل كـ ${label}">
-    ${format === "json" ? icon : `<img style="max-width: 70px; max-height: 70px;" src="${icon}" alt="context icon" aria-hidden="true"></img>`}
+    ${format === "json" || format === "copy" ? icon : `<img style="max-width: 70px; max-height: 70px;" src="${icon}" alt="context icon" aria-hidden="true"></img>`}
        
       <span class="dl-label">${label}</span>
       <span class="dl-sublabel">${sublabel}</span>
@@ -1755,8 +1761,72 @@ window.exportQuiz = function () {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.remove();
   });
+
+  let quizTextBlob = null;
   modal.querySelectorAll(".dl-option-btn").forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
+      if (btn.dataset.format === "copy") {
+        if (!btn.dataset.copied) {
+          try {
+            let text = `Title: ${quizData.title || "Untitled"}\n\n`;
+            if (quizData.description)
+              text += `Description: ${quizData.description}\n\n`;
+
+            exportQuestions.forEach((q, i) => {
+              text += `${i + 1}. ${q.q}\n\n`;
+              if (q.options.length === 1) {
+                text += `   Formal Answer: ${q.options[0]}\n`;
+              } else {
+                q.options.forEach((opt, j) => {
+                  text += `   ${String.fromCharCode(65 + j)}. ${opt}\n`;
+                });
+                if (
+                  q.correct !== undefined &&
+                  q.correct !== null &&
+                  q.correct !== ""
+                ) {
+                  let formattedCorrect = q.correct;
+                  if (
+                    typeof q.correct === "number" ||
+                    (typeof q.correct === "string" && /^\d+$/.test(q.correct))
+                  ) {
+                    formattedCorrect = String.fromCharCode(
+                      65 + Number(q.correct),
+                    );
+                  }
+                  text += `\n   Correct: ${formattedCorrect}\n`;
+                }
+              }
+              if (q.explanation) text += `\n   Explanation: ${q.explanation}\n`;
+              text += `\n`;
+            });
+            await navigator.clipboard.writeText(text);
+            quizTextBlob = new Blob([text], { type: "text/plain" });
+
+            btn.dataset.copied = "true";
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><span class="dl-label">تنزيل</span><span class="dl-sublabel">(.txt)</span>`;
+            showNotification(
+              "تم النسخ",
+              "تم نسخ نص الإختبار! انقر مرة أخرى لتحميله كملف .txt",
+              "success",
+            );
+          } catch (err) {
+            console.error(err);
+            showNotification("خطأ", "فشل نسخ الإختبار", "error");
+          }
+        } else {
+          const url = URL.createObjectURL(quizTextBlob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${quizData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.txt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          modal.remove();
+        }
+        return;
+      }
       modal.remove();
       doExport(btn.dataset.format);
     };

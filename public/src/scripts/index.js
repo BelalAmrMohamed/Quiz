@@ -1394,24 +1394,62 @@ function openInlineCreateQuizModal() {
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-labelledby", "inlineCreateQuizTitle");
+  overlay.style.cssText = `
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6);
+  `;
 
   const modalCard = document.createElement("div");
   modalCard.className = "modal-card";
+  modalCard.style.cssText = `
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    max-width: 550px;
+    width: 90%;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  `;
+
+  if (!document.getElementById("modal-pop-in-style")) {
+    const style = document.createElement("style");
+    style.id = "modal-pop-in-style";
+    style.textContent = `
+      @keyframes modalPopIn {
+        to { transform: translateY(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   modalCard.innerHTML = `
-    <h2 id="inlineCreateQuizTitle">إنشاء إمتحان جديد</h2>
-    <p style="margin-bottom:16px;">الصق أو اكتب أسئلة الإمتحان في الحقل التالي، وسنحوّلها تلقائيًا إلى كويز داخل "إمتحاناتك".</p>
-    <div class="form-group">
-      <label for="inlineQuizTitle">عنوان الإمتحان</label>
-      <input type="text" id="inlineQuizTitle" placeholder="مثال: Arrays in C++" />
+    <h2 id="inlineCreateQuizTitle" style="margin-bottom: 12px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; color: var(--color-text-primary);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus" style="color: var(--color-primary);"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></svg>
+      إنشاء إمتحان جديد
+    </h2>
+    <p style="margin-bottom:24px; color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.5;">الصق أو اكتب أسئلة الإمتحان في الحقل التالي، أو قم باستيراد ملف، وسنحوّلها تلقائيًا إلى كويز داخل "إمتحاناتك".</p>
+    <div class="form-group" style="margin-bottom: 18px;">
+      <label for="inlineQuizTitle" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">عنوان الإمتحان</label>
+      <input type="text" id="inlineQuizTitle" placeholder="Arrays in C++" style="width: 100%; padding: 14px 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 1rem; transition: all 0.2s; outline: none; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';"/>
     </div>
-    <div class="form-group">
-      <label for="inlineQuizContent">محتوى الإمتحان</label>
-      <textarea id="inlineQuizContent" rows="8" placeholder="1. السؤال الأول...\nA. اختيار 1\nB. اختيار 2\n\nCorrect: A\n\nExplanation: ..."></textarea>
+    <div class="form-group" style="margin-bottom: 24px;">
+      <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
+      <textarea id="inlineQuizContent" rows="8" placeholder="1. What is something\n\nA. Option 1\nB. Option 2\nC. Option 3\nD. Option 4\n-E. Option 5\n\nCorrect: B\n\nExplanation: Somewhy\n\n2. Which of the following is easier? \`Python or C++\`\n\n- Python.\n\nExplanation: Pythong is faster than C++." style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';"></textarea>
     </div>
-    <div class="profile-actions">
-      <button type="button" class="profile-btn secondary" id="inlineQuizCancel">إلغاء</button>
-      <button type="button" class="profile-btn primary" id="inlineQuizCreate">إنشاء</button>
+    <div class="profile-actions" style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+      <button type="button" id="inlineQuizImport" style="padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--color-border); background: var(--color-background-secondary); color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; font-weight: 600; font-size: 0.95rem; font-family: inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+        استيراد ملف
+      </button>
+      <div style="flex: 1;"></div>
+      <button type="button" id="inlineQuizCancel" style="padding: 12px 20px; border-radius: 12px; border: none; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; font-weight: 600; font-size: 0.95rem; font-family: inherit;">إلغاء</button>
+      <button type="button" id="inlineQuizCreate" style="padding: 12px 28px; border-radius: 12px; border: none; background: var(--gradient-accent); color: white; cursor: pointer; transition: all 0.2s; font-weight: 600; font-size: 0.95rem; font-family: inherit; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);">إنشاء  ✨</button>
     </div>
+    <input type="file" id="inlineQuizFileInput" accept=".txt,.docx,.pdf,.pptx,.json" style="display: none;" />
   `;
 
   overlay.appendChild(modalCard);
@@ -1421,28 +1459,98 @@ function openInlineCreateQuizModal() {
   const contentInput = modalCard.querySelector("#inlineQuizContent");
   const cancelBtn = modalCard.querySelector("#inlineQuizCancel");
   const createBtn = modalCard.querySelector("#inlineQuizCreate");
+  const importBtn = modalCard.querySelector("#inlineQuizImport");
+  const fileInput = modalCard.querySelector("#inlineQuizFileInput");
+
+  importBtn.onmouseover = () => {
+    importBtn.style.borderColor = "var(--color-primary)";
+    importBtn.style.color = "var(--color-primary)";
+  };
+  importBtn.onmouseout = () => {
+    importBtn.style.borderColor = "var(--color-border)";
+    importBtn.style.color = "var(--color-text-primary)";
+  };
+  cancelBtn.onmouseover = () => {
+    cancelBtn.style.background = "var(--color-background-secondary)";
+    cancelBtn.style.color = "var(--color-text-primary)";
+  };
+  cancelBtn.onmouseout = () => {
+    cancelBtn.style.background = "transparent";
+    cancelBtn.style.color = "var(--color-text-secondary)";
+  };
+  createBtn.onmouseover = () => {
+    createBtn.style.transform = "translateY(-2px)";
+    createBtn.style.boxShadow = "0 6px 20px rgba(220, 38, 38, 0.5)";
+  };
+  createBtn.onmouseout = () => {
+    createBtn.style.transform = "translateY(0)";
+    createBtn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.4)";
+  };
 
   const close = () => {
-    overlay.remove();
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.2s";
+    modalCard.style.transform = "translateY(10px)";
+    modalCard.style.transition = "transform 0.2s";
+    setTimeout(() => overlay.remove(), 200);
   };
 
   cancelBtn.onclick = close;
 
+  importBtn.onclick = () => fileInput.click();
+
+  fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    importBtn.innerHTML =
+      '<span class="adm-spinner" style="margin: 0; border-color: var(--color-primary); border-top-color: transparent;"></span> استخراج...';
+    importBtn.disabled = true;
+
+    try {
+      const text = await extractTextFromFile(file);
+      contentInput.value = text;
+
+      const defaultTitle = file.name
+        .replace(/\.(json|txt|pdf|docx|pptx)$/i, "")
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+      if (!titleInput.value) {
+        titleInput.value = defaultTitle;
+      }
+
+      showNotification(
+        "نجاح",
+        "تم استخراج النص، يمكنك تعديله أو إنشاء الكويز الآن.",
+        "success",
+      );
+    } catch (err) {
+      console.error("Import extract error:", err);
+      showNotification(
+        "خطأ في القراءة",
+        `تعذّر قراءة ${file.name}: ${err.message}`,
+        "error",
+      );
+    } finally {
+      importBtn.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> استيراد ملف';
+      importBtn.disabled = false;
+      fileInput.value = "";
+    }
+  };
+
   createBtn.onclick = async () => {
     const title = (titleInput.value || "").trim();
     const content = (contentInput.value || "").trim();
-    if (!title || !content) {
-      showNotification(
-        "بيانات ناقصة",
-        "الرجاء إدخال العنوان والمحتوى.",
-        "warning",
-      );
+    if (!content) {
+      showNotification("بيانات ناقصة", "الرجاء إدخال المحتوى.", "warning");
       return;
     }
 
     let parsed;
     try {
-      parsed = parseImportContent(content, title);
+      parsed = parseImportContent(content, title || "Quiz");
     } catch (err) {
       showNotification("خطأ في التنسيق", err.message, "error");
       return;
@@ -1464,7 +1572,7 @@ function openInlineCreateQuizModal() {
 
     quizzes.push({
       id: quizId,
-      title: parsed.meta?.title || title,
+      title: parsed.meta?.title || title || "Untitled Quiz",
       description: parsed.meta?.description || "",
       questions: parsed.questions,
       createdAt: new Date().toISOString(),
@@ -1547,6 +1655,9 @@ function createUserQuizCard(quiz, index) {
     font-weight: 700;
     border-radius: 12px;
     margin-bottom: 12px;
+    margin-top: 24px;
+    position: relative;
+    z-index: 1;
   `;
   card.appendChild(badge);
 
@@ -1636,19 +1747,37 @@ function createUserQuizCard(quiz, index) {
   };
 
   const deleteBtn = document.createElement("button");
-  deleteBtn.innerHTML += `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+  deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
   deleteBtn.type = "button";
   deleteBtn.setAttribute("aria-label", `حذف اختبار ${quiz.title}`);
   deleteBtn.style.cssText = `
-    padding: 10px 14px;
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--color-error-light);
     color: var(--color-error);
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: all 0.2s;
+    z-index: 2;
   `;
+  deleteBtn.onmouseover = () => {
+    deleteBtn.style.background = "var(--color-error)";
+    deleteBtn.style.color = "white";
+    deleteBtn.style.transform = "scale(1.05)";
+  };
+  deleteBtn.onmouseout = () => {
+    deleteBtn.style.background = "var(--color-error-light)";
+    deleteBtn.style.color = "var(--color-error)";
+    deleteBtn.style.transform = "scale(1)";
+  };
   deleteBtn.onclick = (e) => {
     e.stopPropagation();
     deleteUserQuiz(quiz.id, index);
@@ -1678,19 +1807,37 @@ function createUserQuizCard(quiz, index) {
   };
 
   const editBtn = document.createElement("button");
-  editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>`;
+  editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>`;
   editBtn.type = "button";
   editBtn.setAttribute("aria-label", `تعديل اختبار ${quiz.title}`);
   editBtn.style.cssText = `
-    padding: 10px 14px;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--color-primary-light);
     color: var(--color-primary);
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: all 0.2s;
+    z-index: 2;
   `;
+  editBtn.onmouseover = () => {
+    editBtn.style.background = "var(--color-primary)";
+    editBtn.style.color = "white";
+    editBtn.style.transform = "scale(1.05)";
+  };
+  editBtn.onmouseout = () => {
+    editBtn.style.background = "var(--color-primary-light)";
+    editBtn.style.color = "var(--color-primary)";
+    editBtn.style.transform = "scale(1)";
+  };
   editBtn.onclick = (e) => {
     e.stopPropagation();
     window.location.href = `create-quiz.html?edit=${encodeURIComponent(quiz.id)}`;
@@ -1698,8 +1845,9 @@ function createUserQuizCard(quiz, index) {
 
   actions.appendChild(playBtn);
   actions.appendChild(downloadBtn);
-  actions.appendChild(editBtn);
-  actions.appendChild(deleteBtn);
+
+  card.appendChild(deleteBtn);
+  card.appendChild(editBtn);
 
   // ── Admin Upload Button (visible only to authenticated admins) ──────────
   // isAdminAuthenticated() checks the in-memory token — no server call needed here.
@@ -2065,11 +2213,98 @@ function createExamCard(exam) {
       grid.appendChild(b);
     });
 
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "mode-btn";
+    copyBtn.type = "button";
+    copyBtn.setAttribute("aria-label", "Copy Quiz Text");
+    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><strong>نسخ كنص</strong>`;
+    let isCopied = false;
+    let quizTextBlob = null;
+    copyBtn.onclick = (ev) => {
+      ev.stopPropagation();
+      withDownloadLoading(copyBtn, async () => {
+        try {
+          if (!isCopied) {
+            let questions = [];
+            if (exam.path.endsWith(".json")) {
+              const res = await fetch(exam.path);
+              const data = await res.json();
+              questions = data.questions || [];
+            } else {
+              const res = await fetch(exam.path);
+              const data = await res.json().catch(() => ({}));
+              questions = data.questions || [];
+            }
+            let text = `Title: ${exam.title || exam.id}\n\n`;
+            if (exam.description)
+              text += `Description: ${exam.description}\n\n`;
+
+            questions.forEach((q, i) => {
+              text += `${i + 1}. ${q.q}\n\n`;
+              if (q.options.length === 1) {
+                text += `   Formal Answer: ${q.options[0]}\n`;
+              } else {
+                q.options.forEach((opt, j) => {
+                  text += `   ${String.fromCharCode(65 + j)}. ${opt}\n`;
+                });
+                if (
+                  q.correct !== undefined &&
+                  q.correct !== null &&
+                  q.correct !== ""
+                ) {
+                  let formattedCorrect = q.correct;
+                  if (
+                    typeof q.correct === "number" ||
+                    (typeof q.correct === "string" && /^\d+$/.test(q.correct))
+                  ) {
+                    formattedCorrect = String.fromCharCode(
+                      65 + Number(q.correct),
+                    );
+                  }
+                  text += `\n   Correct: ${formattedCorrect}\n`;
+                }
+              }
+              if (q.explanation) text += `\n   Explanation: ${q.explanation}\n`;
+              text += `\n`;
+            });
+
+            await navigator.clipboard.writeText(text);
+            quizTextBlob = new Blob([text], { type: "text/plain" });
+            copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>تنزيل .txt</strong>`;
+            isCopied = true;
+            showNotification(
+              "تم النسخ",
+              "تم نسخ نص الإختبار! انقر مرة أخرى لتحميله كملف .txt",
+              "success",
+            );
+          } else {
+            const url = URL.createObjectURL(quizTextBlob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${(exam.title || exam.id).replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            modal.remove();
+          }
+        } catch (e) {
+          console.error(e);
+          showNotification("خطأ", "فشل نسخ أو تحميل الإختبار.", "error");
+        }
+      }).then(() => {
+        if (isCopied) {
+          copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>تنزيل .txt</strong>`;
+        }
+      });
+    };
+    grid.appendChild(copyBtn);
+
     const jsonBtn = document.createElement("button");
     jsonBtn.className = "mode-btn";
     jsonBtn.type = "button";
     jsonBtn.setAttribute("aria-label", `Download JSON (.json)`);
-    jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
+    jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
     jsonBtn.onclick = (ev) => {
       ev.stopPropagation();
       withDownloadLoading(jsonBtn, async () => {
@@ -2101,7 +2336,7 @@ function createExamCard(exam) {
           sourceBtn.className = "mode-btn";
           sourceBtn.type = "button";
           sourceBtn.setAttribute("aria-label", `Download Source`);
-          sourceBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-to-line-icon lucide-arrow-down-to-line"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg><strong>Download Source</strong>`;
+          sourceBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-to-line-icon lucide-arrow-down-to-line"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg><strong>Download Source</strong>`;
           sourceBtn.onclick = (ev) => {
             ev.stopPropagation();
             window.open(data.source, "_blank");
@@ -2157,6 +2392,38 @@ function createExamCard(exam) {
   btnWrap.style.width = "100%";
   btnWrap.appendChild(btn);
   btnWrap.appendChild(downloadBtn);
+
+  card.style.position = "relative";
+
+  const shareBtn = document.createElement("button");
+  shareBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2-icon lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`;
+  shareBtn.setAttribute("aria-label", "مشاركة");
+  shareBtn.className = "share-quiz-link-button";
+  shareBtn.onmouseover = () => {
+    shareBtn.style.color = "var(--color-primary)";
+    shareBtn.style.borderColor = "var(--color-primary)";
+    shareBtn.style.transform = "scale(1.05)";
+  };
+  shareBtn.onmouseout = () => {
+    shareBtn.style.color = "var(--color-text-secondary)";
+    shareBtn.style.borderColor = "var(--color-border)";
+    shareBtn.style.transform = "scale(1)";
+  };
+  shareBtn.onclick = async (e) => {
+    e.stopPropagation();
+    const link =
+      window.location.origin +
+      window.location.pathname.replace(/index\.html$/, "") +
+      (window.location.pathname.endsWith("/") ? "" : "") +
+      `quiz.html?id=${encodeURIComponent(exam.id)}`; // Might need fixing
+    try {
+      await navigator.clipboard.writeText(link);
+      showNotification("تم النسخ", "تم نسخ رابط الإختبار للمشاركة", "success");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  card.appendChild(shareBtn);
 
   card.appendChild(h);
   card.appendChild(questionCountLine);
@@ -2427,11 +2694,88 @@ function showUserQuizDownloadPopup(quiz) {
     grid.appendChild(b);
   });
 
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "mode-btn";
+  copyBtn.type = "button";
+  copyBtn.setAttribute("aria-label", "Copy Quiz Text");
+  copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><strong>نسخ كنص</strong>`;
+  let isCopied = false;
+  let quizTextBlob = null;
+  copyBtn.onclick = (ev) => {
+    ev.stopPropagation();
+    withDownloadLoading(copyBtn, async () => {
+      try {
+        if (!isCopied) {
+          let text = `Title: ${quiz.title || quiz.id}\n\n`;
+          if (quiz.description) text += `Description: ${quiz.description}\n\n`;
+
+          questions.forEach((q, i) => {
+            text += `${i + 1}. ${q.q}\n\n`;
+            if (q.options.length === 1) {
+              text += `   Formal Answer: ${q.options[0]}\n`;
+            } else {
+              q.options.forEach((opt, j) => {
+                text += `   ${String.fromCharCode(65 + j)}. ${opt}\n`;
+              });
+
+              if (
+                q.correct !== undefined &&
+                q.correct !== null &&
+                q.correct !== ""
+              ) {
+                let formattedCorrect = q.correct;
+                if (
+                  typeof q.correct === "number" ||
+                  (typeof q.correct === "string" && /^\d+$/.test(q.correct))
+                ) {
+                  formattedCorrect = String.fromCharCode(
+                    65 + Number(q.correct),
+                  );
+                }
+                text += `\n   Correct: ${formattedCorrect}\n`;
+              }
+            }
+            if (q.explanation) text += `\n   Explanation: ${q.explanation}\n`;
+            text += `\n`;
+          });
+
+          await navigator.clipboard.writeText(text);
+          quizTextBlob = new Blob([text], { type: "text/plain" });
+          copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>تنزيل .txt</strong>`;
+          isCopied = true;
+          showNotification(
+            "تم النسخ",
+            "تم نسخ نص الإختبار! انقر مرة أخرى لتحميله كملف .txt",
+            "success",
+          );
+        } else {
+          const url = URL.createObjectURL(quizTextBlob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${quiz.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.txt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          modal.remove();
+        }
+      } catch (e) {
+        console.error(e);
+        showNotification("خطأ", "فشل نسخ أو تحميل الإختبار.", "error");
+      }
+    }).then(() => {
+      if (isCopied) {
+        copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>تنزيل .txt</strong>`;
+      }
+    });
+  };
+  grid.appendChild(copyBtn);
+
   const jsonBtn = document.createElement("button");
   jsonBtn.className = "mode-btn";
   jsonBtn.type = "button";
   jsonBtn.setAttribute("aria-label", `Download JSON (.json)`);
-  jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
+  jsonBtn.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-braces-icon lucide-file-braces"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg><strong>JSON (.json)</strong>`;
   jsonBtn.onclick = (ev) => {
     ev.stopPropagation();
     withDownloadLoading(jsonBtn, async () => {

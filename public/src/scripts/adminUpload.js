@@ -412,6 +412,8 @@ function renderStep1(saved = {}) {
 
 function populateSubjects(college, subEl, folEl, yearEl, termEl, saved) {
   subEl.disabled = false;
+  yearEl.disabled = false;
+  termEl.disabled = false;
   subEl.innerHTML = '<option value="">— اختر المادة —</option>';
   folEl.innerHTML = '<option value="">— بدون مجلد فرعي —</option>';
   folEl.disabled = false;
@@ -451,11 +453,25 @@ function populateSubjects(college, subEl, folEl, yearEl, termEl, saved) {
 
 function autoFillYearTerm(college, subject, yearEl, termEl) {
   const info = MANIFEST_TREE[college]?.[subject];
-  if (!info) return;
+  if (!info || !info.yearterm || info.yearterm.length === 0) {
+    yearEl.disabled = false;
+    termEl.disabled = false;
+    return;
+  }
   // Use first known year/term pair for this subject
   const [year, term] = info.yearterm[0] || [];
-  if (year) yearEl.value = year;
-  if (term) termEl.value = term;
+  if (year) {
+    yearEl.value = year;
+    yearEl.disabled = true;
+  } else {
+    yearEl.disabled = false;
+  }
+  if (term) {
+    termEl.value = term;
+    termEl.disabled = true;
+  } else {
+    termEl.disabled = false;
+  }
 }
 
 function populateSubfolders(college, subject, folEl, saved) {
@@ -655,7 +671,19 @@ function openModal(quiz) {
   _overlay = makeOverlay();
   document.body.appendChild(_overlay);
   document.body.style.overflow = "hidden";
-  renderStep1();
+
+  let savedCollege = "";
+  try {
+    const profileStr = localStorage.getItem("userProfile");
+    if (profileStr) {
+      const p = JSON.parse(profileStr);
+      if (p.faculty && MANIFEST_TREE[p.faculty]) {
+        savedCollege = p.faculty;
+      }
+    }
+  } catch (e) {}
+
+  renderStep1({ college: savedCollege });
 }
 
 function closeModal() {
