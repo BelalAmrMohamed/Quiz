@@ -1,0 +1,26 @@
+{
+  "id": "user_quiz_1772145535784_fcgpf",
+  "title": "Simple PowerPoint Quiz",
+  "author": "Imported",
+  "createdAt": "2026-02-26T22:38:55.784Z",
+  "questions": [
+    {
+      "q": "What is something",
+      "correct": 1,
+      "options": [
+        "Someone",
+        "Somewhere"
+      ],
+      "explanation": "Somewhy"
+    },
+    {
+      "q": "Which of the following languages is easier? `Python or C++`",
+      "correct": 0,
+      "options": [
+        "Python."
+      ],
+      "explanation": ""
+    }
+  ],
+  "description": ""
+}

@@ -677,6 +677,12 @@
       "title": "Test Quiz",
       "path": "../../data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
       "category": "Website demo"
+    },
+    {
+      "id": "O2Q72L72",
+      "title": "Simple PowerPoint Quiz",
+      "path": "../../data/quizzes/Computer Science/2/2/Website demo/Simple_PowerPoint_Quiz.json",
+      "category": "Website demo"
     }
   ],
   "categoryTree": {
@@ -1669,6 +1675,12 @@
           "id": "44P3E7KS",
           "title": "Quiz",
           "path": "../../data/quizzes/Computer Science/2/2/Website demo/Quiz.json",
+          "category": "Website demo"
+        },
+        {
+          "id": "O2Q72L72",
+          "title": "Simple PowerPoint Quiz",
+          "path": "../../data/quizzes/Computer Science/2/2/Website demo/Simple_PowerPoint_Quiz.json",
           "category": "Website demo"
         },
         {

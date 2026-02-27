@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
+import { generateQuizId } from "./lib/quizId.js"; // New unified ID generartion logic.
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,28 +29,28 @@ function titleCase(name) {
 async function buildCategoryTree(examsDir, repoRoot) {
   const tree = {};
 
-  function generateUniqueId(targetPath) {
-    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    const idLength = 8;
+  // function generateUniqueId(targetPath) {
+  //   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  //   const idLength = 8;
 
-    // Ensure relative path from project root to ensure consistency across environments
-    const projectRoot = path.resolve(examsDir, "..");
-    const relativePath = path
-      .relative(projectRoot, targetPath)
-      .split(path.sep)
-      .join("/");
+  //   // Ensure relative path from project root to ensure consistency across environments
+  //   const projectRoot = path.resolve(examsDir, "..");
+  //   const relativePath = path
+  //     .relative(projectRoot, targetPath)
+  //     .split(path.sep)
+  //     .join("/");
 
-    // Generate hash from the file path
-    const hash = crypto.createHash("sha256").update(relativePath).digest();
+  //   // Generate hash from the file path
+  //   const hash = crypto.createHash("sha256").update(relativePath).digest();
 
-    let id = "";
-    // Generate deterministic ID based on the hash
-    for (let i = 0; i < idLength; i++) {
-      id += charset[hash[i] % charset.length];
-    }
+  //   let id = "";
+  //   // Generate deterministic ID based on the hash
+  //   for (let i = 0; i < idLength; i++) {
+  //     id += charset[hash[i] % charset.length];
+  //   }
 
-    return id;
-  }
+  //   return id;
+  // }
 
   /**
    * Recursively scan directories with metadata extraction
@@ -89,7 +90,12 @@ async function buildCategoryTree(examsDir, repoRoot) {
         } else if (depth === 3) {
           // Level 4: Course Name (ROOT CATEGORY with metadata)
           const categoryKey = entry.name;
-          const courseId = generateUniqueId(fullPath);
+
+          const relativePath = path
+            .relative(path.resolve(examsDir, ".."), fullPath)
+            .split(path.sep)
+            .join("/");
+          const courseId = generateQuizId(relativePath);
 
           console.log(`        📚 Course: ${entry.name} (ID: ${courseId})`);
 
@@ -154,7 +160,11 @@ async function buildCategoryTree(examsDir, repoRoot) {
           if (!isJson && hasOther) continue; // skip .js when .json exists
 
           // Generate unique ID for this exam
-          const examId = generateUniqueId(fullPath);
+          const relativePath = path
+            .relative(path.resolve(examsDir, ".."), fullPath)
+            .split(path.sep)
+            .join("/");
+          const examId = generateQuizId(relativePath);
           const title = titleCase(baseName);
 
           // Calculate relative path from public/data/ directory (use .json in path)

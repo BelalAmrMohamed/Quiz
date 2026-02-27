@@ -11,7 +11,7 @@ import jwt from "jsonwebtoken";
  * Builds the set of allowed origins from the environment.
  * ALLOWED_ORIGIN can be:
  *   - A single URL:   "https://basmagi-quiz.vercel.app"
- *   - Comma-separated: "https://basmagi-quiz.vercel.app,http://localhost:5501"
+ *   - Comma-separated: "https://basmagi-quiz.vercel.app,http://localhost:3000"
  *   - Wildcard:       "*"  (dev/testing only — never use in prod)
  */
 function getAllowedOrigins() {
