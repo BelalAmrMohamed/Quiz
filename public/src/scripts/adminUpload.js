@@ -16,6 +16,7 @@
 
 import { getToken, isAdminAuthenticated, signOut } from "./adminAuth.js";
 import { showNotification } from "../components/notifications.js";
+import { userProfile } from "./userProfile.js";
 
 // ─── Manifest tree (auto-generated from quiz-manifest.json) ──────────────────
 // Structure: { college: { subject: { yearterm: [[year,term],...], subfolders: [...] } } }
@@ -674,12 +675,9 @@ function openModal(quiz) {
 
   let savedCollege = "";
   try {
-    const profileStr = localStorage.getItem("userProfile");
-    if (profileStr) {
-      const p = JSON.parse(profileStr);
-      if (p.faculty && MANIFEST_TREE[p.faculty]) {
-        savedCollege = p.faculty;
-      }
+    const p = userProfile.getProfile();
+    if (p && p.faculty && MANIFEST_TREE[p.faculty]) {
+      savedCollege = p.faculty;
     }
   } catch (e) {}
 

@@ -640,7 +640,7 @@ window.toggleQuestionCollapse = function (questionId) {
       .replace(/`/g, "")
       .trim();
     qPreview.textContent = preview
-      ? preview.slice(0, 40) + (preview.length > 40 ? "…" : "")
+      ? preview.slice(0, 20) + (preview.length > 20 ? "…" : "")
       : "";
   } else if (qPreview) {
     qPreview.textContent = "";
