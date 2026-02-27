@@ -1129,7 +1129,7 @@ function openInlineCreateQuizModal() {
     </div>
     <div class="form-group" style="margin-bottom: 24px;">
       <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
-      <textarea id="inlineQuizContent" rows="8" placeholder="1. What is something\n\nA. Option 1\nB. Option 2\nC. Option 3\nD. Option 4\n-E. Option 5\n\nCorrect: B\n\nExplanation: Somewhy\n\n2. Which of the following is easier? \`Python or C++\`\n\n- Python.\n\nExplanation: Pythong is faster than C++." style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';"></textarea>
+      <textarea id="inlineQuizContent" rows="8" placeholder="1. Which programming languange is fastest?\n\nA. Python\nB. Rust\nC. C++\nD. C#\n\nCorrect: C\n\nExplanation: C++ is the fastest programming language of them.\n\n2. Python is harder than C++.\n\nA. True\nB. False\n\nCorrect: B\n\n3. Write a C++ code to print \`Hello World!\`.\n\n- \`\`\`cout << &quot;Hello World!&quot; << endl;\`\`\`\n\nExplanation: C++ uses \`cout\` for printing statements." style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';"></textarea>
     </div>
     <div class="profile-actions" style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
       <button type="button" id="inlineQuizImport" style="padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--color-border); background: var(--color-background-secondary); color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; font-weight: 600; font-size: 0.95rem; font-family: inherit;">
@@ -1773,6 +1773,28 @@ function createExamCard(exam) {
   card.className = "card exam-card";
   card.setAttribute("role", "article");
   card.setAttribute("aria-label", `اختبار: ${exam.title || exam.id}`);
+
+  // ── DB source badge ────────────────────────────────────────────────────────
+  if (exam.source === "db") {
+    card.classList.add("exam-card--db");
+
+    const badge = document.createElement("span");
+    badge.className = "db-source-badge";
+    badge.setAttribute("aria-label", "متاح من قاعدة البيانات");
+    badge.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true" class="db-badge-icon">
+        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+        <path d="M3 5v6c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/>
+        <path d="M3 11v6c0 1.657 4.03 3 9 3s9-1.343 9-3v-6"/>
+      </svg>
+      قاعدة البيانات
+    `;
+    card.appendChild(badge);
+  }
+  // ──────────────────────────────────────────────────────────────────────────
 
   const h = document.createElement("h3");
   h.textContent = exam.title || exam.id;
