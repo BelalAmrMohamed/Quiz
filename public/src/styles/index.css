@@ -89,8 +89,8 @@ body {
    ============================================================================ */
 .share-quiz-link-button {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 10px;
+  left: 10px;
   background: var(--color-background-secondary);
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
