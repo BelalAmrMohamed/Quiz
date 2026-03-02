@@ -5,6 +5,9 @@
 
 import { showNotification } from "../components/notifications.js";
 
+// `gradeEssay` must be used for essay grading, see export-to-markdown for example usage.
+import { gradeEssay, isEssayQuestion } from "../shared/rate-essays.js";
+
 let pptxgen;
 
 async function loadPptxGen() {
@@ -85,10 +88,6 @@ export async function exportToPptx(config, questions, userAnswers = []) {
         .replace(/\r/g, "\n")
         .trim();
     };
-
-    function isEssayQuestion(q) {
-      return q.options && q.options.length === 1;
-    }
 
     function calculateScore() {
       let correct = 0,

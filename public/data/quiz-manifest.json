@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-02T01:36:32.950Z",
+  "generatedAt": "2026-03-02T02:20:12.204Z",
   "dataRoot": "data/quizzes",
   "subjects": [
     {
@@ -1241,60 +1241,6 @@
       "term": 2,
       "quizzes": [
         {
-          "id": "YGQOFUYD",
-          "title": "C Plus Plus Quiz",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/C_Plus_Plus_Quiz.json",
-          "questionCount": 15,
-          "questionTypes": [
-            "Essay",
-            "MCQ",
-            "True/False"
-          ],
-          "author": "Imported"
-        },
-        {
-          "id": "IEX5TYSF",
-          "title": "Mid 2025",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/Mid_2025.json",
-          "questionCount": 16,
-          "questionTypes": [
-            "MCQ"
-          ],
-          "author": "Imported"
-        },
-        {
-          "id": "42S2UGEU",
-          "title": "Perfect Quiz",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/Perfect_Quiz.json",
-          "questionCount": 2,
-          "questionTypes": [
-            "Essay",
-            "MCQ"
-          ],
-          "author": "Imported"
-        },
-        {
-          "id": "44P3E7KS",
-          "title": "Quiz",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/Quiz.json",
-          "questionCount": 5,
-          "questionTypes": [
-            "True/False"
-          ],
-          "author": "Imported"
-        },
-        {
-          "id": "O2Q72L72",
-          "title": "Simple PowerPoint Quiz",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/Simple_PowerPoint_Quiz.json",
-          "questionCount": 2,
-          "questionTypes": [
-            "Essay",
-            "True/False"
-          ],
-          "author": "Imported"
-        },
-        {
           "id": "4OBRHDOR",
           "title": "Test Quiz",
           "path": "/data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
@@ -1315,18 +1261,6 @@
             "MCQ",
             "True/False"
           ]
-        },
-        {
-          "id": "F3A3IZB6",
-          "title": "C Plus Plus Quiz",
-          "path": "/data/quizzes/Computer Science/2/2/Website demo/أسئلة الدكتور/C_Plus_Plus_Quiz.json",
-          "questionCount": 15,
-          "questionTypes": [
-            "Essay",
-            "MCQ",
-            "True/False"
-          ],
-          "author": "Imported"
         }
       ]
     }

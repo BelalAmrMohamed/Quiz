@@ -4,6 +4,7 @@
 // `jsPDF` library used, included in here `loadPdfLib`
 
 import { showNotification } from "../components/notifications.js";
+import { gradeEssay, isEssayQuestion } from "../shared/rate-essays.js";
 
 const currentName = localStorage.getItem("username") || "User";
 
@@ -797,105 +798,6 @@ export async function exportToPdf(
     };
 
     // =========================================================
-    // ESSAY GRADER  (mirrors quiz.js gradeEssay exactly)
-    // =========================================================
-    const gradeEssay = (userInput, modelAnswer) => {
-      const norm = (s) =>
-        String(s || "")
-          .toLowerCase()
-          .replace(/[.,;:!?()\[\]{}"'\/\\]/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-      const u = norm(userInput),
-        m = norm(modelAnswer);
-      if (!u) return 0;
-      const nums = (s) => (s.match(/\d+(\.\d+)?/g) || []).map(Number);
-      const mn = nums(m),
-        un = nums(u),
-        mNoN = m.replace(/\d+(\.\d+)?/g, "").trim();
-      if (mn.length > 0 && mNoN.length < 8) {
-        return mn.every((n) =>
-          un.some((k) => Math.abs(k - n) / (Math.abs(n) || 1) < 0.02),
-        )
-          ? 5
-          : un.length > 0
-            ? 1
-            : 0;
-      }
-      const stop = new Set([
-        "a",
-        "an",
-        "the",
-        "is",
-        "are",
-        "was",
-        "were",
-        "be",
-        "been",
-        "being",
-        "have",
-        "has",
-        "had",
-        "do",
-        "does",
-        "did",
-        "will",
-        "would",
-        "could",
-        "should",
-        "may",
-        "might",
-        "shall",
-        "can",
-        "to",
-        "of",
-        "in",
-        "on",
-        "at",
-        "by",
-        "for",
-        "with",
-        "and",
-        "or",
-        "but",
-        "if",
-        "this",
-        "that",
-        "it",
-        "its",
-        "as",
-        "from",
-        "into",
-      ]);
-      const kw = (s) =>
-        s.split(/\s+/).filter((w) => w.length > 2 && !stop.has(w));
-      const mk = kw(m);
-      if (!mk.length) {
-        const sim = u.length
-          ? Math.min(u.length, m.length) / Math.max(u.length, m.length)
-          : 0;
-        return Math.round(sim * 5);
-      }
-      const uk = new Set(kw(u));
-      const ratio =
-        mk.filter(
-          (k) =>
-            uk.has(k) ||
-            [...uk].some(
-              (x) =>
-                (x.includes(k) || k.includes(x)) &&
-                Math.min(x.length, k.length) > 3,
-            ),
-        ).length / mk.length;
-      if (ratio >= 0.85) return 5;
-      if (ratio >= 0.65) return 4;
-      if (ratio >= 0.45) return 3;
-      if (ratio >= 0.25) return 2;
-      if (ratio > 0) return 1;
-      return 0;
-    };
-
-    // =========================================================
     // IMAGE UTILITIES
     // =========================================================
     const getDataUrl = (url) =>
@@ -1066,8 +968,6 @@ export async function exportToPdf(
       doc.setLineWidth(0.25);
       doc.roundedRect(x, y, w, h, 1.5, 1.5, "S");
     };
-
-    const isEssayQuestion = (q) => q.options && q.options.length === 1;
 
     const getQuestionStatus = (question, userAns, isEssay) => {
       if (isEssay) return { statusText: "ESSAY" };
