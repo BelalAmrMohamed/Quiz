@@ -1083,7 +1083,7 @@ export async function exportToPdf(
       questions.forEach((q, i) => {
         if (isEssayQuestion(q)) {
           essayCount++;
-          essayScoreTotal += gradeEssay(userAnswers[i], q.options[0]);
+          essayScoreTotal += gradeEssay(userAnswers[i], q.answer);
           essayMaxTotal += 5;
           return;
         }
@@ -1540,11 +1540,11 @@ export async function exportToPdf(
 
       // ── Section 4b: Essay sections ────────────────────────────────
       if (isEssay) {
-        const formalText = sanitizeText(question.options[0]);
+        const formalText = sanitizeText(question.answer);
 
         // Score badge (results mode + answered)
         if (isResultsMode && userAns && String(userAns).trim()) {
-          const score = gradeEssay(userAns, question.options[0]);
+          const score = gradeEssay(userAns, question.answer);
           const stars = "★".repeat(score) + "☆".repeat(5 - score);
           const label = `Score: ${score} / 5`;
           const badgeC =

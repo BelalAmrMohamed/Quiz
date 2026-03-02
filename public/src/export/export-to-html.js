@@ -132,7 +132,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
     processedQuestions.forEach((q, i) => {
       if (isEssayQuestion(q)) {
         const userText = userAnswers[i] || "";
-        essayTotalScore += gradeEssay(userText, q.options[0]);
+        essayTotalScore += gradeEssay(userText, q.answer);
         essayMaxScore += 5;
       } else {
         mcqTotal++;
@@ -194,7 +194,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
     if (isEssayQuestion(q)) {
       const userText = userAns || "";
       if (isResultsMode) {
-        const score = gradeEssay(userText, q.options[0]);
+        const score = gradeEssay(userText, q.answer);
         const stars = "★".repeat(score) + "☆".repeat(5 - score);
         const scoreClass =
           score >= 3 ? "correct" : score >= 1 ? "partial" : "wrong";
@@ -210,7 +210,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
 
       htmlContent += `<div class="essay-box">
               <strong style="color: #f59e0b; display:block; margin-bottom:5px;">Formal Answer / Key Points:</strong>
-              ${renderMarkdown(q.options[0])}
+              ${renderMarkdown(q.answer)}
           </div>`;
     } else {
       htmlContent += `<div class="options-list">`;

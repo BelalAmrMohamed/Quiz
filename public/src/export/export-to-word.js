@@ -104,7 +104,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
     // Document Title
     // ===========================
 
-    const documentTitle = sanitizeText(config.title || "Quiz Quest");
+    const documentTitle = config.title || "Quiz Quest";
 
     // ===========================
     // IMAGE PROCESSING
@@ -572,7 +572,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
       if (isEssay) {
         // Essay Answer
         const userText = sanitizeText(userAns || "Not answered");
-        const formalAnswer = sanitizeText(question.options[0]);
+        const formalAnswer = sanitizeText(question.answer);
 
         // User Answer Box
         if (isResultsMode) {
@@ -1021,7 +1021,7 @@ export async function exportToWord(config, questions, userAnswers = []) {
     // ===========================
 
     const blob = await Packer.toBlob(doc);
-    const filename = `${sanitizeText(config.title)}.docx`;
+    const filename = `${config.title}.docx`;
 
     // Create download link
     const url = URL.createObjectURL(blob);

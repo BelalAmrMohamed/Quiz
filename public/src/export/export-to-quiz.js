@@ -1676,7 +1676,7 @@ export async function exportToQuiz(config, questions) {
     },
   
     isEssayQuestion(question) {
-      return q.answer;;
+      return question.answer;
     },
   
     renderQuestionImage(imageUrl, qIndex) {
@@ -1758,7 +1758,7 @@ export async function exportToQuiz(config, questions) {
           </div>
           <div class="model-answer" id="modelAns\${i}">
             <strong>✓ Model Answer:</strong><br>
-            \${renderMarkdown(q.options[0])}
+            \${renderMarkdown(q.answer)}
           </div>
           <div class="essay-score" id="essayScore\${i}"></div>
         \`;
@@ -2000,7 +2000,7 @@ export async function exportToQuiz(config, questions) {
         essayEl.classList.add("disabled");
       }
   
-      const score = gradeEssay(userText, q.options[0]);
+      const score = gradeEssay(userText, q.answer);
       const stars = "★".repeat(score) + "☆".repeat(5 - score);
       const scoreEl = document.getElementById(\`essayScore\${qIndex}\`);
       if (scoreEl) {
@@ -2346,7 +2346,7 @@ export async function exportToQuiz(config, questions) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${sanitizeFilename(config.title || "practice_quiz")}.html`;
+  a.download = `${config.title || "Basmagi Quiz"}.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

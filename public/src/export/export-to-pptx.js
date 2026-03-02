@@ -608,7 +608,7 @@ export async function exportToPptx(config, questions, userAnswers = []) {
           color: COLORS.success,
         });
 
-        slide.addText(sanitizeText(question.options[0]), {
+        slide.addText(sanitizeText(question.answer), {
           x: MARGIN,
           y: currentY + 0.3,
           w: USABLE_WIDTH,
