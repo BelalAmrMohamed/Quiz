@@ -260,7 +260,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
   );
 }
 
-const isEssayQuestion = (q) => q.options && q.options.length === 1;
+const isEssayQuestion = (q) => q.answer;
 
 function gradeEssay(userInput, modelAnswer) {
   const normalize = (s) =>
