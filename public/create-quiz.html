@@ -39,9 +39,6 @@
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
 
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
     <!-- Theme Controller Script -->
     <script type="module" src="src/scripts/theme-controller.js"></script>
 
@@ -63,9 +60,26 @@
         aria-labelledby="shortcutsTitle">
         <div class="shortcuts-content">
             <div class="shortcuts-header">
-                <h3 id="shortcutsTitle"><i data-lucide="keyboard"></i> اختصارات لوحة المفاتيح</h3>
-                <button class="close-btn" onclick="toggleShortcuts()" aria-label="إغلاق"><i
-                        data-lucide="x"></i></button>
+                <h3 id="shortcutsTitle"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-keyboard-icon lucide-keyboard">
+                        <path d="M10 8h.01" />
+                        <path d="M12 12h.01" />
+                        <path d="M14 8h.01" />
+                        <path d="M16 12h.01" />
+                        <path d="M18 8h.01" />
+                        <path d="M6 8h.01" />
+                        <path d="M7 16h10" />
+                        <path d="M8 12h.01" />
+                        <rect width="20" height="16" x="2" y="4" rx="2" />
+                    </svg> اختصارات لوحة المفاتيح</h3>
+                <button class="close-btn" onclick="toggleShortcuts()" aria-label="إغلاق"><svg
+                        xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-x-icon lucide-x">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg></button>
             </div>
             <div class="shortcuts-list">
                 <div class="shortcut-item">
@@ -120,7 +134,7 @@
             </div>
 
             <nav role="navigation" aria-label="روابط التنقل">
-                <a href="index.html" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                <a href="index.html" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="lucide lucide-house-icon lucide-house">
                         <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
@@ -146,7 +160,7 @@
                 <div class="menu-divider" role="separator"></div>
 
                 <a href="settings.html" class="menu-item">
-                    <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-settings-icon lucide-settings">
@@ -160,7 +174,7 @@
 
                 <div class="theme-controls-section">
                     <div class="theme-section-header">
-                        <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <span><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-palette-icon lucide-palette">
                                 <path
@@ -174,7 +188,7 @@
                     <div class="theme-selector-grid" role="group" aria-label="اختيار الخلفية">
                         <button class="theme-selector-btn" data-theme="dark" aria-pressed="false">
                             <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
-                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                     class="lucide lucide-circle-icon lucide-circle">
                                     <circle cx="12" cy="12" r="10" />
@@ -183,7 +197,7 @@
                         </button>
                         <button class="theme-selector-btn" data-theme="dark-slate" aria-pressed="false">
                             <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
-                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                     class="lucide lucide-moon-icon lucide-moon">
                                     <path
@@ -193,7 +207,7 @@
                         </button>
                         <button class="theme-selector-btn" data-theme="light" aria-pressed="false">
                             <span class="theme-btn-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
-                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                     class="lucide lucide-sun-icon lucide-sun">
                                     <circle cx="12" cy="12" r="4" />
@@ -211,7 +225,7 @@
                     </div>
 
                     <div class="animation-section-header">
-                        <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <span><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-sparkles-icon lucide-sparkles">
                                 <path
@@ -227,7 +241,7 @@
                             checked aria-label="تفعيل الرسوم المتحركة">
                         <span class="toggle-switch" aria-hidden="true"></span>
                     </label>
-                    <p class="theme-info-text"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    <p class="theme-info-text"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-lightbulb-icon lucide-lightbulb">
@@ -240,7 +254,7 @@
 
                     <div class="menu-divider" role="separator"></div>
                     <button class="menu-item" id="contactDevBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-message-circle-more-icon lucide-message-circle-more">
                             <path
@@ -251,7 +265,7 @@
                         </svg> تواصل مع المطور
                     </button>
                     <button class="menu-item install-app" data-action="installApp"><svg
-                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-smartphone-icon lucide-smartphone">
                             <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
@@ -270,15 +284,22 @@
                 <a href="index.html" class="breadcrumb-text">← الصفحة الرئيسية</a>
             </div>
             <div class="autosave-indicator" id="autosaveIndicator">
-                <span class="save-icon"><i data-lucide="save"></i></span>
-                <span class="save-text">محفوظ</span>
+                <span class="save-icon"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-save-icon lucide-save">
+                        <path
+                            d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                        <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+                        <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+                    </svg>
+                    <span class="save-text">محفوظ</span>
             </div>
         </div>
 
         <!-- Header with enhanced description -->
         <header class="header">
             <div class="header-content">
-                <h1>أنشئ اختبارك الخاص <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                <h1>أنشئ اختبارك الخاص <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line">
                         <path d="M13 21h8" />
@@ -289,7 +310,19 @@
                 <p>صمم اختبارات تفاعلية، تتضمن أسئلة متعددة الإختيار، وصورًا، وشرح مفصل.</p>
                 <div class="header-actions">
                     <button class="btn-help" onclick="toggleShortcuts()" aria-label="عرض اختصارات لوحة المفاتيح">
-                        <i data-lucide="keyboard"></i> اختصارات
+                        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-keyboard-icon lucide-keyboard">
+                            <path d="M10 8h.01" />
+                            <path d="M12 12h.01" />
+                            <path d="M14 8h.01" />
+                            <path d="M16 12h.01" />
+                            <path d="M18 8h.01" />
+                            <path d="M6 8h.01" />
+                            <path d="M7 16h10" />
+                            <path d="M8 12h.01" />
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                        </svg> اختصارات
                     </button>
                 </div>
             </div>
@@ -299,7 +332,16 @@
         <div class="quiz-creator">
             <!-- Quiz Metadata -->
             <div class="quiz-metadata card">
-                <h2><i data-lucide="clipboard-list"></i> معلومات عن الاختبار</h2>
+                <h2><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-clipboard-list-icon lucide-clipboard-list">
+                        <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <path d="M12 11h4" />
+                        <path d="M12 16h4" />
+                        <path d="M8 11h.01" />
+                        <path d="M8 16h.01" />
+                    </svg> معلومات عن الاختبار</h2>
                 <div class="form-group">
                     <label for="quizTitle">
                         عنوان الاختبار *
@@ -325,21 +367,46 @@
             <div class="questions-section">
                 <div class="section-header">
                     <div class="section-title-group">
-                        <h2><i data-lucide="list-checks"></i> الأسئلة</h2>
+                        <h2><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-list-checks-icon lucide-list-checks">
+                                <path d="M13 5h8" />
+                                <path d="M13 12h8" />
+                                <path d="M13 19h8" />
+                                <path d="m3 17 2 2 4-4" />
+                                <path d="m3 7 2 2 4-4" />
+                            </svg> الأسئلة</h2>
                         <span class="question-badge" id="questionBadge">0</span>
                     </div>
                     <div class="section-actions">
                         <button class="btn btn-secondary btn-icon-text" id="searchToggleBtn" onclick="toggleSearchBar()"
                             title="بحث في الأسئلة" aria-label="تبديل شريط البحث" aria-expanded="false">
-                            <i data-lucide="search"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-search-icon lucide-search">
+                                <path d="m21 21-4.34-4.34" />
+                                <circle cx="11" cy="11" r="8" />
+                            </svg>
                         </button>
                         <button class="btn btn-secondary btn-icon-text" onclick="importQuestions()"
                             title="استيراد أسئلة">
-                            <i data-lucide="upload"></i> استيراد
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload">
+                                <path d="M12 3v12" />
+                                <path d="m17 8-5-5-5 5" />
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            </svg> استيراد
                         </button>
                         <button class="btn btn-secondary btn-icon-text" onclick="toggleBulkMode()" id="bulkModeBtn"
                             title="الوضع الجماعي">
-                            <i data-lucide="check-square"></i> تحديد أسئلة
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-square-check-big-icon lucide-square-check-big">
+                                <path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344" />
+                                <path d="m9 11 3 3L22 4" />
+                            </svg> تحديد أسئلة
                         </button>
                     </div>
                 </div>
@@ -352,11 +419,23 @@
                     <div class="search-bar-collapse" id="searchBarCollapse" style="display:none;">
                         <div class="controls-row search-only-row">
                             <div class="search-box">
-                                <span class="search-icon"><i data-lucide="search"></i></span>
+                                <span class="search-icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                        class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        class="lucide lucide-search-icon lucide-search">
+                                        <path d="m21 21-4.34-4.34" />
+                                        <circle cx="11" cy="11" r="8" />
+                                    </svg></span>
                                 <input type="search" id="questionSearch" placeholder="ابحث في الأسئلة..."
                                     aria-label="بحث في الأسئلة">
                                 <button class="clear-search" id="clearSearch" onclick="clearSearch()"
-                                    style="display: none;" aria-label="مسح البحث"><i data-lucide="x"></i></button>
+                                    style="display: none;" aria-label="مسح البحث"><svg
+                                        xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-x-icon lucide-x">
+                                        <path d="M18 6 6 18" />
+                                        <path d="m6 6 12 12" />
+                                    </svg></button>
                             </div>
                         </div>
                     </div>
@@ -364,15 +443,34 @@
                         <div class="sort-controls">
                             <button class="btn-action" onclick="sortQuestions('alpha')" title="ترتيب أبجدي"
                                 aria-label="ترتيب أبجدي">
-                                <i data-lucide="a-large-small"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-alarge-small-icon lucide-a-large-small">
+                                    <path d="m15 16 2.536-7.328a1.02 1.02 1 0 1 1.928 0L22 16" />
+                                    <path d="M15.697 14h5.606" />
+                                    <path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" />
+                                    <path d="M3.304 13h6.392" />
+                                </svg>
                             </button>
                             <button class="btn-action" onclick="sortQuestions('recent')" title="الأحدث أولاً"
                                 aria-label="الأحدث أولاً">
-                                <i data-lucide="clock"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-clock-icon lucide-clock">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 6v6l4 2" />
+                                </svg>
                             </button>
                             <button class="btn-action" onclick="toggleExpand()" title="توسيع أو طي الأسئلة"
                                 aria-label="توسيع جميع الأسئلة">
-                                <i data-lucide="chevrons-down-up"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-chevrons-down-up-icon lucide-chevrons-down-up">
+                                    <path d="m7 20 5-5 5 5" />
+                                    <path d="m7 4 5 5 5-5" />
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -384,17 +482,30 @@
                         </div>
                         <div class="bulk-actions">
                             <button class="btn-bulk" onclick="selectAllQuestions()">
-                                <i data-lucide="check-circle-2"></i> تحديد الكل
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-circle-check-icon lucide-circle-check">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="m9 12 2 2 4-4" />
+                                </svg> تحديد الكل
                             </button>
                             <button class="btn-bulk" onclick="deselectAllQuestions()">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-circle-icon lucide-circle">
                                     <circle cx="12" cy="12" r="10" />
                                 </svg> إلغاء التحديد
                             </button>
                             <button class="btn-bulk btn-bulk-danger" onclick="deleteSelectedQuestions()">
-                                <i data-lucide="trash-2"></i> حذف المحدد
+                                <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2">
+                                    <path d="M10 11v6" />
+                                    <path d="M14 11v6" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                                    <path d="M3 6h18" />
+                                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg> حذف المحدد
                             </button>
                         </div>
                     </div>
@@ -408,17 +519,38 @@
                 <!-- Enhanced Empty State -->
                 <div class="empty-state" id="emptyState">
                     <div class="empty-illustration">
-                        <div class="empty-icon"><i data-lucide="notebook-pen" class="empty-icon-svg"></i></div>
+                        <div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" class="empty-icon-svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-trash2-icon lucide-trash-2">
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                                <path d="M3 6h18" />
+                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg></div>
                         <div class="empty-glow"></div>
                     </div>
                     <h3>ابدأ بإنشاء أول سؤال</h3>
                     <p>اختر من القوالب السريعة أو أنشئ سؤالاً مخصصاً</p>
                     <div class="empty-actions">
                         <button class="btn btn-primary btn-large" onclick="addQuestion()">
-                            <i data-lucide="plus"></i> إضافة سؤال
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus">
+                                <path d="M5 12h14" />
+                                <path d="M12 5v14" />
+                            </svg> إضافة سؤال
                         </button>
                         <button class="btn btn-secondary btn-large" onclick="toggleTemplates()">
-                            <i data-lucide="layout-template"></i> استخدام قالب
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-layout-template-icon lucide-layout-template">
+                                <rect width="18" height="7" x="3" y="3" rx="1" />
+                                <rect width="9" height="7" x="3" y="14" rx="1" />
+                                <rect width="5" height="7" x="16" y="14" rx="1" />
+                            </svg> استخدام قالب
                         </button>
                     </div>
                     <p class="empty-hint">اختصار سريع: اضغط <kbd>Ctrl+N</kbd></p>
@@ -426,20 +558,52 @@
 
                 <!-- Question Templates Panel -->
                 <div class="templates-panel" id="templatesPanel" style="display: none;">
-                    <h3><i data-lucide="layout-template"></i> قوالب الأسئلة</h3>
+                    <h3><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-layout-template-icon lucide-layout-template">
+                            <rect width="18" height="7" x="3" y="3" rx="1" />
+                            <rect width="9" height="7" x="3" y="14" rx="1" />
+                            <rect width="5" height="7" x="16" y="14" rx="1" />
+                        </svg> قوالب الأسئلة</h3>
                     <div class="templates-grid">
                         <button class="template-card" onclick="addQuestionFromTemplate('mcq')">
-                            <span class="template-icon"><i data-lucide="list-checks"></i></span>
+                            <span class="template-icon"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-list-checks-icon lucide-list-checks">
+                                    <path d="M13 5h8" />
+                                    <path d="M13 12h8" />
+                                    <path d="M13 19h8" />
+                                    <path d="m3 17 2 2 4-4" />
+                                    <path d="m3 7 2 2 4-4" />
+                                </svg></span>
                             <span class="template-name">اختيار متعدد</span>
                             <span class="template-desc">4 خيارات</span>
                         </button>
                         <button class="template-card" onclick="addQuestionFromTemplate('truefalse')">
-                            <span class="template-icon"><i data-lucide="toggle-left"></i></span>
+                            <span class="template-icon"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-toggle-left-icon lucide-toggle-left">
+                                    <circle cx="9" cy="12" r="3" />
+                                    <rect width="20" height="14" x="2" y="5" rx="7" />
+                                </svg></span>
                             <span class="template-name">صح أم خطأ</span>
                             <span class="template-desc">خياران فقط</span>
                         </button>
                         <button class="template-card" onclick="addQuestionFromTemplate('essay')">
-                            <span class="template-icon"><i data-lucide="notebook-pen"></i></span>
+                            <span class="template-icon"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-notebook-pen-icon lucide-notebook-pen">
+                                    <path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" />
+                                    <path d="M2 6h4" />
+                                    <path d="M2 10h4" />
+                                    <path d="M2 14h4" />
+                                    <path d="M2 18h4" />
+                                    <path
+                                        d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" />
+                                </svg></span>
                             <span class="template-name">سؤال مقالي</span>
                             <span class="template-desc">إجابة مفتوحة</span>
                         </button>
@@ -449,10 +613,21 @@
                 <!-- Add Question Button (Bottom) -->
                 <div class="add-question-bottom" id="addQuestionBottom" style="display: none;">
                     <button class="btn btn-primary btn-add-question" onclick="addQuestion()">
-                        <i data-lucide="plus"></i> إضافة سؤال جديد
+                        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-plus-icon lucide-plus">
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                        </svg> إضافة سؤال جديد
                     </button>
                     <button class="btn btn-secondary" onclick="toggleTemplates()">
-                        <i data-lucide="layout-template"></i> من القوالب
+                        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-layout-template-icon lucide-layout-template">
+                            <rect width="18" height="7" x="3" y="3" rx="1" />
+                            <rect width="9" height="7" x="3" y="14" rx="1" />
+                            <rect width="5" height="7" x="16" y="14" rx="1" />
+                        </svg> من القوالب
                     </button>
                 </div>
             </div>
@@ -460,7 +635,12 @@
             <!-- Floating Action Button -->
             <div class="fab-container" id="fabContainer" style="display: none;">
                 <button class="fab" onclick="addQuestion()" title="إضافة سؤال (Ctrl+N)" aria-label="إضافة سؤال جديد">
-                    <i data-lucide="plus"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-plus-icon lucide-plus">
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
                 </button>
                 <div class="fab-tooltip">إضافة سؤال</div>
             </div>
@@ -468,25 +648,63 @@
             <!-- Action Buttons with better organization -->
             <div class="action-bar card">
                 <div class="action-section">
-                    <h3><i data-lucide="save"></i> حفظ ومشاركة</h3>
+                    <h3><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-save-icon lucide-save">
+                            <path
+                                d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+                            <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+                        </svg> حفظ ومشاركة</h3>
                     <div class="action-buttons">
                         <button class="btn btn-success" onclick="exportQuiz()" title="تحميل الإمتحان (Ctrl+E)">
-                            <i data-lucide="download"></i> تحميل الإمتحان
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-download-icon lucide-download">
+                                <path d="M12 15V3" />
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <path d="m7 10 5 5 5-5" />
+                            </svg> تحميل الإمتحان
                         </button>
                         <button class="btn btn-primary" onclick="saveLocally()" title="حفظ (Ctrl+S)">
-                            <i data-lucide="hard-drive"></i> حفظ محليًا
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-hard-drive-icon lucide-hard-drive">
+                                <path d="M10 16h.01" />
+                                <path
+                                    d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+                                <path d="M21.946 12.013H2.054" />
+                                <path d="M6 16h.01" />
+                            </svg> حفظ محليًا
                         </button>
                         <button class="btn btn-danger" onclick="resetPage()">
-                            <i data-lucide="rotate-ccw"></i> إعادة ضبط الصفحة
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-rotate-ccw-icon lucide-rotate-ccw">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg> إعادة ضبط الصفحة
                         </button>
                     </div>
                 </div>
                 <div class="action-divider"></div>
                 <div class="action-section">
-                    <h3><i data-lucide="eye"></i> معاينة وإدارة</h3>
+                    <h3><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-eye-icon lucide-eye">
+                            <path
+                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg> معاينة وإدارة</h3>
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="previewQuiz()" title="معاينة (Ctrl+P)">
-                            <i data-lucide="eye"></i> معاينة
+                            <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye">
+                                <path
+                                    d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg> معاينة
                         </button>
                     </div>
                 </div>
@@ -494,7 +712,13 @@
 
             <!-- Statistics Card -->
             <div class="stats-card card" id="statsCard" style="display: none;">
-                <h3><i data-lucide="bar-chart-2"></i> إحصائيات الاختبار</h3>
+                <h3><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chart-no-axes-column-icon lucide-chart-no-axes-column">
+                        <path d="M5 21v-6" />
+                        <path d="M12 21V3" />
+                        <path d="M19 21V9" />
+                    </svg> إحصائيات الاختبار</h3>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <span class="stat-label">عدد الأسئلة</span>
@@ -533,15 +757,33 @@
         aria-modal="true">
         <div class="modal-card preview-modal">
             <div class="modal-header">
-                <h2 id="previewTitle"><i data-lucide="eye"></i> معاينة الاختبار</h2>
-                <button class="close-btn" onclick="closePreview()" aria-label="إغلاق المعاينة"><i
-                        data-lucide="x"></i></button>
+                <h2 id="previewTitle"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye">
+                        <path
+                            d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg> معاينة الاختبار</h2>
+                <button class="close-btn" onclick="closePreview()" aria-label="إغلاق المعاينة"><svg
+                        xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-x-icon lucide-x">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg></button>
             </div>
             <div id="previewContent" class="preview-content ltr">
                 <!-- Preview will be rendered here -->
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="exportQuiz()"><i data-lucide="download"></i> تحميل</button>
+                <button class="btn btn-primary" onclick="exportQuiz()"><svg xmlns="http://www.w3.org/2000/svg"
+                        class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-download-icon lucide-download">
+                        <path d="M12 15V3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <path d="m7 10 5 5 5-5" />
+                    </svg> تحميل</button>
                 <button class="btn btn-secondary" onclick="closePreview()">إغلاق</button>
             </div>
         </div>
@@ -552,14 +794,33 @@
         aria-modal="true">
         <div class="modal-card">
             <div class="modal-header">
-                <h2 id="importTitle"><i data-lucide="upload"></i> استيراد أسئلة</h2>
-                <button class="close-btn" onclick="closeImportModal()" aria-label="إغلاق"><i
-                        data-lucide="x"></i></button>
+                <h2 id="importTitle"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload">
+                        <path d="M12 3v12" />
+                        <path d="m17 8-5-5-5 5" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    </svg> استيراد أسئلة</h2>
+                <button class="close-btn" onclick="closeImportModal()" aria-label="إغلاق"><svg
+                        xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-x-icon lucide-x">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg></button>
             </div>
             <div class="modal-body">
                 <!-- Drag & Drop Zone -->
                 <div id="importDropzone" class="import-dropzone">
-                    <i data-lucide="file-up" style="width:32px;height:32px;opacity:0.5;"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;opacity:0.5;"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-file-up-icon lucide-file-up">
+                        <path
+                            d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                        <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                        <path d="M12 12v6" />
+                        <path d="m15 15-3-3-3 3" />
+                    </svg>
                     <p>اسحب وأفلت ملفات JSON أو TXT أو PDF أو DOCX أو PPTX هنا</p>
                     <label for="importFileInput" class="btn btn-secondary" style="cursor:pointer;margin-top:8px;">
                         أو اختر ملفات
@@ -593,7 +854,13 @@ Explanation: C++ is faster than python.
 Explanation: C++ uses `cout` for printing.' aria-label="محتوى الأسئلة للاستيراد"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="processImport()"><i data-lucide="upload"></i> استيراد</button>
+                <button class="btn btn-primary" onclick="processImport()"><svg xmlns="http://www.w3.org/2000/svg"
+                        class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload">
+                        <path d="M12 3v12" />
+                        <path d="m17 8-5-5-5 5" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    </svg> استيراد</button>
                 <button class="btn btn-secondary" onclick="closeImportModal()">إلغاء</button>
             </div>
         </div>
@@ -604,7 +871,15 @@ Explanation: C++ uses `cout` for printing.' aria-label="محتوى الأسئل�
         aria-labelledby="contactDevTitle">
         <div class="contact-overlay-card">
             <div class="contact-overlay-header">
-                <h2 id="contactDevTitle"><i data-lucide="message-circle-heart"></i> تواصل مع المطور</h2>
+                <h2 id="contactDevTitle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-message-circle-heart-icon lucide-message-circle-heart">
+                        <path
+                            d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
+                        <path
+                            d="M7.828 13.07A3 3 0 0 1 12 8.764a3 3 0 0 1 5.004 2.224 3 3 0 0 1-.832 2.083l-3.447 3.62a1 1 0 0 1-1.45-.001z" />
+                    </svg> تواصل مع المطور</h2>
             </div>
             <div class="contact-overlay-body">
                 <p class="contact-overlay-desc">اختر وسيلة التواصل المفضلة لديك</p>

@@ -166,7 +166,11 @@ function gradeEssay(userInput, modelAnswer) {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const isEssayQuestion = (q) => q.options && q.options.length === 1;
+const isEssayQuestion = (q) =>
+  (Array.isArray(q.options) && q.options.length === 1) ||
+  (!Array.isArray(q.options) && q.answer !== undefined);
+
+const getEssayAnswer = (q) => q.answer ?? q.options?.[0] ?? "";
 
 const renderQuestionImage = (imageUrl) => {
   if (!imageUrl) return "";
@@ -182,16 +186,6 @@ const starRating = (score, max = 5) =>
   "★".repeat(score) +
   `<span class="star-empty">${"★".repeat(max - score)}</span>` +
   `</span>`;
-
-function resetLucidIcons() {
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  } else {
-    window.addEventListener("load", () => {
-      if (typeof lucide !== "undefined") lucide.createIcons();
-    });
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -271,8 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     buttonEl.style.width = `${originalWidth > 0 ? originalWidth : buttonEl.getBoundingClientRect().width}px`;
     buttonEl.style.justifyContent = "center";
     buttonEl.innerHTML =
-      '<i data-lucide="loader-circle" class="spin"></i> جاري التحميل...';
-    if (typeof lucide !== "undefined") lucide.createIcons();
+      '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle-icon lucide-loader-circle"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> جاري التحميل...';
 
     // Allow DOM to update
     await new Promise((r) => setTimeout(r, 50));
@@ -364,18 +357,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
-  if (config.path) {
-    fetch(config.path)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.source && exportSourceBtn) {
-          exportSourceBtn.style.display = "flex";
-          exportSourceBtn.onclick = () => {
-            window.open(data.source, "_blank");
-          };
-        }
-      })
-      .catch((e) => console.error("Error fetching for source:", e));
+  // Show source button if the manifest entry has a source URL
+  if (config.source && typeof config.source === "string" && exportSourceBtn) {
+    exportSourceBtn.style.display = "flex";
+    exportSourceBtn.onclick = () => {
+      window.open(config.source, "_blank");
+    };
   }
 
   // ── Score breakdown ────────────────────────────────────────────────────────
@@ -393,7 +380,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ua = result.userAnswers[i];
     if (isEssayQuestion(q)) {
       essayCount++;
-      essayScoreTotal += gradeEssay(ua, q.options[0]);
+      essayScoreTotal += gradeEssay(ua, getEssayAnswer(q));
       essayMaxTotal += 5;
     } else {
       mcqTotal++;
@@ -425,7 +412,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     essayMaxTotal,
   );
   renderReview(container, questions, result.userAnswers);
-  resetLucidIcons();
 
   const newBadges = result.gamification ? result.gamification.newBadges : [];
   newBadges.forEach((badge, index) => {
@@ -469,7 +455,7 @@ function renderHeader(
   if (newBadges.length > 0) {
     badgeHTML = `
       <div class="new-badges-section">
-        <h3><i data-lucide="award"></i> شارات تم إكتسابها</h3>
+        <h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award-icon lucide-award"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg> شارات تم إكتسابها</h3>
         <div class="badge-grid">
           ${newBadges
             .map(
@@ -489,9 +475,9 @@ function renderHeader(
     mcqTotal > 0
       ? `
     <div class="score-breakdown">
-      <span class="breakdown-item breakdown-correct"><i data-lucide="check"></i> ${mcqCorrect} صحيح</span>
-      <span class="breakdown-item breakdown-wrong"><i data-lucide="x"></i> ${mcqWrong} خطأ</span>
-      ${mcqSkipped > 0 ? `<span class="breakdown-item breakdown-skipped"><i data-lucide="minus"></i> ${mcqSkipped} متخطى</span>` : ""}
+      <span class="breakdown-item breakdown-correct"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg> ${mcqCorrect} صحيح</span>
+      <span class="breakdown-item breakdown-wrong"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> ${mcqWrong} خطأ</span>
+      ${mcqSkipped > 0 ? `<span class="breakdown-item breakdown-skipped"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14"/></svg> ${mcqSkipped} متخطى</span>` : ""}
     </div>`
       : "";
 
@@ -500,7 +486,7 @@ function renderHeader(
     essayCount > 0
       ? `
     <div class="essay-score-row">
-      <i data-lucide="scroll-text"></i>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
       <span>المقالي: ${essayScoreTotal} / ${essayMaxTotal}</span>
       ${starRating(Math.round(essayScoreTotal / Math.max(essayCount, 1)), 5)}
     </div>`
@@ -513,11 +499,11 @@ function renderHeader(
     </div>
     <div class="stats-text">
       <h2>${percentage >= 70 ? `أحسنت يا ${currentName}!` : `استمر في المذاكرة يا ${currentName}`}</h2>
-      <div class="points-pill"><i data-lucide="gem"></i> +${points} نقطة</div>
+      <div class="points-pill"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gem-icon lucide-gem"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg> +${points} نقطة</div>
       <p class="total-score-line">النتيجة: <strong>${displayScore} / ${displayTotal}</strong></p>
       ${mcqRow}
       ${essayRow}
-      <p class="time-line"><i data-lucide="clock"></i> الوقت: ${timeStr}</p>
+      <p class="time-line"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-icon lucide-clock"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> الوقت: ${timeStr}</p>
       ${badgeHTML}
     </div>
   `;
@@ -535,7 +521,7 @@ function renderReview(container, questions, userAnswers) {
     const userAns = userAnswers[index];
 
     if (isEssay) {
-      const score = gradeEssay(userAns, q.options[0]);
+      const score = gradeEssay(userAns, getEssayAnswer(q));
       const stars = starRating(score);
       const scoreLabel =
         score >= 4
@@ -562,7 +548,7 @@ function renderReview(container, questions, userAnswers) {
       const userText = userAns
         ? renderMarkdown(String(userAns))
         : "<em>Not answered</em>";
-      const formalText = renderMarkdown(q.options[0]);
+      const formalText = renderMarkdown(getEssayAnswer(q));
       const explanationText = q.explanation
         ? renderMarkdown(q.explanation)
         : "";
@@ -572,7 +558,7 @@ function renderReview(container, questions, userAnswers) {
           <div class="review-header">
             <span class="q-num">#${index + 1}</span>
             <div class="review-header-right">
-              <span class="essay-badge"><i data-lucide="scroll-text"></i> Essay</span>
+              <span class="essay-badge"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg> Essay</span>
               <span class="essay-score-badge ${scoreLabelClass}">${stars} ${scoreLabel} (${score}/5)</span>
             </div>
           </div>
@@ -580,11 +566,11 @@ function renderReview(container, questions, userAnswers) {
           ${renderQuestionImage(q.image)}
           <div class="essay-comparison">
             <div class="essay-answer-box user-essay">
-              <small><i data-lucide="pencil-line"></i> Your Answer:</small>
+              <small><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Your Answer:</small>
               <div class="essay-text">${userText}</div>
             </div>
             <div class="essay-answer-box formal-essay">
-              <small><i data-lucide="book-open"></i> Formal Answer:</small>
+              <small><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-icon lucide-book-open"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg> Formal Answer:</small>
               <div class="essay-text">${formalText}</div>
             </div>
           </div>
@@ -608,10 +594,10 @@ function renderReview(container, questions, userAnswers) {
           ? "skipped"
           : "wrong";
       const statusIcon = isCorrect
-        ? `<i data-lucide="circle-check"></i>`
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-icon lucide-circle-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`
         : isSkipped
-          ? `<i data-lucide="circle-minus"></i>`
-          : `<i data-lucide="circle-x"></i>`;
+          ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-minus-icon lucide-circle-minus"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
 
       const userText = isSkipped
         ? "<em>Skipped</em>"
@@ -631,14 +617,14 @@ function renderReview(container, questions, userAnswers) {
           ${renderQuestionImage(q.image)}
           <div class="ans-comparison">
             <div class="ans-box ${isCorrect ? "ans-correct" : isSkipped ? "ans-skipped" : "ans-wrong"}">
-              <small><i data-lucide="pencil-line"></i> Your Answer:</small>
+              <small><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> Your Answer:</small>
               <div class="ans-text">${userText}</div>
             </div>
             ${
               !isCorrect
                 ? `
             <div class="ans-box ans-correct-answer">
-              <small><i data-lucide="check-circle"></i> Correct Answer:</small>
+              <small><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-icon lucide-circle-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Correct Answer:</small>
               <div class="ans-text">${correctText}</div>
             </div>`
                 : ""

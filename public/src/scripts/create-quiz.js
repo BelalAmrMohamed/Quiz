@@ -12,6 +12,7 @@ import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
 import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
+import { generateQuizId } from "./quizId.js";
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -20,6 +21,7 @@ import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
 let quizData = {
   title: "",
   description: "",
+  source: "",
   questions: [],
 };
 
@@ -233,6 +235,7 @@ function setupEventListeners() {
   // Metadata event listeners
   const titleInput = document.getElementById("quizTitle");
   const descInput = document.getElementById("quizDescription");
+  const sourceInput = document.getElementById("quizSource");
 
   titleInput.addEventListener("input", (e) => {
     quizData.title = e.target.value;
@@ -245,6 +248,13 @@ function setupEventListeners() {
     updateCharCount("descCharCount", e.target.value.length, 500);
     autosave();
   });
+
+  if (sourceInput) {
+    sourceInput.addEventListener("input", (e) => {
+      quizData.source = e.target.value.trim();
+      autosave();
+    });
+  }
 
   // Search functionality with debounce
   const searchInput = document.getElementById("questionSearch");
@@ -601,9 +611,6 @@ function renderQuestion(question, insertAtIndex = null) {
   if (question.image) {
     updateImagePreview(question.id, question.image);
   }
-
-  // Re-initialize Lucide icons for newly injected HTML
-  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // Click on header area (but not buttons/drag) collapses the card
@@ -695,7 +702,6 @@ function updateImagePreview(questionId, imageUrl) {
   img.onerror = function () {
     previewContainer.innerHTML =
       '<div class="image-error"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-off-icon lucide-image-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg> فشل تحميل الصورة. تحقق من الرابط.</div>';
-    if (typeof lucide !== "undefined") lucide.createIcons();
   };
   img.src = imageUrl;
 }
@@ -801,7 +807,6 @@ function rerenderAllQuestions() {
     renderQuestion(question);
   });
   updateQuestionNumbers();
-  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ============================================================================
@@ -878,7 +883,6 @@ function rerenderOptions(questionId) {
     if (container) {
       container.innerHTML = renderOptions(question);
       setupOptionMdEditors(questionId);
-      if (typeof lucide !== "undefined") lucide.createIcons();
     }
   }
 }
@@ -1110,7 +1114,6 @@ window.toggleBulkMode = function () {
         numberSpan.insertBefore(checkbox, numberSpan.firstChild);
       }
     });
-    if (typeof lucide !== "undefined") lucide.createIcons();
   } else {
     bulkActionsBar.style.display = "none";
     bulkBtn.style.background = "";
@@ -1463,16 +1466,27 @@ function loadDraftFromLocalStorage() {
     if (saved) {
       const data = JSON.parse(saved);
 
-      if (data.title) {
-        quizData.title = data.title;
-        document.getElementById("quizTitle").value = data.title;
-        updateCharCount("titleCharCount", data.title.length, 100);
+      // Support both old flat schema and new (meta.title)
+      const title = data.meta?.title || data.title;
+      const description = data.meta?.description || data.description;
+      const source = data.meta?.source || data.source || "";
+
+      if (title) {
+        quizData.title = title;
+        document.getElementById("quizTitle").value = title;
+        updateCharCount("titleCharCount", title.length, 100);
       }
 
-      if (data.description) {
-        quizData.description = data.description;
-        document.getElementById("quizDescription").value = data.description;
-        updateCharCount("descCharCount", data.description.length, 500);
+      if (description) {
+        quizData.description = description;
+        document.getElementById("quizDescription").value = description;
+        updateCharCount("descCharCount", description.length, 500);
+      }
+
+      if (source) {
+        quizData.source = source;
+        const srcEl = document.getElementById("quizSource");
+        if (srcEl) srcEl.value = source;
       }
 
       if (data.questions && data.questions.length > 0) {
@@ -1510,13 +1524,18 @@ function loadQuizFromLocalStorage(quizId) {
       if (headerTitle) headerTitle.textContent = "تعديل الاختبار";
       document.title = "تعديل الاختبار - منصة بصمجي";
 
-      quizData.title = quiz.title || "";
+      // Support both old flat schema and new (meta.title)
+      quizData.title = quiz.meta?.title || quiz.title || "";
       document.getElementById("quizTitle").value = quizData.title;
       updateCharCount("titleCharCount", quizData.title.length, 100);
 
-      quizData.description = quiz.description || "";
+      quizData.description = quiz.meta?.description || quiz.description || "";
       document.getElementById("quizDescription").value = quizData.description;
       updateCharCount("descCharCount", quizData.description.length, 500);
+
+      quizData.source = quiz.meta?.source || quiz.source || "";
+      const srcEl = document.getElementById("quizSource");
+      if (srcEl) srcEl.value = quizData.source;
 
       if (quiz.questions && quiz.questions.length > 0) {
         const { questions, maxId } = normalizeQuestionsWithIds(quiz.questions);
@@ -1546,27 +1565,57 @@ function loadQuizFromLocalStorage(quizId) {
 // SAVE TO USER QUIZZES
 // ============================================================================
 
+function buildQuizPayload(quizToSave, quizId, existingCreatedAt) {
+  const questions = (quizToSave.questions || []).map((q) => {
+    const out = { q: q.q };
+    if (q.image?.trim()) out.image = q.image;
+    // Normalize essay: old 1-option → new answer field
+    if (Array.isArray(q.options) && q.options.length === 1) {
+      out.answer = q.options[0] ?? "";
+    } else if (!Array.isArray(q.options) && q.answer !== undefined) {
+      out.answer = q.answer;
+    } else if (Array.isArray(q.options)) {
+      out.options = q.options;
+      if (q.correct !== undefined) out.correct = q.correct;
+    }
+    if (q.explanation?.trim()) out.explanation = q.explanation;
+    return out;
+  });
+
+  const types = new Set();
+  questions.forEach((q) => {
+    if (!Array.isArray(q.options) || q.options.length === 0) types.add("Essay");
+    else if (q.options.length === 2) types.add("True/False");
+    else types.add("MCQ");
+  });
+
+  const meta = {
+    title: quizToSave.title?.trim() || "Untitled",
+    createdAt: existingCreatedAt || new Date().toLocaleString("ar-EG"),
+  };
+  if (quizToSave.description?.trim())
+    meta.description = quizToSave.description.trim();
+  if (quizToSave.source?.trim()) meta.source = quizToSave.source.trim();
+
+  return {
+    meta,
+    stats: {
+      questionCount: questions.length,
+      questionTypes: Array.from(types).sort(),
+    },
+    questions,
+  };
+}
+
 function saveToUserQuizzes(quizToSave) {
   try {
     const existingQuizzes = JSON.parse(
       localStorage.getItem("user_quizzes") || "[]",
     );
-
     const quizId = `user_quiz_${Date.now()}`;
-
-    const newQuiz = {
-      id: quizId,
-      title: quizToSave.title,
-      description: quizToSave.description,
-      questions: quizToSave.questions,
-      createdAt: new Date().toISOString(),
-      author: "User Created",
-    };
-
+    const newQuiz = { id: quizId, ...buildQuizPayload(quizToSave, quizId) };
     existingQuizzes.push(newQuiz);
-
     localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
-
     return quizId;
   } catch (error) {
     console.error("Error saving quiz:", error);
@@ -1579,20 +1628,16 @@ function updateInUserQuizzes(quizId, quizToSave) {
     const existingQuizzes = JSON.parse(
       localStorage.getItem("user_quizzes") || "[]",
     );
-
     const quizIndex = existingQuizzes.findIndex((q) => q.id === quizId);
     if (quizIndex === -1) return null;
-
-    existingQuizzes[quizIndex] = {
-      ...existingQuizzes[quizIndex],
-      title: quizToSave.title,
-      description: quizToSave.description,
-      questions: quizToSave.questions,
-      lastEditedAt: new Date().toISOString(),
-    };
-
+    const existing = existingQuizzes[quizIndex];
+    const payload = buildQuizPayload(
+      quizToSave,
+      quizId,
+      existing.meta?.createdAt || existing.createdAt,
+    );
+    existingQuizzes[quizIndex] = { ...existing, ...payload, id: quizId };
     localStorage.setItem("user_quizzes", JSON.stringify(existingQuizzes));
-
     return quizId;
   } catch (error) {
     console.error("Error updating quiz:", error);
@@ -1617,8 +1662,18 @@ window.exportQuiz = function () {
 
   const config = { title: quizData.title, description: quizData.description };
   const exportQuestions = quizData.questions.map((q) => {
-    const out = { q: q.q, options: q.options, correct: q.correct };
+    const out = { q: q.q };
     if (q.image?.trim()) out.image = q.image;
+    // Essay question: has 1 option (legacy) or has `answer` field → export as { q, answer }
+    if (Array.isArray(q.options) && q.options.length === 1) {
+      out.answer = q.options[0] || "";
+    } else if (!Array.isArray(q.options) || q.options.length === 0) {
+      out.answer = q.answer || "";
+    } else {
+      out.options = q.options;
+      if (q.correct !== undefined && q.correct !== null)
+        out.correct = q.correct;
+    }
     if (q.explanation?.trim()) out.explanation = q.explanation;
     return out;
   });
@@ -1646,17 +1701,49 @@ window.exportQuiz = function () {
           exportToMarkdown(config, exportQuestions);
           break;
         case "json": {
-          const jsonMeta = { title: quizData.title };
+          // Build quiz object with new schema (meta + stats + questions)
+          const safeFilename = quizData.title
+            .replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")
+            .replace(/_+/g, "_")
+            .replace(/^_|_$/g, "");
+
+          // Compute stats from current questions
+          const statsTypes = new Set();
+          exportQuestions.forEach((q) => {
+            if (!Array.isArray(q.options) || q.options.length === 0)
+              statsTypes.add("Essay");
+            else if (q.options.length === 2) statsTypes.add("True/False");
+            else statsTypes.add("MCQ");
+          });
+
+          const meta = {
+            id: await generateQuizId(`quizzes/draft/${safeFilename}.json`),
+            title: quizData.title,
+            createdAt: new Date()
+              .toISOString()
+              .slice(0, 16)
+              .replace("T", " - "),
+          };
           if (quizData.description?.trim())
-            jsonMeta.description = quizData.description;
-          const payload = { meta: jsonMeta, questions: exportQuestions };
+            meta.description = quizData.description.trim();
+          if (quizData.source?.trim()) meta.source = quizData.source.trim();
+
+          const payload = {
+            meta,
+            stats: {
+              questionCount: exportQuestions.length,
+              questionTypes: Array.from(statsTypes).sort(),
+            },
+            questions: exportQuestions,
+          };
+
           const blob = new Blob([JSON.stringify(payload, null, 2)], {
             type: "application/json",
           });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${quizData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
+          a.download = `${safeFilename || "quiz"}.json`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -1833,7 +1920,6 @@ window.exportQuiz = function () {
   });
 
   document.body.appendChild(modal);
-  if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
 // ============================================================================

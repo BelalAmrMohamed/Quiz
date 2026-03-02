@@ -41,9 +41,6 @@
             rel="stylesheet">
     </noscript>
 
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
     <!-- Preload critical resources -->
     <link rel="preload" href="src/styles/settings.css" as="style">
     <link rel="preload" href="src/styles/themes.css" as="style">
@@ -277,7 +274,17 @@
 
             <!-- Quiz style -->
             <section class="settings-card" aria-labelledby="quiz-style-heading">
-                <h2 id="quiz-style-heading"><span><i data-lucide="layout-list"></i></span> شكل الاختبار</h2>
+                <h2 id="quiz-style-heading"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-layout-list-icon lucide-layout-list">
+                            <rect width="7" height="7" x="3" y="3" rx="1" />
+                            <rect width="7" height="7" x="3" y="14" rx="1" />
+                            <path d="M14 4h7" />
+                            <path d="M14 9h7" />
+                            <path d="M14 15h7" />
+                            <path d="M14 20h7" />
+                        </svg></span> شكل الاختبار</h2>
                 <div class="option-cards" role="group" aria-labelledby="quiz-style-heading">
                     <label class="option-card" id="style-pagination-wrap">
                         <input type="radio" name="quizStyle" value="pagination" id="quizStylePagination"
@@ -302,7 +309,15 @@
 
             <!-- Default quiz mode -->
             <section class="settings-card" aria-labelledby="mode-heading">
-                <h2 id="mode-heading"><span><i data-lucide="book-open-check"></i></span> وضع الاختبار الافتراضي</h2>
+                <h2 id="mode-heading"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-book-open-check-icon lucide-book-open-check">
+                            <path d="M12 21V7" />
+                            <path d="m16 12 2 2 4-4" />
+                            <path
+                                d="M22 6V4a1 1 0 0 0-1-1h-5a4 4 0 0 0-4 4 4 4 0 0 0-4-4H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h6a3 3 0 0 1 3 3 3 3 0 0 1 3-3h6a1 1 0 0 0 1-1v-1.3" />
+                        </svg></span> وضع الاختبار الافتراضي</h2>
                 <p class="profile-hint">يُستخدم عند بدء أي اختبار دون سؤالك في كل مرة</p>
                 <div class="option-cards" role="group" aria-labelledby="mode-heading">
                     <label class="option-card" id="mode-practice-wrap">

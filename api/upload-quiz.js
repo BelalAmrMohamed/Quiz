@@ -4,7 +4,7 @@
 //
 // POST /api/upload-quiz
 // Headers: Authorization: Bearer <token>
-// Body:    { college, year, term, subject, subfolder?, quiz: {...} }
+// Body:    { college, year, term, subject, subfolder?, author?, quiz: {...} }
 //
 // Path stored as: College/Year/Term/Subject[/Subfolder]
 // This matches the codebase structure under public/data/quizzes/
@@ -14,7 +14,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { requireAdmin, applyCors, handleAuthError } from "./_middleware.js";
-import { validateQuizPayload, validatePath } from "./_validateQuiz.js";
+import {
+  validateQuizPayload,
+  validatePath,
+  computeStats,
+} from "./_validateQuiz.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -35,7 +39,8 @@ export default async function handler(req, res) {
   }
 
   // ── 2. Extract & validate fields ───────────────────────────────────────────
-  const { college, year, term, subject, subfolder, quiz } = req.body || {};
+  const { college, year, term, subject, subfolder, author, quiz } =
+    req.body || {};
 
   // Validate each path segment
   try {
@@ -61,7 +66,6 @@ export default async function handler(req, res) {
   }
 
   // ── 3. Build path matching codebase structure ──────────────────────────────
-  // Format: College/Year/Term/Subject[/Subfolder]
   const pathParts = [
     college.trim(),
     String(year),
@@ -71,13 +75,27 @@ export default async function handler(req, res) {
   if (subfolder?.trim()) pathParts.push(subfolder.trim());
   const fullPath = pathParts.join("/");
 
-  const safeTitle = cleanQuiz.title
+  const safeTitle = cleanQuiz.meta.title
     .replace(/[^\u0600-\u06FF\w\s\-]/gu, "")
     .trim()
     .replace(/\s+/g, "_");
   const filename = `${safeTitle || "quiz"}.json`;
 
-  // ── 4. Duplicate check ─────────────────────────────────────────────────────
+  // ── 4. Server-side enrichment ──────────────────────────────────────────────
+  // Set meta.path (canonical path for ID stability and quiz-data endpoint)
+  cleanQuiz.meta.path = `quizzes/${fullPath}/${filename}`;
+
+  // Recompute stats server-side — never trust client-submitted stats
+  cleanQuiz.stats = computeStats(cleanQuiz.questions);
+
+  // Set author from request body (not from JWT)
+  if (author && typeof author === "string" && author.trim()) {
+    cleanQuiz.meta.author = author.trim();
+  } else {
+    delete cleanQuiz.meta.author; // don't store undefined/empty
+  }
+
+  // ── 5. Duplicate check ─────────────────────────────────────────────────────
   const { data: existing } = await supabase
     .from("quizzes")
     .select("id")
@@ -91,7 +109,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // ── 5. Insert ──────────────────────────────────────────────────────────────
+  // ── 6. Insert ──────────────────────────────────────────────────────────────
   const { data, error } = await supabase
     .from("quizzes")
     .insert({
@@ -99,7 +117,7 @@ export default async function handler(req, res) {
       category: college.trim(), // "category" column = college name
       subject: subject.trim(),
       subfolder: subfolder?.trim() || null,
-      title: cleanQuiz.title,
+      title: cleanQuiz.meta.title,
       filename,
       data: cleanQuiz,
     })

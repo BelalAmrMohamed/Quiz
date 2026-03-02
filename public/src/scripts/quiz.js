@@ -70,7 +70,6 @@ window.handleSelectForQuestion = (qIdx, optIdx) => {
   userAnswers[qIdx] = optIdx;
   saveStateDebounced();
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigationDebounced();
   maybeAutoSubmit();
 };
@@ -88,7 +87,6 @@ window.checkAnswerForQuestion = (qIdx) => {
   lockedQuestions[qIdx] = true;
   saveStateDebounced();
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateNav();
 };
@@ -259,9 +257,17 @@ function renderMarkdown(str) {
 }
 
 // === Helper: Check if Essay Question ===
+// Old format: { q, options: ["answer text"], correct: 0 }
+// New format: { q, answer: "answer text" }
 const isEssayQuestion = (q) => {
-  return q.options && q.options.length === 1;
+  return (
+    (Array.isArray(q.options) && q.options.length === 1) ||
+    (!Array.isArray(q.options) && q.answer !== undefined)
+  );
 };
+
+// === Helper: Get the model answer for an essay question ===
+const getEssayAnswer = (q) => q.answer ?? q.options?.[0] ?? "";
 
 // === Helper: Render Question Image ===
 const renderQuestionImage = (imageUrl) => {
@@ -299,14 +305,12 @@ function toggleView() {
 
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
-      els.viewIcon.innerHTML = `<i data-lucide="list"></i>`;
+      els.viewIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>`;
       els.viewText.textContent = "شكل القائمة";
     } else {
-      els.viewIcon.innerHTML = `<i data-lucide="layout-grid"></i>`;
+      els.viewIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid-icon lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`;
       els.viewText.textContent = "شكل الأيقونات";
     }
-
-    resetLucidIcons();
   }
 
   renderMenuNavigation();
@@ -321,10 +325,17 @@ async function loadExamModule(config) {
     return examModuleCache.get(config.id);
   }
 
-  // Load quiz data: fetch .json or dynamic import .js
+  // Resolve the fetch URL.
+  // Paths starting with "/" are origin-relative (e.g. "/data/quizzes/...")
+  // Paths starting with "http" are already absolute (DB quizzes).
+  // Legacy relative paths are resolved against import.meta.url.
   console.log(`[Quiz] Loading exam: ${config.id}`);
-  const baseUrl = new URL(import.meta.url);
-  const quizUrl = new URL(config.path, baseUrl);
+  let quizUrl;
+  if (config.path.startsWith("/") || config.path.startsWith("http")) {
+    quizUrl = new URL("" + config.path, window.location.origin);
+  } else {
+    quizUrl = new URL(config.path, new URL(import.meta.url));
+  }
   let module;
   if (config.path.toLowerCase().endsWith(".json")) {
     const res = await fetch(quizUrl.href);
@@ -407,14 +418,12 @@ async function init() {
   // Update view toggle button
   if (els.viewIcon && els.viewText) {
     if (viewMode === "grid") {
-      els.viewIcon.innerHTML = `<i data-lucide="list"></i>`;
+      els.viewIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg>`;
       els.viewText.textContent = "شكل القائمة";
     } else {
-      els.viewIcon.innerHTML = `<i data-lucide="layout-grid"></i>`;
+      els.viewIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid-icon lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`;
       els.viewText.textContent = "شكل الأيقونات";
     }
-
-    resetLucidIcons();
   }
 
   try {
@@ -434,17 +443,26 @@ async function init() {
 
       const userQuiz = JSON.parse(userQuizData);
 
-      // Map user questions to ensure correct format
-      questions = userQuiz.questions.map((q) => ({
-        q: q.q,
-        options: q.options,
-        correct: q.correct,
-        image: q.image || undefined,
-        explanation: q.explanation || undefined,
-      }));
+      // Map user questions to ensure correct format, handling both old and new essay style
+      questions = userQuiz.questions.map((q) => {
+        const out = { q: q.q };
+        if (q.image) out.image = q.image;
+        if (q.explanation) out.explanation = q.explanation;
+        // Normalize essay: old 1-option → new answer field
+        if (Array.isArray(q.options) && q.options.length === 1) {
+          out.answer = q.options[0] ?? "";
+        } else if (!Array.isArray(q.options) && q.answer !== undefined) {
+          out.answer = q.answer;
+        } else {
+          out.options = q.options;
+          if (q.correct !== undefined) out.correct = q.correct;
+        }
+        return out;
+      });
 
+      // Support both old flat schema (title) and new nested schema (meta.title)
       metaData = {
-        title: userQuiz.title,
+        title: userQuiz.meta?.title || userQuiz.title,
         category: "Your Quiz",
       };
     } else {
@@ -465,8 +483,12 @@ async function init() {
       const parts = config.path.replace(/\\/g, "/").split("/");
       const filename = parts[parts.length - 1] || "";
       const name = filename.replace(/\.(json|js)$/i, "").replace(/[_-]+/g, " ");
-      const title = name.replace(/\b\w/g, (c) => c.toUpperCase());
-      metaData = { title, category: parts[parts.length - 2] || "" };
+      const fallbackTitle = name.replace(/\b\w/g, (c) => c.toUpperCase());
+      // Prefer the title from the manifest over the one derived from filename
+      metaData = {
+        title: config.title || fallbackTitle,
+        category: parts[parts.length - 2] || "",
+      };
     }
 
     // -----------------------------------------------------------
@@ -513,7 +535,6 @@ async function init() {
     renderMenuNavigation();
     updateMenuActionButtons();
     renderQuestion();
-    resetLucidIcons();
     startTimer();
 
     // Global handlers
@@ -524,14 +545,12 @@ async function init() {
     window.toggleBookmark = () => {
       gameEngine.toggleBookmark(examId, currentIdx);
       renderQuestion();
-      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
     window.toggleFlag = () => {
       gameEngine.toggleFlag(examId, currentIdx);
       renderQuestion();
-      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
     };
@@ -540,7 +559,6 @@ async function init() {
       renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
-        resetLucidIcons();
         updateMenuActionButtons();
       }
     };
@@ -549,7 +567,6 @@ async function init() {
       renderMenuNavigationDebounced();
       if (idx === currentIdx) {
         renderQuestion();
-        resetLucidIcons();
         updateMenuActionButtons();
       }
     };
@@ -644,7 +661,6 @@ async function init() {
       currentIdx = idx;
       saveStateDebounced();
       renderQuestion();
-      resetLucidIcons();
       renderMenuNavigationDebounced();
       updateMenuActionButtons();
 
@@ -697,7 +713,7 @@ function renderMenuNavigation() {
   const flagCount = gameEngine.getFlaggedCount(examId);
   const flagInfo =
     flagCount > 0
-      ? `<span class="menu-flag-count"><i data-lucide="flag"></i> ذو علامة مرجعية:  ${flagCount}</span>`
+      ? `<span class="menu-flag-count"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg> ذو علامة مرجعية:  ${flagCount}</span>`
       : "";
 
   if (viewMode === "grid") {
@@ -707,7 +723,6 @@ function renderMenuNavigation() {
   }
 
   // Always refresh icons after re-rendering nav (fixes debounced icon stale state)
-  resetLucidIcons();
 }
 
 // === OPTIMIZED: Grid view with DocumentFragment ===
@@ -782,8 +797,8 @@ function createGridItem(q, idx) {
       isBookmarked || isFlagged
         ? `
       <div class="menu-nav-badges">
-        ${isBookmarked ? '<span class="mini-badge bookmark"><i data-lucide="star"></i></span>' : ""}
-        ${isFlagged ? '<span class="mini-badge flag"><i data-lucide="flag"></i></span>' : ""}
+        ${isBookmarked ? '<span class="mini-badge bookmark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg></span>' : ""}
+        ${isFlagged ? '<span class="mini-badge flag"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg></span>' : ""}
       </div>
     `
         : ""
@@ -864,12 +879,12 @@ function createListItem(q, idx) {
       <span class="menu-nav-icon bookmark-icon ${isBookmarked ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionBookmark(${idx})"
             title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
-        ${isBookmarked ? '<i data-lucide="star-off"></i>' : '<i data-lucide="star"></i>'}
+        ${isBookmarked ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-off-icon lucide-star-off"><path d="m10.344 4.688 1.181-2.393a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.237 3.152"/><path d="m17.945 17.945.43 2.505a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a8 8 0 0 0 .4-.099"/><path d="m2 2 20 20"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>'}
       </span>
       <span class="menu-nav-icon flag-icon ${isFlagged ? "active" : ""}" 
             onclick="event.stopPropagation(); window.toggleQuestionFlag(${idx})"
             title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
-        ${isFlagged ? '<i data-lucide="flag"></i>' : '<i data-lucide="flag-off"></i>'}
+        ${isFlagged ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-icon lucide-flag"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg>'}
       </span>
     </div>
   `;
@@ -899,8 +914,8 @@ function updateMenuActionButtons() {
       const isBookmarked = gameEngine.isBookmarked(examId, currentIdx);
       if (bookmarkIcon)
         bookmarkIcon.innerHTML = isBookmarked
-          ? '<i data-lucide="star-off"></i>'
-          : '<i data-lucide="star"></i>';
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-off-icon lucide-star-off"><path d="m10.344 4.688 1.181-2.393a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.237 3.152"/><path d="m17.945 17.945.43 2.505a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a8 8 0 0 0 .4-.099"/><path d="m2 2 20 20"/></svg>'
+          : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
       if (bookmarkText)
         bookmarkText.textContent = isBookmarked
           ? "حذف من المفضلة"
@@ -921,8 +936,8 @@ function updateMenuActionButtons() {
       const isFlagged = gameEngine.isFlagged(examId, currentIdx);
       if (flagIcon)
         flagIcon.innerHTML = isFlagged
-          ? '<i data-lucide="flag"></i>'
-          : '<i data-lucide="flag-off"></i>';
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg>'
+          : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-icon lucide-flag"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg>';
       if (flagText)
         flagText.textContent = isFlagged
           ? "إزالة العلامة"
@@ -931,8 +946,6 @@ function updateMenuActionButtons() {
       flagBtn.classList.toggle("flagged", isFlagged);
     }
   }
-
-  resetLucidIcons();
 }
 
 // === Vertical style: build one question card HTML for index idx ===
@@ -952,7 +965,7 @@ function buildVerticalQuestionCard(q, idx) {
   if (isLocked) {
     let isCorrect;
     if (isEssay) {
-      const essayScore = gradeEssay(userSelected, q.options[0]);
+      const essayScore = gradeEssay(userSelected, getEssayAnswer(q));
       isCorrect = essayScore >= 3;
       feedbackClass += " essay-feedback show";
       const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
@@ -967,8 +980,8 @@ function buildVerticalQuestionCard(q, idx) {
 
   const actionBtns = `
     <div class="question-actions">
-      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? `<i data-lucide="star-off"></i>` : `<i data-lucide="star"></i>`}</button>
-      <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? `<i data-lucide="flag"></i>` : `<i data-lucide="flag-off"></i>`}</button>
+      <button class="bookmark-btn ${isBookmarked ? "active" : ""}" onclick="window.toggleQuestionBookmark(${idx})" title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">${isBookmarked ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-off-icon lucide-star-off"><path d="m10.344 4.688 1.181-2.393a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.237 3.152"/><path d="m17.945 17.945.43 2.505a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a8 8 0 0 0 .4-.099"/><path d="m2 2 20 20"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`}</button>
+      <button class="flag-btn ${isFlagged ? "active" : ""}" onclick="window.toggleQuestionFlag(${idx})" title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">${isFlagged ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-icon lucide-flag"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg>`}</button>
     </div>
   `;
 
@@ -991,7 +1004,7 @@ function buildVerticalQuestionCard(q, idx) {
         </div>
         <button class="check-answer-btn ${isLocked || !showCheckButton ? "hidden" : ""}" onclick="window.checkAnswerForQuestion(${idx})" ${!userSelected || String(userSelected).trim() === "" ? "disabled" : ""}>Check Answer</button>
         <div class="${feedbackClass}">${feedbackText}</div>
-        ${isLocked ? `<div class="formal-answer"><strong>Formal Answer:</strong><div class="formal-answer-text">${renderMarkdown(q.options[0])}</div></div>` : ""}
+        ${isLocked ? `<div class="formal-answer"><strong>Formal Answer:</strong><div class="formal-answer-text">${renderMarkdown(getEssayAnswer(q))}</div></div>` : ""}
       </div>
     `;
   }
@@ -1039,8 +1052,6 @@ function renderAllQuestionsVertical() {
     .join("");
   els.questionContainer.classList.remove("loading");
   els.questionContainer.classList.add("vertical-style");
-
-  resetLucidIcons();
 }
 
 // === Core: Render Question ===
@@ -1082,9 +1093,8 @@ function renderQuestion() {
     let isCorrect = false;
 
     if (isEssay) {
-      const essayScore = gradeEssay(userSelected, q.options[0]);
+      const essayScore = gradeEssay(userSelected, getEssayAnswer(q));
       isCorrect = essayScore >= 3;
-
       feedbackClass += " essay-feedback show";
       const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
       feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
@@ -1103,12 +1113,12 @@ function renderQuestion() {
       <button class="bookmark-btn ${isBookmarked ? "active" : ""}" 
               onclick="window.toggleBookmark()" 
               title="${isBookmarked ? "Remove Bookmark" : "Bookmark"}">
-        ${isBookmarked ? `<i data-lucide="star-off"></i>` : `<i data-lucide="star"></i>`}
+        ${isBookmarked ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-off-icon lucide-star-off"><path d="m10.344 4.688 1.181-2.393a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.237 3.152"/><path d="m17.945 17.945.43 2.505a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a8 8 0 0 0 .4-.099"/><path d="m2 2 20 20"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`}
       </button>
       <button class="flag-btn ${isFlagged ? "active" : ""}" 
               onclick="window.toggleFlag()" 
               title="${isFlagged ? "إزالة العلامة" : "إضافة علامة للمراجعة"}">
-        ${isFlagged ? `<i data-lucide="flag"></i>` : `<i data-lucide="flag-off"></i>`}
+        ${isFlagged ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-off-icon lucide-flag-off"><path d="M16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/><path d="m2 2 20 20"/><path d="M4 22V4"/><path d="M7.656 2H8c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10.347"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag-icon lucide-flag"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg>`}
       </button>
     </div>
   `;
@@ -1154,7 +1164,7 @@ function renderQuestion() {
             ? `
           <div class="formal-answer">
             <strong>Formal Answer:</strong>
-            <div class="formal-answer-text">${renderMarkdown(q.options[0])}</div>
+            <div class="formal-answer-text">${renderMarkdown(getEssayAnswer(q))}</div>
           </div>
         `
             : ""
@@ -1213,7 +1223,6 @@ function handleSelect(index) {
   userAnswers[currentIdx] = index;
   saveStateDebounced();
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigationDebounced();
   maybeAutoSubmit();
 }
@@ -1262,7 +1271,6 @@ function nav(dir) {
   currentIdx = newIdx;
   saveStateDebounced();
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateMenuActionButtons();
   if (quizStyle === "vertical") {
@@ -1293,7 +1301,7 @@ async function finish(skipconfirmationNotification) {
   questions.forEach((q, i) => {
     if (isEssayQuestion(q)) {
       essayQuestions.push(i);
-      const score = gradeEssay(userAnswers[i], q.options[0]);
+      const score = gradeEssay(userAnswers[i], getEssayAnswer(q));
       essayScore += score;
       essayMaxScore += 5;
     } else {
@@ -1398,7 +1406,6 @@ async function restart(skipconfirmationNotification) {
 
   // 8. Re-render
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigation();
   updateMenuActionButtons();
   startTimer();
@@ -1435,7 +1442,6 @@ function checkAnswer() {
   lockedQuestions[currentIdx] = true;
   saveStateDebounced();
   renderQuestion();
-  resetLucidIcons();
   renderMenuNavigationDebounced();
   updateNav();
 }
@@ -1515,18 +1521,6 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
-}
-
-function resetLucidIcons() {
-  // Reset lucid icons
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  } else {
-    // Fallback: wait for the CDN script if it loads after the module
-    window.addEventListener("load", () => {
-      if (typeof lucide !== "undefined") lucide.createIcons();
-    });
-  }
 }
 
 init();

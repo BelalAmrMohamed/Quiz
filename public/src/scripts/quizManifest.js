@@ -5,28 +5,29 @@
 // Sources
 // ───────
 // 1. LOCAL  /data/quiz-manifest.json  — built by generate-quiz-manifest.js,
-//    bundled with the site at deploy time.  Fast, always available offline.
+//    bundled with the site at deploy time. Fast, always available offline.
 //
 // 2. DB     /api/quiz-manifest        — Vercel function that queries Supabase
 //    and returns newly-uploaded quizzes in the same shape as the local file.
 //    May be unavailable (network error, Supabase down, etc.).
 //
+// Manifest shape (new)
+// ────────────────────
+// { generatedAt, dataRoot, subjects: [ { id, name, faculty, year, term, quizzes: [...] } ] }
+//
 // Merge rules
 // ───────────
-// • Both fetches run in parallel (Promise.allSettled) — neither blocks the
-//   other and the page renders even if one source fails completely.
-// • LOCAL wins on ID collision: if the same quiz exists in both (e.g. an admin
-//   uploaded a quiz that was later baked into the static manifest), the local
-//   copy is kept and the DB copy is silently dropped.
-// • Category tree nodes follow the same rule: local keys are authoritative;
-//   DB-only keys are inserted as-is.  Subcategory lists and exam arrays are
-//   union-merged with local items first.
+// • Both fetches run in parallel (Promise.allSettled).
+// • LOCAL wins on ID collision for both subjects and quizzes.
+// • DB-only subjects/quizzes are appended after local ones.
+//
+// For backward compatibility, getManifest() also returns a `categoryTree`
+// object (keyed by subject name) that index.js uses for navigation.
 //
 // Caching
 // ───────
-// The merged result is cached in memory for the lifetime of the page.
-// Call invalidateManifestCache() (e.g. after an admin upload) to force
-// the next getManifest() call to re-fetch.
+// Cached in memory for the lifetime of the page.
+// Call invalidateManifestCache() after an admin upload.
 // =============================================================================
 
 const LOCAL_MANIFEST_URL = new URL(
@@ -43,7 +44,7 @@ let cached = null;
 /**
  * Returns the merged manifest.  Result is cached after the first call.
  *
- * @returns {Promise<{ examList: Exam[], categoryTree: CategoryTree }>}
+ * @returns {Promise<{ subjects: Subject[], categoryTree: CategoryTree, examList: Exam[] }>}
  */
 export async function getManifest() {
   if (cached) return cached;
@@ -53,8 +54,6 @@ export async function getManifest() {
 
 /**
  * Clears the in-memory cache so the next getManifest() re-fetches both sources.
- * Call this after a successful admin quiz upload so the new quiz appears
- * immediately without requiring a full page reload.
  */
 export function invalidateManifestCache() {
   cached = null;
@@ -68,17 +67,11 @@ async function fetchAndMerge() {
     fetchJson(DB_MANIFEST_URL),
   ]);
 
-  // Always start from the local manifest — it's the authoritative baseline.
-  // If the local fetch fails we still try to show DB-only quizzes.
   const local =
-    localResult.status === "fulfilled"
-      ? localResult.value
-      : { examList: [], categoryTree: {} };
+    localResult.status === "fulfilled" ? localResult.value : { subjects: [] };
 
   const db =
-    dbResult.status === "fulfilled"
-      ? dbResult.value
-      : { examList: [], categoryTree: {} };
+    dbResult.status === "fulfilled" ? dbResult.value : { subjects: [] };
 
   if (dbResult.status === "rejected") {
     console.warn(
@@ -87,88 +80,149 @@ async function fetchAndMerge() {
     );
   }
 
-  return {
-    examList: mergeExamList(local.examList ?? [], db.examList ?? []),
-    categoryTree: mergeCategoryTree(
-      local.categoryTree ?? {},
-      db.categoryTree ?? {},
-    ),
-  };
+  const mergedSubjects = mergeSubjects(local.subjects ?? [], db.subjects ?? []);
+
+  // Build categoryTree + examList for backward compatibility with index.js
+  const { categoryTree, examList } = buildCompatStructures(mergedSubjects);
+
+  return { subjects: mergedSubjects, categoryTree, examList };
 }
 
 /**
- * Merges two examList arrays.
- * Local exams are kept as-is; DB exams with duplicate IDs are dropped.
+ * Merges two subjects arrays.
+ * Subjects are matched by `id`. For matching subjects, their quizzes arrays
+ * are merged (local first, no duplicate IDs).
+ * DB-only subjects are appended.
  *
- * @param {Exam[]} local
- * @param {Exam[]} db
- * @returns {Exam[]}
+ * @param {Subject[]} local
+ * @param {Subject[]} db
+ * @returns {Subject[]}
  */
-function mergeExamList(local, db) {
-  const seen = new Set(local.map((e) => e.id));
-  const merged = [...local];
-
-  for (const exam of db) {
-    if (!seen.has(exam.id)) {
-      seen.add(exam.id);
-      merged.push(exam);
-    }
-  }
-
-  return merged;
-}
-
-/**
- * Merges two categoryTree objects.
- *
- * For keys that exist in both: local data is kept; the DB node's exams and
- * subcategories are union-merged in (local entries first, no duplicates).
- * For keys only in DB: the DB node is inserted verbatim.
- *
- * @param {CategoryTree} local
- * @param {CategoryTree} db
- * @returns {CategoryTree}
- */
-function mergeCategoryTree(local, db) {
-  // Deep-clone local so we never mutate the original fetch result
+function mergeSubjects(local, db) {
+  // Deep-clone local so we never mutate the original
   const merged = JSON.parse(JSON.stringify(local));
+  const seenIds = new Map(merged.map((s) => [s.id, s]));
 
-  for (const [key, dbNode] of Object.entries(db)) {
-    if (!merged[key]) {
-      // Brand-new category that only exists in DB — add it wholesale
-      merged[key] = dbNode;
-      continue;
-    }
-
-    const localNode = merged[key];
-
-    // Merge exam arrays — skip any whose ID is already present
-    const seenExamIds = new Set(localNode.exams.map((e) => e.id));
-    for (const exam of dbNode.exams ?? []) {
-      if (!seenExamIds.has(exam.id)) {
-        seenExamIds.add(exam.id);
-        localNode.exams.push(exam);
+  for (const dbSubject of db) {
+    if (seenIds.has(dbSubject.id)) {
+      // Merge quizzes into the existing local subject
+      const localSubject = seenIds.get(dbSubject.id);
+      const seenQuizIds = new Set(localSubject.quizzes.map((q) => q.id));
+      for (const quiz of dbSubject.quizzes ?? []) {
+        if (!seenQuizIds.has(quiz.id)) {
+          seenQuizIds.add(quiz.id);
+          localSubject.quizzes.push(quiz);
+        }
       }
-    }
-
-    // Merge subcategory key lists
-    const seenSubs = new Set(localNode.subcategories);
-    for (const subKey of dbNode.subcategories ?? []) {
-      if (!seenSubs.has(subKey)) {
-        seenSubs.add(subKey);
-        localNode.subcategories.push(subKey);
-      }
+    } else {
+      // Brand-new subject from DB
+      merged.push(dbSubject);
+      seenIds.set(dbSubject.id, dbSubject);
     }
   }
 
   return merged;
+}
+
+/**
+ * Builds backward-compatible `categoryTree` and `examList` from subjects.
+ *
+ * categoryTree shape expected by index.js:
+ *   { [subjectName]: { id, name, faculty, year, term, path, parent, subcategories, exams } }
+ *
+ * Since the new manifest flattens subfolders, we reconstruct subfolder nodes
+ * from quiz paths when a quiz's path reveals a subfolder segment.
+ *
+ * @param {Subject[]} subjects
+ * @returns {{ categoryTree: object, examList: object[] }}
+ */
+function buildCompatStructures(subjects) {
+  const categoryTree = {};
+  const examList = [];
+
+  for (const subject of subjects) {
+    const key = subject.name;
+
+    if (!categoryTree[key]) {
+      categoryTree[key] = {
+        id: subject.id,
+        name: subject.name,
+        faculty: subject.faculty,
+        year: String(subject.year),
+        term: String(subject.term),
+        path: [subject.name],
+        parent: null,
+        subcategories: [],
+        exams: [],
+        source: subject.source,
+      };
+    }
+
+    for (const quiz of subject.quizzes ?? []) {
+      // Determine if this quiz is inside a subfolder by inspecting its path.
+      // Local quiz paths: "../../data/quizzes/College/Year/Term/Subject/[Subfolder/]file.json"
+      // DB quiz paths:    "/api/quiz-data?path=quizzes/College/Year/Term/Subject/[Subfolder/]file.json"
+      let subfolder = null;
+      try {
+        const rawPath = quiz.path;
+        // Extract the canonical part: "quizzes/College/Year/Term/Subject/..."
+        const canonicalMatch = rawPath.match(
+          /quizzes\/[^/]+\/\d+\/\d+\/[^/]+\/(.+)/,
+        );
+        if (canonicalMatch) {
+          const rest = canonicalMatch[1]; // e.g., "SubfolderName/file.json" or just "file.json"
+          const segments = rest.split("/");
+          if (segments.length > 1) {
+            subfolder = segments.slice(0, -1).join("/");
+          }
+        }
+      } catch (_) {}
+
+      let examCategoryKey = key;
+
+      if (subfolder) {
+        const subKey = `${key}/${subfolder}`;
+        if (!categoryTree[subKey]) {
+          categoryTree[subKey] = {
+            name: subfolder,
+            path: [key, subfolder],
+            parent: key,
+            subcategories: [],
+            exams: [],
+          };
+          if (!categoryTree[key].subcategories.includes(subKey)) {
+            categoryTree[key].subcategories.push(subKey);
+          }
+        }
+        examCategoryKey = subKey;
+      }
+
+      const examEntry = {
+        id: quiz.id,
+        title: quiz.title,
+        path: quiz.path,
+        category: examCategoryKey,
+        questionCount: quiz.questionCount,
+        questionTypes: quiz.questionTypes,
+        ...(quiz.description && { description: quiz.description }),
+        ...(quiz.author && { author: quiz.author }),
+        ...(quiz.source && { source: quiz.source }),
+        // Preserve the "db" marker so index.js can show the "قاعدة البيانات" badge
+        ...(quiz.dbSource === "db" ? { dbSource: "db" } : {}),
+      };
+
+      categoryTree[examCategoryKey].exams.push(examEntry);
+      examList.push(examEntry);
+    }
+  }
+
+  examList.sort((a, b) => (a.category + a.id).localeCompare(b.category + b.id));
+
+  return { categoryTree, examList };
 }
 
 /**
  * Thin fetch wrapper that throws on non-OK responses.
- *
- * @param {string} url
- * @returns {Promise<object>}
  */
 async function fetchJson(url) {
   const res = await fetch(url);

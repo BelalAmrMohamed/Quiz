@@ -89,16 +89,6 @@
   }
 })();
 
-// Initialize Lucide icons (covers side-menu icons + any page-level icons)
-if (typeof lucide !== "undefined") {
-  lucide.createIcons();
-} else {
-  // Fallback: wait for the CDN script if it loads after the module
-  window.addEventListener("load", () => {
-    if (typeof lucide !== "undefined") lucide.createIcons();
-  });
-}
-
 // ============================================================================
 // CONTACT OVERLAY
 // ============================================================================
@@ -110,7 +100,6 @@ window.openContactOverlay = function () {
   const overlay = document.getElementById("contactDevOverlay");
   if (overlay) {
     overlay.style.display = "flex";
-    if (typeof lucide !== "undefined") lucide.createIcons();
   }
 };
 

@@ -1,6 +1,9 @@
 {
   "meta": {
-    "title": "40 MCQs"
+    "title": "40 MCQs",
+    "id": "3YMB3NAE",
+    "createdAt": "2026-03-01 - 20:37",
+    "path": "quizzes/Computer Science/2/2/System Analysis/Lecture 2 - 40 MCQs.json"
   },
   "questions": [
     {
@@ -573,5 +576,12 @@
       "correct": 0,
       "explanation": "Before buying, an organization must ensure the software's features match their needs (functionality) while offering the ability to adapt (flexibility). They must consider the Total Cost of Ownership (cost) and ensure the vendor is financially stable enough (viability) to provide long-term updates and help (vendor support). Finally, they check for adequate training materials (documentation) and how difficult the software is to deploy (ease of installation)."
     }
-  ]
+  ],
+  "stats": {
+    "questionCount": 55,
+    "questionTypes": [
+      "MCQ",
+      "True/False"
+    ]
+  }
 }

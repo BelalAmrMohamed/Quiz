@@ -17,6 +17,7 @@
 import { getToken, isAdminAuthenticated, signOut } from "./adminAuth.js";
 import { showNotification } from "../components/notifications.js";
 import { userProfile } from "./userProfile.js";
+import { generateQuizId } from "./quizId.js";
 
 // ─── Manifest tree (auto-generated from quiz-manifest.json) ──────────────────
 // Structure: { college: { subject: { yearterm: [[year,term],...], subfolders: [...] } } }
@@ -326,32 +327,6 @@ function renderStep1(saved = {}) {
         <input type="text" id="adm-new-subject" placeholder="مثال: Software Engineering" maxlength="80" value="${saved.newSubject || ""}" />
       </div>
 
-      <!-- Year + Term: auto-filled from manifest, editable -->
-      <div class="adm-row2">
-        <div class="adm-field">
-          <label for="adm-year">
-            السنة الدراسية
-            <span class="adm-badge adm-badge-auto">تلقائي</span>
-          </label>
-          <select id="adm-year">
-            <option value="">—</option>
-            <option value="1" ${saved.year === "1" ? "selected" : ""}>السنة الأولى</option>
-            <option value="2" ${saved.year === "2" ? "selected" : ""}>السنة الثانية</option>
-          </select>
-        </div>
-        <div class="adm-field">
-          <label for="adm-term">
-            الترم
-            <span class="adm-badge adm-badge-auto">تلقائي</span>
-          </label>
-          <select id="adm-term">
-            <option value="">—</option>
-            <option value="1" ${saved.term === "1" ? "selected" : ""}>الترم الأول</option>
-            <option value="2" ${saved.term === "2" ? "selected" : ""}>الترم الثاني</option>
-          </select>
-        </div>
-      </div>
-
       <!-- Subfolder: from manifest + create new + none -->
       <div class="adm-field">
         <label for="adm-subfolder">
@@ -367,6 +342,24 @@ function renderStep1(saved = {}) {
         <input type="text" id="adm-new-subfolder" placeholder="مثال: أسئلة الدكتور" maxlength="80" value="${saved.newSubfolder || ""}" />
       </div>
 
+      <!-- Author: optional -->
+      <div class="adm-field">
+        <label for="adm-author">
+          اسم المشرف صاحب الإمتحان
+          <span class="adm-badge adm-badge-opt">اختياري</span>
+        </label>
+        <input type="text" id="adm-author" placeholder="مثال: د. أحمد محمد" maxlength="100" value="${saved.author || ""}" />
+      </div>
+
+      <!-- Quiz ID preview: read-only, computed from path -->
+      <div class="adm-field" id="adm-id-wrap" style="${saved.college && saved.subject ? "" : "display:none;"}">
+        <label>
+          معرّف الاختبار (ID)
+          <span class="adm-badge adm-badge-auto">تلقائي</span>
+        </label>
+        <input type="text" id="adm-quiz-id" readonly style="font-family:monospace;letter-spacing:.1em;background:var(--color-background-secondary);cursor:default;" value="" />
+      </div>
+
       <div class="adm-btns">
         <button class="adm-btn adm-btn-ghost" onclick="window.__admClose()">إلغاء</button>
         <button class="adm-btn adm-btn-primary" id="adm-s1-next">التالي ←</button>
@@ -379,16 +372,58 @@ function renderStep1(saved = {}) {
   const colEl = document.getElementById("adm-college");
   const subEl = document.getElementById("adm-subject");
   const folEl = document.getElementById("adm-subfolder");
-  const yearEl = document.getElementById("adm-year");
-  const termEl = document.getElementById("adm-term");
+
+  // Hidden year/term stored as data attributes on the select (auto from manifest)
+  // We use a hidden select pair to keep the values without showing them
+  const yearHidden = document.createElement("input");
+  yearHidden.type = "hidden";
+  yearHidden.id = "adm-year";
+  yearHidden.value = saved.year || "";
+  document.getElementById("adm-id-wrap").after(yearHidden);
+
+  const termHidden = document.createElement("input");
+  termHidden.type = "hidden";
+  termHidden.id = "adm-term";
+  termHidden.value = saved.term || "";
+  yearHidden.after(termHidden);
+
+  async function refreshQuizId() {
+    const { college, subject, year, term, subfolder } = getStep1Values();
+    const idWrap = document.getElementById("adm-id-wrap");
+    const idInput = document.getElementById("adm-quiz-id");
+    if (!college || !subject || !year || !term || !idInput) {
+      if (idWrap) idWrap.style.display = "none";
+      return;
+    }
+    const pathParts = [college, year, term, subject];
+    if (subfolder) pathParts.push(subfolder);
+    const fullPath = pathParts.join("/");
+    const quizTitle =
+      (_quiz?.meta?.title || _quiz?.title || "quiz")
+        .replace(/[^\u0600-\u06FF\w\s\-]/gu, "")
+        .trim()
+        .replace(/\s+/g, "_") || "quiz";
+    const idPath = `quizzes/${fullPath}/${quizTitle}.json`;
+    idInput.value = await generateQuizId(idPath);
+    if (idWrap) idWrap.style.display = "";
+  }
 
   // If college was already saved, populate dependents immediately
   if (saved.college) {
-    populateSubjects(saved.college, subEl, folEl, yearEl, termEl, saved);
+    populateSubjects(
+      saved.college,
+      subEl,
+      folEl,
+      yearHidden,
+      termHidden,
+      saved,
+    );
+    refreshQuizId();
   }
 
   colEl.addEventListener("change", () => {
-    populateSubjects(colEl.value, subEl, folEl, yearEl, termEl, {});
+    populateSubjects(colEl.value, subEl, folEl, yearHidden, termHidden, {});
+    refreshQuizId();
   });
 
   subEl.addEventListener("change", () => {
@@ -397,13 +432,15 @@ function renderStep1(saved = {}) {
       ? "block"
       : "none";
     if (!isNew && subEl.value)
-      autoFillYearTerm(colEl.value, subEl.value, yearEl, termEl);
+      autoFillYearTerm(colEl.value, subEl.value, yearHidden, termHidden);
     populateSubfolders(colEl.value, subEl.value, folEl, {});
+    refreshQuizId();
   });
 
   folEl.addEventListener("change", () => {
     document.getElementById("adm-new-subfolder-wrap").style.display =
       folEl.value === "__new__" ? "block" : "none";
+    refreshQuizId();
   });
 
   document
@@ -533,10 +570,11 @@ function getStep1Values() {
       : folRaw === ""
         ? ""
         : folRaw?.trim();
-  return { college, subject, year, term, subfolder };
+  const author = document.getElementById("adm-author")?.value?.trim() || "";
+  return { college, subject, year, term, subfolder, author };
 }
 
-function step1Validate() {
+async function step1Validate() {
   const { college, subject, year, term } = getStep1Values();
   if (!college) {
     showNotification("الرجاء اختيار الكلية", "error");
@@ -554,15 +592,35 @@ function step1Validate() {
     showNotification("الرجاء اختيار الترم", "error");
     return;
   }
-  renderStep2(getStep1Values());
+  await renderStep2(getStep1Values());
 }
 
 // ─── Step 2: Preview ──────────────────────────────────────────────────────────
-function renderStep2({ college, subject, year, term, subfolder }) {
+async function renderStep2({
+  college,
+  subject,
+  year,
+  term,
+  subfolder,
+  author,
+}) {
   const parts = [college, year, term, subject, subfolder].filter(Boolean);
   const fullPath = parts.join("/");
   const yearLbl = YEAR_LABELS[year] || year;
   const termLbl = TERM_LABELS[term] || term;
+
+  // Compute quiz ID for preview
+  const quizTitle =
+    (_quiz?.meta?.title || _quiz?.title || "quiz")
+      .replace(/[^\u0600-\u06FF\w\s\-]/gu, "")
+      .trim()
+      .replace(/\s+/g, "_") || "quiz";
+  const idPath = `quizzes/${fullPath}/${quizTitle}.json`;
+  const previewId = await generateQuizId(idPath);
+
+  const quizTitleDisplay = _quiz?.meta?.title || "";
+  const questionCount =
+    _quiz?.stats?.questionCount ?? _quiz?.questions?.length ?? 0;
 
   _overlay.innerHTML = `<div class="adm-card">
     ${hdr("مراجعة الرفع")}
@@ -571,13 +629,15 @@ function renderStep2({ college, subject, year, term, subfolder }) {
       <p class="adm-hint">تحقق من التفاصيل قبل الرفع</p>
       <span class="adm-path-chip">📁 ${fullPath}</span>
       <div class="adm-preview">
-        <div class="adm-preview-row"><span class="adm-preview-lbl">عنوان الاختبار</span><span class="adm-preview-val">${_quiz.title}</span></div>
-        <div class="adm-preview-row"><span class="adm-preview-lbl">عدد الأسئلة</span><span class="adm-preview-val">${_quiz.questions?.length ?? 0} سؤال</span></div>
+        <div class="adm-preview-row"><span class="adm-preview-lbl">عنوان الاختبار</span><span class="adm-preview-val">${quizTitleDisplay}</span></div>
+        <div class="adm-preview-row"><span class="adm-preview-lbl">عدد الأسئلة</span><span class="adm-preview-val">${questionCount} سؤال</span></div>
+        <div class="adm-preview-row"><span class="adm-preview-lbl">معرّف الاختبار</span><span class="adm-preview-val" style="font-family:monospace;">${previewId}</span></div>
         <div class="adm-preview-row"><span class="adm-preview-lbl">الكلية</span><span class="adm-preview-val">${college}</span></div>
         <div class="adm-preview-row"><span class="adm-preview-lbl">المادة</span><span class="adm-preview-val">${subject}</span></div>
         <div class="adm-preview-row"><span class="adm-preview-lbl">السنة</span><span class="adm-preview-val">${yearLbl}</span></div>
         <div class="adm-preview-row"><span class="adm-preview-lbl">الترم</span><span class="adm-preview-val">${termLbl}</span></div>
         ${subfolder ? `<div class="adm-preview-row"><span class="adm-preview-lbl">المجلد الفرعي</span><span class="adm-preview-val">${subfolder}</span></div>` : ""}
+        ${author ? `<div class="adm-preview-row"><span class="adm-preview-lbl">المشرف</span><span class="adm-preview-val">${author}</span></div>` : ""}
       </div>
       <div class="adm-btns">
         <button class="adm-btn adm-btn-ghost" id="adm-s2-back">← تعديل</button>
@@ -590,16 +650,16 @@ function renderStep2({ college, subject, year, term, subfolder }) {
 
   // Back: return to step 1 and restore selections
   document.getElementById("adm-s2-back").addEventListener("click", () => {
-    renderStep1({ college, subject, year, term, subfolder });
+    renderStep1({ college, subject, year, term, subfolder, author });
   });
 
   document.getElementById("adm-s2-upload").addEventListener("click", () => {
-    doUpload({ college, subject, year, term, subfolder });
+    doUpload({ college, subject, year, term, subfolder, author });
   });
 }
 
 // ─── Step 3: Upload ───────────────────────────────────────────────────────────
-async function doUpload({ college, subject, year, term, subfolder }) {
+async function doUpload({ college, subject, year, term, subfolder, author }) {
   const btn = document.getElementById("adm-s2-upload");
   if (btn) {
     btn.disabled = true;
@@ -616,6 +676,7 @@ async function doUpload({ college, subject, year, term, subfolder }) {
       term,
       subject,
       subfolder: subfolder || undefined,
+      author: author || undefined,
       quiz: _quiz,
     });
 
@@ -658,6 +719,57 @@ async function doUpload({ college, subject, year, term, subfolder }) {
   }
 }
 
+// ─── Schema normalizer ────────────────────────────────────────────────────────
+/**
+ * Ensures a quiz object is in the new schema (meta + stats + questions)
+ * before upload, regardless of whether it came from the new create-quiz
+ * flow or from an old localStorage entry.
+ */
+function normalizeQuizSchema(quiz) {
+  // Normalize questions regardless of where schema starts
+  const rawQuestions = quiz.questions || [];
+  const questions = rawQuestions.map((q) => {
+    if (Array.isArray(q.options) && q.options.length === 1) {
+      const { options, correct, ...rest } = q;
+      return { ...rest, answer: options[0] ?? "" };
+    }
+    return q;
+  });
+
+  const types = new Set();
+  questions.forEach((q) => {
+    if (!Array.isArray(q.options) || q.options.length === 0) types.add("Essay");
+    else if (q.options.length === 2) types.add("True/False");
+    else types.add("MCQ");
+  });
+
+  // Build meta — never include id (server assigns it based on file path)
+  const meta = {
+    title: (quiz.meta?.title || quiz.title || "").trim(),
+  };
+  const src = quiz.meta?.createdAt || quiz.createdAt;
+  if (src) meta.createdAt = src;
+  const desc = quiz.meta?.description || quiz.description;
+  if (desc?.trim()) meta.description = desc.trim();
+  const source = quiz.meta?.source;
+  if (source?.trim()) meta.source = source.trim();
+  const author =
+    quiz.meta?.author ||
+    (quiz.author && quiz.author !== "User Created" && quiz.author !== "Imported"
+      ? quiz.author
+      : null);
+  if (author?.trim()) meta.author = author.trim();
+
+  return {
+    meta,
+    stats: {
+      questionCount: questions.length,
+      questionTypes: Array.from(types).sort(),
+    },
+    questions,
+  };
+}
+
 // ─── Modal lifecycle ──────────────────────────────────────────────────────────
 function openModal(quiz) {
   if (!isAdminAuthenticated()) {
@@ -668,7 +780,7 @@ function openModal(quiz) {
     return;
   }
   injectStyles();
-  _quiz = quiz;
+  _quiz = normalizeQuizSchema(quiz);
   _overlay = makeOverlay();
   document.body.appendChild(_overlay);
   document.body.style.overflow = "hidden";

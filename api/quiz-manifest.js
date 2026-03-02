@@ -1,16 +1,14 @@
 // =============================================================================
 // api/quiz-manifest.js
-// Public endpoint — returns all DB-hosted quizzes shaped like quiz-manifest.json.
-//
-// The client fetches this alongside the static local manifest and merges them.
+// Public endpoint — returns all DB-hosted quizzes shaped like the new
+// quiz-manifest.json (subjects array).
 //
 // GET /api/quiz-manifest
 // No auth required — metadata only, no quiz content.
 //
-// 200: { examList: Exam[], categoryTree: CategoryTree }
+// 200: { subjects: Subject[] }
 //
-// Response is CDN-cached for 60 s (stale-while-revalidate 5 min) to stay
-// within Supabase Free Plan connection limits.
+// Response is CDN-cached for 60 s (stale-while-revalidate 5 min).
 // =============================================================================
 
 import { createClient } from "@supabase/supabase-js";
@@ -30,7 +28,7 @@ export default async function handler(req, res) {
   // ── 1. Fetch all quiz metadata rows ───────────────────────────────────────
   const { data, error } = await supabase
     .from("quizzes")
-    .select("path, filename, title, category, subject, subfolder")
+    .select("path, filename, title, category, subject, subfolder, data")
     .order("category", { ascending: true });
 
   if (error) {
@@ -38,107 +36,71 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "فشل تحميل الاختبارات" });
   }
 
-  // ── 2. Build examList + categoryTree ──────────────────────────────────────
+  // ── 2. Build subjects array ────────────────────────────────────────────────
   //
   // DB path column = "College/Year/Term/Subject[/Subfolder]"
-  // This mirrors the local folder structure under public/data/quizzes/.
-  //
-  // We reconstruct the same relative paths that generate-quiz-manifest.js
-  // would produce for equivalent files, so IDs are guaranteed to match
-  // any local copy of the same quiz.
+  // We build a flat subjects array (one entry per Course), each with a quizzes
+  // array containing all quizzes for that course (including subfolders).
 
-  const categoryTree = {};
-  const examList = [];
+  const subjectsMap = new Map(); // key = "College/Year/Term/Subject"
 
   for (const row of data) {
-    // Decompose stored path: College / Year / Term / Subject [/ Subfolder]
     const parts = row.path.split("/");
     const [college, year, term, subject] = parts;
-    const subfolder = parts[4] || null; // optional
 
-    // ── Course-level category (depth 3 in local structure) ──────────────────
-    const categoryKey = subject;
-    // Relative dir path from public/data/ — matches what generate-quiz-manifest.js
-    // would compute as `relativePath` for the course directory.
-    const categoryRelDir = `quizzes/${college}/${year}/${term}/${subject}`;
+    // Course-level key
+    const courseKey = `${college}/${year}/${term}/${subject}`;
 
-    if (!categoryTree[categoryKey]) {
-      categoryTree[categoryKey] = {
-        // ID generated from the directory path — same algorithm as courses in
-        // the local manifest (generateUniqueId called with the directory fullPath).
-        id: generateQuizId(categoryRelDir),
+    // Relative path from public/data/ — used for ID generation
+    const courseRelDir = `quizzes/${courseKey}`;
+
+    if (!subjectsMap.has(courseKey)) {
+      subjectsMap.set(courseKey, {
+        id: generateQuizId(courseRelDir),
         name: subject,
         faculty: college,
-        year,
-        term,
-        path: [subject],
-        parent: null,
-        subcategories: [],
-        exams: [],
-        source: "db", // marker so the client knows this category came from DB
-      };
+        year: parseInt(year, 10),
+        term: parseInt(term, 10),
+        quizzes: [],
+      });
     }
 
-    // ── Subfolder category (depth 4+) ────────────────────────────────────────
-    let examCategoryKey = categoryKey;
+    const subjectEntry = subjectsMap.get(courseKey);
 
-    if (subfolder) {
-      const subKey = `${subject}/${subfolder}`;
-
-      if (!categoryTree[subKey]) {
-        categoryTree[subKey] = {
-          name: subfolder,
-          path: [subject, subfolder],
-          parent: categoryKey,
-          subcategories: [],
-          exams: [],
-          source: "db",
-        };
-        // Register as subcategory of parent (avoid duplicates)
-        if (!categoryTree[categoryKey].subcategories.includes(subKey)) {
-          categoryTree[categoryKey].subcategories.push(subKey);
-        }
-      }
-
-      examCategoryKey = subKey;
-    }
-
-    // ── Exam entry ───────────────────────────────────────────────────────────
-    // Relative file path from public/data/ — the exact string hashed by
-    // generate-quiz-manifest.js when it processes an equivalent local file.
+    // Canonical path for ID generation: quizzes/College/Year/Term/Subject[/Subfolder]/filename
     const examRelPath = `quizzes/${row.path}/${row.filename}`;
 
-    // The `path` field stored here is intentionally an absolute URL path
-    // pointing to the quiz-data API endpoint.  It ends in ".json" (since
-    // row.filename always ends in ".json") so the `.endsWith(".json")` guards
-    // in index.js all pass without any changes to that file.
+    // Fetch path for clients — points to quiz-data API endpoint
     const examFetchPath = `/api/quiz-data?path=${encodeURIComponent(examRelPath)}`;
 
-    const exam = {
-      id: generateQuizId(examRelPath), // identical to local ID for same file
-      title: row.title,
+    // Pull metadata from the stored data column (new schema)
+    const quizMeta = row.data?.meta || {};
+    const quizStats = row.data?.stats || {};
+
+    const quizEntry = {
+      id: quizMeta.id || generateQuizId(examRelPath),
+      title: quizMeta.title || row.title,
       path: examFetchPath,
-      category: examCategoryKey,
-      source: "db", // consumed by quizManifest.js merge; transparent to quiz UI
+      questionCount: quizStats.questionCount ?? 0,
+      questionTypes: quizStats.questionTypes ?? [],
+      dbSource: "db", // tells index.js to show the "قاعدة البيانات" badge
     };
 
-    examList.push(exam);
-    // Also attach to the tree node so categoryTree consumers see it inline
-    categoryTree[examCategoryKey].exams.push(exam);
+    // Optional fields — only include if present
+    if (quizMeta.description) quizEntry.description = quizMeta.description;
+    if (quizMeta.author) quizEntry.author = quizMeta.author;
+    if (quizMeta.source) quizEntry.source = quizMeta.source;
+
+    subjectEntry.quizzes.push(quizEntry);
   }
 
-  // Match the sort order of generate-quiz-manifest.js
-  examList.sort((a, b) => (a.category + a.id).localeCompare(b.category + b.id));
+  const subjects = Array.from(subjectsMap.values());
 
   // ── 3. Cache headers ───────────────────────────────────────────────────────
-  // 60 s fresh on the CDN; stale-while-revalidate lets Vercel serve the old
-  // response instantly while refreshing in the background.  This keeps
-  // Supabase Free Plan query counts low while ensuring data is never more
-  // than ~5 minutes stale for any visitor.
   res.setHeader(
     "Cache-Control",
     "public, s-maxage=60, stale-while-revalidate=300",
   );
 
-  return res.status(200).json({ examList, categoryTree });
+  return res.status(200).json({ subjects });
 }

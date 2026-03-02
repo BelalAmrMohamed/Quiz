@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "Final Exam",
+    "id": "2KTVJKDL",
+    "createdAt": "2026-03-01 - 20:37",
+    "path": "quizzes/Computer Science/2/1/Programming 2/Final Exam.json"
+  },
+  "stats": {
+    "questionCount": 36,
+    "questionTypes": [
+      "MCQ"
+    ]
+  },
   "questions": [
     {
       "q": "Which of the following is a valid HTML tag?",
@@ -8,8 +20,7 @@
         "<div>",
         "All of the above"
       ],
-      "correct": 3,
-      "explanation": ""
+      "correct": 3
     },
     {
       "q": "Which of the following CSS properties is used to set the text alignment?",
@@ -19,8 +30,7 @@
         "justify",
         "text-position"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "How do you make a list that is ordered in HTML?",
@@ -30,8 +40,7 @@
         "<list>",
         "<order>"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What's the effect of display: none; in CSS?",
@@ -41,8 +50,7 @@
         "Centers the element",
         "Makes the element semi-transparent"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "Which CSS property controls the text size?",
@@ -52,8 +60,7 @@
         "size",
         "font-style"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "How do you create a drop-down list in HTML?",
@@ -63,8 +70,7 @@
         "<list>",
         "<option>"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "What is the correct HTML for making a checkbox?",
@@ -74,8 +80,7 @@
         "<input type=\"check\">",
         "<input type=\"box\">"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "How do you specify multiple CSS classes on an HTML element?",
@@ -85,8 +90,7 @@
         "class=\"class1 class2\"",
         "class=\"class1,class2\""
       ],
-      "correct": 2,
-      "explanation": ""
+      "correct": 2
     },
     {
       "q": "What is the correct HTML to define an internal style sheet?",
@@ -96,8 +100,7 @@
         "<link rel=\"stylesheet\">",
         "<script>...</script>"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "Which CSS property controls the text size?",
@@ -107,8 +110,7 @@
         "size",
         "font-style"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What does CSS stand for?",
@@ -118,8 +120,7 @@
         "Computer Style Sheets",
         "Colorful Style Sheets"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "How do you create a hyperlink in HTML?",
@@ -129,8 +130,7 @@
         "<a href=\"url\">link</a>",
         "<href=\"url\">link</href>"
       ],
-      "correct": 2,
-      "explanation": ""
+      "correct": 2
     },
     {
       "q": "How can you apply CSS styles to an HTML document?",
@@ -140,8 +140,7 @@
         "External",
         "All of the above"
       ],
-      "correct": 3,
-      "explanation": ""
+      "correct": 3
     },
     {
       "q": "Which property is used to change the background color of an element in CSS?",
@@ -151,8 +150,7 @@
         "bg-color",
         "background"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What is the correct syntax to link a CSS file in HTML?",
@@ -162,8 +160,7 @@
         "<css href=\"style.css\">",
         "<link href=\"style.css\">"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "Which HTML tag is used to define a table?",
@@ -173,8 +170,7 @@
         "<tab>",
         "<tr>"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What does the float property do in CSS?",
@@ -184,8 +180,7 @@
         "Centers elements",
         "Sets the visibility of an element"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What is the default value of the position property in CSS?",
@@ -195,8 +190,7 @@
         "fixed",
         "static"
       ],
-      "correct": 3,
-      "explanation": ""
+      "correct": 3
     },
     {
       "q": "Which of the following is the correct way to comment in CSS?",
@@ -206,8 +200,7 @@
         "/* comment */",
         "# comment"
       ],
-      "correct": 2,
-      "explanation": ""
+      "correct": 2
     },
     {
       "q": "How do you select an element with id \"header\" in CSS?",
@@ -217,8 +210,7 @@
         "header",
         "*header"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What does the display property do in CSS?",
@@ -228,8 +220,7 @@
         "Changes the appearance of text",
         "None of the above"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "Which attribute is used to specify the URL of the page the link goes to?",
@@ -239,8 +230,7 @@
         "link",
         "url"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "What is the purpose of the <meta> tag in HTML?",
@@ -250,8 +240,7 @@
         "To link stylesheets",
         "To create headings"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "What does the margin property do in CSS?",
@@ -261,8 +250,7 @@
         "Sets the color of text",
         "Sets the size of an element"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "Which CSS property is used to set the font family?",
@@ -272,8 +260,7 @@
         "text-font",
         "style"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What is the file extension for CSS files?",
@@ -283,8 +270,7 @@
         ".js",
         ".xml"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "How do you set a background image in CSS?",
@@ -294,8 +280,7 @@
         "background-image: url(image.jpg);",
         "Both A and C"
       ],
-      "correct": 3,
-      "explanation": ""
+      "correct": 3
     },
     {
       "q": "Which of the following property is used to set the spacing between lines of text?",
@@ -305,8 +290,7 @@
         "padding",
         "margin"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What does the position: absolute; property do?",
@@ -316,8 +300,7 @@
         "Positions an element in relation to the document",
         "None of the above"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "Which property is used to change the text color in CSS?",
@@ -327,8 +310,7 @@
         "font-color",
         "style"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "How can you make text bold in HTML?",
@@ -338,8 +320,7 @@
         "Both A and B",
         "<bold>"
       ],
-      "correct": 2,
-      "explanation": ""
+      "correct": 2
     },
     {
       "q": "How do you apply multiple CSS rules to an element?",
@@ -349,8 +330,7 @@
         "Use semi-colons",
         "None of the above"
       ],
-      "correct": 2,
-      "explanation": ""
+      "correct": 2
     },
     {
       "q": "What does the position: relative; property do?",
@@ -360,8 +340,7 @@
         "None",
         "Both A and B"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     },
     {
       "q": "What is the purpose of the alt attribute in an <img> tag?",
@@ -371,8 +350,7 @@
         "Links to another image",
         "None of the above"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "What does the display: block; property do?",
@@ -382,8 +360,7 @@
         "Aligns the element to the center",
         "None of the above"
       ],
-      "correct": 1,
-      "explanation": ""
+      "correct": 1
     },
     {
       "q": "What is the effect of the opacity property in CSS?",
@@ -393,8 +370,7 @@
         "It changes color",
         "None"
       ],
-      "correct": 0,
-      "explanation": ""
+      "correct": 0
     }
   ]
 }
