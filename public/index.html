@@ -489,11 +489,49 @@
             </div>
         </div>
 
-        <main id="contentArea" class="loading" role="main" aria-live="polite" aria-busy="true"
-            aria-label="محتوى الصفحة الرئيسية">
-            <div class="loading-container">
-                <div class="loading-spinner" aria-hidden="true"></div>
-                <p>جارٍ تحضير تجربتك التعليمية...</p>
+        <main id="contentArea" role="main" aria-live="polite" aria-busy="true" aria-label="محتوى الصفحة الرئيسية">
+            <!-- Shimmer skeleton shown while async data loads. JS replaces this on ready. -->
+            <div class="skeleton-grid" id="skeletonLoader" aria-hidden="true">
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-block skeleton-icon"></div>
+                    <div class="skeleton-block skeleton-title"></div>
+                    <div class="skeleton-block skeleton-text"></div>
+                </div>
             </div>
         </main>
 

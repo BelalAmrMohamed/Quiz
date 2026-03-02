@@ -70,6 +70,157 @@ function formatArabicQuestionCount(count) {
   return `${count} سؤال`;
 }
 
+// ============================================================================
+// SUBJECT ICON UTILITY — keyword-based emoji assignment
+// ============================================================================
+
+const SUBJECT_ICON_MAP = [
+  {
+    keywords: [
+      "math",
+      "calculus",
+      "algebra",
+      "statistics",
+      "probability",
+      "رياضيات",
+      "احصاء",
+      "احتمالات",
+      "جبر",
+      "تفاضل",
+      "تكامل",
+      "إحصاء",
+    ],
+    icon: "🎲",
+  },
+  {
+    keywords: ["physics", "فيزياء", "ميكانيكا", "كهرباء"],
+    icon: "⚛️",
+  },
+  {
+    keywords: ["chemistry", "كيمياء"],
+    icon: "🧪",
+  },
+  {
+    keywords: [
+      "programming",
+      "code",
+      "software",
+      "python",
+      "java",
+      "c++",
+      "برمجة",
+      "خوارزميات",
+      "algorithms",
+      "object",
+      "oop",
+    ],
+    icon: "💻",
+  },
+  {
+    keywords: ["database", "sql", "قواعد بيانات", "بيانات"],
+    icon: "🗄️",
+  },
+  {
+    keywords: ["network", "شبكات", "networking", "tcp", "ip"],
+    icon: "🌐",
+  },
+  {
+    keywords: [
+      "artificial intelligence",
+      "machine learning",
+      "deep learning",
+      "ذكاء اصطناعي",
+      "تعلم آلي",
+      "تعلم عميق",
+      "ai",
+      "ml",
+    ],
+    icon: "🤖",
+  },
+  {
+    keywords: ["security", "أمن", "cybersecurity", "cryptography", "تشفير"],
+    icon: "🔒",
+  },
+  {
+    keywords: [
+      "operating system",
+      "os",
+      "نظم تشغيل",
+      "linux",
+      "windows",
+      "unix",
+    ],
+    icon: "⚙️",
+  },
+  {
+    keywords: [
+      "digital",
+      "circuit",
+      "hardware",
+      "دوائر",
+      "رقمي",
+      "إلكترونيات",
+      "electronics",
+      "logic",
+    ],
+    icon: "🔌",
+  },
+  {
+    keywords: ["english", "language", "انجليزي", "لغة", "grammar"],
+    icon: "🗣️",
+  },
+  {
+    keywords: [
+      "data structure",
+      "هياكل بيانات",
+      "linked list",
+      "tree",
+      "graph",
+    ],
+    icon: "🌲",
+  },
+  {
+    keywords: ["web", "html", "css", "javascript", "frontend", "backend"],
+    icon: "🕸️",
+  },
+  {
+    keywords: ["mobile", "android", "ios", "flutter", "موبايل"],
+    icon: "📱",
+  },
+  {
+    keywords: [
+      "computer graphics",
+      "رسومات",
+      "graphics",
+      "image processing",
+      "معالجة صور",
+    ],
+    icon: "🎨",
+  },
+  {
+    keywords: ["computer", "حاسبات", "information", "معلومات"],
+    icon: "🖥️",
+  },
+];
+
+/**
+ * Returns an emoji icon based on the subject/course name.
+ * @param {string} name - The name of the subject or folder
+ * @param {boolean} isSubfolder - True if this is a subfolder inside a course
+ * @returns {string} emoji
+ */
+function getSubjectIcon(name, isSubfolder = false) {
+  if (isSubfolder) return "📁"; // Subfolders always get a folder icon
+
+  const lower = (name || "").toLowerCase();
+  for (const entry of SUBJECT_ICON_MAP) {
+    if (entry.keywords.some((kw) => lower.includes(kw))) {
+      return entry.icon;
+    }
+  }
+  return "📚"; // Default for root categories with no keyword match
+}
+
 // Notifications
 import {
   showNotification,
@@ -277,49 +428,63 @@ function getCategoriesLazy() {
 
 // Initialize after manifest is loaded (called from DOMContentLoaded)
 async function initApp() {
+  // ── Guard: check for redirect BEFORE any rendering ──────────────────────
+  try {
+    const hasVisited = localStorage.getItem("first_visit_complete");
+    const storedUsername = localStorage.getItem("username");
+    const isDefaultName = !storedUsername || storedUsername === "User";
+
+    if (!hasVisited || isDefaultName) {
+      if (isDefaultName) localStorage.removeItem("first_visit_complete");
+      window.location.href = "onboarding.html";
+      return; // Stop — we're redirecting
+    }
+  } catch (e) {
+    console.error("Error checking first-visit state:", e);
+  }
+
+  // ── 1. Immediately render "إمتحاناتك" card — no async wait needed ───────
+  try {
+    if (container) {
+      container.innerHTML = "";
+      container.className = "grid-container";
+      container.setAttribute("aria-busy", "true");
+
+      const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
+      const quizzesCard = createCategoryCard(
+        "إمتحاناتك",
+        userQuizzes.length,
+        false,
+        null,
+        false,
+      );
+      const iconDiv = quizzesCard.querySelector(".icon");
+      if (iconDiv) iconDiv.textContent = "✏️";
+      quizzesCard.onclick = () => renderUserQuizzesView();
+      container.appendChild(quizzesCard);
+    }
+  } catch (e) {
+    console.error("Error rendering immediate user quizzes card:", e);
+  }
+
+  // ── 2. Fetch manifest asynchronously, then render all categories ─────────
   try {
     const manifest = await getManifest();
     categoryTree = manifest.categoryTree;
-
-    // Initialize search manager after data is loaded
     initializeSearchManager();
   } catch (err) {
     console.error("Failed to load quiz manifest:", err);
     categoryTree = {};
   }
 
-  // Check for first time visit
+  // ── 3. Full render now that manifest is ready ────────────────────────────
   try {
-    const hasVisited = localStorage.getItem("first_visit_complete");
-    // Read from the standalone "username" key — this is what userProfile.setUsername()
-    // always syncs to, so it is the authoritative source regardless of whether the
-    // full quiz_user_profile JSON blob exists yet.
-    const storedUsername = localStorage.getItem("username");
-    const isDefaultName = !storedUsername || storedUsername === "User";
-
-    // Redirect to onboarding when EITHER:
-    //   1. The user has never completed onboarding (!hasVisited), OR
-    //   2. They completed onboarding but their username is still the default
-    //      — meaning they skipped the name step or something went wrong.
-    //
-    // IMPORTANT: onboarding.html bounces straight back to index.html when it
-    // sees first_visit_complete === "true".  So if we're redirecting because
-    // of a default username (case 2), we must clear that flag first — otherwise
-    // we get an infinite redirect loop between the two pages.
-    if (!hasVisited || isDefaultName) {
-      if (isDefaultName) {
-        localStorage.removeItem("first_visit_complete");
-      }
-      window.location.href = "onboarding.html";
-      return;
-    }
     renderRootCategories();
   } catch (error) {
-    console.error("Error initializing:", error);
-    renderRootCategories();
+    console.error("Error in renderRootCategories:", error);
+    renderRootCategories(); // retry once
   }
 }
-
 /**
  * Initialize the search manager with course data
  */
@@ -563,7 +728,13 @@ function renderQuizSearchResults(exams) {
         const subCat = categoryTree[subCatKey];
         if (subCat) {
           const itemCount = getCourseItemCount(subCat);
-          const card = createCategoryCard(subCat.name, itemCount, true);
+          const card = createCategoryCard(
+            subCat.name,
+            itemCount,
+            true,
+            null,
+            true,
+          );
           card.onclick = () => renderCategory(subCat);
           fragment.appendChild(card);
         }
@@ -1338,7 +1509,7 @@ function buildUserQuizEntry(id, parsed, titleFallback) {
     id,
     meta: {
       title: parsed.meta?.title || titleFallback || "Untitled",
-      createdAt: new Date().toLocaleString("ar-EG"),
+      createdAt: new Date().toLocaleString("en-US"),
       ...(parsed.meta?.description
         ? { description: parsed.meta.description }
         : {}),
@@ -1444,7 +1615,7 @@ function createUserQuizCard(quiz, index) {
 
   const questionsCount = document.createElement("span");
   const count = qz(quiz, "count");
-  questionsCount.textContent = `📝 ${count} question${count !== 1 ? "s" : ""}`;
+  questionsCount.textContent = `📝 ${formatArabicQuestionCount(count)}`;
   questionsCount.style.cssText = `
     color: var(--color-text-secondary);
     font-size: 0.85rem;
@@ -1688,7 +1859,13 @@ function renderCategory(category) {
       const subCat = categoryTree[subCatKey];
       if (subCat) {
         const itemCount = getCourseItemCount(subCat);
-        const card = createCategoryCard(subCat.name, itemCount, true);
+        const card = createCategoryCard(
+          subCat.name,
+          itemCount,
+          true,
+          null,
+          true,
+        );
         card.onclick = () => renderCategory(subCat);
         fragment.appendChild(card);
       }
@@ -1730,6 +1907,7 @@ function createCategoryCard(
   itemCount,
   isFolder = false,
   courseData = null,
+  isSubfolder = false, // ← new param: true for subcategories inside a course
 ) {
   const card = document.createElement("div");
 
@@ -1754,7 +1932,7 @@ function createCategoryCard(
     `${name}, ${itemCount} ${getItemText(itemCount)}`,
   );
 
-  const icon = isFolder ? "📁" : "📂";
+  const icon = getSubjectIcon(name, isSubfolder);
 
   const iconDiv = document.createElement("div");
   iconDiv.className = "icon";
@@ -2167,6 +2345,22 @@ function createExamCard(exam) {
   card.appendChild(shareBtn);
 
   card.appendChild(h);
+  // Add question type badges if manifest provides them
+  if (Array.isArray(exam.questionTypes) && exam.questionTypes.length > 0) {
+    const typesWrap = document.createElement("div");
+    typesWrap.className = "exam-question-types";
+    typesWrap.setAttribute("aria-label", "أنواع الأسئلة");
+
+    exam.questionTypes.forEach((type) => {
+      const badge = document.createElement("span");
+      badge.className = "question-type-badge";
+      badge.setAttribute("data-type", type);
+      badge.textContent = type;
+      typesWrap.appendChild(badge);
+    });
+
+    card.appendChild(typesWrap);
+  }
   card.appendChild(questionCountLine);
   card.appendChild(btnWrap);
 

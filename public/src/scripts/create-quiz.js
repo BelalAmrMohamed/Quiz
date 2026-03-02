@@ -1613,7 +1613,7 @@ function buildQuizPayload(quizToSave, quizId, existingCreatedAt) {
 
   const meta = {
     title: quizToSave.title?.trim() || "Untitled",
-    createdAt: existingCreatedAt || new Date().toLocaleString("ar-EG"),
+    createdAt: existingCreatedAt || new Date().toLocaleString("en-US"),
   };
   if (quizToSave.description?.trim())
     meta.description = quizToSave.description.trim();

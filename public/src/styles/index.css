@@ -471,11 +471,35 @@ Container
 ============================================================================ */
 
 /* Premium Grid */
+/* Premium Grid — 4 columns desktop → 2 tablet → stacked list mobile */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
   margin-bottom: 48px;
+}
+
+@media (max-width: 1280px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 960px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Mobile: switch from grid → stacked vertical list */
+@media (max-width: 640px) {
+  .grid-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
 }
 
 .user-quizzes-drop-zone {
@@ -810,17 +834,60 @@ Container
   filter: grayscale(1);
 }
 
+/* ============================================================================
+   ERROR STATE
+   ============================================================================ */
+.error-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 32px;
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  border-radius: 20px;
+  color: var(--color-text-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.error-state::before {
+  content: "⚠️";
+  display: block;
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.error-state p {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.error-state button {
+  display: inline-block;
+  padding: 11px 28px;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.error-state button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+}
+
 .empty-state h3 {
   font-size: 1.5rem;
   margin-bottom: 12px;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .grid-container {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -1009,7 +1076,142 @@ Container
   direction: ltr;
 }
 
-/* Responsive adjustments */
+/* ============================================================================
+   SHIMMER SKELETON LOADER
+   ============================================================================ */
+@keyframes shimmer {
+  0% {
+    background-position: -1200px 0;
+  }
+  100% {
+    background-position: 1200px 0;
+  }
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 1280px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 960px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+@media (max-width: 640px) {
+  .skeleton-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+.skeleton-card {
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid var(--color-border-light, #e5e7eb);
+  background: var(--color-surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-height: 180px;
+}
+
+.skeleton-block {
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    var(--color-border, #e5e7eb) 0%,
+    var(--color-border-light, #f3f4f6) 40%,
+    var(--color-border, #e5e7eb) 80%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.skeleton-title {
+  height: 20px;
+  width: 70%;
+}
+
+.skeleton-text {
+  height: 13px;
+  width: 45%;
+}
+
+/* ============================================================================
+   QUESTION TYPE BADGES (exam cards)
+   ============================================================================ */
+.exam-question-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 10px 0 4px;
+}
+
+.question-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.question-type-badge:hover {
+  transform: scale(1.05);
+}
+
+.question-type-badge[data-type="MCQ"] {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.question-type-badge[data-type="Essay"] {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.question-type-badge[data-type="True/False"] {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* Fallback for any other type */
+.question-type-badge:not([data-type="MCQ"]):not([data-type="Essay"]):not(
+    [data-type="True/False"]
+  ) {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--color-accent, #6366f1);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* ============================================================================
+   Responsive adjustments
+   ============================================================================ */
 @media (max-width: 768px) {
   .onboarding-card {
     padding: 32px 24px;
