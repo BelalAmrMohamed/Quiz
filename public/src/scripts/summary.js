@@ -7,6 +7,7 @@ import { exportToHtml } from "../export/export-to-html.js";
 import { exportToPdf } from "../export/export-to-pdf.js";
 import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
+import { buildQuizText } from "../export/export-to-text.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
 
 // Notifications
@@ -95,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("reviewContainer");
   const backBtn = document.getElementById("backHomeBtn");
   const exportMdBtn = document.getElementById("exportMdBtn");
+  const exportTxtBtn = document.getElementById("exportTxtBtn");
   const exportPdfBtn = document.getElementById("exportPdfBtn");
   const exportWordBtn = document.getElementById("exportWordBtn");
   const exportPptxBtn = document.getElementById("exportPptxBtn");
@@ -183,12 +185,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  let isCopied = false;
+  let quizTextBlob = null;
+
   backBtn && (backBtn.onclick = goHome);
   exportMdBtn &&
     (exportMdBtn.onclick = () =>
       withDownloadLoading(exportMdBtn, async () =>
         exportToMarkdown(config, questions, result.userAnswers),
       ));
+  exportTxtBtn &&
+    (exportTxtBtn.onclick = () =>
+      withDownloadLoading(exportTxtBtn, async () => {
+        withDownloadLoading(exportTxtBtn, async () => {
+          try {
+            if (!isCopied) {
+              const text = buildQuizText(config, questions, result.userAnswers);
+              await navigator.clipboard.writeText(text);
+              quizTextBlob = new Blob([text], { type: "text/plain" });
+
+              exportTxtBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>Copy text</strong>`;
+              isCopied = true;
+              showNotification(
+                "تم النسخ",
+                "تم نسخ نص الإختبار! انقر مرة أخرى لتحميله كملف .txt",
+                "success",
+              );
+            } else {
+              const url = URL.createObjectURL(quizTextBlob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${config.title}.txt`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }
+          } catch (e) {
+            console.error(e);
+            showNotification("خطأ", "فشل نسخ أو تحميل الإختبار.", "error");
+          }
+        }).then(() => {
+          if (isCopied) {
+            exportTxtBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>Text (.txt)</strong>`;
+          }
+        });
+      }));
+
   exportPdfBtn &&
     (exportPdfBtn.onclick = () =>
       withDownloadLoading(
