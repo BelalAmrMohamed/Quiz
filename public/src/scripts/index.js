@@ -6,7 +6,11 @@
 import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
 import { SearchManager } from "./search-manager.js";
-import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
+import {
+  extractTextFromFile,
+  parseImportContent,
+  processQuizFile,
+} from "./quiz-processor.js";
 
 let categoryTree = null;
 let searchManager = null;
@@ -18,6 +22,7 @@ import { exportToPdf } from "../export/export-to-pdf.js";
 import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
+import { buildQuizText } from "../export/export-to-text.js";
 import { createUploadButton } from "./adminUpload.js";
 import { isAdminAuthenticated, hasAdminSessionHint } from "./adminAuth.js";
 
@@ -2002,38 +2007,11 @@ function createExamCard(exam) {
               const data = await res.json().catch(() => ({}));
               questions = data.questions || [];
             }
-            let text = `Title: ${exam.title || exam.id}\n\n`;
-            if (exam.description)
-              text += `Description: ${exam.description}\n\n`;
-
-            questions.forEach((q, i) => {
-              text += `${i + 1}. ${q.q}\n\n`;
-              if (q.options.length === 1) {
-                text += `   Formal Answer: ${q.options[0]}\n`;
-              } else {
-                q.options.forEach((opt, j) => {
-                  text += `   ${String.fromCharCode(65 + j)}. ${opt}\n`;
-                });
-                if (
-                  q.correct !== undefined &&
-                  q.correct !== null &&
-                  q.correct !== ""
-                ) {
-                  let formattedCorrect = q.correct;
-                  if (
-                    typeof q.correct === "number" ||
-                    (typeof q.correct === "string" && /^\d+$/.test(q.correct))
-                  ) {
-                    formattedCorrect = String.fromCharCode(
-                      65 + Number(q.correct),
-                    );
-                  }
-                  text += `\n   Correct: ${formattedCorrect}\n`;
-                }
-              }
-              if (q.explanation) text += `\n   Explanation: ${q.explanation}\n`;
-              text += `\n`;
-            });
+            const config = {
+              title: exam.title || exam.id,
+              description: exam.description,
+            };
+            const text = buildQuizText(config, questions);
 
             await navigator.clipboard.writeText(text);
             quizTextBlob = new Blob([text], { type: "text/plain" });
@@ -2466,40 +2444,11 @@ function showUserQuizDownloadPopup(quiz) {
           let text = `Title: ${qz(quiz, "title") || quiz.id}\n\n`;
           if (qz(quiz, "description"))
             text += `Description: ${qz(quiz, "description")}\n\n`;
-
-          questions.forEach((q, i) => {
-            text += `${i + 1}. ${q.q}\n\n`;
-            const isEssay =
-              (Array.isArray(q.options) && q.options.length === 1) ||
-              (!Array.isArray(q.options) && q.answer !== undefined);
-            const modelAnswer = q.answer ?? q.options?.[0];
-            if (isEssay) {
-              text += `   Formal Answer: ${modelAnswer}\n`;
-            } else {
-              (q.options || []).forEach((opt, j) => {
-                text += `   ${String.fromCharCode(65 + j)}. ${opt}\n`;
-              });
-
-              if (
-                q.correct !== undefined &&
-                q.correct !== null &&
-                q.correct !== ""
-              ) {
-                let formattedCorrect = q.correct;
-                if (
-                  typeof q.correct === "number" ||
-                  (typeof q.correct === "string" && /^\d+$/.test(q.correct))
-                ) {
-                  formattedCorrect = String.fromCharCode(
-                    65 + Number(q.correct),
-                  );
-                }
-                text += `\n   Correct: ${formattedCorrect}\n`;
-              }
-            }
-            if (q.explanation) text += `\n   Explanation: ${q.explanation}\n`;
-            text += `\n`;
-          });
+          const config = {
+            title: qz(quiz, "title") || quiz.id,
+            description: qz(quiz, "description"),
+          };
+          text = buildQuizText(config, questions);
 
           await navigator.clipboard.writeText(text);
           quizTextBlob = new Blob([text], { type: "text/plain" });

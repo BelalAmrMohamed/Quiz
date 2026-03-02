@@ -5,7 +5,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: var(--z-above);
+  z-index: var(--z-overlay);
 }
 
 .hamburger {

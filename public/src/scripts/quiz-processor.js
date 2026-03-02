@@ -18,10 +18,8 @@ function loadScript(src) {
   });
 }
 
-/**
- * Extract raw text from a File object.
- * Supports: .json, .txt (plain read), .pdf (pdf.js), .docx (JSZip+XML), .pptx (JSZip+XML)
- */
+// ─── Raw text extractors ──────────────────────────────────────────────────────
+
 async function extractTextFromPdf(file) {
   await loadScript(
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
@@ -50,7 +48,6 @@ async function extractTextFromDocx(file) {
   const docXml = zip.file("word/document.xml");
   if (!docXml) throw new Error("ملف DOCX غير صحيح: لا يوجد document.xml");
   const xmlText = await docXml.async("string");
-  // Strip XML tags and decode entities
   return xmlText
     .replace(/<w:p[ >]/g, "\n<w:p>")
     .replace(/<[^>]+>/g, "")
@@ -91,6 +88,10 @@ async function extractTextFromPptx(file) {
   return fullText.trim();
 }
 
+/**
+ * Extract raw text from a File object (legacy, kept for compatibility).
+ * Supports: .json, .txt (plain read), .pdf (pdf.js), .docx (JSZip+XML), .pptx (JSZip+XML)
+ */
 export async function extractTextFromFile(file) {
   const name = file.name.toLowerCase();
   if (name.endsWith(".json") || name.endsWith(".txt")) {
@@ -107,6 +108,8 @@ export async function extractTextFromFile(file) {
   }
   return file.text();
 }
+
+// ─── JSON parser ──────────────────────────────────────────────────────────────
 
 /** Parse a string as JSON array/object OR numbered text format */
 export function parseImportContent(content, defaultTitle = "") {
@@ -143,10 +146,6 @@ export function parseImportContent(content, defaultTitle = "") {
   }
 
   // --- Numbered text format ---
-  // 1. Question text
-  // A. option / B) option / a. option / - option
-  // Correct: A
-  // Explanation: ...
   const questions = [];
   const blocks = trimmed.split(/(?=^\d+\.)/m);
 
@@ -162,7 +161,6 @@ export function parseImportContent(content, defaultTitle = "") {
     if (!firstMatch) continue;
 
     let q = firstMatch[1].trim();
-    // Collect multi-line question text until first option
     let lineIdx = 1;
     while (
       lineIdx < lines.length &&
@@ -182,21 +180,19 @@ export function parseImportContent(content, defaultTitle = "") {
     const optionLetters = [];
     let correct = 0;
     let explanation = "";
-    let dashOptionIndex = 0; // for dash-style options
+    let dashOptionIndex = 0;
 
     for (let i = lineIdx; i < lines.length; i++) {
       const line = lines[i];
-      // Match: A) / A. / a) / a. (case-insensitive)
       const optMatch = line.match(/^([A-Eا-ي])[.)]\s*(.*)/i);
       if (optMatch) {
         optionLetters.push(optMatch[1].toUpperCase());
         options.push(optMatch[2].trim());
         continue;
       }
-      // Match: - option text (dash-prefixed)
       const dashMatch = line.match(/^-\s+(.*)/);
       if (dashMatch) {
-        const letter = String.fromCharCode(65 + dashOptionIndex); // A, B, C...
+        const letter = String.fromCharCode(65 + dashOptionIndex);
         optionLetters.push(letter);
         options.push(dashMatch[1].trim());
         dashOptionIndex++;
@@ -236,3 +232,66 @@ export function parseImportContent(content, defaultTitle = "") {
   return { questions, meta: defaultTitle ? { title: defaultTitle } : null };
 }
 
+// ─── High-level helper ────────────────────────────────────────────────────────
+
+/**
+ * Process a File and return { questions, meta } directly.
+ *
+ * - For .json: parsed immediately without text round-trip
+ * - For .txt / .pdf / .docx / .pptx: text extracted first, then parsed
+ *
+ * The returned questions always follow the unified schema:
+ *   MCQ/TF  → { q, options[], correct, explanation?, image? }
+ *   Essay   → { q, options: [answer], correct: 0, explanation?, image? }
+ *             OR { q, answer, explanation?, image? } (new-save format)
+ *
+ * @param {File}   file
+ * @param {string} [defaultTitle] - fallback title (usually derived from filename)
+ * @returns {Promise<{ questions: Array, meta: Object|null }>}
+ */
+export async function processQuizFile(file, defaultTitle = "") {
+  const name = file.name.toLowerCase();
+
+  if (name.endsWith(".json")) {
+    try {
+      const text = await file.text();
+      const trimmed = text.trim();
+      const data = JSON.parse(trimmed);
+
+      // Flat array
+      if (Array.isArray(data)) {
+        return {
+          questions: data,
+          meta: defaultTitle ? { title: defaultTitle } : null,
+        };
+      }
+
+      // Object with questions key
+      const questions = Array.isArray(data.questions) ? data.questions : null;
+      if (!questions) throw new Error("لا توجد أسئلة في ملف JSON");
+
+      const meta =
+        data.meta ||
+        (data.title
+          ? { title: data.title, description: data.description || "" }
+          : defaultTitle
+            ? { title: defaultTitle }
+            : null);
+
+      return { questions, meta };
+    } catch (e) {
+      throw new Error(`خطأ في قراءة ${file.name}: ${e.message}`);
+    }
+  }
+
+  // For non-JSON: extract text → parse
+  const text = await extractTextFromFile(file);
+  const title =
+    defaultTitle ||
+    file.name
+      .replace(/\.(txt|pdf|docx|pptx)$/i, "")
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return parseImportContent(text, title);
+}
