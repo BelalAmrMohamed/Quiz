@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "title": "2025 Mid",
+    "createdAt": "3/4/2026, 9:00:13 PM",
+    "id": "UGK3N3C5",
+    "path": "quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2025 Mid.json"
+  },
+  "stats": {
+    "questionCount": 16,
+    "questionTypes": [
+      "MCQ"
+    ]
+  },
+  "questions": [
+    {
+      "q": "1. If `V(x) = 3`, then `V(x/3 - 3)` = ...",
+      "options": [
+        "1/3",
+        "-2",
+        "1",
+        "1/9"
+      ],
+      "correct": 0,
+      "explanation": "V(aX + b) = a² V(X). So V(x/3 - 3) = (1/3)² × V(x) = (1/9) × 3 = 3/9 = 1/3."
+    },
+    {
+      "q": "2. For a continuous random variable X with a probability density function\n```f(x) = k x³ ,  0 ≤ x ≤ 2\n       0     ,  o.w.```\nthen the value of k is",
+      "options": [
+        "16",
+        "1/4",
+        "4",
+        "1/16"
+      ],
+      "correct": 1,
+      "image": "./assets/quiz-media/mid-2025.jpg",
+      "explanation": "For f(x) to be a valid PDF, ∫[0 to 2] kx³ dx = 1.\nk × [x⁴/4] from 0 to 2 = k × 16/4 = 4k = 1, so k = 1/4."
+    },
+    {
+      "q": "3. The value of k when the probability mass function is given by:\n```P(x) = x/k ,  x = 1, 2, 3, 4\n        0   ,  o.w.```",
+      "options": [
+        "15",
+        "10",
+        "1/10",
+        "1/15"
+      ],
+      "correct": 1,
+      "image": "./assets/quiz-media/mid-2025-2.jpg",
+      "explanation": "ΣP(x) = 1 ⇒ (1+2+3+4)/k = 1 ⇒ 10/k = 1 ⇒ k = 10."
+    },
+    {
+      "q": "4. A company producing electric relays has three manufacturing plants producing 50%, 30%, and 20%, respectively, of its product. Suppose that the probabilities that a relay manufactured by these plants is defective are 0.02, 0.05, and 0.01, respectively.\n\ni) If a relay is selected at random from the output of the company, what is the probability that it is defective?",
+      "options": [
+        "0.027",
+        "0.05",
+        "0.002",
+        "None of them"
+      ],
+      "correct": 0,
+      "explanation": "Using the Total Probability Theorem:\nP(D) = P(D|B₁)P(B₁) + P(D|B₂)P(B₂) + P(D|B₃)P(B₃)\n= (0.02)(0.5) + (0.05)(0.3) + (0.01)(0.2)\n= 0.010 + 0.015 + 0.002\n= 0.027"
+    },
+    {
+      "q": "4. A company producing electric relays has three manufacturing plants producing 50%, 30%, and 20%, respectively, of its product. Suppose that the probabilities that a relay manufactured by these plants is defective are 0.02, 0.05, and 0.01, respectively.\n\nii) If a relay selected at random is found to be defective, what is the probability that it was manufactured by plant 2?",
+      "options": [
+        "0.65",
+        "0.22",
+        "0.88",
+        "None of them"
+      ],
+      "correct": 3,
+      "explanation": "Using Bayes' Theorem:\nP(B₂|D) = P(D|B₂) × P(B₂) / P(D)\n= (0.05 × 0.3) / 0.027\n= 0.015 / 0.027\n= 5/9 ≈ 0.5556\n\nThis value does not match any of options a, b, or c, so the answer is: None of them."
+    },
+    {
+      "q": "5. If `A ⊂ B`, then `p(Aᶜ | B)` = ...",
+      "options": [
+        "1 - p(B|Aᶜ)",
+        "P(A)",
+        "1 - P(A)/P(B)",
+        "None of them"
+      ],
+      "correct": 2,
+      "explanation": "If A ⊂ B, then Aᶜ ∩ B = B \\ A, so P(Aᶜ ∩ B) = P(B) - P(A).\nP(Aᶜ|B) = P(Aᶜ ∩ B) / P(B) = [P(B) - P(A)] / P(B) = 1 - P(A)/P(B)."
+    },
+    {
+      "q": "6. If `p(A) = 0.5`, and `p(B|A) = 1/3`, then `p(Bᶜ|A)` = ...",
+      "options": [
+        "1/3",
+        "2/3",
+        "0.5",
+        "None of them"
+      ],
+      "correct": 1,
+      "explanation": "P(Bᶜ|A) = 1 - P(B|A) = 1 - 1/3 = 2/3."
+    },
+    {
+      "q": "7. If `A = B`, Then `P(A|B)` = ...",
+      "options": [
+        "P(B|A)",
+        "P(A)",
+        "P(B)",
+        "None of them"
+      ],
+      "correct": 1,
+      "explanation": "If A = B, then P(A|B) = P(A ∩ B)/P(B) = P(A)/P(A) = 1. But also P(A) = P(B) so P(A|B) = P(A∩B)/P(B) = P(A)/P(B) = P(B)/P(B) = 1. More directly: since A = B, P(A|B) = P(B|A) = P(A)/P(B) = 1. Since both options P(B|A) and P(A) are circled/marked on the exam, the accepted answer is P(A) (= P(B) = 1 in this case)."
+    },
+    {
+      "q": "8. If the knowledge that an event A has occurred implies that a second event B cannot occur, the events A and B are said to be",
+      "options": [
+        "Independent",
+        "Mutually exclusive",
+        "A ⊂ B",
+        "B ⊂ A"
+      ],
+      "correct": 1,
+      "explanation": "If A occurring means B cannot occur, then A ∩ B = ∅, which is the definition of mutually exclusive events."
+    },
+    {
+      "q": "9. If A and B be independent events in a sample space S, then which of the following statement(s) are true",
+      "options": [
+        "A and Bᶜ are independent",
+        "B and Aᶜ are independent",
+        "Aᶜ and Bᶜ are independent",
+        "All of preceding"
+      ],
+      "correct": 3,
+      "explanation": "If A and B are independent, then all pairs involving their complements are also independent: A & Bᶜ, Aᶜ & B, and Aᶜ & Bᶜ are all independent pairs."
+    },
+    {
+      "q": "10. A code consists of a digit chosen from 0 to 5 followed by a letter of the alphabet.\nWhat is the probability the code is 5Z?",
+      "options": [
+        "1/260",
+        "1/156",
+        "1/182",
+        "None of them"
+      ],
+      "correct": 1,
+      "explanation": "Digits from 0 to 5: 6 possible digits. Letters of the alphabet: 26 possible letters.\nTotal codes = 6 × 26 = 156.\nP(code is 5Z) = 1/156."
+    },
+    {
+      "q": "11. If `A` and `B` are mutually exclusive events, then `p(B|A)` = ...",
+      "options": [
+        "1 - P(A)",
+        "P(B)",
+        "P(A)",
+        "0"
+      ],
+      "correct": 3,
+      "explanation": "If A and B are mutually exclusive, A ∩ B = ∅, so P(B|A) = P(A ∩ B)/P(A) = 0/P(A) = 0."
+    },
+    {
+      "q": "12. If `A` and `B` are independent events, Then `P(A|B)` = ...",
+      "options": [
+        "P(B|A)",
+        "P(A)",
+        "P(B)",
+        "None of them"
+      ],
+      "correct": 1,
+      "explanation": "If A and B are independent, P(A ∩ B) = P(A)P(B), so P(A|B) = P(A ∩ B)/P(B) = P(A)P(B)/P(B) = P(A)."
+    },
+    {
+      "q": "13. The bag contains 5 red marbles, 4 green marbles and 1 blue marble. A marble is chosen at random from the bag and not replaced; then a second marble is chosen. What is the probability both marbles are green?",
+      "options": [
+        "2/15",
+        "1/4",
+        "0.5",
+        "4/10"
+      ],
+      "correct": 0,
+      "explanation": "P(both green) = P(1st green) × P(2nd green | 1st green)\n= (4/10) × (3/9)\n= 12/90\n= 2/15."
+    },
+    {
+      "q": "14. In Exton School, 60% of the boys play baseball and 24% of the boys play baseball and football. What percent of those that play baseball also play football?",
+      "options": [
+        "0.4",
+        "0.6",
+        "0.24",
+        "4"
+      ],
+      "correct": 0,
+      "explanation": "P(football | baseball) = P(baseball ∩ football) / P(baseball) = 0.24 / 0.60 = 0.4."
+    },
+    {
+      "q": "15. If `B ⊂ A`, then `p(A|B)` = ...",
+      "options": [
+        "1",
+        "P(A)",
+        "P(A)/P(B)",
+        "0"
+      ],
+      "correct": 0,
+      "explanation": "If B ⊂ A, then every outcome in B is also in A, so A ∩ B = B.\nP(A|B) = P(A ∩ B)/P(B) = P(B)/P(B) = 1."
+    }
+  ]
+}
