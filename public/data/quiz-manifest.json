@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-04T19:03:15.115Z",
+  "generatedAt": "2026-03-05T06:56:35.079Z",
   "dataRoot": "data/quizzes",
   "subjects": [
     {
@@ -1157,7 +1157,7 @@
         {
           "id": "22GYF6BY",
           "title": "2020 2021 Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020_2021 Final.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020 2021 Final.json",
           "questionCount": 18,
           "questionTypes": [
             "Essay",
@@ -1167,7 +1167,7 @@
         {
           "id": "MEN4UJWM",
           "title": "2020 2021 Summer Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020_2021 Summer Final.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2020 2021 Summer Final.json",
           "questionCount": 19,
           "questionTypes": [
             "Essay",
@@ -1177,7 +1177,7 @@
         {
           "id": "NBFAKG6E",
           "title": "2021 2022 Mid",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2021_2022 Mid.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2021 2022 Mid.json",
           "questionCount": 10,
           "questionTypes": [
             "Essay",
@@ -1187,7 +1187,7 @@
         {
           "id": "F2FBKM3G",
           "title": "2022 2023 Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2022_2023 Final.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2022 2023 Final.json",
           "questionCount": 10,
           "questionTypes": [
             "Essay"
@@ -1196,7 +1196,7 @@
         {
           "id": "IVRGWRUK",
           "title": "2023 2024 Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2023_2024 Final.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2023 2024 Final.json",
           "questionCount": 19,
           "questionTypes": [
             "Essay",
@@ -1206,11 +1206,20 @@
         {
           "id": "YPXHQWGU",
           "title": "2024 2025 Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2024_2025 Final.json",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2024 2025 Final.json",
           "questionCount": 22,
           "questionTypes": [
             "Essay",
             "MCQ"
+          ]
+        },
+        {
+          "id": "4STRBLI5",
+          "title": "2025 - 2026 Summer Final",
+          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2025 - 2026 Summer Final.json",
+          "questionCount": 9,
+          "questionTypes": [
+            "Essay"
           ]
         },
         {
@@ -1220,15 +1229,6 @@
           "questionCount": 16,
           "questionTypes": [
             "MCQ"
-          ]
-        },
-        {
-          "id": "4STRBLI5",
-          "title": "2025 - 2026 Summer Final",
-          "path": "/data/quizzes/Computer Science/2/2/Probability and Statistics/إمتحانات الدكتور السابقة/2025_2026 Summer Final.json",
-          "questionCount": 9,
-          "questionTypes": [
-            "Essay"
           ]
         },
         {
