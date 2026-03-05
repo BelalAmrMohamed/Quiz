@@ -8,18 +8,31 @@
   },
   "stats": {
     "questionCount": 19,
-    "questionTypes": ["Essay", "MCQ"]
+    "questionTypes": [
+      "Essay",
+      "MCQ"
+    ]
   },
   "questions": [
     {
       "q": "1. If `A ⊂ B`, Then `P(B|A)` =",
-      "options": ["P(A|B)", "P(A)", "P(B)", "None of them"],
+      "options": [
+        "P(A|B)",
+        "P(A)",
+        "P(B)",
+        "None of them"
+      ],
       "correct": 2,
       "explanation": "If A ⊂ B, then every outcome in A is also in B, so A ∩ B = A.\nP(B|A) = P(A ∩ B) / P(A) = P(A) / P(A) = 1.\nBut also P(B) ≥ P(A) and P(B|A) = 1, which equals P(B) only if P(B) = 1. More precisely, P(B|A) = P(B∩A)/P(A) = P(A)/P(A) = 1. Since none of the options explicitly equal 1, the closest interpretation from the exam answer key is P(B) — as when A ⊂ B, P(A|B) = P(A)/P(B) ≠ 1, but P(B|A) = 1 which matches P(B) only when P(B)=1. The standard exam answer here is P(B) based on the logic P(B|A) = P(A∩B)/P(A) = P(A)/P(A) = 1, and since P(B) is the closest valid expression."
     },
     {
       "q": "2. If the knowledge that an event A has occurred implies that a second event B cannot occur, the events A and B are said to be",
-      "options": ["Independent", "Mutually exclusive", "A ⊂ B", "B ⊂ A"],
+      "options": [
+        "Independent",
+        "Mutually exclusive",
+        "A ⊂ B",
+        "B ⊂ A"
+      ],
       "correct": 1,
       "explanation": "If A occurring means B cannot occur, then A ∩ B = ∅, which is the definition of mutually exclusive events."
     },
@@ -36,47 +49,82 @@
     },
     {
       "q": "4. A code consists of a digit chosen from 0 to 7 followed by a letter of the alphabet.\nWhat is the probability the code is 7Z?",
-      "options": ["1/260", "1/156", "1/208", "None of them"],
+      "options": [
+        "1/260",
+        "1/156",
+        "1/208",
+        "None of them"
+      ],
       "correct": 2,
       "explanation": "Digits from 0 to 7: 8 possible digits. Letters of the alphabet: 26 possible letters.\nTotal codes = 8 × 26 = 208.\nP(code is 7Z) = 1/208."
     },
     {
       "q": "5. For a continuous random variable X with a probability density function\n```f(x) = k(x² + 1) ,  0 ≤ x ≤ 1\n        0          ,  o.w.```\nthen the value of k is",
-      "options": ["1/2", "3/4", "1/3", "4/5"],
+      "options": [
+        "1/2",
+        "3/4",
+        "1/3",
+        "4/5"
+      ],
       "correct": 1,
       "image": "./assets/quiz-media/2020_2021-summer-final-2.jpg",
       "explanation": "∫[0 to 1] k(x² + 1) dx = 1\nk × [x³/3 + x] from 0 to 1 = k × (1/3 + 1) = k × 4/3 = 1\nk = 3/4."
     },
     {
       "q": "6. The value of k when the probability mass function is given by:\n```P(x) = x/k ,  x = 1, 2, 3\n        0   ,  o.w.```",
-      "options": ["9", "6", "1/9", "1/6"],
+      "options": [
+        "9",
+        "6",
+        "1/9",
+        "1/6"
+      ],
       "correct": 1,
       "image": "./assets/quiz-media/2020_2021-summer-final-6.jpg",
       "explanation": "ΣP(x) = 1 ⇒ (1 + 2 + 3)/k = 1 ⇒ 6/k = 1 ⇒ k = 6."
     },
     {
       "q": "7. The cumulative distribution function for the random variable X for\n```f(x) = 2x ,  0 ≤ x < 1\n        0  ,  o.w.```\nis given by",
-      "options": ["1 - x", "x - 1", "x²", "None of them"],
+      "options": [
+        "1 - x",
+        "x - 1",
+        "x²",
+        "None of them"
+      ],
       "correct": 2,
       "image": "./assets/quiz-media/2020_2021-summer-final-7.jpg",
       "explanation": "F(x) = ∫[0 to x] 2t dt = [t²] from 0 to x = x², for 0 ≤ x < 1."
     },
     {
       "q": "8. If `f(x) = 2e^(-2x)`, `0 ≤ x < ∞`, then the value of x such that `p(X > x) = 0.1` is",
-      "options": ["1.15", "2.3", "-2.3", "None of them"],
+      "options": [
+        "1.15",
+        "2.3",
+        "-2.3",
+        "None of them"
+      ],
       "correct": 0,
       "image": "./assets/quiz-media/2020_2021-summer-final-8.jpg",
       "explanation": "P(X > x) = ∫[x to ∞] 2e^(-2t) dt = [-e^(-2t)] from x to ∞ = e^(-2x)\nSetting e^(-2x) = 0.1:\n-2x = ln(0.1) = -2.3026\nx = 2.3026/2 ≈ 1.15."
     },
     {
       "q": "9. If the variance of x `v(x) = 2`, then `v(x/2 - 5)` =",
-      "options": ["1/2", "2", "4", "1/4"],
+      "options": [
+        "1/2",
+        "2",
+        "4",
+        "1/4"
+      ],
       "correct": 0,
       "explanation": "V(aX + b) = a² V(X).\nV(x/2 - 5) = (1/2)² × V(x) = (1/4) × 2 = 1/2."
     },
     {
       "q": "10. `E(ax + b)` =",
-      "options": ["a² E(x + b)", "aE(x)", "aE(x) + b", "None of them"],
+      "options": [
+        "a² E(x + b)",
+        "aE(x)",
+        "aE(x) + b",
+        "None of them"
+      ],
       "correct": 2,
       "explanation": "By linearity of expectation: E(ax + b) = a·E(x) + b."
     },

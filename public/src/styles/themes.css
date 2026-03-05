@@ -111,6 +111,10 @@
   --z-toast: 7000;
   --z-notification: 10000;
   --z-modal-top: 11000;
+
+  /* Sidebar */
+  --sidebar-collapsed-width: 64px;
+  --sidebar-expanded-width: 240px;
 }
 
 /* ==================== DARK SLATE THEME ==================== */

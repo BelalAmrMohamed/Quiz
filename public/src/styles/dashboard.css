@@ -25,7 +25,15 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  padding: 40px 24px;
+  /*
+   * DO NOT use padding shorthand here — side-menu.css owns padding-right
+   * (the sidebar side). Use individual properties so the shorthand doesn't
+   * clobber the sidebar offset.
+   */
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 24px; /* physical left — the non-sidebar side */
+  /* padding-right is controlled by side-menu.css */
   position: relative;
   overflow-x: hidden;
 }
@@ -224,11 +232,34 @@ body {
   opacity: 0.95;
 }
 
+/*
+ * Badges card: JS moves this out of the right sidebar column and inserts it
+ * after .level-progress-card so it never hides under the fixed side-menu.
+ * Make it full-width and display the grid properly outside the 2-col layout.
+ */
+.sidebar-card.badges-relocated {
+  margin-bottom: 30px;
+}
+
+.sidebar-card.badges-relocated .badge-display-grid {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
 /* Dashboard Layout */
 .dashboard-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 32px;
+}
+
+/*
+ * Badges + leaderboard sidebar: ensure this column is never obscured by the
+ * fixed side-menu panel on the right. The body already has padding-right set
+ * by side-menu.css, but we add an explicit max-width cap on the layout to
+ * guarantee the 1fr column never overlaps the sidebar even on narrow desktops.
+ */
+.dashboard-layout > *:last-child {
+  min-width: 0; /* prevent grid blowout */
 }
 
 /* History Items */
@@ -514,7 +545,10 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
   body {
-    padding: 24px 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    padding-left: 16px;
+    /* padding-right is controlled by side-menu.css (16px on mobile) */
   }
 
   .dashboard-layout {

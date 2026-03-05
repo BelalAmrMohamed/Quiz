@@ -3,13 +3,6 @@
 // ============================================================================
 
 import { userProfile } from "./userProfile.js";
-import {
-  extractMetadata,
-  filterCourses,
-  getSubscribedCourses,
-  getAvailableYears,
-  getAvailableTerms,
-} from "./filterUtils.js";
 
 export class SearchManager {
   constructor(containerSelector, onSearchCallback, getNavigationStack) {

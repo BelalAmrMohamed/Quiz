@@ -161,6 +161,7 @@ function renderHistory(user) {
           <div class="history-score ${
             percentage >= 60 ? "pass" : "fail"
           }">${percentage}%</div>
+          ${exam ? `<a href="quiz.html?id=${attempt.examId}" class="nav-btn primary" style="padding:8px 14px;font-size:0.8rem;text-decoration:none;">اذهب إلى الإمتحان</a>` : ""}
           <button class="delete-btn" onclick="deleteHistory(${index})">🗑️</button>
         </div>
       </div>`;
@@ -196,6 +197,7 @@ function renderBookmarks(user) {
               <small>Question #${parseInt(qIdx) + 1}</small>
             </div>
             <div class="history-actions">
+              <a href="quiz.html?id=${examId}&q=${qIdx}" class="nav-btn primary" style="padding:8px 14px;font-size:0.8rem;text-decoration:none;">اذهب إلى السؤال</a>
               <button class="unstar-btn" onclick="removeBookmark('${key}')">⭐</button>
             </div>
           </div>`;
@@ -218,6 +220,18 @@ function renderBadges(user) {
           : "";
       })
       .join("") || "Earn badges by completing quizzes!";
+
+  // Move the badges sidebar-card out of the right column and into the main
+  // content area, right after the level-progress-card. Prevents it from
+  // being hidden behind the fixed side-menu and makes it visible on mobile.
+  const badgeCard = container.closest(".sidebar-card");
+  const levelCard = document.querySelector(".level-progress-card");
+  if (badgeCard && levelCard && levelCard.parentNode) {
+    if (!badgeCard.classList.contains("badges-relocated")) {
+      badgeCard.classList.add("badges-relocated");
+      levelCard.parentNode.insertBefore(badgeCard, levelCard.nextSibling);
+    }
+  }
 }
 
 function renderLeaderboard(user) {

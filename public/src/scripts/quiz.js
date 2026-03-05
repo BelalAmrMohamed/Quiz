@@ -1140,7 +1140,7 @@ const maybeAutoSubmit = () => {
       try {
         if (
           await confirmationNotification(
-            "You have answered all questions. Submit now?",
+            "لقد أجبت على جميع الأسئلة. هل تريد تسليم الإمتحان الآن؟",
           )
         ) {
           finish(true);

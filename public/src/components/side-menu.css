@@ -1,15 +1,105 @@
-/* ─── Side Menu ─────────────────────────────────────────────── */
+/* ============================================================================
+   SIDEBAR — Persistent Collapsible Icon-Rail
+   Desktop: 64px collapsed → 240px expanded (left-fixed, full-height)
+   Mobile (≤768px): hidden off-screen, slides in from left with backdrop
+   ============================================================================ */
 
-/* Hamburger button */
-.menu-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: var(--z-overlay);
+/* ── CSS Variables ────────────────────────────────────────────────────────── */
+:root {
+  --sidebar-collapsed-width: 64px;
+  --sidebar-expanded-width: 240px;
 }
 
-.hamburger {
+/* ── Body padding shifts with sidebar (RTL: sidebar is on the right) ────── */
+body {
+  /* 16px gap added so content never visually touches the sidebar edge */
+  padding-right: calc(var(--sidebar-collapsed-width) + 16px);
+  transition: padding-right 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.sidebar-expanded {
+  padding-right: calc(var(--sidebar-expanded-width) + 16px);
+}
+
+/* ── Sidebar Panel ────────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0; /* RTL: anchored to right edge */
+  left: auto;
+  height: 100%;
+  width: var(--sidebar-collapsed-width);
+  background: var(--color-background);
+  border-left: 1px solid var(--color-border); /* border on the inner/left edge */
+  z-index: var(--z-overlay, 500);
   display: flex;
+  flex-direction: column;
+  /* NO overflow:hidden here — it clips the toggle button & button lift transforms.
+     Overflow control is applied per-section (nav has overflow-y: auto). */
+  transition: width 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.expanded {
+  width: var(--sidebar-expanded-width);
+}
+
+/* ── Desktop Expand/Collapse Toggle ──────────────────────────────────────── */
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-background-secondary, #f5f5f5);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  position: absolute;
+  top: 22px;
+  left: -14px; /* straddles the LEFT edge of the right-anchored sidebar */
+  right: auto;
+  z-index: 10;
+  color: var(--color-text);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0, 0, 0, 0.12));
+}
+
+.sidebar-toggle:hover {
+  background: var(--color-primary-light, #e8f0fe);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+.sidebar-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The SVG path M15 18l-6-6 6-6 is a left-pointing chevron (‹).
+   Collapsed → points LEFT (‹) meaning "expand"
+   Expanded  → rotate 180° → points RIGHT (›) meaning "collapse" */
+.toggle-chevron {
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.expanded .toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Mobile Close Button — REMOVED (hamburger is the toggle on mobile) ────── */
+/* The .close-menu element exists in the HTML but is always hidden.          */
+.close-menu {
+  display: none !important;
+}
+
+/* ── Mobile Hamburger (hidden on desktop) ────────────────────────────────── */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: calc(var(--z-overlay, 500) + 2);
   align-items: center;
   justify-content: center;
   width: 44px;
@@ -35,7 +125,6 @@
   outline-offset: 2px;
 }
 
-/* Hamburger → X animation */
 .hamburger-icon .bar {
   transform-origin: center;
   transition:
@@ -54,13 +143,13 @@
   transform: translateY(-4.5px) rotate(-45deg);
 }
 
-/* Backdrop */
+/* ── Backdrop (mobile overlay) ───────────────────────────────────────────── */
 .side-menu-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(2px);
-  z-index: calc(var(--z-overlay) - 1);
+  z-index: calc(var(--z-overlay, 500) - 1);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -71,131 +160,119 @@
   pointer-events: auto;
 }
 
-/* Side menu panel */
-.side-menu {
-  position: fixed;
-  top: 0;
-  right: -360px;
-  width: 340px;
-  height: 100%;
-  background: var(--color-background, #fff);
-  box-shadow: var(--shadow-lg);
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: var(--z-overlay);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.side-menu.open {
-  right: 0;
-}
-
-/* Menu header */
-.menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 20px 12px;
-  border-bottom: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.menu-header h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-}
-
-.close-menu {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 1px solid var(--color-border);
-  background: var(--color-background-secondary, #f5f5f5);
-  color: var(--color-text);
-  transition:
-    transform 0.25s ease,
-    background-color 0.2s ease;
-}
-
-.close-menu:hover {
-  transform: rotate(90deg);
-  background: var(--color-primary-light, #e8f0fe);
-}
-
-.close-menu:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Scrollable nav */
-nav {
+/* ── Nav Scroll Container ────────────────────────────────────────────────── */
+.sidebar nav {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 16px 16px 20px;
+  /*
+   * overflow-x: clip (not hidden) — critical distinction:
+   *   hidden → creates a Block Formatting Context (BFC) that traps children's
+   *            translateY transforms inside the element's paint bounds, causing
+   *            theme-selector-btn:active translateY(-2px) to be clipped at top.
+   *   clip   → clips visually without creating a BFC, so children's transforms
+   *            can paint outside the block edge. Supported in all modern browsers.
+   */
+  overflow-x: clip;
+  padding: 64px 8px 24px;
   display: flex;
   flex-direction: column;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
+  /*
+   * RTL scrollbar fix: the document is dir="rtl", which moves the scrollbar
+   * to the LEFT side of scroll containers. Setting direction: ltr on the nav
+   * forces the scrollbar back to the RIGHT edge (closer to the sidebar's
+   * inner border). The individual .menu-item elements already set their own
+   * direction: rtl, so Arabic text alignment is unaffected.
+   */
+  direction: ltr;
 }
 
-nav::-webkit-scrollbar {
-  width: 5px;
+.sidebar nav::-webkit-scrollbar {
+  width: 4px;
 }
-nav::-webkit-scrollbar-track {
+.sidebar nav::-webkit-scrollbar-track {
   background: transparent;
 }
-nav::-webkit-scrollbar-thumb {
+.sidebar nav::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 4px;
 }
-nav::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-tertiary);
-}
 
-/* Menu items */
+/* ── Menu Items ──────────────────────────────────────────────────────────── */
 .menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px;
   text-decoration: none;
   border-radius: 10px;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   background: none;
   border: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
   text-align: right;
-  direction: inherit;
+  direction: rtl;
+  white-space: nowrap;
+  position: relative;
   transition:
     background-color 0.18s ease,
-    transform 0.18s ease,
     color 0.18s ease;
 }
 
-.menu-item .icon {
-  font-size: 2rem;
+/*
+ * Fix: JS shows install-app via style.display = "block", which breaks flex
+ * centering in the collapsed sidebar. Force display:flex !important so the
+ * icon centers correctly regardless of the inline style value.
+ */
+.menu-item.install-app {
+  display: flex !important;
+}
 
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 8px;
+.menu-item svg {
+  flex-shrink: 0;
+  min-width: 22px;
+}
+
+/* Collapsed: center icons perfectly.
+ * CRITICAL — gap must be 0 here: the .menu-label still exists in the DOM with
+ * max-width: 0, but the flex gap (10px) between icon and label still pushes
+ * the icon ~5px off-center. Setting gap: 0 when collapsed ensures pixel-perfect
+ * centering of every icon within the 64px rail. */
+.sidebar:not(.expanded) .menu-item {
+  justify-content: center;
+  padding: 10px 0;
+  gap: 0;
+}
+
+/* Labels: hidden when collapsed */
+.menu-label {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition:
+    opacity 0s,
+    max-width 0s;
+  pointer-events: none;
+  flex: 1;
+  text-align: right;
+}
+
+.sidebar.expanded .menu-label {
+  opacity: 1;
+  max-width: 180px;
+  pointer-events: auto;
+  transition:
+    opacity 120ms ease 80ms,
+    max-width 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .menu-item:hover {
   background: var(--color-background-secondary, #f5f5f5);
-  transform: translateX(-3px); /* RTL: slide left toward content */
 }
 
 .menu-item:focus-visible {
@@ -207,50 +284,111 @@ nav::-webkit-scrollbar-thumb:hover {
 .menu-item.active {
   background: var(--color-primary-light, #e8f0fe);
   color: var(--color-primary);
-  font-weight: 700;
 }
 
-/* Divider */
+/* ── Tooltips (collapsed state, desktop only) ────────────────────────────── */
+/* Sidebar is on the RIGHT → tooltips appear to the LEFT of each icon       */
+.sidebar:not(.expanded) [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 10px); /* left of the icon, toward the content area */
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-surface, #fff);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: var(--shadow-md);
+  transition: opacity 0.15s ease 0.35s;
+  z-index: 1000;
+  direction: rtl;
+}
+
+.sidebar:not(.expanded) [data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
 .menu-divider {
   height: 1px;
   background: var(--color-border);
-  margin: 10px 0;
+  margin-block: 8px; /* logical: top/bottom only — no physical left/right */
+  margin-inline: 4px; /* logical: replaces margin: 8px 4px */
   flex-shrink: 0;
 }
 
-/* Theme section */
+/* ── Theme Controls Section ──────────────────────────────────────────────── */
 .theme-controls-section {
   margin-top: 4px;
 }
 
-.theme-section-header,
-.animation-section-header {
+.theme-section-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+  padding: 8px;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--color-text-tertiary, #888);
-  margin-bottom: 10px;
+  white-space: nowrap;
+  position: relative;
 }
 
-.animation-section-header {
-  margin-top: 18px;
+.sidebar:not(.expanded) .theme-section-header {
+  justify-content: center;
+  padding: 8px 0;
 }
 
+/* ── Items visible only when expanded ────────────────────────────────────── */
+.sidebar-expanded-only {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0s,
+    max-height 0s;
+}
+
+.sidebar.expanded .sidebar-expanded-only {
+  opacity: 1;
+  max-height: 600px;
+  overflow: visible; /* allow theme-selector-btn translateY(-2px) not to clip */
+  pointer-events: auto;
+  transition:
+    opacity 150ms ease 100ms,
+    max-height 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+/* ── Theme Selector Grid ─────────────────────────────────────────────────── */
 .theme-selector-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-block: 4px 6px; /* logical top/bottom — replaces margin: 4px 4px 6px */
+  margin-inline: 4px; /* logical left/right  */
+  /*
+   * padding-top gives vertical room for the translateY(-2px) lift on hover/active.
+   * Since .sidebar nav now uses overflow-x: clip (not hidden), the nav no longer
+   * creates a BFC that would trap this upward movement.
+   */
+  padding-top: 4px;
+  overflow: visible;
 }
 
 .theme-selector-btn {
   border: 2px solid var(--color-border);
-  border-radius: 12px;
-  padding: 13px 8px;
+  border-radius: 10px;
+  padding: 10px 4px;
   cursor: pointer;
   background: none;
   transition:
@@ -260,7 +398,7 @@ nav::-webkit-scrollbar-thumb:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 [data-theme="dark-slate"] .theme-selector-btn,
@@ -281,16 +419,16 @@ nav::-webkit-scrollbar-thumb:hover {
 }
 
 .theme-btn-icon {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   transition: transform 0.2s ease;
 }
 
 .theme-selector-btn[aria-pressed="true"] .theme-btn-icon {
-  transform: scale(1.15);
+  transform: scale(1.12);
 }
 
 .theme-btn-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--color-text);
 }
@@ -300,15 +438,31 @@ nav::-webkit-scrollbar-thumb:hover {
   outline-offset: 2px;
 }
 
-/* Animation toggle — native checkbox styled as switch */
+/* ── Animation Toggle ────────────────────────────────────────────────────── */
+.animation-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-tertiary, #888);
+  margin-block: 10px 8px; /* logical: replaces margin: 10px 4px 8px */
+  margin-inline: 4px; /* logical: left/right */
+  padding: 0 4px;
+}
+
 .animation-toggle-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border: 1.5px solid var(--color-border);
-  border-radius: 12px;
-  padding: 11px 14px;
+  border-radius: 10px;
+  padding: 9px 12px;
   cursor: pointer;
+  margin-block-end: 4px; /* logical bottom: replaces margin: 0 4px 4px */
+  margin-inline: 4px; /* logical left/right */
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -321,7 +475,7 @@ nav::-webkit-scrollbar-thumb:hover {
 }
 
 .animation-toggle-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text);
 }
@@ -336,8 +490,8 @@ nav::-webkit-scrollbar-thumb:hover {
 
 .toggle-switch {
   position: relative;
-  width: 48px;
-  height: 26px;
+  width: 44px;
+  height: 24px;
   border-radius: 100px;
   background: var(--color-border, #ccc);
   transition: background 0.3s ease;
@@ -349,8 +503,8 @@ nav::-webkit-scrollbar-thumb:hover {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background: white;
   border-radius: 50%;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -362,7 +516,7 @@ nav::-webkit-scrollbar-thumb:hover {
 }
 
 .toggle-input:checked ~ .toggle-switch::after {
-  left: 25px;
+  left: 23px;
 }
 
 .toggle-input:focus-visible ~ .toggle-switch {
@@ -370,84 +524,93 @@ nav::-webkit-scrollbar-thumb:hover {
   outline-offset: 2px;
 }
 
-.theme-info-text {
-  font-size: 0.78rem;
-  margin-top: 10px;
-  line-height: 1.5;
-  font-style: italic;
-  opacity: 0.65;
-  color: var(--color-text);
-}
-
-/* ─── Responsive ──────────────────────────────────────────── */
-
+/* ── Responsive: Mobile (≤768px) ─────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .menu-container {
-    top: 10px;
-    right: 10px;
-  }
-
   .hamburger {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    display: flex;
   }
 
-  .side-menu {
-    width: 300px;
-    right: -300px;
+  /* Slide in from RIGHT (sidebar is right-anchored) */
+  .sidebar {
+    transform: translateX(100%); /* hidden: off-screen to the right */
+    width: 280px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+
+  .sidebar.expanded {
+    transform: translateX(0); /* visible: slide in from right */
+    width: 280px;
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* No body padding shift on mobile — sidebar is an overlay, not a rail.
+   * BUT we keep 16px on the right side so RTL content has breathing room
+   * (the sidebar slides in over the top, it doesn't push content). */
+  body,
+  body.sidebar-expanded {
+    padding-right: 16px !important;
+  }
+
+  /* Full labels always visible on mobile */
+  .sidebar .menu-item {
+    justify-content: flex-start !important;
+    padding: 11px 14px !important;
+  }
+
+  .sidebar .menu-label {
+    opacity: 1 !important;
+    max-width: 200px !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    transition: none !important;
+  }
+
+  .sidebar-expanded-only {
+    opacity: 1 !important;
+    max-height: 600px !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    transition: none !important;
+  }
+
+  .theme-section-header {
+    justify-content: flex-start !important;
+    padding: 8px 14px !important;
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
+
+  /* Suppress desktop tooltips on mobile */
+  .sidebar:not(.expanded) [data-tooltip]::after {
+    display: none;
   }
 }
 
-@media (max-width: 600px) {
-  .side-menu {
-    top: auto;
-    bottom: -100%;
-    right: 0;
-    left: 0;
-    width: 100%;
-    height: 72vh;
-    border-radius: 20px 20px 0 0;
-    transition: bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .side-menu.open {
-    bottom: 0;
-    right: 0;
-  }
-
-  /* Drag handle hint */
-  .side-menu::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    background: var(--color-border);
-    border-radius: 2px;
-  }
-}
-
-/* Respect reduced motion */
+/* ── Reduced Motion ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .side-menu,
+  .sidebar,
   .hamburger-icon .bar,
   .toggle-switch,
   .toggle-switch::after,
   .side-menu-backdrop,
   .close-menu,
   .menu-item,
-  .theme-selector-btn {
-    transition: none;
+  .theme-selector-btn,
+  .sidebar-toggle,
+  .toggle-chevron,
+  .menu-label,
+  .sidebar-expanded-only,
+  body {
+    transition: none !important;
   }
 }
 
 /* ============================================================================
    CONTACT DEVELOPER OVERLAY
    ============================================================================ */
-
 .contact-overlay {
   position: fixed;
   inset: 0;
@@ -540,7 +703,6 @@ nav::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
   color: white;
 }
-
 .contact-whatsapp:hover {
   border-color: #25d366;
   background: rgba(37, 211, 102, 0.05);
@@ -550,7 +712,6 @@ nav::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #2ca5e0 0%, #1a7fb5 100%);
   color: white;
 }
-
 .contact-telegram:hover {
   border-color: #2ca5e0;
   background: rgba(44, 165, 224, 0.05);
@@ -560,7 +721,6 @@ nav::-webkit-scrollbar-thumb:hover {
   background: var(--gradient-accent);
   color: white;
 }
-
 .contact-email:hover {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
@@ -600,7 +760,6 @@ nav::-webkit-scrollbar-thumb:hover {
   font-size: large;
 }
 
-/* Dark theme adjustments for contact overlay */
 [data-theme="dark"] .cancel-contact-overlay-button,
 [data-theme="dark-slate"] .cancel-contact-overlay-button {
   color: #e8f0fe;

@@ -1,92 +1,236 @@
+// ============================================================================
+// side-menu.js — Persistent collapsible icon-rail sidebar
+// Desktop: 64px collapsed ↔ 240px expanded, state in localStorage
+// Mobile (≤768px): overlay from left with backdrop
+// ============================================================================
+
 (function () {
-  const menu = document.getElementById("sideMenu");
+  const sidebar = document.getElementById("sidebar");
   const backdrop = document.getElementById("sideMenuBackdrop");
-  const menuBtn = document.getElementById("menuBtn");
-  const closeBtn = document.getElementById("closeMenuBtn");
+  const hamburgerBtn = document.getElementById("menuBtn"); // mobile-only
+  const closeBtn = document.getElementById("closeMenuBtn"); // mobile-only
+  const toggleBtn = document.getElementById("sidebarToggle"); // desktop-only
   const animationToggle = document.getElementById("animationToggle");
 
+  const MOBILE_BP = 768;
+  const STORAGE_KEY = "sidebar_expanded";
   const FOCUSABLE =
     'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
-  // ✅ Replace with:
-  animationToggle.addEventListener("change", () => {
-    themeManager.applyAnimations(animationToggle.checked);
-  });
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
-  function openMenu() {
-    menu.classList.add("open");
-    menu.setAttribute("aria-hidden", "false");
+  function isMobile() {
+    return window.innerWidth <= MOBILE_BP;
+  }
+
+  /** Apply sidebar expanded/collapsed state on desktop */
+  function applyDesktopState(expanded) {
+    if (expanded) {
+      sidebar.classList.add("expanded");
+      document.body.classList.add("sidebar-expanded");
+    } else {
+      sidebar.classList.remove("expanded");
+      document.body.classList.remove("sidebar-expanded");
+    }
+  }
+
+  /** Open the sidebar (mobile overlay mode) */
+  function openMobileSidebar() {
+    sidebar.classList.add("expanded");
     backdrop.classList.add("visible");
-    menuBtn.setAttribute("aria-expanded", "true");
+    hamburgerBtn.setAttribute("aria-expanded", "true");
+    sidebar.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden"; // prevent scroll behind overlay
     // Focus first focusable item
-    const first = menu.querySelectorAll(FOCUSABLE)[0];
+    const first = sidebar.querySelectorAll(FOCUSABLE)[0];
     if (first) first.focus();
   }
 
-  function closeMenu() {
-    menu.classList.remove("open");
-    menu.setAttribute("aria-hidden", "true");
+  /** Close the sidebar (mobile overlay mode) */
+  function closeMobileSidebar() {
+    sidebar.classList.remove("expanded");
     backdrop.classList.remove("visible");
-    menuBtn.setAttribute("aria-expanded", "false");
-    menuBtn.focus(); // restore focus
+    hamburgerBtn.setAttribute("aria-expanded", "false");
+    sidebar.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    hamburgerBtn.focus();
   }
 
-  // Focus trap
-  menu.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeMenu();
-      return;
+  // ── Initialise ─────────────────────────────────────────────────────────────
+
+  function init() {
+    if (!sidebar) return;
+
+    if (isMobile()) {
+      // Mobile: sidebar starts hidden
+      sidebar.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    } else {
+      // Desktop: restore saved preference
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const expanded = saved === null ? false : saved === "true";
+      applyDesktopState(expanded);
+      sidebar.setAttribute("aria-hidden", "false");
     }
-    if (e.key !== "Tab") return;
-    const focusable = [...menu.querySelectorAll(FOCUSABLE)];
-    const first = focusable[0],
-      last = focusable[focusable.length - 1];
-    if (
-      e.shiftKey
-        ? document.activeElement === first
-        : document.activeElement === last
-    ) {
-      e.preventDefault();
-      (e.shiftKey ? last : first).focus();
+
+    // Sync theme buttons pressed state
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "light";
+    sidebar.querySelectorAll("[data-theme]").forEach((btn) => {
+      btn.setAttribute(
+        "aria-pressed",
+        btn.dataset.theme === currentTheme ? "true" : "false",
+      );
+    });
+
+    // Sync animation toggle state
+    if (animationToggle) {
+      const animsEnabled =
+        document.documentElement.getAttribute("data-animations") !== "disabled";
+      animationToggle.checked = animsEnabled;
+    }
+  }
+
+  // ── Desktop Toggle ──────────────────────────────────────────────────────────
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      const willExpand = !sidebar.classList.contains("expanded");
+      applyDesktopState(willExpand);
+      try {
+        localStorage.setItem(STORAGE_KEY, String(willExpand));
+      } catch (_) {}
+    });
+  }
+
+  // ── Mobile Hamburger ────────────────────────────────────────────────────────
+
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", () => {
+      if (sidebar.classList.contains("expanded")) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
+    });
+  }
+
+  // ── Mobile Close Button ─────────────────────────────────────────────────────
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeMobileSidebar);
+  }
+
+  // ── Backdrop Click ──────────────────────────────────────────────────────────
+
+  if (backdrop) {
+    backdrop.addEventListener("click", closeMobileSidebar);
+  }
+
+  // ── Focus trap (mobile keyboard) ───────────────────────────────────────────
+
+  if (sidebar) {
+    sidebar.addEventListener("keydown", (e) => {
+      if (!isMobile()) return;
+
+      if (e.key === "Escape") {
+        closeMobileSidebar();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+      const focusable = [...sidebar.querySelectorAll(FOCUSABLE)];
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (
+        e.shiftKey
+          ? document.activeElement === first
+          : document.activeElement === last
+      ) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
+    });
+  }
+
+  // ── Resize: reset state on breakpoint cross ─────────────────────────────────
+
+  let lastMobile = isMobile();
+  window.addEventListener("resize", () => {
+    const nowMobile = isMobile();
+    if (nowMobile === lastMobile) return;
+    lastMobile = nowMobile;
+
+    if (!nowMobile) {
+      // Switched to desktop — restore preference, remove overlay artefacts
+      backdrop.classList.remove("visible");
+      document.body.style.overflow = "";
+      sidebar.setAttribute("aria-hidden", "false");
+      const saved = localStorage.getItem(STORAGE_KEY);
+      applyDesktopState(saved === "true");
+    } else {
+      // Switched to mobile — close/reset
+      sidebar.classList.remove("expanded");
+      document.body.classList.remove("sidebar-expanded");
+      backdrop.classList.remove("visible");
+      sidebar.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
   });
 
-  menuBtn.addEventListener("click", () =>
-    menu.classList.contains("open") ? closeMenu() : openMenu(),
-  );
-  closeBtn.addEventListener("click", closeMenu);
-  backdrop.addEventListener("click", closeMenu);
+  // ── Action buttons (data-action) ────────────────────────────────────────────
 
-  // Action buttons
-  menu.querySelectorAll("[data-action]").forEach((btn) => {
+  sidebar.querySelectorAll("[data-action]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const fn = window[btn.dataset.action];
       if (typeof fn === "function") fn();
-      closeMenu();
+      if (isMobile()) closeMobileSidebar();
     });
   });
 
-  // Theme buttons
-  // ✅ Replace with:
-  menu.querySelectorAll("[data-theme]").forEach((btn) => {
+  // ── Theme buttons ───────────────────────────────────────────────────────────
+
+  sidebar.querySelectorAll("[data-theme]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      themeManager.applyTheme(btn.dataset.theme);
+      if (typeof themeManager !== "undefined" && themeManager.applyTheme) {
+        themeManager.applyTheme(btn.dataset.theme);
+      }
+      // Update pressed states
+      sidebar.querySelectorAll("[data-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
     });
   });
 
-  // ── Contact Developer button ──────────────────────────────────────────────
+  // ── Animation toggle ────────────────────────────────────────────────────────
+
+  if (animationToggle) {
+    animationToggle.addEventListener("change", () => {
+      if (typeof themeManager !== "undefined" && themeManager.applyAnimations) {
+        themeManager.applyAnimations(animationToggle.checked);
+      }
+    });
+  }
+
+  // ── Contact Developer button ────────────────────────────────────────────────
+
   const contactDevBtn = document.getElementById("contactDevBtn");
   if (contactDevBtn) {
     contactDevBtn.addEventListener("click", () => {
-      closeMenu();
-      // Allow menu close animation to finish before showing overlay
-      setTimeout(() => {
-        if (typeof window.openContactOverlay === "function") {
-          window.openContactOverlay();
-        }
-      }, 150);
+      if (isMobile()) closeMobileSidebar();
+      setTimeout(
+        () => {
+          if (typeof window.openContactOverlay === "function") {
+            window.openContactOverlay();
+          }
+        },
+        isMobile() ? 150 : 0,
+      );
     });
   }
+
+  // ── Run ─────────────────────────────────────────────────────────────────────
+  init();
 })();
 
 // ============================================================================
@@ -98,9 +242,7 @@ const emailAddress = "belalamrofficial@gmail.com";
 
 window.openContactOverlay = function () {
   const overlay = document.getElementById("contactDevOverlay");
-  if (overlay) {
-    overlay.style.display = "flex";
-  }
+  if (overlay) overlay.style.display = "flex";
 };
 
 window.closeContactOverlay = function () {
@@ -123,7 +265,6 @@ window.contactViaEmail = function () {
   closeContactOverlay();
 };
 
-// Close overlay on backdrop click
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("contactDevOverlay");
   if (overlay) {

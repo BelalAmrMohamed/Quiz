@@ -26,7 +26,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  padding: 40px 24px;
+  /*
+   * DO NOT use padding shorthand here — it would override padding-right set by
+   * side-menu.css (80px for collapsed sidebar) regardless of stylesheet load order.
+   * Set only the three sides that index.css owns; side-menu.css owns padding-right.
+   */
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 24px; /* physical left — the non-sidebar side */
   position: relative;
   overflow-x: hidden;
 }
@@ -55,16 +62,17 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
   width: fit-content;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--color-text-primary, #1a1a1a);
+  /* Sidebar is on the RIGHT — breadcrumb anchors to the left freely */
   position: fixed;
   z-index: 100;
   top: 24px;
-  left: 40px;
+  left: 16px;
   right: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #breadcrumb:hover {
@@ -174,8 +182,8 @@ body {
 .header {
   border-radius: 24px;
   box-shadow: var(--shadow-xl);
-  padding: 64px 48px;
-  margin-bottom: 48px;
+  padding: 36px 40px;
+  margin-bottom: 28px;
   border: 1px solid var(--color-border-light);
   text-align: center;
   position: relative;
@@ -198,7 +206,7 @@ body {
 }
 
 .header h1 {
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin-bottom: 16px;
@@ -210,7 +218,7 @@ body {
 }
 
 .header p {
-  font-size: 1.25rem;
+  font-size: 1rem;
   max-width: 700px;
   margin: 0 auto;
   font-weight: 500;
@@ -266,8 +274,7 @@ HEADER BADGE – GAMIFIED WELCOME
   letter-spacing: 0.2px;
   padding: 2px 6px;
   border-radius: 6px;
-  margin-right: 0;
-  margin-left: 0;
+  margin-inline: 0; /* logical: replaces margin-right: 0; margin-left: 0 */
 
   animation: namePulse 3s ease-in-out infinite;
 }
@@ -475,7 +482,7 @@ Container
 .grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
+  gap: 20px;
   margin-bottom: 48px;
 }
 
@@ -489,16 +496,281 @@ Container
 @media (max-width: 960px) {
   .grid-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 14px;
   }
 }
 
-/* Mobile: switch from grid → stacked vertical list */
+/* Mobile: full-width flex column handled in the mobile list-row block below */
+
+/* ── Tablet card padding ── Obj 2B */
+@media (max-width: 960px) {
+  .card,
+  .category-card,
+  .exam-card {
+    padding: 14px 16px;
+  }
+}
+
+/* ── .card-text wrapper: transparent on desktop, flex column on mobile ─────── */
+/* display:contents makes it invisible to layout — children behave as if     */
+/* they are direct children of the card. Perfect for desktop card centering. */
+.card-text {
+  display: contents;
+}
+
+/* ── Obj 1: Mobile List-Row Design (≤640px) ─────────────────────────────── */
 @media (max-width: 640px) {
+  /* ── Grid becomes a flex column with border wrapping the whole list ──────── */
   .grid-container {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    overflow: hidden; /* clip children to the border-radius */
+  }
+
+  /* ── Each card becomes a compact horizontal list-row ─────────────────────── */
+  .card,
+  .category-card,
+  .exam-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    min-height: 58px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+    transition: background-color 0.12s ease;
+    overflow: hidden;
+    /* LTR physical layout so icon is on the visual left and text flows left→right */
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* First card has no top border */
+  .card:first-child,
+  .category-card:first-child,
+  .exam-card:first-child {
+    border-top: none;
+  }
+
+  /* Remove the decorative top-accent strip */
+  .card::before,
+  .category-card::before,
+  .exam-card::before {
+    display: none;
+  }
+
+  /* Subtle hover — no lift on mobile */
+  .card:hover,
+  .category-card:hover,
+  .exam-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--color-background-secondary, #f5f5f5);
+  }
+
+  /* ── .card-text: takes up remaining middle space ─────────────────────────── */
+  .card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    min-width: 0; /* allows text-overflow: ellipsis */
+  }
+
+  /* ── Category card icon: compact emoji on the left ───────────────────────── */
+  .category-card .icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    text-align: center;
+    margin-bottom: 0;
+    filter: none;
+    transform: none !important;
+    transition: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background-secondary);
+    border-radius: 8px;
+  }
+
+  /* ── Title line: LTR, left-aligned, English friendly ────────────────────── */
+  .card-text h3,
+  .card h3,
+  .category-card h3,
+  .exam-card h3 {
+    font-size: 0.83rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* ── Subtext (question count, types): muted, compact, left-aligned ───────── */
+  .card-text p,
+  .card p,
+  .category-card p,
+  .exam-card p {
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary, #888);
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    text-align: left;
+    direction: ltr;
+    font-weight: 400;
+  }
+
+  /* ── Exam meta wrapper: row with types · count, pushed to right ─────────── */
+  .exam-card-meta {
+    position: static !important; /* reset desktop absolute */
+    display: flex;
+    flex-direction: row; /* side-by-side (was column) */
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+
+  /* ── Exam types and count: same row, muted, right-aligned ───────────────── */
+  .exam-types-subtext {
+    display: block !important;
+    font-size: 0.65rem !important;
+    color: var(--color-text-tertiary, #888);
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 400;
+    text-align: right;
+    order: 1 !important; /* reset desktop order */
+  }
+
+  .exam-question-count:not(.exam-types-subtext) {
+    display: block !important;
+    font-size: 0.65rem !important;
+    color: var(--color-text-tertiary, #888);
+    margin-bottom: 0;
+    text-align: right;
+    order: 2 !important; /* count after types in mobile row */
+  }
+
+  /* ── Share button: HIDDEN on mobile ─────────────────────────────────────── */
+  .share-quiz-link-button {
+    display: none !important;
+  }
+
+  /* ── btnWrap: reset absolute positioning, compact icon row ──────────────── */
+  .exam-card div[style*="margin-top"] {
+    position: static !important;
+    margin-top: 0 !important;
+    gap: 4px !important;
+    flex-shrink: 0;
+    width: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  /* ── Exam card: reset min-height for compact rows ────────────────────────── */
+  .exam-card {
+    min-height: 52px !important;
+  }
+
+  /* ── Start button: compact play icon pill ────────────────────────────────── */
+  .exam-card .start-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    padding: 0;
+    font-size: 0; /* hide text */
+    flex: 0 0 32px;
+    min-width: 0 !important;
+  }
+
+  /* Show a ▶ play icon via ::before instead of the Arabic text */
+  .exam-card .start-btn::after {
+    content: "▶";
+    font-size: 0.75rem;
+    color: white;
+  }
+
+  /* Download button — also compact */
+  .exam-card .start-btn:last-of-type {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+  }
+
+  .exam-card .start-btn:last-of-type::after {
+    content: "↓";
+    font-size: 0.85rem;
+  }
+
+  /* ── Hide db-source badge in compact row ─────────────────────────────────── */
+  .exam-card .db-source-badge {
+    display: none !important;
+  }
+
+  /* ── Skeleton adapts to list rows ────────────────────────────────────────── */
+  .skeleton-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 14px;
+    min-height: 52px;
+    border-radius: 0;
+    gap: 12px;
+    border-bottom: none;
+    border-top: 1px solid var(--color-border);
+    box-shadow: none;
+  }
+
+  .skeleton-card:first-child {
+    border-top: none;
+  }
+
+  .skeleton-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .skeleton-title {
+    height: 11px;
+    width: 50%;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .skeleton-text {
+    height: 9px;
+    width: 30%;
+    border-radius: 6px;
+    flex-shrink: 0;
   }
 }
 
@@ -522,7 +794,7 @@ Container
 .category-card,
 .exam-card {
   border-radius: 20px;
-  padding: 32px;
+  padding: 20px 22px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border-light);
   cursor: pointer;
@@ -608,6 +880,159 @@ Container
   color: var(--color-text-secondary);
 }
 
+/*
+ * Desktop exam card meta bar: absolutely positioned above the action buttons.
+ * direction:ltr + space-between → count anchored left, types anchored right.
+ * CSS order properties ensure correct sides regardless of DOM insertion order.
+ */
+.exam-card-meta {
+  position: absolute;
+  bottom: 68px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  direction: ltr;
+  gap: 8px;
+  margin: 0;
+  /* Prevent text from bleeding into the share button area at top-left */
+  padding: 0;
+}
+
+/* Count always on the LEFT side */
+.exam-card-meta .exam-question-count:not(.exam-types-subtext) {
+  order: 1;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* Types always on the RIGHT side */
+.exam-card-meta .exam-types-subtext {
+  order: 2;
+  text-align: right;
+  flex: 1;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Desktop exam card: min-height ensures room for the absolute-positioned
+ * meta bar and button row below the heading.
+ */
+.exam-card {
+  min-height: 200px;
+}
+
+/*
+ * Desktop btnWrap: absolutely anchored to the bottom of the card.
+ * Targets the JS-generated div with inline style margin-top.
+ */
+.exam-card div[style*="margin-top"] {
+  position: absolute !important;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  margin-top: 0 !important;
+  width: calc(100% - 32px) !important;
+}
+
+.exam-types-subtext {
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary, #888);
+  letter-spacing: 0.2px;
+}
+
+/*
+ * ============================================================================
+ * MOBILE CARD OVERRIDE — MUST come AFTER the base card styles above.
+ *
+ * CSS cascade ordering problem: The mobile @media (max-width: 640px) block
+ * that sets up the compact list-row layout lives at an earlier position in
+ * this file (~line 522). The base .card / .category-card / .exam-card rules
+ * directly above (font-size: 3.5rem, padding: 20px 22px, text-align: center,
+ * etc.) are in the normal flow and appear AFTER that mobile block. Since both
+ * blocks have equal specificity, source order wins — the base styles override
+ * the mobile styles on small screens, producing the "ginormous card" bug.
+ *
+ * Solution: re-declare only the conflicting overrides here, later in the
+ * file, so cascade ordering now works in our favour. No !important needed.
+ * ============================================================================
+ */
+@media (max-width: 640px) {
+  /* ── Card shell: compact horizontal row ─────────────────────────────────── */
+  .card,
+  .category-card,
+  .exam-card {
+    padding: 0 10px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    text-align: left;
+    direction: ltr;
+    /* Suppress desktop hover lift */
+    transform: none !important;
+  }
+
+  .card:first-child,
+  .category-card:first-child,
+  .exam-card:first-child {
+    border-top: none;
+  }
+
+  /* Also kill the tablet override padding that fires at ≤960px */
+  .category-card {
+    padding: 0 10px;
+    padding-bottom: 0;
+    text-align: left;
+  }
+
+  /* ── Category icon: small pill on the left ───────────────────────────────── */
+  .category-card .icon {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    /* Suppress the desktop hover spin */
+    transform: none !important;
+    transition: none;
+    filter: none;
+    /* Pill background */
+    background: var(--color-background-secondary);
+    border-radius: 8px;
+  }
+
+  /* Suppress desktop hover icon animation */
+  .category-card:hover .icon {
+    transform: none !important;
+  }
+
+  /* ── Heading: small, LTR, left-aligned ──────────────────────────────────── */
+  .card h3,
+  .category-card h3,
+  .exam-card h3 {
+    font-size: 0.83rem;
+    margin-bottom: 0;
+    text-align: left;
+    direction: ltr;
+  }
+
+  /* ── Paragraph / subtext: tiny muted label ───────────────────────────────── */
+  .card p,
+  .category-card p,
+  .exam-card p {
+    font-size: 0.7rem;
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+}
+
 .user-create-quiz-card {
   border-style: dashed;
   background: var(--color-surface);
@@ -659,6 +1084,66 @@ Container
 
 .start-btn:active {
   transform: translateY(0);
+}
+
+/* Mobile: shrink .start-btn into a compact 32px icon button.
+ * The base rule (width: 100%) comes before this in the file, so we need
+ * this block after it to win the cascade at ≤640px. */
+@media (max-width: 640px) {
+  .exam-card .start-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 0 !important;
+    flex: 0 0 32px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    font-size: 0 !important; /* hide Arabic text */
+    line-height: 1 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* ▶ play icon for the start button */
+  .exam-card .start-btn::after {
+    content: "▶";
+    font-size: 0.75rem;
+    color: white;
+  }
+
+  /* ↓ download icon for the (red) download button */
+  .exam-card .start-btn[style*="dc2626"]::after,
+  .exam-card .start-btn[style*="b91c1c"]::after {
+    content: "↓";
+    font-size: 0.85rem;
+  }
+
+  /* Suppress the hover lift on mobile buttons */
+  .exam-card .start-btn:hover {
+    transform: none !important;
+  }
+
+  /* The btnWrap div: reset absolute, keep it flex inline in the row */
+  .exam-card div[style*="margin-top"] {
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin-top: 0 !important;
+    gap: 4px !important;
+    width: auto !important;
+    flex-shrink: 0;
+  }
+
+  /* Reset exam-card min-height and meta absolute positioning */
+  .exam-card {
+    min-height: 52px !important;
+  }
+
+  .exam-card-meta {
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+  }
 }
 
 /* Modal Styles */
@@ -892,22 +1377,47 @@ Container
 
 @media (max-width: 768px) {
   body {
-    padding: 24px 16px;
+    /*
+     * Same load-order safety as the base body rule: don't set padding-right.
+     * side-menu.css owns it and sets padding-right: 0 !important for mobile.
+     */
+    padding-top: 24px;
+    padding-bottom: 24px;
+    padding-left: 16px;
   }
 
   .header {
-    padding: 48px 32px;
+    padding: 28px 24px;
     border-radius: 20px;
   }
 
   .header h1 {
-    font-size: 2.25rem;
+    font-size: 1.8rem;
   }
 
   .header p {
-    font-size: 1.125rem;
+    font-size: 0.95rem;
   }
 
+  #breadcrumb {
+    top: 16px;
+    left: 16px;
+    padding: 8px 14px;
+    gap: 6px;
+  }
+}
+
+/*
+ * Tablet-only card/grid overrides — MUST be scoped to min-width: 641px.
+ *
+ * WHY: The mobile list-row layout lives in @media (max-width: 640px) at an
+ * earlier position in this file. Without the min-width guard, a plain
+ * @media (max-width: 768px) block here (later in the cascade) would override
+ * the 640px block's display:flex, padding:0 16px, etc. — completely breaking
+ * the mobile UI. The guard ensures these tablet styles only apply between
+ * 641px and 768px, never below 641px.
+ */
+@media (min-width: 641px) and (max-width: 768px) {
   .grid-container {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -931,43 +1441,28 @@ Container
 
   .category-card .icon {
     font-size: 2.5rem;
-    margin-bottom: 0px;
-  }
-
-  #breadcrumb {
-    top: 16px;
-    left: 16px;
-    padding: 8px 14px;
-    gap: 6px;
+    margin-bottom: 0;
   }
 }
 
+/*
+ * 480px: only header/controls adjustments — all card rules removed.
+ * Rationale: the @media (max-width: 640px) mobile list-row block handles every
+ * card at ≤640px (including ≤480px). Any card overrides here (padding:15px,
+ * font-size:2.5rem, margin-bottom:5px) would reverse the compact list layout
+ * since this block appears later in the file and has higher cascade priority.
+ */
 @media (max-width: 480px) {
   .header {
-    padding: 40px 24px;
+    padding: 24px 20px;
   }
 
   .header h1 {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
 
   .header p {
-    font-size: 1rem;
-  }
-
-  .category-card {
-    padding: 15px;
-  }
-
-  .card p,
-  .category-card p,
-  .exam-card p {
-    margin-bottom: 5px;
-  }
-
-  .category-card .icon {
-    font-size: 2.5rem;
-    margin-bottom: 0px;
+    font-size: 0.92rem;
   }
 
   .mode-btn {
@@ -1153,6 +1648,61 @@ Container
 .skeleton-text {
   height: 13px;
   width: 45%;
+}
+
+/*
+ * Mobile skeleton re-override — placed AFTER the base skeleton rules above.
+ * The base .skeleton-card (flex-direction: column, padding: 32px, etc.) sits
+ * later in the file than the @media (max-width: 640px) block at line ~521,
+ * so the base rules would override the mobile ones without this block.
+ * Cascade rule: later source order wins at equal specificity — so this
+ * block, placed after the base rules, correctly wins at ≤640px.
+ */
+@media (max-width: 640px) {
+  .skeleton-grid {
+    /* Wrap skeleton rows in the same grouped container as real cards */
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .skeleton-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 14px;
+    min-height: 52px;
+    border-radius: 0;
+    gap: 12px;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    box-shadow: none;
+  }
+
+  .skeleton-card:first-child {
+    border-top: none;
+  }
+
+  .skeleton-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .skeleton-title {
+    height: 11px;
+    width: 50%;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .skeleton-text {
+    height: 9px;
+    width: 30%;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
 }
 
 /* ============================================================================

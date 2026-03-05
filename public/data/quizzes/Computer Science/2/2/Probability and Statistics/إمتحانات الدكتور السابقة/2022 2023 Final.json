@@ -8,7 +8,9 @@
   },
   "stats": {
     "questionCount": 10,
-    "questionTypes": ["Essay"]
+    "questionTypes": [
+      "Essay"
+    ]
   },
   "questions": [
     {
