@@ -6,11 +6,7 @@
 import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
 import { SearchManager } from "./search-manager.js";
-import {
-  extractTextFromFile,
-  parseImportContent,
-  processQuizFile,
-} from "./quiz-processor.js";
+import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
 
 let categoryTree = null;
 let searchManager = null;
@@ -27,13 +23,7 @@ import { createUploadButton } from "./adminUpload.js";
 import { isAdminAuthenticated, hasAdminSessionHint } from "./adminAuth.js";
 
 // Helper utilities
-import {
-  extractMetadata,
-  filterCourses,
-  getSubscribedCourses,
-  getAvailableYears,
-  getAvailableTerms,
-} from "./filterUtils.js";
+import { getSubscribedCourses } from "./filterUtils.js";
 
 /**
  * Recursively count only the actual quiz/exam leaves under a category node.
@@ -443,28 +433,13 @@ async function initApp() {
     console.error("Error checking first-visit state:", e);
   }
 
-  // ── 1. Immediately render "إمتحاناتك" card — no async wait needed ───────
-  try {
-    if (container) {
-      container.innerHTML = "";
-      container.className = "grid-container";
-      container.setAttribute("aria-busy", "true");
-
-      const userQuizzes = JSON.parse(getFromStorage("user_quizzes", "[]"));
-      const quizzesCard = createCategoryCard(
-        "إمتحاناتك",
-        userQuizzes.length,
-        false,
-        null,
-        false,
-      );
-      const iconDiv = quizzesCard.querySelector(".icon");
-      if (iconDiv) iconDiv.textContent = "✏️";
-      quizzesCard.onclick = () => renderUserQuizzesView();
-      container.appendChild(quizzesCard);
-    }
-  } catch (e) {
-    console.error("Error rendering immediate user quizzes card:", e);
+  // ── 1. Leave skeleton visible; just mark aria state ───────────────────────
+  // The skeleton HTML in index.html is shown while we wait for the manifest.
+  // Do NOT clear container.innerHTML here — that would hide the skeleton.
+  // The “إمتحاناتك” card is now a static skeleton item in index.html
+  // and is replaced properly by renderRootCategories() after the manifest loads.
+  if (container) {
+    container.setAttribute("aria-busy", "true");
   }
 
   // ── 2. Fetch manifest asynchronously, then render all categories ─────────
@@ -479,12 +454,58 @@ async function initApp() {
 
   // ── 3. Full render now that manifest is ready ────────────────────────────
   try {
-    renderRootCategories();
+    // ── Obj 4: Hash-based routing ──
+    const hash = window.location.hash.slice(1); // strip leading #
+    let navigatedViaHash = false;
+
+    if (hash === "my-quizzes") {
+      navigatedViaHash = true;
+      renderUserQuizzesView();
+    } else if (hash.startsWith("category/")) {
+      const rawKey = decodeURIComponent(hash.slice("category/".length));
+      const cat = categoryTree && categoryTree[rawKey];
+      if (cat) {
+        navigatedViaHash = true;
+        // Reconstruct ancestor chain so breadcrumb "back" works correctly
+        // e.g. for subfolder_2, ancestors = [root_cat, subfolder_1]
+        const ancestors = findCategoryAncestors(rawKey, categoryTree);
+        navigationStack = [...ancestors]; // pre-load ancestors without re-rendering
+        renderCategory(cat); // pushes cat, renders content
+      }
+    }
+
+    if (!navigatedViaHash) {
+      renderRootCategories();
+    }
   } catch (error) {
     console.error("Error in renderRootCategories:", error);
     renderRootCategories(); // retry once
   }
 }
+/**
+ * Find the chain of ancestor category objects for a given category key.
+ * Returns an array ordered from root → direct parent (not including the target itself).
+ * Used to reconstruct navigationStack when loading from a deep-link hash.
+ *
+ * @param {string} targetKey  - The key of the category we navigated to
+ * @param {object} tree       - The flat categoryTree object
+ * @returns {Array}           - Array of ancestor category objects (may be empty for root categories)
+ */
+function findCategoryAncestors(targetKey, tree) {
+  if (!tree || !targetKey) return [];
+  for (const [key, cat] of Object.entries(tree)) {
+    if (
+      Array.isArray(cat.subcategories) &&
+      cat.subcategories.includes(targetKey)
+    ) {
+      // `cat` is the direct parent — recurse to find grandparents
+      const grandAncestors = findCategoryAncestors(key, tree);
+      return [...grandAncestors, cat];
+    }
+  }
+  return []; // targetKey is a root-level category
+}
+
 /**
  * Initialize the search manager with course data
  */
@@ -883,6 +904,9 @@ function renderRootCategories() {
     navigationStack = [];
     updateBreadcrumb();
 
+    // ── Obj 4: Update URL hash ──
+    history.replaceState(null, "", window.location.pathname);
+
     // Update search context when returning to root
     if (searchManager) {
       searchManager.updateContextVisibility();
@@ -984,6 +1008,9 @@ function renderUserQuizzesView() {
     navigationStack.push({ name: "إمتحاناتك" });
     updateBreadcrumb();
 
+    // ── Obj 4: Update URL hash ──
+    window.location.hash = "my-quizzes";
+
     // Update Title & Clear Container
     if (title) title.textContent = "إمتحاناتك";
     if (!container) return;
@@ -1034,7 +1061,6 @@ function renderUserQuizzesView() {
 
     actionsBar.appendChild(createBtn);
 
-    // Admin sign-in / sign-out button (only show if not already authenticated)
     if (!isAdminAuthenticated()) {
       const adminSignInBtn = document.createElement("a");
       adminSignInBtn.href = "sign-in.html";
@@ -1298,7 +1324,7 @@ function openInlineCreateQuizModal() {
     </div>
     <div class="form-group" style="margin-bottom: 24px;">
       <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
-<textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">1. Which programming languange is fastest?
+      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">1. Which programming languange is fastest?
 
 A. Python
 B. Rust
@@ -1320,7 +1346,8 @@ Correct: B
 
 - \`\`\`cout << "Hello World!" << endl;\`\`\`
 
-Explanation: C++ uses \`cout\` for printing statements.</textarea>    </div>
+Explanation: C++ uses \`cout\` for printing statements.</textarea>
+    </div>
     <div class="profile-actions" style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
       <button type="button" id="inlineQuizImport" style="padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--color-border); background: var(--color-background-secondary); color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; font-weight: 600; font-size: 0.95rem; font-family: inherit;">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
@@ -1864,6 +1891,12 @@ function renderCategory(category) {
     navigationStack.push(category);
     updateBreadcrumb();
 
+    // ── Obj 4: Update URL hash with category key ──
+    const catKey = Object.keys(categoryTree || {}).find(
+      (k) => categoryTree[k] === category,
+    );
+    if (catKey) window.location.hash = `category/${encodeURIComponent(catKey)}`;
+
     // Update search context when entering a category
     if (searchManager) {
       searchManager.updateContextVisibility();
@@ -1967,6 +2000,11 @@ function createCategoryCard(
 
   p.textContent = `${itemCount > 2 ? itemCount : ""} ${getItemText(itemCount)}`;
 
+  // Wrap text elements — display:contents on desktop (transparent), flex col on mobile
+  const textWrap = document.createElement("div");
+  textWrap.className = "card-text";
+  textWrap.appendChild(h3);
+
   // Add course metadata if available
   if (courseData && courseData.faculty && courseData.year && courseData.term) {
     const profile = userProfile.getProfile();
@@ -2001,15 +2039,13 @@ function createCategoryCard(
       metaDiv.appendChild(termBadge);
     }
 
-    card.appendChild(iconDiv);
-    card.appendChild(h3);
-    card.appendChild(metaDiv);
-    card.appendChild(p);
-  } else {
-    card.appendChild(iconDiv);
-    card.appendChild(h3);
-    card.appendChild(p);
+    textWrap.appendChild(metaDiv);
   }
+
+  textWrap.appendChild(p);
+
+  card.appendChild(iconDiv);
+  card.appendChild(textWrap);
 
   // Keyboard support
   card.addEventListener("keydown", (e) => {
@@ -2335,54 +2371,30 @@ function createExamCard(exam) {
 
   card.style.position = "relative";
 
-  const shareBtn = document.createElement("button");
-  shareBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2-icon lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`;
-  shareBtn.setAttribute("aria-label", "مشاركة");
-  shareBtn.className = "share-quiz-link-button";
-  shareBtn.onmouseover = () => {
-    shareBtn.style.color = "var(--color-primary)";
-    shareBtn.style.borderColor = "var(--color-primary)";
-    shareBtn.style.transform = "scale(1.05)";
-  };
-  shareBtn.onmouseout = () => {
-    shareBtn.style.color = "var(--color-text-secondary)";
-    shareBtn.style.borderColor = "var(--color-border)";
-    shareBtn.style.transform = "scale(1)";
-  };
-  shareBtn.onclick = async (e) => {
-    e.stopPropagation();
-    const link =
-      window.location.origin +
-      window.location.pathname.replace(/index\.html$/, "") +
-      (window.location.pathname.endsWith("/") ? "" : "") +
-      `quiz.html?id=${encodeURIComponent(exam.id)}`; // Might need fixing
-    try {
-      await navigator.clipboard.writeText(link);
-      showNotification("تم النسخ", "تم نسخ رابط الإختبار للمشاركة", "success");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  card.appendChild(shareBtn);
+  // ── Build text wrapper (display:contents on desktop, flex-col on mobile) ──
+  const textWrap = document.createElement("div");
+  textWrap.className = "card-text";
+  textWrap.appendChild(h);
 
-  card.appendChild(h);
-  // Add question type badges if manifest provides them
+  // Meta wrapper: holds types + count in a flex row on desktop, column on mobile
+  const metaWrap = document.createElement("div");
+  metaWrap.className = "exam-card-meta";
+
+  // Render question types as a plain subtext line (e.g. "MCQ · Essay")
   if (Array.isArray(exam.questionTypes) && exam.questionTypes.length > 0) {
-    const typesWrap = document.createElement("div");
-    typesWrap.className = "exam-question-types";
-    typesWrap.setAttribute("aria-label", "أنواع الأسئلة");
-
-    exam.questionTypes.forEach((type) => {
-      const badge = document.createElement("span");
-      badge.className = "question-type-badge";
-      badge.setAttribute("data-type", type);
-      badge.textContent = type;
-      typesWrap.appendChild(badge);
-    });
-
-    card.appendChild(typesWrap);
+    const typesLine = document.createElement("p");
+    typesLine.className = "exam-question-count exam-types-subtext";
+    typesLine.textContent = exam.questionTypes.join(" · ");
+    metaWrap.appendChild(typesLine);
   }
-  card.appendChild(questionCountLine);
+
+  metaWrap.appendChild(questionCountLine);
+  textWrap.appendChild(metaWrap);
+
+  // DOM order: [db-badge] [textWrap] [btnWrap]
+  // On desktop: textWrap is display:contents (transparent).
+  // On mobile: flex row → textWrap fills space.
+  card.appendChild(textWrap);
   card.appendChild(btnWrap);
 
   // Read question count from manifest (no individual file fetch needed)
@@ -2503,7 +2515,8 @@ window.addEventListener("beforeinstallprompt", (e) => {
     deferredPrompt = e;
     const installBtn = document.querySelector(".install-app");
     if (installBtn) {
-      installBtn.style.display = "block";
+      // Use flex (not block) so the icon stays centered in the collapsed sidebar
+      installBtn.style.display = "flex";
     }
   } catch (error) {
     console.error("Error handling beforeinstallprompt:", error);

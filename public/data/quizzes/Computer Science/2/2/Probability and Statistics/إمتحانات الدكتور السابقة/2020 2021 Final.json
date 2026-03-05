@@ -8,18 +8,31 @@
   },
   "stats": {
     "questionCount": 18,
-    "questionTypes": ["Essay", "MCQ"]
+    "questionTypes": [
+      "Essay",
+      "MCQ"
+    ]
   },
   "questions": [
     {
       "q": "If `A ⊂ B` Then `P(A|B) =`",
-      "options": ["`P(B|A)`", "`P(A)`", "`P(B)`", "None of them"],
+      "options": [
+        "`P(B|A)`",
+        "`P(A)`",
+        "`P(B)`",
+        "None of them"
+      ],
       "correct": 3,
       "explanation": "By definition, `P(A|B) = P(A ∩ B) / P(B)`. Because `A ⊂ B`, the intersection `A ∩ B = A`. Therefore, the equation simplifies to `P(A) / P(B)`. Since this result is not among the first three options, the correct choice is 'None of them'."
     },
     {
       "q": "If the knowledge that an event A has occurred implies that a second event B cannot occur, the events A and B are said to be",
-      "options": ["Independent", "Mutually exclusive", "A ⊂ B", "B ⊂ A"],
+      "options": [
+        "Independent",
+        "Mutually exclusive",
+        "A ⊂ B",
+        "B ⊂ A"
+      ],
       "correct": 1,
       "explanation": "Events are mutually exclusive when they cannot occur simultaneously, meaning their intersection is empty (`A ∩ B = Φ`) and the probability of their intersection is zero."
     },
@@ -36,43 +49,78 @@
     },
     {
       "q": "A code consists of a digit chosen from 0 to 6 followed by a letter of the alphabet. What is the probability the code is 6Z?",
-      "options": ["1/260", "1/156", "1/182", "None of them"],
+      "options": [
+        "1/260",
+        "1/156",
+        "1/182",
+        "None of them"
+      ],
       "correct": 2,
       "explanation": "There are 7 possible digits (0, 1, 2, 3, 4, 5, 6) and 26 letters. The probability of picking the specific digit '6' is 1/7 and the letter 'Z' is 1/26. Multiplying these independent probabilities gives `(1/7) * (1/26) = 1/182`."
     },
     {
       "q": "For a continuous random variable X with a probability density function f(x) = k(x^3 + 1) for 0 ≤ x ≤ 1, then the value of k is",
-      "options": ["1/2", "5/4", "1/3", "4/5"],
+      "options": [
+        "1/2",
+        "5/4",
+        "1/3",
+        "4/5"
+      ],
       "correct": 3,
       "explanation": "The total area under the density function must equal 1. Integrating `k(x^3 + 1)` from 0 to 1 results in `k[x^4/4 + x] = 1`, which simplifies to `k(1/4 + 1) = 5k/4 = 1`. Solving for k gives `4/5`."
     },
     {
       "q": "The value of k when the probability mass function is given by P(x) = 2x/k for x = 1, 2, 3, 4 is",
-      "options": ["10", "20", "1/10", "1/20"],
+      "options": [
+        "10",
+        "20",
+        "1/10",
+        "1/20"
+      ],
       "correct": 1,
       "explanation": "The sum of probabilities for all possible values of x must equal 1. Thus, `(2(1)/k) + (2(2)/k) + (2(3)/k) + (2(4)/k) = 1`, which means `(2 + 4 + 6 + 8) / k = 20 / k = 1`. Therefore, `k = 20`."
     },
     {
       "q": "The cumulative distribution function for the random variable X for f(x) = λ e^(-λx) for 0 ≤ x < ∞ is given by",
-      "options": ["e^-x", "e^-x-1", "1 - e^(-λx)", "4/5"],
+      "options": [
+        "e^-x",
+        "e^-x-1",
+        "1 - e^(-λx)",
+        "4/5"
+      ],
       "correct": 2,
       "explanation": "The CDF is the integral of the PDF from 0 to x. Integrating `λ e^(-λt)` with respect to t from 0 to x yields `[-e^(-λt)]` from 0 to x, which equals `1 - e^(-λx)`."
     },
     {
       "q": "If f(x) = 2 e^(-2x) for 0 ≤ x < ∞, then the value of x such that P(X > x) = 0.1 is",
-      "options": ["1.15", "2.3", "-2.3", "None of them"],
+      "options": [
+        "1.15",
+        "2.3",
+        "-2.3",
+        "None of them"
+      ],
       "correct": 0,
       "explanation": "The tail probability `P(X > x) = 0.1` means `e^(-2x) = 0.1`. Taking the natural log of both sides: `-2x = ln(0.1) ≈ -2.302`. Dividing by -2 gives `x ≈ 1.15`."
     },
     {
       "q": "If the variance of x v(x) = 1/3, then v(x/3 - 5) =",
-      "options": ["1/3", "3", "27", "1/27"],
+      "options": [
+        "1/3",
+        "3",
+        "27",
+        "1/27"
+      ],
       "correct": 3,
       "explanation": "Variance follows the property `v(ax + b) = a^2 * v(x)`. Here, `a = 1/3`, so the variance is `(1/3)^2 * v(x) = (1/9) * (1/3) = 1/27`."
     },
     {
       "q": "E(ax + b) =",
-      "options": ["a E(x + b)", "a E(x)", "a E(x) + b", "None of them"],
+      "options": [
+        "a E(x + b)",
+        "a E(x)",
+        "a E(x) + b",
+        "None of them"
+      ],
       "correct": 2,
       "explanation": "By the linearity of expectation, the constant 'a' can be pulled out and the constant 'b' is added separately: `E(ax + b) = aE(x) + b`."
     },

@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     buttonEl.style.width = `${originalWidth > 0 ? originalWidth : buttonEl.getBoundingClientRect().width}px`;
     buttonEl.style.justifyContent = "center";
     buttonEl.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle-icon lucide-loader-circle"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> جاري التحميل...';
+      '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle-icon lucide-loader-circle"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg><span class="menu-label">جاري التحميل...</span>';
 
     // Allow DOM to update
     await new Promise((r) => setTimeout(r, 50));
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               await navigator.clipboard.writeText(text);
               quizTextBlob = new Blob([text], { type: "text/plain" });
 
-              exportTxtBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>Copy text</strong>`;
+              exportTxtBtn.innerHTML = `<span><svg xmlns="http://www.w3.org/2000/svg" class="download-option-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span><span class="menu-label">Copy text</span>`;
               isCopied = true;
               showNotification(
                 "تم النسخ",
@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }).then(() => {
           if (isCopied) {
-            exportTxtBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><strong>Text (.txt)</strong>`;
+            exportTxtBtn.innerHTML = `<span><svg xmlns="http://www.w3.org/2000/svg" class="download-option-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span><span class="menu-label">Text (.txt)</span>`;
           }
         });
       }));

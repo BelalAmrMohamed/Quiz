@@ -717,6 +717,12 @@ body {
   border: 0;
 }
 
+/* ─── Side Menu download options' images ──────────────────────────────────────────────────────────── */
+.download-option-image {
+  max-width: 30px;
+  max-height: 30px;
+}
+
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   body {
