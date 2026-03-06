@@ -1235,6 +1235,7 @@ async function handleUserQuizzesDrop(files) {
       `تم إنشاء ${quizCountText} في "إمتحاناتك"`,
       "success",
     );
+    renderRootCategories();
     renderUserQuizzesView();
   }
 }
@@ -1487,6 +1488,7 @@ Explanation: C++ uses \`cout\` for printing statements.</textarea>
       'تم إنشاء الإمتحان وإضافته إلى "إمتحاناتك"',
       "success",
     );
+    renderRootCategories();
     renderUserQuizzesView();
   };
 
