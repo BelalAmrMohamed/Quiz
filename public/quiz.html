@@ -70,7 +70,7 @@
 <body>
     <!-- The status bar at the top -->
     <div class="stats-bar" id="statsBar">
-        <button class="hamburger hamburger-stats" id="menuBtn" aria-label="فتح القائمة" aria-controls="sidebar"
+        <button class="hamburger-stats" id="menuBtn" aria-label="فتح القائمة" aria-controls="sidebar"
             aria-expanded="false" type="button">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
                 <line class="bar bar-top" x1="2" y1="5" x2="20" y2="5" stroke="currentColor" stroke-width="2"
@@ -139,6 +139,17 @@
             </svg>
         </button>
 
+        <!-- Sidebar Logo Thumbnail -->
+        <div class="sidebar-logo sidebar-expanded-only"
+            style="position: absolute; top: 16px; right: 20px; pointer-events: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="220" height="40" viewBox="0 0 220 40"
+                style="direction: ltr;">
+                <image x="0" y="0" width="40" height="40" href="./favicon.png" />
+                <text x="50" y="27" font-family="Tajawal, Arial, sans-serif" font-size="17" font-weight="bold"
+                    fill="currentColor" text-anchor="start">إمتحانات بصمجي</text>
+            </svg>
+        </div>
+
         <nav role="navigation">
             <button id="finishBtn" class="menu-item action-btn" data-action="finishEarly" data-tooltip="تسليم الإمتحان">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
@@ -191,7 +202,7 @@
             <div class="menu-divider"></div>
 
             <div class="theme-controls-section sidebar-expanded-only">
-                <div class="theme-section-header">
+                <div class="theme-section-header sidebar-expanded-only">
                     <span><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             aria-hidden="true">
@@ -251,9 +262,9 @@
                 </label>
             </div>
 
-            <div class="menu-divider"></div>
+            <div class="menu-divider sidebar-expanded-only"></div>
 
-            <button id="viewToggle" class="menu-item view-toggle-btn" data-tooltip="شكل القائمة">
+            <button id="viewToggle" class="menu-item view-toggle-btn sidebar-expanded-only" data-tooltip="شكل القائمة">
                 <span id="viewIcon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" aria-hidden="true">
@@ -262,17 +273,17 @@
                 <span class="menu-label" id="viewText">شكل القائمة</span>
             </button>
 
-            <div class="menu-divider"></div>
+            <div class="menu-divider sidebar-expanded-only"></div>
 
             <!-- List or Grid view navigations get displayed here -->
-            <div id="menuNavContainer">
+            <div id="menuNavContainer" class="sidebar-expanded-only">
             </div>
 
-            <div class="menu-divider"></div>
+            <div class="menu-divider sidebar-expanded-only"></div>
 
             <!-- bookmark and flag buttons -->
-            <button id="menuBookmarkBtn" class="menu-item action-btn" onclick="window.toggleBookmark()"
-                data-tooltip="حفظ في المفضلة">
+            <button id="menuBookmarkBtn" class="menu-item action-btn sidebar-expanded-only"
+                onclick="window.toggleBookmark()" data-tooltip="حفظ في المفضلة">
                 <span id="menuBookmarkIcon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" aria-hidden="true">
@@ -282,7 +293,7 @@
                 <span class="menu-label" id="menuBookmarkText">حفظ في المفضلة</span>
             </button>
 
-            <button id="menuFlagBtn" class="menu-item action-btn" onclick="window.toggleFlag()"
+            <button id="menuFlagBtn" class="menu-item action-btn sidebar-expanded-only" onclick="window.toggleFlag()"
                 data-tooltip="إضافة علامة للمراجعة">
                 <span id="menuFlagIcon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

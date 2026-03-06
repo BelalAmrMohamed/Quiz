@@ -197,7 +197,7 @@ function renderBookmarks(user) {
               <small>Question #${parseInt(qIdx) + 1}</small>
             </div>
             <div class="history-actions">
-              <a href="quiz.html?id=${examId}&q=${qIdx}" class="nav-btn primary" style="padding:8px 14px;font-size:0.8rem;text-decoration:none;">اذهب إلى السؤال</a>
+              <a href="quiz.html?id=${examId}&startAt=${qIdx}" class="nav-btn primary" style="padding:8px 14px;font-size:0.8rem;text-decoration:none;">اذهب إلى السؤال</a>
               <button class="unstar-btn" onclick="removeBookmark('${key}')">⭐</button>
             </div>
           </div>`;

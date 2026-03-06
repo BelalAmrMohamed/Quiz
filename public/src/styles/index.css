@@ -745,6 +745,7 @@ Container
     border-bottom: none;
     border-top: 1px solid var(--color-border);
     box-shadow: none;
+    direction: ltr;
   }
 
   .skeleton-card:first-child {
@@ -1833,5 +1834,69 @@ Container
 
   .term-btn {
     padding: 14px 16px;
+  }
+}
+
+/* ============================================================================
+   Custom utility classes for responsive visibility & Mobile Layout Fixes
+   ============================================================================ */
+.phone-only-emoji {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .phone-only-emoji {
+    display: inline;
+  }
+
+  .desktop-download-btn {
+    display: none !important;
+  }
+
+  .desktop-share-btn {
+    display: none !important;
+  }
+
+  .mobile-more-btn {
+    display: flex !important;
+  }
+
+  .course-meta-badge {
+    font-size: 0.65rem !important; /* Make faculty, year, term info smaller on phones */
+  }
+
+  /* User Quizzes Mobile Layout Fixes */
+  .grid-container.user-quizzes-drop-zone {
+    border: none !important;
+    border-radius: 0 !important;
+    gap: 16px !important;
+    background: transparent !important;
+  }
+
+  .exam-card.user-quiz-card {
+    border-radius: 12px !important;
+    border: 1px solid var(--color-border) !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    box-shadow: var(--shadow-sm) !important;
+    align-items: stretch !important;
+  }
+
+  .user-create-quiz-card {
+    border-radius: 12px !important;
+    border: 1px dashed var(--color-primary) !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center;
+    align-items: center !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .mobile-more-btn {
+    display: none !important;
   }
 }

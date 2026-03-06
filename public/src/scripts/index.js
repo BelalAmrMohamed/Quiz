@@ -2089,7 +2089,7 @@ function createExamCard(exam) {
   // ──────────────────────────────────────────────────────────────────────────
 
   const h = document.createElement("h3");
-  h.textContent = exam.title || exam.id;
+  h.innerHTML = `<span class="phone-only-emoji">📖</span> ${exam.title || exam.id}`;
 
   const questionCountLine = document.createElement("p");
   questionCountLine.className = "exam-question-count";
@@ -2347,7 +2347,7 @@ function createExamCard(exam) {
   };
 
   const downloadBtn = document.createElement("button");
-  downloadBtn.className = "start-btn";
+  downloadBtn.className = "start-btn desktop-download-btn";
   downloadBtn.type = "button";
   downloadBtn.style.flex = "1";
   downloadBtn.style.minWidth = "0";
@@ -2362,7 +2362,90 @@ function createExamCard(exam) {
     showDownloadPopup();
   };
 
+  const moreBtn = document.createElement("button");
+  moreBtn.className = "start-btn mobile-more-btn";
+  moreBtn.type = "button";
+  moreBtn.style.flex = "0 0 32px";
+  moreBtn.style.minWidth = "0";
+  moreBtn.style.background = "var(--color-background-secondary)";
+  moreBtn.style.color = "var(--color-text-primary)";
+  moreBtn.style.border = "1px solid var(--color-border)";
+  moreBtn.style.boxShadow = "none";
+  moreBtn.innerHTML = `⋮`;
+  moreBtn.setAttribute("aria-label", "خيارات إضافية");
+  moreBtn.onclick = (ev) => {
+    ev.stopPropagation();
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.style.zIndex = "9999";
+    modal.addEventListener("click", () => modal.remove());
+
+    const menu = document.createElement("div");
+    menu.style.cssText = `
+       background: var(--color-surface);
+       border-radius: 20px 20px 0 0;
+       position: absolute;
+       bottom: 0; left: 0; right: 0;
+       padding: 24px;
+       box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+       display: flex; flex-direction: column; gap: 12px;
+    `;
+
+    const downloadOpt = document.createElement("button");
+    downloadOpt.className = "btn btn-primary";
+    downloadOpt.textContent = "تحميل ⬇️";
+    downloadOpt.style.padding = "14px";
+    downloadOpt.style.fontWeight = "bold";
+    downloadOpt.onclick = (e) => {
+      e.stopPropagation();
+      modal.remove();
+      showDownloadPopup();
+    };
+
+    const shareOpt = document.createElement("button");
+    shareOpt.className = "btn";
+    shareOpt.textContent = "مشاركة 🔗";
+    shareOpt.style.padding = "14px";
+    shareOpt.style.background = "var(--color-primary-light)";
+    shareOpt.style.color = "var(--color-primary)";
+    shareOpt.style.fontWeight = "bold";
+    shareOpt.onclick = (e) => {
+      e.stopPropagation();
+      modal.remove();
+      const url =
+        window.location.origin +
+        window.location.pathname.replace("index.html", "") +
+        "quiz.html?id=" +
+        exam.id;
+      if (navigator.share) {
+        navigator
+          .share({ title: exam.title || exam.id, url: url })
+          .catch(() => {});
+      } else {
+        navigator.clipboard
+          .writeText(url)
+          .then(() =>
+            showNotification("تم النسخ", "تم نسخ رابط الإمتحان!", "success"),
+          );
+      }
+    };
+
+    const cancelOpt = document.createElement("button");
+    cancelOpt.className = "btn";
+    cancelOpt.textContent = "إلغاء";
+    cancelOpt.style.padding = "14px";
+    cancelOpt.style.background = "transparent";
+    cancelOpt.style.color = "var(--color-text-secondary)";
+
+    menu.appendChild(downloadOpt);
+    menu.appendChild(shareOpt);
+    menu.appendChild(cancelOpt);
+    modal.appendChild(menu);
+    document.body.appendChild(modal);
+  };
+
   const btnWrap = document.createElement("div");
+  btnWrap.className = "exam-card-actions-wrap";
   btnWrap.style.display = "flex";
   btnWrap.style.gap = "8px";
   btnWrap.style.flexWrap = "wrap";
@@ -2370,6 +2453,27 @@ function createExamCard(exam) {
   btnWrap.style.width = "100%";
   btnWrap.appendChild(btn);
   btnWrap.appendChild(downloadBtn);
+  btnWrap.appendChild(moreBtn);
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share-quiz-link-button desktop-share-btn";
+  shareBtn.type = "button";
+  shareBtn.setAttribute("aria-label", `مشاركة ${exam.title || exam.id}`);
+  shareBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`;
+  shareBtn.onclick = (ev) => {
+    ev.stopPropagation();
+    const url =
+      window.location.origin +
+      window.location.pathname.replace("index.html", "") +
+      "quiz.html?id=" +
+      exam.id;
+    navigator.clipboard
+      .writeText(url)
+      .then(() =>
+        showNotification("تم النسخ", "تم نسخ رابط الإمتحان!", "success"),
+      );
+  };
+  card.appendChild(shareBtn);
 
   card.style.position = "relative";
 

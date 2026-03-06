@@ -53,18 +53,30 @@ body {
 }
 
 .hamburger-stats {
-  color: white;
-  border: none;
-  font-size: 1.25rem;
-  padding: 8px 14px;
-  border-radius: 8px;
+  z-index: calc(var(--z-overlay, 500) + 1000);
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-background, #fff);
+  color: var(--color-text, #111);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .hamburger-stats:hover {
-  transform: scale(1.05);
+  transform: scale(1.07);
+  box-shadow: var(--shadow-lg);
+}
+
+.hamburger-stats:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .stat-item {
