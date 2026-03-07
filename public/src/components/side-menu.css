@@ -552,6 +552,10 @@ body.sidebar-expanded {
     box-shadow: var(--shadow-xl);
   }
 
+  .sidebar-logo {
+    right: 30px;
+  }
+
   /* No body padding shift on mobile — sidebar is an overlay, not a rail.
    * BUT we keep 16px on the right side so RTL content has breathing room
    * (the sidebar slides in over the top, it doesn't push content). */
