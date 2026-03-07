@@ -925,6 +925,11 @@ function renderRootCategories() {
     } else {
       title.textContent = "جميع المواد";
     }
+    const profile = userProfile.getProfile();
+    title.setAttribute(
+      "title",
+      `${[`${profile.faculty} facutly`, `Year ${profile.year}`, `Term ${profile.term}`].join(" · ")} `,
+    );
 
     container.innerHTML = "";
     container.className = "grid-container";
@@ -1983,6 +1988,7 @@ function createCategoryCard(
   card.className = "card category-card";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
+  card.setAttribute("title", `${name}`);
   card.setAttribute(
     "aria-label",
     `${name}, ${itemCount} ${getItemText(itemCount)}`,
@@ -2064,6 +2070,7 @@ function createExamCard(exam) {
   const card = document.createElement("div");
   card.className = "card exam-card";
   card.setAttribute("role", "article");
+  card.setAttribute("title", `${exam.description || exam.title}`);
   card.setAttribute("aria-label", `اختبار: ${exam.title || exam.id}`);
 
   // ── DB source badge ────────────────────────────────────────────────────────
