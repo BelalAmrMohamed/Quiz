@@ -1559,10 +1559,6 @@ Container
   }
 }
 
-.onboarding-skip:hover {
-  opacity: 1;
-}
-
 /* Empty state for no options */
 .no-options-message {
   text-align: center;
@@ -1767,15 +1763,6 @@ Container
    Responsive adjustments
    ============================================================================ */
 @media (max-width: 768px) {
-  .onboarding-card {
-    padding: 32px 24px;
-    width: 95%;
-  }
-
-  .onboarding-header h2 {
-    font-size: 1.5rem;
-  }
-
   .faculty-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -1798,22 +1785,9 @@ Container
     padding: 16px 20px;
     font-size: 1.1rem;
   }
-
-  .onboarding-nav {
-    flex-direction: column;
-  }
-
-  .onboarding-btn {
-    width: 100%;
-    text-align: center;
-  }
 }
 
 @media (max-width: 480px) {
-  .onboarding-card {
-    padding: 28px 20px;
-  }
-
   .faculty-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1852,7 +1826,7 @@ Container
     display: inline;
   }
 
-  .desktop-download-btn {
+  .start-btn.desktop-download-btn {
     display: none !important;
   }
 
@@ -1861,20 +1835,21 @@ Container
   }
 
   .mobile-more-btn {
-    display: flex !important;
+    display: flex;
+    width: 15px;
+    height: 32px;
+    max-width: 10px;
+    flex: 0 0 32px;
+    background: var(--color-surface);
+    border: none;
+    box-shadow: none;
+    align-items: center;
+    justify-content: end;
   }
 
   .course-meta {
-    /* gap: 2px;
-    margin: 0px; */
     display: none;
   }
-  /* .course-meta-badge {
-    font-size: 0.5rem !important;
-    margin: 0px;
-    padding: 2px 4px;
-    gap: 0px;
-  } */
 
   /* User Quizzes Mobile Layout Fixes */
   .grid-container.user-quizzes-drop-zone {

@@ -2374,14 +2374,8 @@ function createExamCard(exam) {
   };
 
   const moreBtn = document.createElement("button");
-  moreBtn.className = "start-btn mobile-more-btn";
+  moreBtn.className = "mobile-more-btn";
   moreBtn.type = "button";
-  moreBtn.style.flex = "0 0 32px";
-  moreBtn.style.minWidth = "0";
-  moreBtn.style.background = "var(--color-background-secondary)";
-  moreBtn.style.color = "var(--color-text-primary)";
-  moreBtn.style.border = "1px solid var(--color-border)";
-  moreBtn.style.boxShadow = "none";
   moreBtn.innerHTML = `⋮`;
   moreBtn.setAttribute("aria-label", "خيارات إضافية");
   moreBtn.onclick = (ev) => {
