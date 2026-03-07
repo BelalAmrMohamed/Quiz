@@ -673,6 +673,7 @@ Container
     margin-bottom: 0;
     text-align: right;
     order: 2 !important; /* count after types in mobile row */
+    direction: rtl;
   }
 
   /* ── Share button: HIDDEN on mobile ─────────────────────────────────────── */
@@ -879,6 +880,7 @@ Container
 .exam-question-count {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
+  direction: rtl;
 }
 
 /*
@@ -992,7 +994,8 @@ Container
   }
 
   /* ── Category icon: small pill on the left ───────────────────────────────── */
-  .category-card .icon {
+  .category-card .icon,
+  .phone-only-emoji {
     font-size: 1.25rem;
     margin-bottom: 0;
     display: flex;
