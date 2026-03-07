@@ -1861,8 +1861,15 @@ Container
     display: flex !important;
   }
 
+  .course-meta {
+    gap: 2px;
+    margin: 0px;
+  }
   .course-meta-badge {
-    font-size: 0.65rem !important; /* Make faculty, year, term info smaller on phones */
+    font-size: 0.5rem !important; /* Make faculty, year, term info smaller on phones */
+    margin: 0px;
+    padding: 2px 4px;
+    gap: 0px;
   }
 
   /* User Quizzes Mobile Layout Fixes */
