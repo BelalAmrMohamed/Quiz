@@ -61,7 +61,7 @@ export function showNotification(title, message = "", type = "info") {
     : `<span class="notification-icon">${icon}</span>`;
 
   toast.innerHTML = `
-    <div class="notification-content">
+    <div class="notification-content" title="${escapeHtml(title)}">
       ${iconHTML}
       <div>
         <strong>${escapeHtml(title)}</strong>

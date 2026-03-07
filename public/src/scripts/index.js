@@ -924,16 +924,20 @@ function renderRootCategories() {
     const subscribedCourses = getSubscribedCourses(categoryTree, subscribedIds);
 
     // Title based on subscription status
+    const profile = userProfile.getProfile();
     if (subscribedCourses.length > 0) {
       title.textContent = "المواد خاصتي";
+      title.setAttribute(
+        "title",
+        `${profile.faculty} facutly · Year ${profile.year} · Term ${profile.term}`,
+      );
     } else {
       title.textContent = "جميع المواد";
+      title.setAttribute(
+        "title",
+        `${"All Faculties · All Years · Both Terms"}`,
+      );
     }
-    const profile = userProfile.getProfile();
-    title.setAttribute(
-      "title",
-      `${[`${profile.faculty} facutly`, `Year ${profile.year}`, `Term ${profile.term}`].join(" · ")} `,
-    );
 
     container.innerHTML = "";
     container.className = "grid-container";
