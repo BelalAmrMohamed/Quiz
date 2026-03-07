@@ -1862,15 +1862,16 @@ Container
   }
 
   .course-meta {
-    gap: 2px;
-    margin: 0px;
+    /* gap: 2px;
+    margin: 0px; */
+    display: none;
   }
-  .course-meta-badge {
-    font-size: 0.5rem !important; /* Make faculty, year, term info smaller on phones */
+  /* .course-meta-badge {
+    font-size: 0.5rem !important;
     margin: 0px;
     padding: 2px 4px;
     gap: 0px;
-  }
+  } */
 
   /* User Quizzes Mobile Layout Fixes */
   .grid-container.user-quizzes-drop-zone {
