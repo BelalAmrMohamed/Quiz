@@ -378,6 +378,10 @@ function updateWelcomeMessage() {
     if (userNameBadge) {
       userNameBadge.innerHTML = styledMessage;
       userNameBadge.setAttribute("aria-label", `تغيير اسم المستخدم: ${name}`);
+      userNameBadge.setAttribute(
+        "title",
+        `إصغط لتغيير اسم المستخدم: [${name}]`,
+      );
     }
   } catch (error) {
     console.error("Error updating welcome message:", error);
