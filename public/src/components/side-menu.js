@@ -218,6 +218,18 @@
   if (contactDevBtn) {
     contactDevBtn.addEventListener("click", () => {
       if (isMobile()) closeMobileSidebar();
+      else {
+        // The side bar is expanded
+        const sideBarIsNotExpanded = !sidebar.classList.contains("expanded");
+
+        if (!sideBarIsNotExpanded) {
+          applyDesktopState(sideBarIsNotExpanded);
+          try {
+            localStorage.setItem(STORAGE_KEY, String(sideBarIsNotExpanded));
+          } catch (_) {}
+        }
+      }
+
       setTimeout(
         () => {
           if (typeof window.openContactOverlay === "function") {

@@ -1,4 +1,4 @@
-// src/scripts/create-quiz.js - Enhanced Quiz Creator with Advanced Features
+// src/scripts/create-quiz.js
 
 import {
   showNotification,
@@ -216,6 +216,23 @@ function setupMdEditor(id, onChange) {
 // INITIALIZATION
 // ============================================================================
 
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  try {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.querySelector(".install-app");
+    if (installBtn) {
+      // Use flex (not block) so the icon stays centered in the collapsed sidebar
+      installBtn.style.display = "flex";
+    }
+  } catch (error) {
+    console.error("Error handling beforeinstallprompt:", error);
+    showNotification("Error handling beforeinstallprompt", `${error}`, "error");
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get("edit");
@@ -225,11 +242,62 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     loadDraftFromLocalStorage();
   }
+
+  // ============================================================================
+  // PWA INSTALLATION
+  // ============================================================================
+  const installBtn = document.querySelector(".install-app");
+  if (installBtn) {
+    installBtn.style.display = "none";
+
+    installBtn.addEventListener("click", async () => {
+      try {
+        if (!deferredPrompt) {
+          showNotification(
+            "غير متاح",
+            "التطبيق غير قابل للتثبيت في الوقت الحالي",
+            "warning",
+          );
+          return;
+        }
+
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+
+        if (outcome === "accepted") {
+          console.log("User accepted the install prompt");
+          installBtn.style.display = "none";
+          showNotification(
+            "تم التثبيت",
+            "تم تثبيت التطبيق بنجاح",
+            "./favicon.png",
+          );
+        } else {
+          console.log("User dismissed the install prompt");
+        }
+
+        deferredPrompt = null;
+      } catch (error) {
+        console.error("Error during PWA installation:", error);
+        showNotification("Error during PWA installation", `${error}`, "error");
+      }
+    });
+  }
+
   updateEmptyState();
   setupEventListeners();
   setupKeyboardShortcuts();
   updateProgress();
   updateStatistics();
+});
+
+window.addEventListener("appinstalled", () => {
+  console.log("PWA installed successfully");
+  showNotification(
+    "مبروك!",
+    "تم تثبيت التطبيق بنجاح على جهازك",
+    "./favicon.png",
+  );
 });
 
 function setupEventListeners() {

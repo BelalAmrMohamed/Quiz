@@ -199,6 +199,14 @@ body.sidebar-expanded {
   border-radius: 4px;
 }
 
+/* Side bar logo */
+.sidebar-logo {
+  position: absolute;
+  top: 16px;
+  right: 10px;
+  pointer-events: none;
+}
+
 /* ── Menu Items ──────────────────────────────────────────────────────────── */
 .menu-item {
   display: flex;

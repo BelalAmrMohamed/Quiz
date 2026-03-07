@@ -2626,6 +2626,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
     }
   } catch (error) {
     console.error("Error handling beforeinstallprompt:", error);
+    showNotification("Error handling beforeinstallprompt", `${error}`, "error");
   }
 });
 
@@ -2645,7 +2646,7 @@ document.addEventListener("DOMContentLoaded", () => {
           showNotification(
             "غير متاح",
             "التطبيق غير قابل للتثبيت في الوقت الحالي",
-            "./assets/images/warning.png",
+            "warning",
           );
           return;
         }
@@ -2668,6 +2669,7 @@ document.addEventListener("DOMContentLoaded", () => {
         deferredPrompt = null;
       } catch (error) {
         console.error("Error during PWA installation:", error);
+        showNotification("Error during PWA installation", `${error}`, "error");
       }
     });
   }
@@ -2682,6 +2684,9 @@ window.addEventListener("appinstalled", () => {
   );
 });
 
+// ============================================================================
+// show UserQuiz Download Popup
+// ============================================================================
 function showUserQuizDownloadPopup(quiz) {
   const modal = document.createElement("div");
   modal.className = "modal-overlay";
