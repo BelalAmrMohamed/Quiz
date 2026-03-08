@@ -1519,6 +1519,7 @@ function createUserQuizCard(quiz, index) {
     border: 2px solid var(--color-border);
     position: relative;
     overflow: hidden;
+    margin-top: 24px; /* add this */
   `;
 
   // Gradient accent on top
@@ -1538,18 +1539,17 @@ function createUserQuizCard(quiz, index) {
   const badge = document.createElement("div");
   badge.textContent = "👤 Your Quiz";
   badge.style.cssText = `
-    display: inline-block;
-    padding: 4px 10px;
-    background: var(--color-primary-light);
-    color: var(--color-primary);
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    margin-top: 24px;
-    position: relative;
-    z-index: 1;
-  `;
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 12px;
+  margin-left: 50px;
+  margin-right: 50px;
+`;
+
   card.appendChild(badge);
 
   // Quiz title
