@@ -17,7 +17,7 @@ import { showNotification } from "../components/notifications.js";
 import { gradeEssay, isEssayQuestion } from "../shared/rate-essays.js";
 
 // Helpers
-const currentName = localStorage.getItem("username") || "User";
+const userName = localStorage.getItem("username") || "User";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "index.html";
 
@@ -361,7 +361,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(
       () =>
         showNotification(
-          `Congratulations, ${currentName}`,
+          `Congratulations, ${userName}`,
           `You've earned the ${badge.title} badge`,
           `${badge.icon}`,
         ),
@@ -435,13 +435,14 @@ function renderHeader(
     </div>`
       : "";
 
+  const userNameHtml = `<span id="summary-page-username">${userName}</span>`;
   if (scoreHeader)
     scoreHeader.innerHTML = `
     <div class="score-circle ${percentage >= 70 ? "pass" : "fail"}">
       <span>${percentage}%</span>
     </div>
     <div class="stats-text">
-      <h2>${percentage >= 70 ? `أحسنت يا ${currentName}!` : `استمر في المذاكرة يا ${currentName}`}</h2>
+      <h2>${percentage >= 70 ? `أحسنت يا ${userNameHtml}!` : `استمر في المذاكرة يا ${userNameHtml}`}</h2>
       <div class="points-pill"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gem-icon lucide-gem"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg> +${points} نقطة</div>
       <p class="total-score-line">النتيجة: <strong>${displayScore} / ${displayTotal}</strong></p>
       ${mcqRow}

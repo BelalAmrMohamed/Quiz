@@ -188,6 +188,13 @@
     });
   });
 
+  // ── Action buttons (data-action) ────────────────────────────────────────────
+  const nameDisplay = document.getElementById("userNameDisplay");
+  if (nameDisplay) {
+    const currentName = localStorage.getItem("username") || "مستخدم";
+    nameDisplay.textContent = currentName;
+  }
+
   // ── Theme buttons ───────────────────────────────────────────────────────────
 
   sidebar.querySelectorAll("[data-theme]").forEach((btn) => {
@@ -285,3 +292,65 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ============================================================================
+// CHANGE USERNAME
+// ============================================================================
+import { updateWelcomeMessage } from "../scripts/index.js";
+import { getFromStorage, setInStorage } from "../shared/storage-helpers.js";
+import { showNotification } from "./notifications.js";
+import { refreshUI } from "../scripts/dashboard.js";
+import { validateUsername } from "../shared/user-name-validation.js";
+
+window.changeUsername = function () {
+  try {
+    const currentName = getFromStorage("username", "User");
+    const newName = prompt("أدخل الإسم الجديد", currentName);
+
+    if (!newName) return;
+
+    const validation = validateUsername(newName);
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
+    }
+
+    const trimmedName = newName.trim();
+    if (setInStorage("username", trimmedName)) {
+      // For the main page's welcome message
+      if (
+        window.location.pathname.startsWith("/index") ||
+        window.location.pathname === "/"
+      ) {
+        updateWelcomeMessage();
+      }
+      // For the leaderboard name in dashboard page
+      else if (window.location.pathname.startsWith("/dashboard")) {
+        refreshUI();
+      } else if (window.location.pathname.startsWith("/settings")) {
+        const settingsNameInput = document.getElementById("settingsName");
+        if (settingsNameInput) settingsNameInput.value = trimmedName;
+      } else if (window.location.pathname.startsWith("/summary")) {
+        const summaryUserName = document.getElementById(
+          "summary-page-username",
+        );
+        summaryUserName.textContent = trimmedName;
+      }
+
+      const sideMemuNameDisplay = document.getElementById("userNameDisplay");
+      if (sideMemuNameDisplay) {
+        const currentName = localStorage.getItem("username") || "مستخدم";
+        sideMemuNameDisplay.textContent = currentName;
+      }
+
+      showNotification(
+        "تم التحديث",
+        `تم تغيير اسمك إلى ${trimmedName}`,
+        "./favicon.png",
+      );
+    }
+  } catch (error) {
+    console.error("Error changing username:", error);
+    alert("حدث خطأ أثناء تغيير الاسم. حاول مرة أخرى.");
+  }
+};

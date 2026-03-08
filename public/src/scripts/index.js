@@ -24,6 +24,7 @@ import { isAdminAuthenticated, hasAdminSessionHint } from "./adminAuth.js";
 
 // Helper utilities
 import { getSubscribedCourses } from "./filterUtils.js";
+import { getFromStorage, setInStorage } from "../shared/storage-helpers.js";
 
 /**
  * Recursively count only the actual quiz/exam leaves under a category node.
@@ -218,78 +219,12 @@ import {
 } from "../components/notifications.js";
 
 // ============================================================================
-// CONFIGURATION & CONSTANTS
+// CONSTANTS
 // ============================================================================
-
-const CONFIG = {
-  MAX_USERNAME_LENGTH: 50,
-  DEBOUNCE_DELAY: 300,
-};
 
 const container = document.getElementById("contentArea");
 const title = document.getElementById("Subjects-text");
 const breadcrumb = document.getElementById("breadcrumb");
-
-// ============================================================================
-// UTILITY FUNCTIONS - Enhanced with Security
-// ============================================================================
-
-/**
- * Safe localStorage getter with error handling
- */
-function getFromStorage(key, defaultValue = null) {
-  try {
-    const item = localStorage.getItem(key);
-    return item !== null ? item : defaultValue;
-  } catch (error) {
-    console.error(`Error reading from localStorage: ${key}`, error);
-    return defaultValue;
-  }
-}
-
-/**
- * Safe localStorage setter with error handling
- */
-function setInStorage(key, value) {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch (error) {
-    console.error(`Error writing to localStorage: ${key}`, error);
-    if (error.name === "QuotaExceededError") {
-      showNotification(
-        "تحذير",
-        "مساحة التخزين ممتلئة. قد تفقد بعض البيانات.",
-        "./assets/images/warning.png",
-      );
-    }
-    return false;
-  }
-}
-
-/**
- * Validate username input
- */
-function validateUsername(username) {
-  if (!username || !username.trim()) {
-    return { valid: false, message: "الرجاء إدخال اسم صالح" };
-  }
-
-  if (username.length > CONFIG.MAX_USERNAME_LENGTH) {
-    return {
-      valid: false,
-      message: `الاسم طويل جداً (الحد الأقصى ${CONFIG.MAX_USERNAME_LENGTH} حرف)`,
-    };
-  }
-
-  // Check for potentially malicious content
-  const dangerousPatterns = /<script|javascript:|onerror=/gi;
-  if (dangerousPatterns.test(username)) {
-    return { valid: false, message: "اسم غير صالح" };
-  }
-
-  return { valid: true, message: "" };
-}
 
 // ============================================================================
 // USER PERSONALIZATION & GAMIFIED WELCOME SYSTEM
@@ -321,37 +256,6 @@ const opts = [
 ];
 
 /**
- * Change username with enhanced validation
- */
-window.changeUsername = function () {
-  try {
-    const currentName = getFromStorage("username", "User");
-    const newName = prompt("أدخل الإسم الجديد", currentName);
-
-    if (!newName) return;
-
-    const validation = validateUsername(newName);
-    if (!validation.valid) {
-      alert(validation.message);
-      return;
-    }
-
-    const trimmedName = newName.trim();
-    if (setInStorage("username", trimmedName)) {
-      updateWelcomeMessage();
-      showNotification(
-        "تم التحديث",
-        `تم تغيير الاسم إلى ${trimmedName}`,
-        "./favicon.png",
-      );
-    }
-  } catch (error) {
-    console.error("Error changing username:", error);
-    alert("حدث خطأ أثناء تغيير الاسم. حاول مرة أخرى.");
-  }
-};
-
-/**
  * Get random welcome message
  */
 function getRandomWelcomeMessage(name) {
@@ -364,7 +268,7 @@ function getRandomWelcomeMessage(name) {
 /**
  * Update welcome badge text
  */
-function updateWelcomeMessage() {
+export function updateWelcomeMessage() {
   try {
     const name = getFromStorage("username", "User");
     const messageTemplate = getRandomWelcomeMessage(name);
@@ -394,11 +298,20 @@ updateWelcomeMessage();
 // Show welcome notification with error handling
 try {
   const username = getFromStorage("username", "User");
-  showNotification(
-    "منصة إمتحانات بصمجي",
-    `السلام عليكم يا ${escapeHtml(username)}`,
-    "./assets/images/السلام عليكم.png",
-  );
+
+  // The `if` statement is an attempt to fix the issue where it shows this
+  // notification on all pages for some reason.
+  // It maybe be connected to another weird things, like the browser console logging errors of other
+  // pages, even though these pages aren't supposed to be loaded.
+  if (
+    window.location.pathname.startsWith("/index") ||
+    window.location.pathname === "/"
+  )
+    showNotification(
+      "منصة إمتحانات بصمجي",
+      `السلام عليكم يا ${escapeHtml(username)}`,
+      "./assets/images/السلام عليكم.png",
+    );
 } catch (error) {
   console.error("Error showing welcome notification:", error);
 }

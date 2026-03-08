@@ -7,11 +7,9 @@ import {
   getAvailableTerms,
   filterCourses,
 } from "./filterUtils.js";
+import { validateUsername } from "../shared/user-name-validation.js";
 
-const CONFIG = {
-  MAX_USERNAME_LENGTH: 50,
-  AUTOSAVE_DELAY: 800, // ms - delay before auto-saving
-};
+const AUTOSAVE_DELAY = 800;
 
 let categoryTree = null;
 let autoSaveTimeout = null;
@@ -25,23 +23,6 @@ function escapeHtml(unsafe) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-}
-
-function validateUsername(username) {
-  if (!username || !username.trim()) {
-    return { valid: false, message: "الرجاء إدخال اسم صالح" };
-  }
-  if (username.length > CONFIG.MAX_USERNAME_LENGTH) {
-    return {
-      valid: false,
-      message: `الاسم طويل جداً (الحد الأقصى ${CONFIG.MAX_USERNAME_LENGTH} حرف)`,
-    };
-  }
-  const dangerousPatterns = /<script|javascript:|onerror=/gi;
-  if (dangerousPatterns.test(username)) {
-    return { valid: false, message: "اسم غير صالح" };
-  }
-  return { valid: true, message: "" };
 }
 
 function setOptionCardsSelection(name, value) {
@@ -189,7 +170,7 @@ function scheduleAutoSave() {
 
   autoSaveTimeout = setTimeout(async () => {
     await saveSettingsAuto();
-  }, CONFIG.AUTOSAVE_DELAY);
+  }, AUTOSAVE_DELAY);
 }
 
 function showSavingIndicator() {

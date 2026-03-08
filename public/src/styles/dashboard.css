@@ -303,6 +303,10 @@ body {
   align-items: center;
   justify-content: center;
 }
+.delete-btn {
+  background: var(--color-error-light);
+  color: var(--color-error);
+}
 
 .delete-btn:hover {
   transform: scale(1.1);
@@ -526,20 +530,6 @@ body {
   max-width: 700px;
   margin: 0 auto;
   font-weight: 500;
-}
-
-/* Username */
-.change-username {
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
-
-  position: relative;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  padding: 2px 6px;
-  border-radius: 6px;
-  margin-right: 0;
-  margin-left: 0;
 }
 
 /* Responsive */
