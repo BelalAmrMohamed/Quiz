@@ -303,6 +303,7 @@ try {
   // notification on all pages for some reason.
   // It maybe be connected to another weird things, like the browser console logging errors of other
   // pages, even though these pages aren't supposed to be loaded.
+  // The sidemenu's new side name changer button might be doing something wrong, see `window.changeUsername` in `side-menu.js`
   if (
     window.location.pathname.startsWith("/index") ||
     window.location.pathname === "/"
