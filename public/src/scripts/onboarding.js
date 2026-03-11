@@ -417,7 +417,15 @@ async function saveAndRedirect() {
 
     clearDraft();
     localStorage.setItem("first_visit_complete", "true");
-    window.location.href = "index.html";
+
+    // Restore preserved redirect
+    const preservedHash = sessionStorage.getItem("intended_redirect_hash");
+    if (preservedHash) {
+      sessionStorage.removeItem("intended_redirect_hash");
+      window.location.href = `index.html${preservedHash}`;
+    } else {
+      window.location.href = "index.html";
+    }
   } catch (e) {
     console.error("Error saving", e);
     alert("حدث خطأ أثناء الحفظ");
@@ -466,7 +474,15 @@ async function skipOnboarding() {
 
     clearDraft();
     localStorage.setItem("first_visit_complete", "true");
-    window.location.href = "index.html";
+
+    // Restore preserved redirect
+    const preservedHash = sessionStorage.getItem("intended_redirect_hash");
+    if (preservedHash) {
+      sessionStorage.removeItem("intended_redirect_hash");
+      window.location.href = `index.html${preservedHash}`;
+    } else {
+      window.location.href = "index.html";
+    }
   }
 }
 

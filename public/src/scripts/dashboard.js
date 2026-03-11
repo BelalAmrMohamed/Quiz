@@ -64,36 +64,52 @@ document.addEventListener("DOMContentLoaded", async () => {
 function renderStats(user) {
   const levelInfo = gameEngine.calculateLevel(user.totalPoints);
 
+  // Safely update element helper
+  const updateEl = (id, htmlOrText, isHtml = false) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (isHtml) el.innerHTML = htmlOrText;
+    else el.textContent = htmlOrText;
+  };
+  const updateStyle = (id, prop, val) => {
+    const el = document.getElementById(id);
+    if (el) el.style[prop] = val;
+  };
+
   // Core Stats
-  document.getElementById("totalPoints").textContent =
-    user.totalPoints?.toLocaleString() || 0;
-  document.getElementById("totalQuizzes").textContent = user.history
-    ? user.history.length
-    : 0;
-  document.getElementById("totalBadges").textContent = user.badges
-    ? user.badges.length
-    : 0;
-  document.getElementById("currentLevel").textContent = levelInfo.level | 0;
+  updateEl("totalPoints", user.totalPoints?.toLocaleString() || 0);
+  updateEl("totalQuizzes", user.history ? user.history.length : 0);
+  updateEl("totalBadges", user.badges ? user.badges.length : 0);
+  updateEl("currentLevel", levelInfo.level | 0);
 
   // Level Details
-  document.getElementById("levelTitle").textContent = levelInfo.title;
-  document.getElementById("levelBadge").innerHTML =
-    `<span class="level-number">${levelInfo.level | 0}</span>`;
-  document.getElementById("levelProgressBar").style.width = `${
-    levelInfo.progressPercent || 0
-  }%`;
-  document.getElementById("currentXP").textContent = `${
-    levelInfo.pointsInCurrentLevel || 0
-  } XP`;
-  document.getElementById("nextLevelXP").textContent = `${
-    levelInfo.pointsNeededForNext || 0
-  } XP to next level`;
+  updateEl("levelTitle", levelInfo.title);
+  updateEl(
+    "levelBadge",
+    `<span class="level-number">${levelInfo.level | 0}</span>`,
+    true,
+  );
+  updateStyle(
+    "levelProgressBar",
+    "width",
+    `${levelInfo.progressPercent || 0}%`,
+  );
+  updateEl("currentXP", `${levelInfo.pointsInCurrentLevel || 0} XP`);
+  updateEl(
+    "nextLevelXP",
+    `${levelInfo.pointsNeededForNext || 0} XP to next level`,
+  );
 
   // Statistics Sidebar
   const accuracyRateEl = document.getElementById("accuracyRate");
   const perfectScoresEl = document.getElementById("perfectScores");
 
-  if (user.history && user.history.length > 0) {
+  if (
+    user.history &&
+    user.history.length > 0 &&
+    accuracyRateEl &&
+    perfectScoresEl
+  ) {
     const totalCorrect = user.history.reduce(
       (sum, h) => sum + (h.score || 0),
       0,
@@ -115,13 +131,14 @@ function renderStats(user) {
   }
 
   // Both ways result in the same direction
-  document.getElementById("currentStreak").textContent =
-    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
-    ` ${user.streaks?.currentDaily || 0} `;
-
-  document.getElementById("bestStreak").textContent =
-    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"} ` +
-    ` ${user.streaks?.longestStreak || 0} `;
+  updateEl(
+    "currentStreak",
+    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.currentDaily || 0} `,
+  );
+  updateEl(
+    "bestStreak",
+    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.longestStreak || 0} `,
+  );
 }
 
 function renderHistory(user) {

@@ -62,6 +62,43 @@ function formatArabicQuestionCount(count) {
 }
 
 // ============================================================================
+// URL HASH ENCODING UTILITIES (Base64 URL-safe)
+// ============================================================================
+function encodeB64(str) {
+  try {
+    return btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (match, p1) =>
+        String.fromCharCode(parseInt(p1, 16)),
+      ),
+    )
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  } catch (e) {
+    return encodeURIComponent(str);
+  }
+}
+
+function decodeB64(str) {
+  try {
+    let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) {
+      base64 += "=";
+    }
+    return decodeURIComponent(
+      Array.prototype.map
+        .call(
+          atob(base64),
+          (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2),
+        )
+        .join(""),
+    );
+  } catch (e) {
+    return str;
+  }
+}
+
+// ============================================================================
 // SUBJECT ICON UTILITY — keyword-based emoji assignment
 // ============================================================================
 
@@ -344,6 +381,12 @@ async function initApp() {
 
     if (!hasVisited || isDefaultName) {
       if (isDefaultName) localStorage.removeItem("first_visit_complete");
+
+      // Save intended path for onboarding redirect preservation
+      if (window.location.hash) {
+        sessionStorage.setItem("intended_redirect_hash", window.location.hash);
+      }
+
       window.location.href = "onboarding.html";
       return; // Stop — we're redirecting
     }
@@ -380,13 +423,63 @@ async function initApp() {
       navigatedViaHash = true;
       renderUserQuizzesView();
     } else if (hash.startsWith("category/")) {
-      const rawKey = decodeURIComponent(hash.slice("category/".length));
-      const cat = categoryTree && categoryTree[rawKey];
+      const rawIdentifier = hash.slice("category/".length);
+
+      // Try resolving by ID first (shorter URLs), then fallback to name/key
+      // Note: We perform decoding manually on the different segments instead of decodeURIComponent once.
+      let cat = null;
+      let catKey = null;
+
+      if (categoryTree) {
+        // Parse the identifier
+        // It could be `[id]`, `[id]/b64:[encodedSub]`, `[id]/[sub]`, `b64:[encodedKey]`, or `[un-encoded-key]`
+        const parts = rawIdentifier.split("/").map(decodeURIComponent);
+
+        if (parts.length === 1) {
+          const part = parts[0];
+          if (part.startsWith("b64:")) {
+            catKey = decodeB64(part.slice(4));
+            cat = categoryTree[catKey];
+          } else {
+            // Try ID
+            const entryWithId = Object.entries(categoryTree).find(
+              ([k, v]) => v.id === part,
+            );
+            if (entryWithId) {
+              cat = entryWithId[1];
+              catKey = entryWithId[0];
+            } else {
+              // Fallback to name
+              catKey = part;
+              cat = categoryTree[catKey];
+            }
+          }
+        } else {
+          // It has multiple parts: e.g. `[rootId]/b64:[encodedSubfolder]` or `[rootId]/[subfolder]`
+          const rootIdentifier = parts[0];
+          const rootEntry = Object.entries(categoryTree).find(
+            ([k, v]) => v.id === rootIdentifier || k === rootIdentifier,
+          );
+          if (rootEntry) {
+            const rootName = rootEntry[0];
+
+            let subfolderPath = parts.slice(1).join("/");
+            if (subfolderPath.startsWith("b64:")) {
+              subfolderPath =
+                decodeB64(subfolderPath.slice(4)) || subfolderPath;
+            }
+
+            catKey = `${rootName}/${subfolderPath}`;
+            cat = categoryTree[catKey];
+          }
+        }
+      }
+
       if (cat) {
         navigatedViaHash = true;
         // Reconstruct ancestor chain so breadcrumb "back" works correctly
         // e.g. for subfolder_2, ancestors = [root_cat, subfolder_1]
-        const ancestors = findCategoryAncestors(rawKey, categoryTree);
+        const ancestors = findCategoryAncestors(catKey, categoryTree);
         navigationStack = [...ancestors]; // pre-load ancestors without re-rendering
         renderCategory(cat); // pushes cat, renders content
       }
@@ -1820,11 +1913,32 @@ function renderCategory(category) {
     navigationStack.push(category);
     updateBreadcrumb();
 
-    // ── Obj 4: Update URL hash with category key ──
+    // ── Obj 4: Update URL hash with category key or ID (to shorten Arabic links) ──
     const catKey = Object.keys(categoryTree || {}).find(
       (k) => categoryTree[k] === category,
     );
-    if (catKey) window.location.hash = `category/${encodeURIComponent(catKey)}`;
+    if (catKey) {
+      let identifier = category.id;
+
+      if (!identifier) {
+        // It's a subcategory. We know catKey is "RootName/Subfolder".
+        const parts = catKey.split("/");
+        const rootName = parts[0];
+        const rootCat = categoryTree[rootName];
+        const subfolderPath = parts.slice(1).join("/");
+
+        if (rootCat && rootCat.id) {
+          // Base64 encode the subfolder part
+          const encodedSubfolder = `b64:${encodeB64(subfolderPath)}`;
+          identifier = `${rootCat.id}/${encodedSubfolder}`;
+        } else {
+          identifier = `b64:${encodeB64(catKey)}`;
+        }
+      }
+
+      // Split by '/' to encode each part without encoding the '/' itself
+      window.location.hash = `category/${identifier.split("/").map(encodeURIComponent).join("/")}`;
+    }
 
     // Update search context when entering a category
     if (searchManager) {
