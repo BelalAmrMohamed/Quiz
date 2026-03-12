@@ -24,7 +24,7 @@ const STATIC_ASSETS = [
   "/src/scripts/index.js",
   "/src/scripts/quiz.js",
   "/src/scripts/summary.js",
-  "/src/scripts/theme-controller.js",
+  "/src/shared/theme-controller.js",
 
   // Notifications and side menu
   "/src/components/side-menu.css",

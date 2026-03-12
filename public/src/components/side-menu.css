@@ -126,6 +126,7 @@ body.sidebar-expanded {
 }
 
 .hamburger-icon .bar {
+  transform-box: fill-box;
   transform-origin: center;
   transition:
     transform 0.25s ease,
@@ -133,14 +134,16 @@ body.sidebar-expanded {
 }
 
 .hamburger[aria-expanded="true"] .bar-top {
-  transform: translateY(4.5px) rotate(45deg);
+  transform: translateY(6px) rotate(45deg);
 }
+
 .hamburger[aria-expanded="true"] .bar-mid {
   opacity: 0;
   transform: scaleX(0);
 }
+
 .hamburger[aria-expanded="true"] .bar-bottom {
-  transform: translateY(-4.5px) rotate(-45deg);
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* ── Backdrop (mobile overlay) ───────────────────────────────────────────── */
@@ -335,6 +338,15 @@ body.sidebar-expanded {
 /* ── Theme Controls Section ──────────────────────────────────────────────── */
 .theme-controls-section {
   margin-top: 4px;
+}
+
+/* Collapsed: collapse all margins in the theme/animation sections to remove dead space */
+.sidebar:not(.expanded) .theme-controls-section {
+  margin-top: 0;
+}
+
+.sidebar:not(.expanded) .animation-section-header {
+  margin-block: 4px;
 }
 
 .theme-section-header {
@@ -538,27 +550,49 @@ body.sidebar-expanded {
     display: flex;
   }
 
-  /* Slide in from RIGHT (sidebar is right-anchored) */
+  /* Slide up from BOTTOM — full-width bottom sheet */
   .sidebar {
-    transform: translateX(100%); /* hidden: off-screen to the right */
-    width: 280px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    height: auto;
+    max-height: 85dvh; /* use dvh so it respects mobile browser chrome */
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%); /* hidden below the viewport */
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: none;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .sidebar.expanded {
-    transform: translateX(0); /* visible: slide in from right */
-    width: 280px;
+    transform: translateY(0); /* slide up into view */
     box-shadow: var(--shadow-xl);
   }
 
-  .sidebar-logo {
-    right: 30px;
+  /* Drag handle pill at the top of the sheet */
+  .sidebar::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-border);
+    margin: 12px auto 4px;
+    flex-shrink: 0;
   }
 
-  /* No body padding shift on mobile — sidebar is an overlay, not a rail.
-   * BUT we keep 16px on the right side so RTL content has breathing room
-   * (the sidebar slides in over the top, it doesn't push content). */
+  .sidebar-logo {
+    /* Reposition logo inside bottom sheet */
+    top: 20px;
+    right: 16px;
+  }
+
+  /* No body padding shift on mobile — sidebar is an overlay */
   body,
   body.sidebar-expanded {
     padding-right: 16px !important;
@@ -593,6 +627,13 @@ body.sidebar-expanded {
 
   .sidebar-toggle {
     display: none;
+  }
+
+  /* Nav: remove top padding offset (logo sits in the sheet header now) */
+  .sidebar nav {
+    padding-top: 8px;
+    overflow-y: visible;
+    overflow-x: visible;
   }
 
   /* Suppress desktop tooltips on mobile */

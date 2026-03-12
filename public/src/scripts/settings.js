@@ -6,7 +6,7 @@ import {
   getAvailableYears,
   getAvailableTerms,
   filterCourses,
-} from "./filterUtils.js";
+} from "../shared/filterUtils.js";
 import { validateUsername } from "../shared/user-name-validation.js";
 
 const AUTOSAVE_DELAY = 800;

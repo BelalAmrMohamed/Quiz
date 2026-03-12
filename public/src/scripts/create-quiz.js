@@ -12,7 +12,10 @@ import { exportToWord } from "../export/export-to-word.js";
 import { exportToPptx } from "../export/export-to-pptx.js";
 import { exportToMarkdown } from "../export/export-to-markdown.js";
 import { buildQuizText } from "../export/export-to-text.js";
-import { processQuizFile, parseImportContent } from "./quiz-processor.js";
+import {
+  processQuizFile,
+  parseImportContent,
+} from "../shared/quiz-processor.js";
 import { generateQuizId } from "./quizId.js";
 
 // ============================================================================
@@ -1624,8 +1627,8 @@ function loadQuizFromLocalStorage(quizId) {
       updateCharCount("descCharCount", quizData.description.length, 500);
 
       quizData.source = quiz.meta?.source || quiz.source || "";
-      const srcEl = document.getElementById("quizSource");
-      if (srcEl) srcEl.value = quizData.source;
+      document.getElementById("quizSource").value = quizData.source;
+      updateCharCount("sourceCharCount", quizData.source.length, 500);
 
       if (quiz.questions && quiz.questions.length > 0) {
         const { questions, maxId } = normalizeQuestionsWithIds(quiz.questions);
@@ -1750,7 +1753,11 @@ window.exportQuiz = function () {
     return;
   }
 
-  const config = { title: quizData.title, description: quizData.description };
+  const config = {
+    title: quizData.title,
+    description: quizData.description,
+    source: quizData.source,
+  };
   const exportQuestions = quizData.questions.map((q) => {
     const out = { q: q.q };
     if (q.image?.trim()) out.image = q.image;
@@ -1956,7 +1963,11 @@ window.exportQuiz = function () {
         if (!btn.dataset.copied) {
           try {
             const text = buildQuizText(
-              { title: quizData.title, description: quizData.description },
+              {
+                title: quizData.title,
+                description: quizData.description,
+                source: quizData.source,
+              },
               exportQuestions,
             );
             await navigator.clipboard.writeText(text);
@@ -2244,6 +2255,7 @@ window.processImport = async function () {
           quizData.description = parsed.meta.description || "";
           const titleEl = document.getElementById("quizTitle");
           const descEl = document.getElementById("quizDescription");
+          const sourceInput = document.getElementById("quizSource");
           if (titleEl) {
             titleEl.value = quizData.title;
             updateCharCount("titleCharCount", quizData.title.length, 100);
@@ -2251,6 +2263,10 @@ window.processImport = async function () {
           if (descEl) {
             descEl.value = quizData.description;
             updateCharCount("descCharCount", quizData.description.length, 500);
+          }
+          if (sourceInput) {
+            sourceInput.value = quizData.source;
+            updateCharCount("sourceCharCount", quizData.source.length, 250);
           }
         }
       }
@@ -2267,6 +2283,7 @@ window.processImport = async function () {
         quizData.description = parsed.meta.description || "";
         const titleEl = document.getElementById("quizTitle");
         const descEl = document.getElementById("quizDescription");
+        const sourceInput = document.getElementById("quizSource");
         if (titleEl) {
           titleEl.value = quizData.title;
           updateCharCount("titleCharCount", quizData.title.length, 100);
@@ -2274,6 +2291,10 @@ window.processImport = async function () {
         if (descEl) {
           descEl.value = quizData.description;
           updateCharCount("descCharCount", quizData.description.length, 500);
+        }
+        if (sourceInput) {
+          sourceInput.value = quizData.source;
+          updateCharCount("sourceCharCount", quizData.source.length, 250);
         }
       }
     }
@@ -2332,6 +2353,7 @@ window.resetPage = async function () {
   quizData = {
     title: "",
     description: "",
+    source: "",
     questions: [],
   };
 

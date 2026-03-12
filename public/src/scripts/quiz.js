@@ -1,6 +1,6 @@
 // src/scripts/quiz.js - Performance Optimized
 import { getManifest } from "./quizManifest.js";
-import { gameEngine } from "./gameEngine.js";
+import { gameEngine } from "../shared/gameEngine.js";
 import {
   showNotification,
   confirmationNotification,

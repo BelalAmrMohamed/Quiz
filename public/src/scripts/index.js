@@ -6,7 +6,10 @@
 import { getManifest } from "./quizManifest.js";
 import { userProfile } from "./userProfile.js";
 import { SearchManager } from "./search-manager.js";
-import { extractTextFromFile, parseImportContent } from "./quiz-processor.js";
+import {
+  extractTextFromFile,
+  parseImportContent,
+} from "../shared/quiz-processor.js";
 
 let categoryTree = null;
 let searchManager = null;
@@ -23,7 +26,7 @@ import { createUploadButton } from "./adminUpload.js";
 import { isAdminAuthenticated, hasAdminSessionHint } from "./adminAuth.js";
 
 // Helper utilities
-import { getSubscribedCourses } from "./filterUtils.js";
+import { getSubscribedCourses } from "../shared/filterUtils.js";
 import { getFromStorage, setInStorage } from "../shared/storage-helpers.js";
 
 /**
@@ -1060,6 +1063,7 @@ function renderUserQuizzesView() {
     createBtn.textContent = "➕ إنشاء اختبار جديد";
     createBtn.className = "btn btn-primary";
     createBtn.setAttribute("aria-label", "إنشاء اختبار جديد");
+    createBtn.setAttribute("title", "صفحة إنشاء امتحان");
     createBtn.style.cssText = `
         display: inline-block;
         padding: 12px 24px;
@@ -1265,6 +1269,7 @@ function createInlineCreateQuizCard() {
   card.className = "exam-card user-create-quiz-card";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
+  card.setAttribute("title", "تحويل نص ← امتحان");
   card.setAttribute("aria-label", "إنشاء إمتحان جديد من نص");
 
   const icon = document.createElement("div");
@@ -1277,7 +1282,7 @@ function createInlineCreateQuizCard() {
 
   const desc = document.createElement("p");
   desc.textContent =
-    'الصق أسئلة الإمتحان كنص وسيتم تحويلها تلقائيًا إلى كويز داخل "إمتحاناتك".';
+    'الصق أسئلة الإمتحان كنص وسيتم تحويلها تلقائيًاإلى امتحان".';
 
   card.appendChild(icon);
   card.appendChild(titleEl);
@@ -1338,7 +1343,7 @@ function openInlineCreateQuizModal() {
       <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus" style="color: var(--color-primary);"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></svg>
       إنشاء إمتحان جديد
     </h2>
-    <p style="margin-bottom:24px; color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.5;">الصق أو اكتب أسئلة الإمتحان في الحقل التالي، أو قم باستيراد ملف، وسنحوّلها تلقائيًا إلى كويز داخل "إمتحاناتك".</p>
+    <p style="margin-bottom:24px; color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.5;">الصق أو اكتب أسئلة الإمتحان في الحقل التالي، أو قم باستيراد ملف، وسنحوّلها تلقائيًاإلى امتحان".</p>
     <div class="form-group" style="margin-bottom: 18px;">
       <label for="inlineQuizTitle" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">عنوان الإمتحان</label>
       <input type="text" id="inlineQuizTitle" placeholder="Arrays in C++" style="width: 100%; padding: 14px 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 1rem; transition: all 0.2s; outline: none; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';"/>
@@ -1552,6 +1557,8 @@ function qz(quiz, field) {
       return quiz.meta?.createdAt || quiz.createdAt || "";
     case "count":
       return quiz.stats?.questionCount ?? quiz.questions?.length ?? 0;
+    case "type":
+      return quiz.stats?.questionTypes.join(" · ") || "";
     default:
       return undefined;
   }
@@ -1612,6 +1619,10 @@ function createUserQuizCard(quiz, index) {
   card.className = "exam-card user-quiz-card";
   card.setAttribute("role", "article");
   card.setAttribute("aria-label", `اختبار: ${qz(quiz, "title")}`);
+  card.setAttribute(
+    "title",
+    `${qz(quiz, "description") ? `Description: ${qz(quiz, "description")}` : `Type: ${qz(quiz, "type")}`}`,
+  );
   card.style.cssText = `
     background: var(--color-surface);
     border-radius: 12px;

@@ -1,5 +1,5 @@
 // src/scripts/dashboard.js - Enhanced with All Features
-import { gameEngine, BADGES } from "./gameEngine.js";
+import { gameEngine, BADGES } from "../shared/gameEngine.js";
 import { getManifest } from "./quizManifest.js";
 
 import { confirmationNotification } from "../components/notifications.js";

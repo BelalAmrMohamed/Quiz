@@ -1,4 +1,4 @@
-// src/scripts/canvas-animation.js - Modular Canvas Background Animation System
+// src/shared/canvas-animation.js - Modular Canvas Background Animation System
 // Integrates with theme system and provides performance optimization
 
 export class CanvasAnimationController {

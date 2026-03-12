@@ -1,4 +1,4 @@
-// src/scripts/filterUtils.js - Course Filtering & Metadata Extraction
+// src/shared/filterUtils.js - Course Filtering & Metadata Extraction
 
 /**
  * Extract unique values for faculties, years, and terms from categoryTree

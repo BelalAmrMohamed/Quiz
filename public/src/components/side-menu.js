@@ -1,8 +1,38 @@
 // ============================================================================
 // side-menu.js — Persistent collapsible icon-rail sidebar
 // Desktop: 64px collapsed ↔ 240px expanded, state in localStorage
-// Mobile (≤768px): overlay from left with backdrop
+// Mobile (≤768px): bottom sheet with backdrop
 // ============================================================================
+
+// ── PWA Install Prompt — captured globally so it works on every page ─────────
+(function () {
+  let _deferredInstallPrompt = null;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    // Reveal the install button wherever it lives in the sidebar
+    const btn = document.querySelector(".install-app");
+    if (btn) btn.style.display = "flex";
+  });
+
+  window.addEventListener("appinstalled", () => {
+    _deferredInstallPrompt = null;
+    const btn = document.querySelector(".install-app");
+    if (btn) btn.style.display = "none";
+  });
+
+  window.installApp = async function () {
+    if (!_deferredInstallPrompt) return;
+    _deferredInstallPrompt.prompt();
+    const { outcome } = await _deferredInstallPrompt.userChoice;
+    if (outcome === "accepted") {
+      _deferredInstallPrompt = null;
+      const btn = document.querySelector(".install-app");
+      if (btn) btn.style.display = "none";
+    }
+  };
+})();
 
 (function () {
   const sidebar = document.getElementById("sidebar");
@@ -34,19 +64,19 @@
     }
   }
 
-  /** Open the sidebar (mobile overlay mode) */
+  /** Open the sidebar (mobile bottom-sheet mode) */
   function openMobileSidebar() {
     sidebar.classList.add("expanded");
     backdrop.classList.add("visible");
     hamburgerBtn.setAttribute("aria-expanded", "true");
     sidebar.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden"; // prevent scroll behind overlay
+    document.body.style.overflow = "hidden"; // prevent scroll behind sheet
     // Focus first focusable item
     const first = sidebar.querySelectorAll(FOCUSABLE)[0];
     if (first) first.focus();
   }
 
-  /** Close the sidebar (mobile overlay mode) */
+  /** Close the sidebar (mobile bottom-sheet mode) */
   function closeMobileSidebar() {
     sidebar.classList.remove("expanded");
     backdrop.classList.remove("visible");

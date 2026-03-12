@@ -1,4 +1,4 @@
-// src/scripts/quiz-processor.js
+// src/shared/quiz-processor.js
 // Shared quiz file/text processing utilities used by both create-quiz and index pages.
 
 /**
@@ -46,7 +46,7 @@ async function extractTextFromDocx(file) {
   const arrayBuffer = await file.arrayBuffer();
   const zip = await JSZip.loadAsync(arrayBuffer);
   const docXml = zip.file("word/document.xml");
-  if (!docXml) throw new Error("ملف DOCX غير صحيح: لا يوجد document.xml");
+  if (!docXml) throw new Error("Incorrect DOCX file: There's no document.xml");
   const xmlText = await docXml.async("string");
   return xmlText
     .replace(/<w:p[ >]/g, "\n<w:p>")
@@ -111,6 +111,46 @@ export async function extractTextFromFile(file) {
 
 // ─── JSON parser ──────────────────────────────────────────────────────────────
 
+/**
+ * Extract leading metadata lines from the raw text.
+ * Recognises: Title, Description, Source (case-insensitive).
+ * Returns { meta, rest } where rest is the text after the meta block.
+ */
+function extractMetaBlock(trimmed) {
+  const metaLineRe = /^(Title|Description|Source)\s*:\s*(.*)/i;
+  const lines = trimmed.split("\n");
+  const meta = {};
+  let i = 0;
+
+  // Walk past blank lines at the very top
+  while (i < lines.length && !lines[i].trim()) i++;
+
+  // Consume contiguous meta key-value lines (blank lines between them are ok)
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line) {
+      // Blank line — only skip if we haven't seen the first question number yet
+      const next = lines.slice(i + 1).find((l) => l.trim());
+      if (next && metaLineRe.test(next)) {
+        i++;
+        continue;
+      }
+      // Otherwise the meta block has ended
+      break;
+    }
+    const m = line.match(metaLineRe);
+    if (m) {
+      meta[m[1].toLowerCase()] = m[2].trim();
+      i++;
+    } else {
+      break;
+    }
+  }
+
+  const rest = lines.slice(i).join("\n").trim();
+  return { meta: Object.keys(meta).length ? meta : null, rest };
+}
+
 /** Parse a string as JSON array/object OR numbered text format */
 export function parseImportContent(content, defaultTitle = "") {
   const trimmed = content.trim();
@@ -132,22 +172,36 @@ export function parseImportContent(content, defaultTitle = "") {
             : defaultTitle
               ? { title: defaultTitle }
               : null);
-        if (!questions) throw new Error("لا توجد أسئلة في البيانات");
+        if (!questions) throw new Error("There are no questions");
         return { questions, meta };
       } else {
         const questions = JSON.parse(trimmed);
-        if (!Array.isArray(questions)) throw new Error("ليست مصفوفة");
+        if (!Array.isArray(questions)) throw new Error("No an array");
         const meta = defaultTitle ? { title: defaultTitle } : null;
         return { questions, meta };
       }
     } catch (e) {
-      throw new Error("JSON غير صحيح: " + e.message);
+      throw new Error("JSON incorrect: " + e.message);
     }
   }
 
   // --- Numbered text format ---
+  // First, peel off the optional metadata block at the top
+  const { meta: parsedMeta, rest } = extractMetaBlock(trimmed);
+
+  // Build the final meta object, letting parsed values override the defaultTitle
+  const meta = parsedMeta
+    ? {
+        title: parsedMeta.title || defaultTitle || undefined,
+        description: parsedMeta.description || undefined,
+        source: parsedMeta.source || undefined,
+      }
+    : defaultTitle
+      ? { title: defaultTitle }
+      : null;
+
   const questions = [];
-  const blocks = trimmed.split(/(?=^\d+\.)/m);
+  const blocks = rest.split(/(?=^\d+\.)/m);
 
   for (const block of blocks) {
     const lines = block
@@ -164,13 +218,9 @@ export function parseImportContent(content, defaultTitle = "") {
     let lineIdx = 1;
     while (
       lineIdx < lines.length &&
-      !lines[lineIdx].match(/^(?:[A-Eا-ي][.)]\s*|-\s+)/)
+      !lines[lineIdx].match(/^(?:[A-E][.)]\s*|-\s+)/)
     ) {
-      if (
-        lines[lineIdx].match(
-          /^(?:Correct|الصحيح|الإجابة|Explanation|الشرح)\s*[:\-]/i,
-        )
-      )
+      if (lines[lineIdx].match(/^(?:Correct|Answer|Explanation)\s*[:\-]/i))
         break;
       q += "\n" + lines[lineIdx];
       lineIdx++;
@@ -181,10 +231,11 @@ export function parseImportContent(content, defaultTitle = "") {
     let correct = 0;
     let explanation = "";
     let dashOptionIndex = 0;
+    let essayAnswer = null; // holds a direct Answer: value for essay questions
 
     for (let i = lineIdx; i < lines.length; i++) {
       const line = lines[i];
-      const optMatch = line.match(/^([A-Eا-ي])[.)]\s*(.*)/i);
+      const optMatch = line.match(/^([A-E])[.)]\s*(.*)/i);
       if (optMatch) {
         optionLetters.push(optMatch[1].toUpperCase());
         options.push(optMatch[2].trim());
@@ -199,37 +250,50 @@ export function parseImportContent(content, defaultTitle = "") {
         continue;
       }
 
-      const correctMatch = line.match(
-        /^(?:Correct|الصحيح|الإجابة الصحيحة|Answer)\s*[:\-]\s*(.+)/i,
-      );
+      const correctMatch = line.match(/^(?:Correct|Answer)\s*[:\-]\s*(.+)/i);
       if (correctMatch) {
-        const letter = correctMatch[1].trim().charAt(0).toUpperCase();
-        const idx = optionLetters.indexOf(letter);
-        correct = idx >= 0 ? idx : 0;
+        const value = correctMatch[1].trim();
+        // If value looks like a single letter option (A–E), treat as MCQ correct
+        if (/^[A-E]$/i.test(value) && optionLetters.length > 0) {
+          const idx = optionLetters.indexOf(value.toUpperCase());
+          correct = idx >= 0 ? idx : 0;
+        } else {
+          // Essay answer — strip surrounding backticks / triple-backtick fences
+          essayAnswer = value.replace(/^`{1,3}([^`]*)(`{1,3})?$/, "$1").trim();
+        }
         continue;
       }
 
-      const expMatch = line.match(
-        /^(?:Explanation|الشرح|شرح|Reason)\s*[:\-]\s*(.*)/i,
-      );
+      const expMatch = line.match(/^(?:Explanation|Reason)\s*[:\-]\s*(.*)/i);
       if (expMatch) {
         explanation = expMatch[1].trim();
         continue;
       }
     }
 
-    if (q)
+    if (!q) continue;
+
+    if (essayAnswer !== null) {
+      // Essay question: store answer directly
+      questions.push({
+        q: q.trim(),
+        answer: essayAnswer,
+        options: [essayAnswer],
+        correct: 0,
+        explanation,
+      });
+    } else {
       questions.push({
         q: q.trim(),
         options: options.length ? options : [""],
         correct,
         explanation,
       });
+    }
   }
 
-  if (!questions.length)
-    throw new Error("التنسيق غير مدعوم. الرجاء لصق JSON أو نص مرقّم.");
-  return { questions, meta: defaultTitle ? { title: defaultTitle } : null };
+  if (!questions.length) throw new Error("Unsupported format!");
+  return { questions, meta };
 }
 
 // ─── High-level helper ────────────────────────────────────────────────────────
@@ -268,7 +332,8 @@ export async function processQuizFile(file, defaultTitle = "") {
 
       // Object with questions key
       const questions = Array.isArray(data.questions) ? data.questions : null;
-      if (!questions) throw new Error("لا توجد أسئلة في ملف JSON");
+      if (!questions)
+        throw new Error("No questions in the provided JSON File.");
 
       const meta =
         data.meta ||
@@ -280,7 +345,9 @@ export async function processQuizFile(file, defaultTitle = "") {
 
       return { questions, meta };
     } catch (e) {
-      throw new Error(`خطأ في قراءة ${file.name}: ${e.message}`);
+      throw new Error(
+        `Something went wrong while reading ${file.name}: ${e.message}`,
+      );
     }
   }
 

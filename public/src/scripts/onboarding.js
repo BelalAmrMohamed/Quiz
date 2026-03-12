@@ -5,7 +5,7 @@ import {
   getAvailableYears,
   getAvailableTerms,
   filterCourses,
-} from "./filterUtils.js";
+} from "../shared/filterUtils.js";
 
 import {
   showNotification,

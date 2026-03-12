@@ -181,23 +181,47 @@ body {
 /* Premium Header */
 .header {
   border-radius: 24px;
-  box-shadow: var(--shadow-xl);
-  padding: 36px 40px;
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgba(99, 102, 241, 0.06);
+  padding: 40px 48px 36px;
   margin-bottom: 28px;
   border: 1px solid var(--color-border-light);
   text-align: center;
   position: relative;
   overflow: hidden;
+  /* Subtle noise-like background depth */
+  background: var(--color-surface);
 }
 
+/* Two-tone top accent bar: thicker, gradient-glow effect */
 .header::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 6px;
+  height: 5px;
   background: var(--gradient-accent);
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
+}
+
+/* Subtle radial glow centred behind the title */
+.header::after {
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 220px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(99, 102, 241, 0.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .header-content {
@@ -206,22 +230,26 @@ body {
 }
 
 .header h1 {
-  font-size: 2.2rem;
+  font-size: 2.35rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  letter-spacing: -0.035em;
+  margin-bottom: 14px;
   line-height: 1.1;
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Subtle text-shadow glow on supported browsers */
+  filter: drop-shadow(0 1px 2px rgba(99, 102, 241, 0.18));
 }
 
 .header p {
   font-size: 1rem;
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
   font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
 }
 
 /* ============================================================================
@@ -800,13 +828,15 @@ Container
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border-light);
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-
   text-align: center;
+  /* Slight inset highlight at top edge */
+  background: var(--color-surface);
 }
 
+/* Accent strip — starts hidden, animates in on hover */
 .card::before,
 .category-card::before,
 .exam-card::before {
@@ -815,18 +845,23 @@ Container
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: var(--gradient-accent);
+  border-radius: 20px 20px 0 0;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover,
 .category-card:hover,
 .exam-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-xl), var(--shadow-glow);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgba(99, 102, 241, 0.08),
+    var(--shadow-glow, 0 8px 32px rgba(99, 102, 241, 0.12));
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .card:hover::before,
@@ -838,7 +873,8 @@ Container
 .card:active,
 .category-card:active,
 .exam-card:active {
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-2px) scale(1.005);
+  transition-duration: 0.1s;
 }
 
 .category-card {
@@ -1052,16 +1088,19 @@ Container
   background: var(--gradient-success);
   color: white;
   border: none;
-  padding: 14px 24px;
+  padding: 13px 24px;
   border-radius: 12px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-md);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   width: 100%;
   position: relative;
   overflow: hidden;
+  letter-spacing: 0.01em;
 }
 
 .start-btn::before {
@@ -1391,16 +1430,16 @@ Container
   }
 
   .header {
-    padding: 28px 24px;
-    border-radius: 20px;
+    padding: 28px 20px;
+    border-radius: 18px;
   }
 
   .header h1 {
-    font-size: 1.8rem;
+    font-size: 1.75rem;
   }
 
   .header p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   #breadcrumb {
