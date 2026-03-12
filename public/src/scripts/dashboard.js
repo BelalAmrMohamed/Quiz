@@ -52,6 +52,9 @@ window.removeBookmark = async function (key) {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Guard: Only run dashboard initialisation if we're on the dashboard page
+  if (!document.getElementById("totalPoints")) return;
+
   try {
     const manifest = await getManifest();
     examList = manifest.examList || [];
@@ -131,14 +134,16 @@ function renderStats(user) {
   }
 
   // Both ways result in the same direction
-  updateEl(
-    "currentStreak",
-    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.currentDaily || 0} `,
-  );
-  updateEl(
-    "bestStreak",
-    ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.longestStreak || 0} `,
-  );
+  if (user.streaks) {
+    updateEl(
+      "currentStreak",
+      ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.currentDaily || 0} `,
+    );
+    updateEl(
+      "bestStreak",
+      ` ${user.streaks?.longestStreak === 1 ? "يوم:" : "أيام:"}  ${user.streaks?.longestStreak || 0} `,
+    );
+  }
 }
 
 function renderHistory(user) {
