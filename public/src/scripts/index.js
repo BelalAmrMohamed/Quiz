@@ -1540,6 +1540,8 @@ Explanation: C++ uses \`cout\` for printing statements.</textarea>
 /** Read a field from either old or new schema */
 function qz(quiz, field) {
   switch (field) {
+    case "id":
+      return quiz.meta?.id || "";
     case "title":
       return quiz.meta?.title || quiz.title || "";
     case "description":
@@ -1575,20 +1577,27 @@ function buildUserQuizEntry(id, parsed, titleFallback) {
     else if (q.options.length === 2) types.add("True/False");
     else types.add("MCQ");
   });
+
+  // Preserve ALL original meta fields (including id, createdAt, source, etc.)
+  // Only fill in fields that are genuinely missing.
+  const meta = {
+    ...(parsed.meta || {}),
+    title: parsed.meta?.title || titleFallback || "Untitled",
+  };
+  if (!meta.createdAt) {
+    meta.createdAt = new Date().toLocaleString("en-US");
+  }
+
+  // Preserve original stats if present; otherwise compute from questions.
+  const stats = parsed.stats || {
+    questionCount: questions.length,
+    questionTypes: Array.from(types).sort(),
+  };
+
   return {
     id,
-    meta: {
-      title: parsed.meta?.title || titleFallback || "Untitled",
-      createdAt: new Date().toLocaleString("en-US"),
-      ...(parsed.meta?.description
-        ? { description: parsed.meta.description }
-        : {}),
-      ...(parsed.meta?.source ? { source: parsed.meta.source } : {}),
-    },
-    stats: {
-      questionCount: questions.length,
-      questionTypes: Array.from(types).sort(),
-    },
+    meta,
+    stats,
     questions,
   };
 }
@@ -2920,6 +2929,22 @@ function showUserQuizDownloadPopup(quiz) {
     }).then(() => modal.remove());
   };
   grid.appendChild(jsonBtn);
+
+  // Show source button if the quiz has a source URL
+  const quizSource = qz(quiz, "source");
+  if (quizSource && typeof quizSource === "string") {
+    const sourceBtn = document.createElement("button");
+    sourceBtn.className = "mode-btn";
+    sourceBtn.type = "button";
+    sourceBtn.setAttribute("aria-label", `Download Source`);
+    sourceBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-to-line-icon lucide-arrow-down-to-line"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg><strong>Download Source</strong>`;
+    sourceBtn.onclick = (ev) => {
+      ev.stopPropagation();
+      window.open(quizSource, "_blank");
+      modal.remove();
+    };
+    grid.appendChild(sourceBtn);
+  }
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-modal";
