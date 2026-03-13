@@ -709,18 +709,6 @@ Container
     display: none !important;
   }
 
-  /* ── btnWrap: reset absolute positioning, compact icon row ──────────────── */
-  .exam-card:not(.user-quiz-card) div[style*="margin-top"] {
-    position: static !important;
-    margin-top: 0 !important;
-    gap: 4px !important;
-    flex-shrink: 0;
-    width: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-  }
-
   /* ── Exam card: reset min-height for compact rows ────────────────────────── */
   .exam-card {
     min-height: 52px !important;
@@ -966,18 +954,47 @@ Container
 }
 
 /*
- * Desktop btnWrap: absolutely anchored to the bottom of the card.
- * Targets the JS-generated div with inline style margin-top.
- * EXCLUDE .user-quiz-card — those cards use flex-column layout where
- * metadata, chips, source, and the action row must all stay in flow.
+ * Desktop btnWrap: flex row of action buttons with top margin, full-width.
+ * Absolutely anchored to the bottom of the card on desktop.
+ * EXCLUDE .user-quiz-card — those use normal flow layout.
  */
-.exam-card:not(.user-quiz-card) div[style*="margin-top"] {
-  position: absolute !important;
+.exam-card:not(.user-quiz-card) .exam-card-actions-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  width: 100%;
+  position: absolute;
   bottom: 16px;
   left: 16px;
   right: 16px;
-  margin-top: 0 !important;
-  width: calc(100% - 32px) !important;
+  width: calc(100% - 32px);
+}
+
+/* Mobile: restore to normal flex flow so btnWrap sits on the RIGHT */
+@media (max-width: 640px) {
+  .exam-card:not(.user-quiz-card) .exam-card-actions-wrap {
+    position: static;
+    width: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 0;
+    margin-left: auto; /* push to the right end of the flex row */
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+}
+
+/* ── user-quiz-card btnWrap: inline flex row, pushes to bottom of column ──── */
+/* display/gap/width were previously set as inline styles in JS — now in CSS. */
+.exam-card.user-quiz-card .exam-card-actions-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto; /* push buttons to bottom of the flex-column card */
+  width: 100%;
 }
 
 /* ── User-quiz cards: full flex-column layout ────────────────────────────── */
