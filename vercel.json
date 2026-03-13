@@ -1,7 +1,6 @@
 {
   "buildCommand": null,
   "outputDirectory": "public",
-  "installCommand": null,
   "framework": null,
   "rewrites": []
 }

@@ -24,10 +24,11 @@ export default function handler(req, res) {
 
   // Reject obviously bad inputs immediately (before timing-sensitive comparison)
   if (!adminId || typeof adminId !== "string" || adminId.length > 500) {
-    return setTimeout(
+    setTimeout(
       () => res.status(400).json({ error: "فشل تسجيل الدخول" }),
       300,
     );
+    return;
   }
 
   // Timing-safe comparison — prevents brute-force timing oracles.
@@ -46,10 +47,11 @@ export default function handler(req, res) {
 
   if (!authorized) {
     // Uniform 300ms delay regardless of reason — attacker learns nothing
-    return setTimeout(
+    setTimeout(
       () => res.status(401).json({ error: "فشل تسجيل الدخول" }),
       300,
     );
+    return;
   }
 
   // Issue a short-lived JWT — role claim only, zero personal data
