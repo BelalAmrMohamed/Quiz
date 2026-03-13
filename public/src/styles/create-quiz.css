@@ -70,7 +70,7 @@ body {
   padding: 20px;
 }
 
-/* Top Bar with Breadcrumb and Autosave */
+/* Top Bar with Autosave */
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -78,27 +78,6 @@ body {
   margin-bottom: 20px;
   gap: 20px;
   flex-wrap: wrap;
-}
-
-/* Breadcrumb */
-#breadcrumb {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  direction: ltr;
-}
-
-#breadcrumb:hover {
-  transform: translateX(-4px);
-}
-
-.breadcrumb-text {
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--color-text-primary);
 }
 
 /* Autosave Indicator */

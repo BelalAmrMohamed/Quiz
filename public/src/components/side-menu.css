@@ -176,6 +176,12 @@ body.sidebar-expanded {
    *            can paint outside the block edge. Supported in all modern browsers.
    */
   overflow-x: clip;
+  /*
+   * 64px top padding clears the absolutely-positioned .sidebar-toggle button
+   * (top: 22px + height: 28px ≈ 50px) and gives breathing room above the
+   * first icon.  When the new .sidebar-header HTML is present, the header
+   * occupies the top 56px in flow; the sibling rule below reduces this to 8px.
+   */
   padding: 64px 8px 24px;
   display: flex;
   flex-direction: column;
@@ -191,6 +197,12 @@ body.sidebar-expanded {
   direction: ltr;
 }
 
+/* New HTML: .sidebar-header is in-flow before nav, so its 56px height already
+   provides top clearance — restore compact padding. */
+.sidebar-header ~ nav {
+  padding-top: 8px;
+}
+
 .sidebar nav::-webkit-scrollbar {
   width: 4px;
 }
@@ -202,12 +214,81 @@ body.sidebar-expanded {
   border-radius: 4px;
 }
 
-/* Side bar logo */
+/* ── Sidebar Header ──────────────────────────────────────────────────────── */
+/*
+ * A real in-flow header at the top of the sidebar (not absolute).
+ * Desktop collapsed (64px): shows only the favicon pill.
+ * Desktop expanded (240px): shows the full logo wordmark.
+ * Mobile bottom-sheet: shows a drag-handle pill above the logo row.
+ */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  overflow: hidden;
+  padding: 0 12px;
+}
+
+/* Favicon-only pill shown in collapsed state */
+.sidebar-favicon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: opacity 200ms ease;
+}
+
+.sidebar-favicon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Collapsed: show favicon, hide wordmark */
+.sidebar:not(.expanded) .sidebar-favicon {
+  opacity: 1;
+}
+
+.sidebar:not(.expanded) .sidebar-logo {
+  display: none;
+}
+
+/* Expanded: hide favicon, show wordmark */
+.sidebar.expanded .sidebar-favicon {
+  display: none;
+}
+
+.sidebar.expanded .sidebar-logo {
+  display: flex;
+  align-items: center;
+}
+
+/* Side bar logo (now in-flow, inside .sidebar-header) */
 .sidebar-logo {
-  position: absolute;
-  top: 16px;
-  right: 10px;
   pointer-events: none;
+}
+
+/**/
+.sidebar:not(.expanded) .menu-section-title,
+.sidebar:not(.expanded) .animation-toggle-container,
+.sidebar:not(.expanded) .animation-section-header,
+.sidebar:not(.expanded) .animation-toggle-label,
+.sidebar:not(.expanded) .theme-section-header,
+.sidebar:not(.expanded) .theme-selector-grid,
+.sidebar:not(.expanded) .menu-divider.sidebar-expanded-only,
+.sidebar:not(.expanded) .toggle-switch {
+  display: none;
 }
 
 /* ── Menu Items ──────────────────────────────────────────────────────────── */
@@ -343,10 +424,11 @@ body.sidebar-expanded {
 /* Collapsed: collapse all margins in the theme/animation sections to remove dead space */
 .sidebar:not(.expanded) .theme-controls-section {
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .sidebar:not(.expanded) .animation-section-header {
-  margin-block: 4px;
+  margin-block: 0;
 }
 
 .theme-section-header {
@@ -374,6 +456,14 @@ body.sidebar-expanded {
   max-height: 0;
   overflow: hidden;
   pointer-events: none;
+  /*
+   * CRITICAL: setting margin: 0 here eliminates invisible dead space.
+   * When max-height: 0 + overflow: hidden, the element's box is 0px tall
+   * but its margin is NOT collapsed — it still pushes neighbours apart.
+   * Zeroing margin here removes that ghost gap (e.g. the space above
+   * the contactDev button in the collapsed sidebar).
+   */
+  margin: 0;
   transition:
     opacity 0s,
     max-height 0s;
@@ -565,7 +655,7 @@ body.sidebar-expanded {
     transform: translateY(100%); /* hidden below the viewport */
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: none;
-    overflow-y: auto;
+    overflow-y: hidden; /* nav handles scrolling so header can stay sticky */
     overflow-x: hidden;
   }
 
@@ -586,10 +676,41 @@ body.sidebar-expanded {
     flex-shrink: 0;
   }
 
-  .sidebar-logo {
-    /* Reposition logo inside bottom sheet */
-    top: 20px;
-    right: 16px;
+  /* Sidebar header on mobile: sits above the nav, full-width, sticky */
+  .sidebar-header {
+    border-top: none;
+    height: auto;
+    padding: 6px 16px 10px;
+    justify-content: center; /* center the logo horizontally in the sheet */
+    /* position: sticky + top: 0 inherited from base rule — do NOT override with static */
+    /* border-bottom inherited from base rule so the nav separator is visible */
+    background: var(--color-background);
+  }
+
+  /* Old HTML: logo lives in a bare <a> directly inside .sidebar (no .sidebar-header).
+     Center it and add a separator line below to match the new-HTML header style. */
+  .sidebar > a:has(.sidebar-logo) {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 6px;
+    margin-left: 10px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    flex-shrink: 0;
+  }
+
+  /* Always show logo in mobile sheet (expanded-only override already covers this) */
+  .sidebar .sidebar-logo {
+    display: flex !important;
+    align-items: center;
+  }
+
+  /* Favicon hidden on mobile — full logo always shows */
+  .sidebar .sidebar-favicon {
+    display: none !important;
   }
 
   /* No body padding shift on mobile — sidebar is an overlay */
@@ -629,10 +750,11 @@ body.sidebar-expanded {
     display: none;
   }
 
-  /* Nav: remove top padding offset (logo sits in the sheet header now) */
+  /* Nav: no extra top padding — logo lives in .sidebar-header now.
+     overflow-y: auto makes nav the scroll root so the sticky header above it works. */
   .sidebar nav {
     padding-top: 8px;
-    overflow-y: visible;
+    overflow-y: auto;
     overflow-x: visible;
   }
 

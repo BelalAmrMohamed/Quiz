@@ -427,23 +427,6 @@ function setupMdEditor(id, onChange) {
 // INITIALIZATION
 // ============================================================================
 
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  try {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.querySelector(".install-app");
-    if (installBtn) {
-      // Use flex (not block) so the icon stays centered in the collapsed sidebar
-      installBtn.style.display = "flex";
-    }
-  } catch (error) {
-    console.error("Error handling beforeinstallprompt:", error);
-    showNotification("Error handling beforeinstallprompt", `${error}`, "error");
-  }
-});
-
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get("edit");

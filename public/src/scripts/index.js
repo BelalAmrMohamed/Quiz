@@ -620,6 +620,8 @@ function handleUserQuizSearchResults(results) {
         grid-column: 1 / -1;
         display: flex;
         justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
         margin-bottom: 20px;
     `;
 
@@ -1350,7 +1352,11 @@ function openInlineCreateQuizModal() {
     </div>
     <div class="form-group" style="margin-bottom: 24px;">
       <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
-      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">1. Which programming languange is fastest?
+      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">Title: C++ Quiz
+Description: A small quiz aimed at teaching Junior devs C++.
+Source: https://www.w3schools.com/CPP/default.asp
+
+1. Which programming languange is fastest?
 
 A. Python
 B. Rust
@@ -2737,78 +2743,14 @@ function escapeHtml(unsafe) {
 window.startQuiz = startQuiz;
 
 // ============================================================================
-// PWA INSTALLATION
+// DOM Content Loaded
 // ============================================================================
-
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  try {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.querySelector(".install-app");
-    if (installBtn) {
-      // Use flex (not block) so the icon stays centered in the collapsed sidebar
-      installBtn.style.display = "flex";
-    }
-  } catch (error) {
-    console.error("Error handling beforeinstallprompt:", error);
-    showNotification("Error handling beforeinstallprompt", `${error}`, "error");
-  }
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   initApp().catch((err) => {
     console.error("Init error:", err);
     if (typeof renderRootCategories === "function") renderRootCategories();
   });
-
-  const installBtn = document.querySelector(".install-app");
-  if (installBtn) {
-    installBtn.style.display = "none";
-
-    installBtn.addEventListener("click", async () => {
-      try {
-        if (!deferredPrompt) {
-          showNotification(
-            "غير متاح",
-            "التطبيق غير قابل للتثبيت في الوقت الحالي",
-            "warning",
-          );
-          return;
-        }
-
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-
-        if (outcome === "accepted") {
-          console.log("User accepted the install prompt");
-          installBtn.style.display = "none";
-          showNotification(
-            "تم التثبيت",
-            "تم تثبيت التطبيق بنجاح",
-            "./favicon.png",
-          );
-        } else {
-          console.log("User dismissed the install prompt");
-        }
-
-        deferredPrompt = null;
-      } catch (error) {
-        console.error("Error during PWA installation:", error);
-        showNotification("Error during PWA installation", `${error}`, "error");
-      }
-    });
-  }
-});
-
-window.addEventListener("appinstalled", () => {
-  console.log("PWA installed successfully");
-  showNotification(
-    "مبروك!",
-    "تم تثبيت التطبيق بنجاح على جهازك",
-    "./favicon.png",
-  );
 });
 
 // ============================================================================

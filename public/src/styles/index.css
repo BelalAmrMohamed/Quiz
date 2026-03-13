@@ -710,7 +710,7 @@ Container
   }
 
   /* ── btnWrap: reset absolute positioning, compact icon row ──────────────── */
-  .exam-card div[style*="margin-top"] {
+  .exam-card:not(.user-quiz-card) div[style*="margin-top"] {
     position: static !important;
     margin-top: 0 !important;
     gap: 4px !important;
@@ -968,14 +968,29 @@ Container
 /*
  * Desktop btnWrap: absolutely anchored to the bottom of the card.
  * Targets the JS-generated div with inline style margin-top.
+ * EXCLUDE .user-quiz-card — those cards use flex-column layout where
+ * metadata, chips, source, and the action row must all stay in flow.
  */
-.exam-card div[style*="margin-top"] {
+.exam-card:not(.user-quiz-card) div[style*="margin-top"] {
   position: absolute !important;
   bottom: 16px;
   left: 16px;
   right: 16px;
   margin-top: 0 !important;
   width: calc(100% - 32px) !important;
+}
+
+/* ── User-quiz cards: full flex-column layout ────────────────────────────── */
+/*
+ * Ensure the grid does not stretch the card height to match its tallest
+ * sibling (e.g. the tall "create new quiz" card).  align-self: start lets
+ * the card shrink-wrap its own content while the action buttons still pin
+ * to the bottom via margin-top: auto on the actions div.
+ */
+.exam-card.user-quiz-card {
+  align-self: start;
+  overflow: visible !important; /* accent bar corners are rounded; no clip needed */
+  text-align: start;
 }
 
 .exam-types-subtext {
