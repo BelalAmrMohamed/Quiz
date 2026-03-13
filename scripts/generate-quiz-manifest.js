@@ -9,7 +9,7 @@
 //     - Set meta.title from filename if missing
 //     - Do NOT overwrite meta.id or meta.createdAt if they already exist
 //  2. Build quiz-manifest.json in the new subjects format.
-// > npm run sync:quizzes
+// > node scripts/sync-quizzes.js --all --delete-synced
 // ========================================================================
 import fs from "fs/promises";
 import path from "path";

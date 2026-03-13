@@ -9,7 +9,11 @@
   },
   "stats": {
     "questionCount": 5,
-    "questionTypes": ["Essay", "MCQ", "True/False"]
+    "questionTypes": [
+      "Essay",
+      "MCQ",
+      "True/False"
+    ]
   },
   "questions": [
     {
@@ -28,13 +32,21 @@
       "q": "Is this component a CPU?",
       "image": "./assets/quiz-media/dashboard-thumbnail.jpg",
       "explanation": "The CPU is the brain of the computer, responsible for executing instructions.",
-      "options": ["True", "False"],
+      "options": [
+        "True",
+        "False"
+      ],
       "correct": 1
     },
     {
       "q": "Which programming language is primarily used for server-side web development?",
       "explanation": "PHP is a popular server-side scripting language designed for web development.",
-      "options": ["HTML", "CSS", "JavaScript", "PHP"],
+      "options": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "PHP"
+      ],
       "correct": 3
     },
     {

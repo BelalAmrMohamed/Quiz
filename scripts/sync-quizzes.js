@@ -13,6 +13,8 @@
 //   "sync:quizzes":       "node scripts/sync-quizzes.js",
 //   "sync:quizzes:clean": "node scripts/sync-quizzes.js --delete-synced",
 //   "sync:status":        "node scripts/sync-quizzes.js --status"
+// The command below syncs all quizzes locally and deltes them from the database to emtpy it.
+// > node scripts/sync-quizzes.js --all --delete-synced
 // =============================================================================
 
 import { createClient } from "@supabase/supabase-js";
