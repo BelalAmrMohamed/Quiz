@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "غير مصرح" });
   }
 
-  // ── 2. Extract & validate fields ───────────────────────────────────────────
+  // ── 2. Extract & validate fields ──────────
   const { college, year, term, subject, subfolder, author, quiz } =
     req.body || {};
 
@@ -57,6 +57,12 @@ export default async function handler(req, res) {
   // Term must be "1" or "2"
   if (!["1", "2"].includes(String(term))) {
     return res.status(400).json({ error: "INVALID_PATH: term must be 1 or 2" });
+  }
+
+  // Inject a dummy valid Base32 ID to pass strict validation.
+  // We deterministically override this ID downstream anyway.
+  if (quiz && quiz.meta) {
+    quiz.meta.id = "AAAAAAAA";
   }
 
   let cleanQuiz;
