@@ -2579,11 +2579,6 @@ function createExamCard(exam) {
 
   const btnWrap = document.createElement("div");
   btnWrap.className = "exam-card-actions-wrap";
-  btnWrap.style.display = "flex";
-  btnWrap.style.gap = "8px";
-  btnWrap.style.flexWrap = "wrap";
-  btnWrap.style.marginTop = "20px";
-  btnWrap.style.width = "100%";
   btnWrap.appendChild(btn);
   btnWrap.appendChild(downloadBtn);
   btnWrap.appendChild(moreBtn);
