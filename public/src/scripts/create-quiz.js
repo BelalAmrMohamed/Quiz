@@ -15,6 +15,7 @@ import { buildQuizText } from "../export/export-to-text.js";
 import {
   processQuizFile,
   parseImportContent,
+  buildJsonQuizExport,
 } from "../shared/quiz-processor.js";
 import { generateQuizId } from "./quizId.js";
 
@@ -2010,41 +2011,17 @@ window.exportQuiz = function () {
           exportToMarkdown(config, exportQuestions);
           break;
         case "json": {
-          // Build quiz object with new schema (meta + stats + questions)
-          const safeFilename = quizData.title
+          const payload = await buildJsonQuizExport(
+            quizData.title,
+            quizData.description,
+            quizData.source,
+            exportQuestions
+          );
+
+          const safeFilename = (quizData.title || "quiz")
             .replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")
             .replace(/_+/g, "_")
             .replace(/^_|_$/g, "");
-
-          // Compute stats from current questions
-          const statsTypes = new Set();
-          exportQuestions.forEach((q) => {
-            if (!Array.isArray(q.options) || q.options.length === 0)
-              statsTypes.add("Essay");
-            else if (q.options.length === 2) statsTypes.add("True/False");
-            else statsTypes.add("MCQ");
-          });
-
-          const meta = {
-            id: await generateQuizId(`quizzes/draft/${safeFilename}.json`),
-            title: quizData.title,
-            createdAt: new Date()
-              .toISOString()
-              .slice(0, 16)
-              .replace("T", " - "),
-          };
-          if (quizData.description?.trim())
-            meta.description = quizData.description.trim();
-          if (quizData.source?.trim()) meta.source = quizData.source.trim();
-
-          const payload = {
-            meta,
-            stats: {
-              questionCount: exportQuestions.length,
-              questionTypes: Array.from(statsTypes).sort(),
-            },
-            questions: exportQuestions,
-          };
 
           const blob = new Blob([JSON.stringify(payload, null, 2)], {
             type: "application/json",

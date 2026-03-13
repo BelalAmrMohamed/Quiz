@@ -1,5 +1,6 @@
 // src/shared/quiz-processor.js
 // Shared quiz file/text processing utilities used by both create-quiz and index pages.
+import { generateQuizId } from "../scripts/quizId.js";
 
 /**
  * Dynamically load a script from CDN.
@@ -361,4 +362,63 @@ export async function processQuizFile(file, defaultTitle = "") {
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
   return parseImportContent(text, title);
+}
+
+/**
+ * Build a full JSON export payload for a quiz.
+ * Includes schema construction and ID generation.
+ * @param {string} title
+ * @param {string} description
+ * @param {string} source
+ * @param {Array} questions
+ * @param {string} [createdAt]
+ */
+export async function buildJsonQuizExport(title, description, source, questions, createdAt = null) {
+  const exportQuestions = questions.map((q) => {
+    const out = { q: q.q };
+    if (q.image?.trim()) out.image = q.image;
+    // Essay question: has 1 option (legacy) or has `answer` field
+    if (Array.isArray(q.options) && q.options.length === 1) {
+      out.answer = q.options[0] || "";
+    } else if (!Array.isArray(q.options) || q.options.length === 0) {
+      out.answer = q.answer || "";
+    } else {
+      out.options = q.options;
+      if (q.correct !== undefined && q.correct !== null) out.correct = q.correct;
+    }
+    if (q.explanation?.trim()) out.explanation = q.explanation;
+    return out;
+  });
+
+  const safeFilename = (title || "quiz")
+    .replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+
+  const statsTypes = new Set();
+  exportQuestions.forEach((q) => {
+    if (!Array.isArray(q.options) || q.options.length === 0) statsTypes.add("Essay");
+    else if (q.options.length === 2) statsTypes.add("True/False");
+    else statsTypes.add("MCQ");
+  });
+
+  const meta = {
+    id: await generateQuizId(`quizzes/draft/${safeFilename}.json`),
+    title: title || "",
+    createdAt: createdAt || new Date()
+      .toISOString()
+      .slice(0, 16)
+      .replace("T", " - "),
+  };
+  if (description?.trim()) meta.description = description.trim();
+  if (source?.trim()) meta.source = source.trim();
+
+  return {
+    meta,
+    stats: {
+      questionCount: exportQuestions.length,
+      questionTypes: Array.from(statsTypes).sort(),
+    },
+    questions: exportQuestions,
+  };
 }

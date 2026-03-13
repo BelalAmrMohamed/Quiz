@@ -9,6 +9,7 @@ import { SearchManager } from "./search-manager.js";
 import {
   extractTextFromFile,
   parseImportContent,
+  buildJsonQuizExport,
 } from "../shared/quiz-processor.js";
 
 let categoryTree = null;
@@ -2896,46 +2897,23 @@ function showUserQuizDownloadPopup(quiz) {
       try {
         const title = qz(quiz, "title");
         const description = qz(quiz, "description");
-        const exportQuestions = (quiz.questions || []).map((q) => {
-          const isEssay =
-            (Array.isArray(q.options) && q.options.length === 1) ||
-            (!Array.isArray(q.options) && q.answer !== undefined);
-          const out = { q: q.q };
-          if (isEssay) {
-            out.answer = q.answer ?? q.options?.[0] ?? "";
-          } else {
-            out.options = q.options;
-            if (q.correct !== undefined) out.correct = q.correct;
-          }
-          if (q.image?.trim()) out.image = q.image;
-          if (q.explanation?.trim()) out.explanation = q.explanation;
-          return out;
-        });
-        const types = new Set();
-        exportQuestions.forEach((q) => {
-          if (!Array.isArray(q.options) || q.options.length === 0)
-            types.add("Essay");
-          else if (q.options.length === 2) types.add("True/False");
-          else types.add("MCQ");
-        });
-        const payload = {
-          meta: {
-            title,
-            ...(description ? { description } : {}),
-            createdAt: qz(quiz, "createdAt"),
-          },
-          stats: {
-            questionCount: exportQuestions.length,
-            questionTypes: Array.from(types).sort(),
-          },
-          questions: exportQuestions,
-        };
+        const source = qz(quiz, "source");
+        const createdAt = qz(quiz, "createdAt");
+        
+        const payload = await buildJsonQuizExport(
+          title,
+          description,
+          source,
+          quiz.questions || [],
+          createdAt
+        );
+
         const fileContent = JSON.stringify(payload, null, 2);
         const blob = new Blob([fileContent], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
+        a.download = `${(title || "quiz").replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_")}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
