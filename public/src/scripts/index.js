@@ -1350,11 +1350,8 @@ function openInlineCreateQuizModal() {
     </div>
     <div class="form-group" style="margin-bottom: 24px;">
       <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
-      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">Title: C++ Quiz
-Description: A small quiz aimed at teaching Junior devs C++.
-Source: https://www.w3schools.com/CPP/default.asp
+      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">1. Which programming languange is fastest?
 
-1. Which programming languange is fastest?
 A. Python
 B. Rust
 C. C++
@@ -1373,7 +1370,7 @@ Correct: B
 
 3. Write a C++ code to print \`Hello World!\`.
 
-Answer: \`\`\`cout << "Hello World!" << endl;\`\`\`
+- \`\`\`cout << "Hello World!" << endl;\`\`\`
 
 Explanation: C++ uses \`cout\` for printing statements.</textarea>
     </div>
@@ -1700,6 +1697,7 @@ function createUserQuizCard(quiz, index) {
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      direction: ltr;
     `;
     card.appendChild(desc);
   }
