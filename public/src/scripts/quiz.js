@@ -271,7 +271,7 @@ async function init() {
   if (!examId && !quizType) {
     console.error("No quiz selected");
     alert("لم يتم اختيار اختبار. سيتم توجيهك للصفحة الرئيسية.");
-    window.location.href = "index.html";
+    window.location.href = "/";
     return;
   }
 
@@ -283,7 +283,7 @@ async function init() {
       console.warn("Quiz session expired");
       localStorage.removeItem("quiz_start_time");
       alert("انتهت صلاحية الجلسة. يرجى بدء الاختبار من جديد.");
-      window.location.href = "index.html";
+      window.location.href = "/";
       return;
     }
   }
@@ -325,7 +325,7 @@ async function init() {
 
       if (!userQuizData) {
         alert("Quiz not found!");
-        window.location.href = "index.html";
+        window.location.href = "/";
         return;
       }
 
@@ -360,7 +360,7 @@ async function init() {
 
       if (!config) {
         alert("Exam not found!");
-        window.location.href = "index.html";
+        window.location.href = "/";
         return;
       }
 
@@ -1313,7 +1313,7 @@ async function exit(skipconfirmationNotification) {
 
   localStorage.removeItem("quiz_start_time");
 
-  window.location.href = "index.html";
+  window.location.href = "/";
 }
 
 function checkAnswer() {
