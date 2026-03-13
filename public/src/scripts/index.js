@@ -1376,7 +1376,7 @@ Correct: B
 
 3. Write a C++ code to print \`Hello World!\`.
 
-- \`\`\`cout << "Hello World!" << endl;\`\`\`
+Answer: \`\`\`cout << "Hello World!" << endl;\`\`\`
 
 Explanation: C++ uses \`cout\` for printing statements.</textarea>
     </div>
