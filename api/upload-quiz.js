@@ -19,6 +19,7 @@ import {
   validatePath,
   computeStats,
 } from "./_validateQuiz.js";
+import { generateQuizId } from "../scripts/lib/quizId.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -84,6 +85,9 @@ export default async function handler(req, res) {
   // ── 4. Server-side enrichment ──────────────────────────────────────────────
   // Set meta.path (canonical path for ID stability and quiz-data endpoint)
   cleanQuiz.meta.path = `quizzes/${fullPath}/${filename}`;
+
+  // Deterministically generate ID from path (discarding any client-supplied ID)
+  cleanQuiz.meta.id = generateQuizId(cleanQuiz.meta.path);
 
   // Recompute stats server-side — never trust client-submitted stats
   cleanQuiz.stats = computeStats(cleanQuiz.questions);
