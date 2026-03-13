@@ -42,37 +42,245 @@ let editingQuizId = null;
 // MARKDOWN & INLINE EDITOR SYSTEM
 // ============================================================================
 
-function renderMarkdown(str) {
-  if (!str) return "";
-  const codeBlocks = [];
-  // 1. Extract fenced code blocks first
-  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
-    const idx = codeBlocks.length;
-    const escaped = code
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    codeBlocks.push(
-      `<pre class="code-block ltr"><code>${escaped.trim()}</code></pre>`,
-    );
-    return `\x00CODE${idx}\x00`;
-  });
-  // 2. Escape HTML in remaining text
-  str = str
+// ── Escape HTML for safe insertion ───────────────────────────────────────────
+function escHtml(s) {
+  return (s || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-  // 3. Inline code
-  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
-  // 4. Bold and italic
-  str = str.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
-  str = str.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  str = str.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
-  // 5. Newlines → <br>
-  str = str.replace(/\n/g, "<br>");
-  // 6. Restore code blocks
-  return str.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+}
+
+// ── Apply inline Markdown formatting to a pre-escaped string ─────────────────
+function applyInline(s) {
+  // Inline math $...$ (protect from other replacements with a temp stash)
+  const iMathStash = [];
+  s = s.replace(/\$([^\$\n]+)\$/g, (_, m) => {
+    const idx = iMathStash.length;
+    if (typeof window.katex !== "undefined") {
+      try {
+        iMathStash.push(
+          window.katex.renderToString(m.trim(), {
+            displayMode: false,
+            throwOnError: false,
+          }),
+        );
+      } catch {
+        iMathStash.push(
+          `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+        );
+      }
+    } else {
+      iMathStash.push(
+        `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+      );
+    }
+    return `\x01IM${idx}\x01`;
+  });
+
+  // Inline code
+  s = s.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+  // Bold + italic combined
+  s = s.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
+  // Bold: **...** or __...__
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
+  // Italic: *...* or _..._
+  s = s.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  s = s.replace(/_([^_\n]+)_/g, "<em>$1</em>");
+  // Strikethrough: ~~...~~
+  s = s.replace(/~~([^~\n]+)~~/g, "<del>$1</del>");
+  // Links: [text](url)
+  s = s.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="md-link">$1</a>',
+  );
+  // Images: ![alt](url)
+  s = s.replace(
+    /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g,
+    '<img src="$2" alt="$1" class="md-img" loading="lazy">',
+  );
+
+  // Restore inline math
+  s = s.replace(/\x01IM(\d+)\x01/g, (_, i) => iMathStash[parseInt(i)]);
+  return s;
+}
+
+/**
+ * Full-featured Markdown renderer with:
+ *  • KaTeX LaTeX math:  $inline$  and  $$block$$
+ *  • Fenced code blocks: ```lang ... ```
+ *  • Headings H1–H6
+ *  • Horizontal rules  ---  ***  ___
+ *  • Blockquotes  > text
+ *  • Unordered lists  - / * / +
+ *  • Ordered lists  1.
+ *  • Bold, italic, bold-italic, strikethrough
+ *  • Inline code
+ *  • Links and images
+ *  • Falls back gracefully if KaTeX is not loaded
+ */
+function renderMarkdown(str) {
+  if (!str) return "";
+  try {
+    return _renderMarkdownCore(str);
+  } catch (err) {
+    console.error("renderMarkdown error:", err);
+    // Safe fallback: return HTML-escaped plain text so something is always visible
+    return escHtml(str).replace(/\n/g, "<br>");
+  }
+}
+
+function _renderMarkdownCore(str) {
+  const stash = [];
+  const stashPush = (html) => {
+    const idx = stash.length;
+    stash.push(html);
+    return `\x00ST${idx}\x00`;
+  };
+
+  // ── 1. Block math  $$...$$ ────────────────────────────────────────────────
+  str = str.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+    let rendered;
+    if (typeof window.katex !== "undefined") {
+      try {
+        rendered = window.katex.renderToString(m.trim(), {
+          displayMode: true,
+          throwOnError: false,
+        });
+      } catch {
+        rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+      }
+    } else {
+      rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+    }
+    return stashPush(`<div class="math-block">${rendered}</div>`);
+  });
+
+  // ── 2. Fenced code blocks  ```lang\n...\n``` ──────────────────────────────
+  str = str.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const safe = escHtml(code.trim());
+    const cls = `code-block ltr${lang ? " language-" + lang : ""}`;
+    return stashPush(`<pre class="${cls}"><code>${safe}</code></pre>`);
+  });
+
+  // ── 3. Process line-by-line for block elements ────────────────────────────
+  const rawLines = str.split("\n");
+  const outParts = [];
+  let listBuf = [];
+  let listTag = null;
+
+  const flushList = () => {
+    if (listBuf.length) {
+      outParts.push(
+        `<${listTag} class="md-list">${listBuf.join("")}</${listTag}>`,
+      );
+      listBuf = [];
+      listTag = null;
+    }
+  };
+
+  // Split a line that may contain stash tokens into safe HTML,
+  // escaping the non-token segments and preserving the tokens verbatim.
+  const escapeAroundTokens = (line) => {
+    // Split on stash tokens, escape the non-token parts, rejoin
+    const TOKEN_RE = /(\x00ST\d+\x00)/g;
+    const parts = line.split(TOKEN_RE);
+    return parts
+      .map((part, i) =>
+        // Odd indices come from the capture group → they are tokens, keep as-is
+        i % 2 === 1 ? part : escHtml(part),
+      )
+      .join("");
+  };
+
+  for (const rawLine of rawLines) {
+    // Pass-through stash placeholders (may be on their own line)
+    if (/\x00ST\d+\x00/.test(rawLine)) {
+      flushList();
+      outParts.push(escapeAroundTokens(rawLine));
+      continue;
+    }
+
+    // Horizontal rule  ---  ***  ___
+    if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(rawLine)) {
+      flushList();
+      outParts.push('<hr class="md-hr">');
+      continue;
+    }
+
+    // Headings  # … ######
+    const hMatch = rawLine.match(/^(#{1,6})\s+(.+)$/);
+    if (hMatch) {
+      flushList();
+      const lvl = hMatch[1].length;
+      outParts.push(
+        `<h${lvl} class="md-h${lvl}">${applyInline(escHtml(hMatch[2]))}</h${lvl}>`,
+      );
+      continue;
+    }
+
+    // Blockquote  >
+    const bqMatch = rawLine.match(/^>\s*(.*)$/);
+    if (bqMatch) {
+      flushList();
+      outParts.push(
+        `<blockquote class="md-blockquote">${applyInline(escHtml(bqMatch[1]))}</blockquote>`,
+      );
+      continue;
+    }
+
+    // Unordered list  - / * / +
+    const ulMatch = rawLine.match(/^[-*+]\s+(.+)$/);
+    if (ulMatch) {
+      if (listTag === "ol") flushList();
+      listTag = "ul";
+      listBuf.push(`<li>${applyInline(escHtml(ulMatch[1]))}</li>`);
+      continue;
+    }
+
+    // Ordered list  1.
+    const olMatch = rawLine.match(/^\d+\.\s+(.+)$/);
+    if (olMatch) {
+      if (listTag === "ul") flushList();
+      listTag = "ol";
+      listBuf.push(`<li>${applyInline(escHtml(olMatch[1]))}</li>`);
+      continue;
+    }
+
+    // Empty line → paragraph break
+    if (rawLine.trim() === "") {
+      flushList();
+      outParts.push(""); // becomes a gap in the join step
+      continue;
+    }
+
+    // Regular text line
+    flushList();
+    outParts.push(applyInline(escHtml(rawLine)));
+  }
+
+  flushList();
+
+  // ── 4. Join lines, inserting <br> only between consecutive inline segments ──
+  // Block-level elements (tags or empty spacers) never get a trailing <br>.
+  const BLOCK_START = /^<(h[1-6]|ul|ol|blockquote|hr|div|pre|p)[\s>\/]/;
+  const BLOCK_END = /^<\/(h[1-6]|ul|ol|blockquote|div|pre|p)>/;
+  const isBlock = (s) =>
+    s === undefined || s === "" || BLOCK_START.test(s) || BLOCK_END.test(s);
+
+  let result = "";
+  for (let i = 0; i < outParts.length; i++) {
+    result += outParts[i];
+    if (!isBlock(outParts[i]) && !isBlock(outParts[i + 1])) {
+      result += "<br>";
+    }
+  }
+
+  // ── 5. Restore stashed blocks ─────────────────────────────────────────────
+  result = result.replace(/\x00ST(\d+)\x00/g, (_, i) => stash[parseInt(i)]);
+
+  return result;
 }
 
 /**
@@ -246,61 +454,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDraftFromLocalStorage();
   }
 
-  // ============================================================================
-  // PWA INSTALLATION
-  // ============================================================================
-  const installBtn = document.querySelector(".install-app");
-  if (installBtn) {
-    installBtn.style.display = "none";
-
-    installBtn.addEventListener("click", async () => {
-      try {
-        if (!deferredPrompt) {
-          showNotification(
-            "غير متاح",
-            "التطبيق غير قابل للتثبيت في الوقت الحالي",
-            "warning",
-          );
-          return;
-        }
-
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-
-        if (outcome === "accepted") {
-          console.log("User accepted the install prompt");
-          installBtn.style.display = "none";
-          showNotification(
-            "تم التثبيت",
-            "تم تثبيت التطبيق بنجاح",
-            "./favicon.png",
-          );
-        } else {
-          console.log("User dismissed the install prompt");
-        }
-
-        deferredPrompt = null;
-      } catch (error) {
-        console.error("Error during PWA installation:", error);
-        showNotification("Error during PWA installation", `${error}`, "error");
-      }
-    });
-  }
-
   updateEmptyState();
   setupEventListeners();
   setupKeyboardShortcuts();
   updateProgress();
   updateStatistics();
-});
-
-window.addEventListener("appinstalled", () => {
-  console.log("PWA installed successfully");
-  showNotification(
-    "مبروك!",
-    "تم تثبيت التطبيق بنجاح على جهازك",
-    "./favicon.png",
-  );
 });
 
 function setupEventListeners() {
@@ -583,6 +741,10 @@ function renderQuestion(question, insertAtIndex = null) {
   questionCard.draggable = true;
   questionCard.dataset.questionId = question.id;
 
+  // ── Detect question type and tag the card ──────────────────────────────────
+  const isEssay = question.options.length === 1;
+  if (isEssay) questionCard.classList.add("question-card--essay");
+
   // Check if question is incomplete
   const isIncomplete =
     !question.q ||
@@ -620,13 +782,21 @@ function renderQuestion(question, insertAtIndex = null) {
             </div>
             
             <div class="form-group">
-                <label>الإختيارات (إختيار واحد = سؤال مقالي)</label>
+                <label class="options-label">${isEssay ? "الإجابة المرجعية" : "الإختيارات (إختيار واحد = سؤال مقالي)"}</label>
                 <div id="options-container-${question.id}" class="options-list">
                     ${renderOptions(question)}
                 </div>
-                <button class="add-option-btn" onclick="addOption(${question.id})">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg> إضافة خيار
-                </button>
+                <div id="option-btn-${question.id}">
+                  ${
+                    isEssay
+                      ? `<button class="add-option-btn add-option-btn--convert" onclick="convertEssayToMcq(${question.id})">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> تحويل إلى اختيار متعدد
+                       </button>`
+                      : `<button class="add-option-btn" onclick="addOption(${question.id})">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg> إضافة خيار
+                       </button>`
+                  }
+                </div>
             </div>
             
             <div class="collapsible-section">
@@ -886,6 +1056,24 @@ function rerenderAllQuestions() {
 // ============================================================================
 
 function renderOptions(question) {
+  // ── Essay question: single option — render a distinct answer-model editor ──
+  if (question.options.length === 1) {
+    const optId = `option-text-${question.id}-0`;
+    return `
+      <div class="essay-answer-container" id="option-${question.id}-0">
+        <div class="essay-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+          سؤال مقالي
+        </div>
+        <div class="essay-answer-label">نموذج الإجابة <span class="essay-optional">(اختياري — لمرجعية المراجع فقط)</span></div>
+        <div class="essay-answer-editor">
+          ${mdEditorHtml(optId, question.options[0], "اكتب نموذج إجابة هنا...", 5)}
+        </div>
+      </div>
+    `;
+  }
+
+  // ── MCQ / True-False ─────────────────────────────────────────────────────
   return question.options
     .map((option, index) => {
       const optId = `option-text-${question.id}-${index}`;
@@ -948,13 +1136,40 @@ window.setCorrectAnswer = function (questionId, optionIndex) {
 
 function rerenderOptions(questionId) {
   const question = quizData.questions.find((q) => q.id === questionId);
-  if (question) {
-    const container = document.getElementById(
-      `options-container-${questionId}`,
-    );
-    if (container) {
-      container.innerHTML = renderOptions(question);
-      setupOptionMdEditors(questionId);
+  if (!question) return;
+
+  const container = document.getElementById(`options-container-${questionId}`);
+  if (container) {
+    container.innerHTML = renderOptions(question);
+    setupOptionMdEditors(questionId);
+  }
+
+  // ── Keep card class, label, and button in sync with question type ──────────
+  const isEssay = question.options.length === 1;
+  const card = document.getElementById(`question-${questionId}`);
+  if (card) {
+    card.classList.toggle("question-card--essay", isEssay);
+  }
+
+  const label = document.querySelector(
+    `#question-${questionId} .options-label`,
+  );
+  if (label) {
+    label.textContent = isEssay
+      ? "الإجابة المرجعية"
+      : "الإختيارات (إختيار واحد = سؤال مقالي)";
+  }
+
+  const btnDiv = document.getElementById(`option-btn-${questionId}`);
+  if (btnDiv) {
+    if (isEssay) {
+      btnDiv.innerHTML = `<button class="add-option-btn add-option-btn--convert" onclick="convertEssayToMcq(${questionId})">
+        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> تحويل إلى اختيار متعدد
+      </button>`;
+    } else {
+      btnDiv.innerHTML = `<button class="add-option-btn" onclick="addOption(${questionId})">
+        <svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> إضافة خيار
+      </button>`;
     }
   }
 }
@@ -980,6 +1195,19 @@ window.removeOption = function (questionId, optionIndex) {
     updateStatistics();
     autosave();
   }
+};
+
+/** Convert a single-option (essay) question into a 4-option MCQ */
+window.convertEssayToMcq = function (questionId) {
+  const question = quizData.questions.find((q) => q.id === questionId);
+  if (!question) return;
+  // Keep the model-answer text as the first option
+  while (question.options.length < 4) question.options.push("");
+  question.correct = 0;
+  rerenderOptions(questionId);
+  updateStatistics();
+  autosave();
+  showNotification("تم التحويل", "تم تحويل السؤال إلى اختيار متعدد", "success");
 };
 
 // ============================================================================
@@ -1470,6 +1698,7 @@ function autosave() {
       const dataToSave = {
         title: quizData.title,
         description: quizData.description,
+        source: quizData.source, // FIX: persist source in draft
         questions: quizData.questions,
         lastModified: new Date().toISOString(),
       };
@@ -1963,11 +2192,7 @@ window.exportQuiz = function () {
         if (!btn.dataset.copied) {
           try {
             const text = buildQuizText(
-              {
-                title: quizData.title,
-                description: quizData.description,
-                source: quizData.source,
-              },
+              { title: quizData.title, description: quizData.description },
               exportQuestions,
             );
             await navigator.clipboard.writeText(text);
@@ -2253,6 +2478,8 @@ window.processImport = async function () {
         if (!quizData.title && parsed.meta) {
           quizData.title = parsed.meta.title || defaultTitle;
           quizData.description = parsed.meta.description || "";
+          // FIX: read source FROM parsed.meta, not from stale quizData.source
+          quizData.source = parsed.meta.source || "";
           const titleEl = document.getElementById("quizTitle");
           const descEl = document.getElementById("quizDescription");
           const sourceInput = document.getElementById("quizSource");
@@ -2281,6 +2508,8 @@ window.processImport = async function () {
       if (!quizData.title && parsed.meta) {
         quizData.title = parsed.meta.title || "";
         quizData.description = parsed.meta.description || "";
+        // FIX: read source FROM parsed.meta, not from stale quizData.source
+        quizData.source = parsed.meta.source || "";
         const titleEl = document.getElementById("quizTitle");
         const descEl = document.getElementById("quizDescription");
         const sourceInput = document.getElementById("quizSource");

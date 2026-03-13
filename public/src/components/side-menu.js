@@ -12,24 +12,51 @@
     e.preventDefault();
     _deferredInstallPrompt = e;
     // Reveal the install button wherever it lives in the sidebar
-    const btn = document.querySelector(".install-app");
-    if (btn) btn.style.display = "flex";
+    const btns = document.querySelectorAll(".install-app");
+    btns.forEach((btn) => (btn.style.display = "flex"));
   });
 
   window.addEventListener("appinstalled", () => {
     _deferredInstallPrompt = null;
-    const btn = document.querySelector(".install-app");
-    if (btn) btn.style.display = "none";
+    const btns = document.querySelectorAll(".install-app");
+    btns.forEach((btn) => (btn.style.display = "none"));
+    if (typeof showNotification === "function") {
+      showNotification("تم التثبيت", "تم تثبيت التطبيق بنجاح", "./favicon.png");
+    }
   });
 
   window.installApp = async function () {
-    if (!_deferredInstallPrompt) return;
-    _deferredInstallPrompt.prompt();
-    const { outcome } = await _deferredInstallPrompt.userChoice;
-    if (outcome === "accepted") {
-      _deferredInstallPrompt = null;
-      const btn = document.querySelector(".install-app");
-      if (btn) btn.style.display = "none";
+    console.log(
+      "installApp triggered, prompt state:",
+      _deferredInstallPrompt ? "Available" : "NULL",
+    );
+    if (!_deferredInstallPrompt) {
+      if (typeof showNotification === "function") {
+        showNotification(
+          "غير متاح",
+          "التطبيق غير قابل للتثبيت حالياً (قد يكون مثبتاً بالفعل أو المتصفح لا يدعم) جرّب من الصفحة الرئيسية",
+          "warning",
+        );
+      }
+      return;
+    }
+
+    const promptEvent = _deferredInstallPrompt;
+    try {
+      console.log("Calling prompt()...");
+      await promptEvent.prompt();
+      const { outcome } = await promptEvent.userChoice;
+      console.log("User choice outcome:", outcome);
+      if (outcome === "accepted") {
+        _deferredInstallPrompt = null;
+        const btns = document.querySelectorAll(".install-app");
+        btns.forEach((btn) => (btn.style.display = "none"));
+      }
+    } catch (err) {
+      console.error("PWA Prompt error:", err);
+      if (typeof showNotification === "function") {
+        showNotification("خطأ في التثبيت", err.message, "error");
+      }
     }
   };
 })();
@@ -211,10 +238,17 @@
   // ── Action buttons (data-action) ────────────────────────────────────────────
 
   sidebar.querySelectorAll("[data-action]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const fn = window[btn.dataset.action];
-      if (typeof fn === "function") fn();
-      if (isMobile()) closeMobileSidebar();
+    btn.addEventListener("click", (e) => {
+      const action = btn.dataset.action;
+      const fn = window[action];
+      if (typeof fn === "function") {
+        // For PWA install, we trigger it immediately to preserve user gesture
+        fn();
+      }
+      // Close sidebar on mobile, unless it's the install app button (the browser prompt will cover it)
+      if (isMobile() && action !== "installApp") {
+        closeMobileSidebar();
+      }
     });
   });
 

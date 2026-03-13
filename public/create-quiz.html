@@ -39,6 +39,13 @@
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
 
+    <!-- KaTeX — LaTeX math rendering
+         Classic (non-deferred) script so window.katex is synchronously
+         available before any ES module runs. No SRI: jsDelivr serves the
+         canonical npm release unmodified. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
     <!-- Theme Controller Script -->
     <script type="module" src="src/shared/theme-controller.js"></script>
 
@@ -880,20 +887,33 @@
                 <p style="font-size:0.82rem;color:var(--color-text-secondary);margin-bottom:8px;">
                     يدعم: JSON · نص مرقّم (1. سؤال / A. خيار / Correct: A / Explanation: ...)
                 </p>
-                <textarea id="importTextarea" rows="7" placeholder='1. Which programming language is faster, `C++ or python`?
+                <textarea id="importTextarea" rows="7" placeholder='Title: C++ Quiz
+Description: A small quiz aimed at teaching Junior devs C++.
+Source: https://www.w3schools.com/CPP/default.asp
+
+1. Which programming languange is fastest?
 
 A. Python
-B. C++
+B. Rust
+C. C++
+D. C#
+
+Correct: C
+
+Explanation: C++ is the fastest programming language of them.
+
+2. Python is harder than C++.
+
+A. True
+B. False
 
 Correct: B
 
-Explanation: C++ is faster than python.
+3. Write a C++ code to print `Hello World!`.
 
-2. Write a simple printing statement in C++.
+Answer: ```cout << "Hello World!" << endl;```
 
-- ```cout << "Hello World" << endl;```
-
-Explanation: C++ uses `cout` for printing.' aria-label="محتوى الأسئلة للاستيراد"></textarea>
+Explanation: C++ uses `cout` for printing statements.' aria-label="محتوى الأسئلة للاستيراد"></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="processImport()"><svg xmlns="http://www.w3.org/2000/svg"

@@ -1350,8 +1350,11 @@ function openInlineCreateQuizModal() {
     </div>
     <div class="form-group" style="margin-bottom: 24px;">
       <label for="inlineQuizContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-primary); font-size: 0.9rem;">محتوى الإمتحان</label>
-      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">1. Which programming languange is fastest?
+      <textarea id="inlineQuizContent" rows="8" style="width: 100%; padding: 16px; direction: ltr; border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-background); color: var(--color-text-primary); font-family: inherit; font-size: 0.95rem; line-height: 1.6; transition: all 0.2s; outline: none; resize: vertical; box-sizing: border-box;" onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 4px var(--color-primary-light)';" onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none';">Title: C++ Quiz
+Description: A small quiz aimed at teaching Junior devs C++.
+Source: https://www.w3schools.com/CPP/default.asp
 
+1. Which programming languange is fastest?
 A. Python
 B. Rust
 C. C++
@@ -1370,7 +1373,7 @@ Correct: B
 
 3. Write a C++ code to print \`Hello World!\`.
 
-- \`\`\`cout << "Hello World!" << endl;\`\`\`
+Answer: \`\`\`cout << "Hello World!" << endl;\`\`\`
 
 Explanation: C++ uses \`cout\` for printing statements.</textarea>
     </div>
@@ -1545,8 +1548,13 @@ Explanation: C++ uses \`cout\` for printing statements.</textarea>
 /** Read a field from either old or new schema */
 function qz(quiz, field) {
   switch (field) {
+    // Always prefer the top-level id (the storage key); fall back to meta.id for
+    // legacy payloads that accidentally stored it only inside meta.
     case "id":
-      return quiz.meta?.id || "";
+      return quiz.id || quiz.meta?.id || "";
+    // path is a top-level field on manifest exams, not stored in user quizzes
+    case "path":
+      return quiz.path || quiz.meta?.path || "";
     case "title":
       return quiz.meta?.title || quiz.title || "";
     case "description":
@@ -1557,8 +1565,9 @@ function qz(quiz, field) {
       return quiz.meta?.createdAt || quiz.createdAt || "";
     case "count":
       return quiz.stats?.questionCount ?? quiz.questions?.length ?? 0;
+    // FIX: guard against undefined questionTypes before calling .join()
     case "type":
-      return quiz.stats?.questionTypes.join(" · ") || "";
+      return (quiz.stats?.questionTypes || []).join(" · ");
     default:
       return undefined;
   }
@@ -1632,8 +1641,10 @@ function createUserQuizCard(quiz, index) {
     transition: transform 0.2s, box-shadow 0.2s;
     border: 2px solid var(--color-border);
     position: relative;
-    overflow: hidden;
-    margin-top: 24px; /* add this */
+    overflow: visible;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
   `;
 
   // Gradient accent on top
@@ -1646,6 +1657,7 @@ function createUserQuizCard(quiz, index) {
     right: 0;
     height: 4px;
     background: var(--gradient-accent);
+    border-radius: 10px 10px 0 0;
   `;
   card.appendChild(accentBar);
 
@@ -1712,9 +1724,10 @@ function createUserQuizCard(quiz, index) {
   `;
 
   const createdDate = document.createElement("span");
-  const date = new Date(qz(quiz, "createdAt"));
-
-  createdDate.textContent = date.toLocaleDateString();
+  const rawDate = qz(quiz, "createdAt");
+  const dateObj = rawDate ? new Date(rawDate) : null;
+  createdDate.textContent =
+    dateObj && !isNaN(dateObj) ? dateObj.toLocaleDateString() : rawDate || "";
   createdDate.style.cssText = `
     color: var(--color-text-tertiary);
     font-size: 0.85rem;
@@ -1724,12 +1737,71 @@ function createUserQuizCard(quiz, index) {
   metadata.appendChild(createdDate);
   card.appendChild(metadata);
 
+  // ── Question type badges ─────────────────────────────────────────────────────
+  const typeStr = qz(quiz, "type");
+  if (typeStr) {
+    const typesRow = document.createElement("div");
+    typesRow.style.cssText = `
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    `;
+    typeStr.split(" · ").forEach((t) => {
+      const chip = document.createElement("span");
+      chip.textContent = t;
+      const colorMap = {
+        MCQ: "var(--color-primary-light)",
+        Essay: "var(--color-success-light)",
+        "True/False": "var(--color-warning-light)",
+      };
+      chip.style.cssText = `
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: ${colorMap[t] || "var(--color-border)"};
+        color: var(--color-text-primary);
+      `;
+      typesRow.appendChild(chip);
+    });
+    card.appendChild(typesRow);
+  }
+
+  // ── Source link ──────────────────────────────────────────────────────────────
+  const sourceUrl = qz(quiz, "source");
+  if (sourceUrl && /^https?:\/\//.test(sourceUrl.trim())) {
+    const sourceRow = document.createElement("div");
+    sourceRow.style.cssText = "margin-top: 8px;";
+    const sourceLink = document.createElement("a");
+    sourceLink.href = sourceUrl.trim();
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noopener noreferrer";
+    sourceLink.textContent = "🔗 المصدر";
+    sourceLink.setAttribute("aria-label", `مصدر الاختبار: ${sourceUrl}`);
+    sourceLink.style.cssText = `
+      font-size: 0.8rem;
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 600;
+    `;
+    sourceLink.onmouseenter = () => {
+      sourceLink.style.textDecoration = "underline";
+    };
+    sourceLink.onmouseleave = () => {
+      sourceLink.style.textDecoration = "none";
+    };
+    sourceRow.appendChild(sourceLink);
+    card.appendChild(sourceRow);
+  }
+
   // Action buttons
   const actions = document.createElement("div");
   actions.style.cssText = `
     display: flex;
     gap: 8px;
-    margin-top: 15px;
+    margin-top: auto;
+    padding-top: 15px;
   `;
 
   const playBtn = document.createElement("button");
