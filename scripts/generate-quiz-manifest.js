@@ -9,7 +9,8 @@
 //     - Set meta.title from filename if missing
 //     - Do NOT overwrite meta.id or meta.createdAt if they already exist
 //  2. Build quiz-manifest.json in the new subjects format.
-
+// > npm run sync:quizzes
+// ========================================================================
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";

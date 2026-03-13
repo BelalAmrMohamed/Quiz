@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-05T07:49:08.525Z",
+  "generatedAt": "2026-03-13T08:30:40.162Z",
   "dataRoot": "data/quizzes",
   "subjects": [
     {
@@ -1326,6 +1326,32 @@
       "term": 2,
       "quizzes": [
         {
+          "id": "4LM6V43K",
+          "title": "Cpluspkus Quiz",
+          "path": "/data/quizzes/Computer Science/2/2/Website demo/Cpluspkus_Quiz.json",
+          "questionCount": 3,
+          "questionTypes": [
+            "Essay",
+            "MCQ",
+            "True/False"
+          ],
+          "description": "A small quiz aimed at teaching Junior devs C++.",
+          "source": "https://www.w3schools.com/CPP/default.asp"
+        },
+        {
+          "id": "CUL6BD4R",
+          "title": "C++ Quiz",
+          "path": "/data/quizzes/Computer Science/2/2/Website demo/C_Quiz.json",
+          "questionCount": 3,
+          "questionTypes": [
+            "Essay",
+            "MCQ",
+            "True/False"
+          ],
+          "description": "A small quiz aimed at teaching Junior devs C++.",
+          "source": "https://www.w3schools.com/CPP/default.asp"
+        },
+        {
           "id": "4OBRHDOR",
           "title": "Test Quiz",
           "path": "/data/quizzes/Computer Science/2/2/Website demo/test-quiz.json",
@@ -1345,7 +1371,8 @@
             "Essay",
             "MCQ",
             "True/False"
-          ]
+          ],
+          "description": "Basmagi Quiz Platform Demo"
         }
       ]
     }
