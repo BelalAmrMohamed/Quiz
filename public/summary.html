@@ -330,7 +330,10 @@
     <div class="container">
         <!-- Page Header -->
         <div class="header">
-            <h1>اكتمل الاختبار <svg xmlns="http://www.w3.org/2000/svg"
+
+            <!-- This is Oddly arranged Because of mix between rlt element `اكتمل الإختبار` 
+             and ltr element (#quiz-title), but this arrangement works -->
+            <h1 style="direction: ltr !important;"><svg xmlns="http://www.w3.org/2000/svg"
                     style="display:inline-block;vertical-align:middle;width:2rem;height:2rem;" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="lucide lucide-party-popper-icon lucide-party-popper">
@@ -345,7 +348,7 @@
                     <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7" />
                     <path
                         d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z" />
-                </svg></h1>
+                </svg>اكتمل الإختبار<br><span id="quiz-title"></span></h1>
         </div>
 
         <!-- Score Header Card (rendered by summary.js) -->

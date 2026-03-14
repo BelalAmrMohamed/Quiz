@@ -535,6 +535,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  const limit = 30;
+  const title = result.examTitle;
+
+  /* Since the page is RTL and the welcome title is in Arabic,
+     but most exam Titles are in English, I reversed the placement
+     of the `...` so they actually get displayed correctly */
+  document.getElementById("quiz-title").textContent =
+    title.length > limit ? `${title.substring(0, limit)}...` : title;
+
   // Support both old result format and new (with mcqScore + essayScore fields)
   const displayScore =
     result.score !== undefined ? result.score : mcqCorrect + essayScoreTotal;
