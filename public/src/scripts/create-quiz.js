@@ -17,7 +17,6 @@ import {
   parseImportContent,
   buildJsonQuizExport,
 } from "../shared/quiz-processor.js";
-import { generateQuizId } from "./quizId.js";
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -58,10 +57,22 @@ function applyInline(s) {
   const iMathStash = [];
   s = s.replace(/\$([^\$\n]+)\$/g, (_, m) => {
     const idx = iMathStash.length;
+    // ── Fix: decode HTML entities before KaTeX renders ──────────────────────
+    // applyInline() always receives an already-escHtml()-encoded string.
+    // Characters like < become &lt; BEFORE this regex runs, so KaTeX would
+    // receive "&lt;" instead of "<" and render the expression in red (error).
+    // Decoding here restores the original LaTeX source that KaTeX expects.
+    const decoded = m
+      .trim()
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
     if (typeof window.katex !== "undefined") {
       try {
         iMathStash.push(
-          window.katex.renderToString(m.trim(), {
+          window.katex.renderToString(decoded, {
             displayMode: false,
             throwOnError: false,
           }),
