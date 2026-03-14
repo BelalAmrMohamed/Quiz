@@ -394,11 +394,9 @@ window.changeUsername = function () {
       } else if (window.location.pathname.startsWith("/settings")) {
         const settingsNameInput = document.getElementById("settingsName");
         if (settingsNameInput) settingsNameInput.value = trimmedName;
-      } else if (window.location.pathname.startsWith("/summary")) {
-        const summaryUserName = document.getElementById(
-          "summary-page-username",
-        );
-        summaryUserName.textContent = trimmedName;
+      } else if (window.location.pathname.startsWith("/result")) {
+        const resultUserName = document.getElementById("result-page-username");
+        resultUserName.textContent = trimmedName;
       }
 
       const sideMemuNameDisplay = document.getElementById("userNameDisplay");

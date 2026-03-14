@@ -1,4 +1,4 @@
-// src/scripts/summary.js
+// src/scripts/result.js
 import { getManifest } from "./quizManifest.js";
 
 // Download functions
@@ -645,7 +645,7 @@ function renderHeader(
     </div>`
       : "";
 
-  const userNameHtml = `<span id="summary-page-username">${userName}</span>`;
+  const userNameHtml = `<span id="result-page-username">${userName}</span>`;
   if (scoreHeader)
     scoreHeader.innerHTML = `
     <div class="score-circle ${percentage >= 70 ? "pass" : "fail"}">

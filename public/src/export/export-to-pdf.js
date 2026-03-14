@@ -1,6 +1,6 @@
 // src/scripts/exportToPdf.js
 // Downloads the quiz as a PDF file (.pdf)
-// Deals with the export from both main page and results/summary page
+// Deals with the export from both main page and results page
 // `jsPDF` library used, included in here `loadPdfLib`
 
 import { showNotification } from "../components/notifications.js";

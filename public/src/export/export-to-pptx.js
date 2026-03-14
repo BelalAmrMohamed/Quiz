@@ -1,6 +1,6 @@
 // src/scripts/exportToPptx.js
 // Downloads the quiz as a PowerPoint file (.pptx)
-// Deals with the export from both main page and results/summary page
+// Deals with the export from both main page and results page
 // `PptxGenJS` library used, included in this file.
 
 import { showNotification } from "../components/notifications.js";

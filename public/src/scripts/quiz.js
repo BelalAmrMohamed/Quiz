@@ -1435,7 +1435,7 @@ async function finish(skipconfirmationNotification) {
   // Clear quiz session data
   localStorage.removeItem("quiz_start_time");
 
-  window.location.href = "summary.html";
+  window.location.href = "result.html";
 }
 
 async function restart(skipconfirmationNotification) {

@@ -32,7 +32,7 @@ Welcome to the inaugural release of **Quiz**, a sophisticated, beginner-friendly
 - **Intuitive Navigation & UI**
   Single-question view with previous/next buttons, a dynamic progress bar, real-time timer, and score tracking. Beginner-oriented styling with encouraging feedback like _"Great job – you're learning fast!"_ to build confidence.
 
-- **Summary & Review Mode**
+- **Result & Review Mode**
   Detailed post-quiz summary with total time, scores, and per-question breakdowns (correct/wrong/unanswered), including your answers and correct solutions for self-reflection.
 
 - **Modular Architecture**

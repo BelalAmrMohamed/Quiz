@@ -1,6 +1,6 @@
 // src/scripts/export-to-word.js
 // Downloads the quiz as a Word file (.docx)
-// Deals with the export from both main page and results/summary page
+// Deals with the export from both main page and results page
 // `docx` library used, included in this file.
 
 import { showNotification } from "../components/notifications.js";

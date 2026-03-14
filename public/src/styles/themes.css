@@ -455,7 +455,7 @@ body {
   border: 1px solid var(--color-border);
 }
 
-/* Answer boxes (summary page) */
+/* Answer boxes (result page) */
 .your-ans {
   background: var(--color-surface);
   border-color: var(--color-border);
@@ -637,7 +637,7 @@ body {
   color: white;
 }
 
-/* Answer comparison boxes (summary page) */
+/* Answer comparison boxes (result page) */
 .ans-comparison {
   background: var(--color-background-secondary);
   border-color: var(--color-border-light);

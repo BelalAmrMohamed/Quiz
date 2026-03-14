@@ -1,4 +1,4 @@
-/* src/styles/summary.css */
+/* src/styles/result.css */
 /* All theme variables live in themes.css */
 
 * {
@@ -821,7 +821,7 @@ body {
 /* ============================================================================
    MARKDOWN + KATEX STYLES (mirrored from create-quiz)
    ── Do not add .md-editor-wrap / .md-rendered / .md-source / .md-live-preview
-      here — those are create-quiz editor-UI rules, not needed on the summary page.
+      here — those are create-quiz editor-UI rules, not needed on the result page.
    ============================================================================ */
 
 /* Direction helper used by the renderer for code blocks and math */

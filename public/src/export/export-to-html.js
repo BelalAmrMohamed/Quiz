@@ -1,6 +1,6 @@
 // src/scripts/exportToHtml.js
 // Downloads the quiz as an html page, showing the results of the quiz only (.html)
-// Deals with the export from both main page and results/summary page
+// Deals with the export from both main page and result page
 // No libraries used
 
 import { showNotification } from "../components/notifications.js";
@@ -11,7 +11,7 @@ import { gradeEssay, isEssayQuestion } from "../shared/rate-essays.js";
 //
 // exportToHtml() runs inside the app's browser context, where KaTeX has already
 // been loaded synchronously (via the CDN <script> tag present on create-quiz.html,
-// quiz.html, and summary.html since the previous integration task).  That means
+// quiz.html, and result.html since the previous integration task).  That means
 // window.katex is available here, so all math is fully rendered to HTML at export
 // time — the output file contains pre-rendered KaTeX markup, not raw LaTeX.
 //
