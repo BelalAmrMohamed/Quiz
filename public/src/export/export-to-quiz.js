@@ -2636,6 +2636,18 @@ function _renderMarkdownCore(str) {
     return `\x00ST${idx}\x00`;
   };
 
+  // ── Fix 0: Auto-wrap bare LaTeX lines ──────────────────────────────────────
+  // Some quiz data stores LaTeX without $ delimiters (e.g. "x = \frac{...}").
+  // Detect lines that contain LaTeX commands but no $ or ` (not already
+  // math/code), and wrap them in $...$ so step 1 can render them with KaTeX.
+  const BARE_LATEX_CMD_RE =
+    /\\(?:frac|sqrt|sum|int|prod|lim|pm|mp|cdot|times|div|leq|geq|neq|approx|equiv|infty|partial|alpha|beta|gamma|delta|epsilon|theta|lambda|mu|nu|pi|sigma|phi|psi|omega|vec|hat|bar|tilde|dot|binom|mathbb|mathbf|mathrm|mathit)\b/;
+  if (BARE_LATEX_CMD_RE.test(str)) {
+    str = str.replace(/^(?![^\n]*[$`])([^\n]+)$/gm, (line) =>
+      BARE_LATEX_CMD_RE.test(line) ? `$${line.trim()}$` : line,
+    );
+  }
+
   // 1. Block math  $$...$$
   str = str.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
     let rendered;
