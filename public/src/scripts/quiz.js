@@ -116,42 +116,241 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
-// === Helper: Markdown-lite renderer (code blocks, inline code, line breaks) ===
-function renderMarkdown(str) {
-  if (str === null || str === undefined) return "";
-  str = String(str);
-  const codeBlocks = [];
+// ── Markdown + KaTeX integration (mirrored from create-quiz) ──
 
-  // 1. Extract fenced code blocks (preserve their inner newlines verbatim)
-  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
-    const idx = codeBlocks.length;
-    const escaped = code
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    codeBlocks.push(
-      `<div class="code-block-wrapper"><button class="copy-code-btn" onclick="window.copyCodeBlock(this)" title="نسخ الكود"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg></button><pre class="code-block" dir="ltr"><code>${escaped.trim()}</code></pre></div>`,
-    );
-    return `\x00CODE${idx}\x00`;
-  });
-
-  // 2. Escape remaining HTML
-  str = str
+// ── Escape HTML for safe insertion ───────────────────────────────────────────
+function escHtml(s) {
+  return (s || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
 
-  // 3. Inline code (single backticks)
-  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+// ── Apply inline Markdown formatting to a pre-escaped string ─────────────────
+function applyInline(s) {
+  // Inline math $...$ (protect from other replacements with a temp stash)
+  const iMathStash = [];
+  s = s.replace(/\$([^\$\n]+)\$/g, (_, m) => {
+    const idx = iMathStash.length;
+    if (typeof window.katex !== "undefined") {
+      try {
+        iMathStash.push(
+          window.katex.renderToString(m.trim(), {
+            displayMode: false,
+            throwOnError: false,
+          }),
+        );
+      } catch {
+        iMathStash.push(
+          `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+        );
+      }
+    } else {
+      iMathStash.push(
+        `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+      );
+    }
+    return `\x01IM${idx}\x01`;
+  });
 
-  // 4. Newlines → <br>
-  str = str.replace(/\n/g, "<br>");
+  // Inline code
+  s = s.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+  // Bold + italic combined
+  s = s.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
+  // Bold: **...** or __...__
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
+  // Italic: *...* or _..._
+  s = s.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  s = s.replace(/_([^_\n]+)_/g, "<em>$1</em>");
+  // Strikethrough: ~~...~~
+  s = s.replace(/~~([^~\n]+)~~/g, "<del>$1</del>");
+  // Links: [text](url)
+  s = s.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="md-link">$1</a>',
+  );
+  // Images: ![alt](url)
+  s = s.replace(
+    /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g,
+    '<img src="$2" alt="$1" class="md-img" loading="lazy">',
+  );
 
-  // 5. Restore fenced code blocks
-  str = str.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+  // Restore inline math
+  s = s.replace(/\x01IM(\d+)\x01/g, (_, i) => iMathStash[parseInt(i)]);
+  return s;
+}
 
-  return str;
+/**
+ * Full-featured Markdown renderer with:
+ *  • KaTeX LaTeX math:  $inline$  and  $$block$$
+ *  • Fenced code blocks: ```lang ... ```
+ *  • Headings H1–H6
+ *  • Horizontal rules  ---  ***  ___
+ *  • Blockquotes  > text
+ *  • Unordered lists  - / * / +
+ *  • Ordered lists  1.
+ *  • Bold, italic, bold-italic, strikethrough
+ *  • Inline code
+ *  • Links and images
+ *  • Falls back gracefully if KaTeX is not loaded
+ */
+function renderMarkdown(str) {
+  if (!str) return "";
+  try {
+    return _renderMarkdownCore(str);
+  } catch (err) {
+    console.error("renderMarkdown error:", err);
+    return escHtml(str).replace(/\n/g, "<br>");
+  }
+}
+
+function _renderMarkdownCore(str) {
+  const stash = [];
+  const stashPush = (html) => {
+    const idx = stash.length;
+    stash.push(html);
+    return `\x00ST${idx}\x00`;
+  };
+
+  // ── 1. Block math  $$...$$ ────────────────────────────────────────────────
+  str = str.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+    let rendered;
+    if (typeof window.katex !== "undefined") {
+      try {
+        rendered = window.katex.renderToString(m.trim(), {
+          displayMode: true,
+          throwOnError: false,
+        });
+      } catch {
+        rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+      }
+    } else {
+      rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+    }
+    return stashPush(`<div class="math-block">${rendered}</div>`);
+  });
+
+  // ── 2. Fenced code blocks  ```lang\n...\n``` ──────────────────────────────
+  str = str.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const safe = escHtml(code.trim());
+    const cls = `code-block ltr${lang ? " language-" + lang : ""}`;
+    return stashPush(`<pre class="${cls}"><code>${safe}</code></pre>`);
+  });
+
+  // ── 3. Process line-by-line for block elements ────────────────────────────
+  const rawLines = str.split("\n");
+  const outParts = [];
+  let listBuf = [];
+  let listTag = null;
+
+  const flushList = () => {
+    if (listBuf.length) {
+      outParts.push(
+        `<${listTag} class="md-list">${listBuf.join("")}</${listTag}>`,
+      );
+      listBuf = [];
+      listTag = null;
+    }
+  };
+
+  // Split a line that may contain stash tokens into safe HTML,
+  // escaping the non-token segments and preserving the tokens verbatim.
+  const escapeAroundTokens = (line) => {
+    const TOKEN_RE = /(\x00ST\d+\x00)/g;
+    const parts = line.split(TOKEN_RE);
+    return parts
+      .map((part, i) => (i % 2 === 1 ? part : escHtml(part)))
+      .join("");
+  };
+
+  for (const rawLine of rawLines) {
+    // Pass-through stash placeholders (may be on their own line)
+    if (/\x00ST\d+\x00/.test(rawLine)) {
+      flushList();
+      outParts.push(escapeAroundTokens(rawLine));
+      continue;
+    }
+
+    // Horizontal rule  ---  ***  ___
+    if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(rawLine)) {
+      flushList();
+      outParts.push('<hr class="md-hr">');
+      continue;
+    }
+
+    // Headings  # … ######
+    const hMatch = rawLine.match(/^(#{1,6})\s+(.+)$/);
+    if (hMatch) {
+      flushList();
+      const lvl = hMatch[1].length;
+      outParts.push(
+        `<h${lvl} class="md-h${lvl}">${applyInline(escHtml(hMatch[2]))}</h${lvl}>`,
+      );
+      continue;
+    }
+
+    // Blockquote  >
+    const bqMatch = rawLine.match(/^>\s*(.*)$/);
+    if (bqMatch) {
+      flushList();
+      outParts.push(
+        `<blockquote class="md-blockquote">${applyInline(escHtml(bqMatch[1]))}</blockquote>`,
+      );
+      continue;
+    }
+
+    // Unordered list  - / * / +
+    const ulMatch = rawLine.match(/^[-*+]\s+(.+)$/);
+    if (ulMatch) {
+      if (listTag === "ol") flushList();
+      listTag = "ul";
+      listBuf.push(`<li>${applyInline(escHtml(ulMatch[1]))}</li>`);
+      continue;
+    }
+
+    // Ordered list  1.
+    const olMatch = rawLine.match(/^\d+\.\s+(.+)$/);
+    if (olMatch) {
+      if (listTag === "ul") flushList();
+      listTag = "ol";
+      listBuf.push(`<li>${applyInline(escHtml(olMatch[1]))}</li>`);
+      continue;
+    }
+
+    // Empty line → paragraph break
+    if (rawLine.trim() === "") {
+      flushList();
+      outParts.push("");
+      continue;
+    }
+
+    // Regular text line
+    flushList();
+    outParts.push(applyInline(escHtml(rawLine)));
+  }
+
+  flushList();
+
+  // ── 4. Join lines, inserting <br> only between consecutive inline segments ──
+  const BLOCK_START = /^<(h[1-6]|ul|ol|blockquote|hr|div|pre|p)[\s>\/]/;
+  const BLOCK_END = /^<\/(h[1-6]|ul|ol|blockquote|div|pre|p)>/;
+  const isBlock = (s) =>
+    s === undefined || s === "" || BLOCK_START.test(s) || BLOCK_END.test(s);
+
+  let result = "";
+  for (let i = 0; i < outParts.length; i++) {
+    result += outParts[i];
+    if (!isBlock(outParts[i]) && !isBlock(outParts[i + 1])) {
+      result += "<br>";
+    }
+  }
+
+  // ── 5. Restore stashed blocks ─────────────────────────────────────────────
+  result = result.replace(/\x00ST(\d+)\x00/g, (_, i) => stash[parseInt(i)]);
+
+  return result;
 }
 
 // === Helper: Get the model answer for an essay question ===

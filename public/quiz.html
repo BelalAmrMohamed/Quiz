@@ -60,6 +60,14 @@
     <link rel="stylesheet" href="src/components/side-menu.css">
     <link rel="stylesheet" href="src/components/notifications.css">
 
+    <!-- ── Markdown + KaTeX integration (mirrored from create-quiz) ──
+         KaTeX must load as a classic (non-deferred) script so that
+         window.katex is synchronously available when ES modules execute.
+         No SRI hashes: jsDelivr serves the canonical npm release unmodified.
+         Pinned to 0.16.9 exactly — do NOT add defer/async. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
     <!-- Theme Controller - Load once as module -->
     <script type="module" src="src/shared/theme-controller.js"></script>
 

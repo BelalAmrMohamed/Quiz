@@ -90,7 +90,7 @@ if (form) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function redirectToApp() {
-  window.location.href = "index.html";
+  window.location.href = "/";
 }
 
 function setLoading(on) {

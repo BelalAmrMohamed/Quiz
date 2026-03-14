@@ -424,7 +424,7 @@ async function saveAndRedirect() {
       sessionStorage.removeItem("intended_redirect_hash");
       window.location.href = `index.html${preservedHash}`;
     } else {
-      window.location.href = "index.html";
+      window.location.href = "/";
     }
   } catch (e) {
     console.error("Error saving", e);
@@ -481,7 +481,7 @@ async function skipOnboarding() {
       sessionStorage.removeItem("intended_redirect_hash");
       window.location.href = `index.html${preservedHash}`;
     } else {
-      window.location.href = "index.html";
+      window.location.href = "/";
     }
   }
 }

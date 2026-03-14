@@ -726,7 +726,7 @@ function renderQuestion(question, insertAtIndex = null) {
   questionCard.dataset.questionId = question.id;
 
   // ── Detect question type and tag the card ──────────────────────────────────
-  const isEssay = question.options.length === 1;
+  const isEssay = question.answer;
   if (isEssay) questionCard.classList.add("question-card--essay");
 
   // Check if question is incomplete
@@ -1040,8 +1040,7 @@ function rerenderAllQuestions() {
 // ============================================================================
 
 function renderOptions(question) {
-  // ── Essay question: single option — render a distinct answer-model editor ──
-  if (question.options.length === 1) {
+  if (question.answer) {
     const optId = `option-text-${question.id}-0`;
     return `
       <div class="essay-answer-container" id="option-${question.id}-0">
@@ -1076,7 +1075,7 @@ function renderOptions(question) {
                 ${mdEditorHtml(optId, option, `إختيار ${index + 1}`, 1)}
             </div>
             ${
-              question.options.length > 1
+              question.options.length >= 2
                 ? `<button class="option-delete" onclick="removeOption(${question.id}, ${index})" title="حذف الخيار" aria-label="حذف الخيار ${index + 1}"><svg xmlns="http://www.w3.org/2000/svg" class="page-data-lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`
                 : ""
             }
@@ -1129,7 +1128,7 @@ function rerenderOptions(questionId) {
   }
 
   // ── Keep card class, label, and button in sync with question type ──────────
-  const isEssay = question.options.length === 1;
+  const isEssay = question.answer === 1;
   const card = document.getElementById(`question-${questionId}`);
   if (card) {
     card.classList.toggle("question-card--essay", isEssay);
@@ -1170,7 +1169,7 @@ window.addOption = function (questionId) {
 
 window.removeOption = function (questionId, optionIndex) {
   const question = quizData.questions.find((q) => q.id === questionId);
-  if (question && question.options.length > 1) {
+  if (question && question.options.length >= 2) {
     question.options.splice(optionIndex, 1);
     if (question.correct >= question.options.length) {
       question.correct = question.options.length - 1;
@@ -1263,48 +1262,6 @@ window.clearSearch = function () {
     });
   }
 };
-
-// window.filterQuestions = function () {
-//   const filter = document.getElementById("questionFilter").value;
-//   currentFilter = filter;
-//   const questionCards = document.querySelectorAll(".question-card");
-
-//   let visibleCount = 0;
-//   questionCards.forEach((card) => {
-//     const questionId = parseInt(card.dataset.questionId);
-//     const question = quizData.questions.find((q) => q.id === questionId);
-
-//     let shouldShow = true;
-
-//     switch (filter) {
-//       case "with-images":
-//         shouldShow = question.image && question.image.trim() !== "";
-//         break;
-//       case "with-explanations":
-//         shouldShow = question.explanation && question.explanation.trim() !== "";
-//         break;
-//       case "mcq":
-//         shouldShow = question.options.length > 1;
-//         break;
-//       case "essay":
-//         shouldShow = question.options.length === 1;
-//         break;
-//       case "incomplete":
-//         shouldShow =
-//           !question.q ||
-//           question.q.trim() === "" ||
-//           question.options.some((opt) => !opt || opt.trim() === "");
-//         break;
-//       default:
-//         shouldShow = true;
-//     }
-
-//     card.style.display = shouldShow ? "block" : "none";
-//     if (shouldShow) visibleCount++;
-//   });
-
-//   showNotification("تم التصفية", `عرض ${visibleCount} سؤال`, "info");
-// };
 
 window.sortQuestions = function (type = "alpha") {
   const container = document.getElementById("questionsContainer");
@@ -1859,7 +1816,7 @@ function loadQuizFromLocalStorage(quizId) {
       showNotification("أهلاً بك", "تم تحميل الاختبار للتعديل", "success");
     } else {
       showNotification("خطأ", "لم يتم العثور على الاختبار", "error");
-      setTimeout(() => (window.location.href = "index.html"), 1500);
+      setTimeout(() => (window.location.href = "/"), 1500);
     }
   } catch (error) {
     console.error("Error loading quiz for edit:", error);
@@ -2015,7 +1972,7 @@ window.exportQuiz = function () {
             quizData.title,
             quizData.description,
             quizData.source,
-            exportQuestions
+            exportQuestions,
           );
 
           const safeFilename = (quizData.title || "quiz")
@@ -2177,7 +2134,8 @@ window.exportQuiz = function () {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          modal.remove();
+          btn.dataset.copied = "";
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="dl-label">نسخ</span><span class="dl-sublabel">(نص)</span>`;
         }
         return;
       }
@@ -2228,7 +2186,7 @@ window.saveLocally = function () {
         "success",
       );
       if (editingQuizId) {
-        setTimeout(() => (window.location.href = "index.html"), 1000);
+        setTimeout(() => (window.location.href = "/"), 1000);
       }
     } else {
       showNotification("خطأ", "فشل حفظ الاختبار", "error");
