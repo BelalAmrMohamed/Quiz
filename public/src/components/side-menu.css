@@ -87,12 +87,6 @@ body.sidebar-expanded {
   transform: rotate(180deg);
 }
 
-/* ── Mobile Close Button — REMOVED (hamburger is the toggle on mobile) ────── */
-/* The .close-menu element exists in the HTML but is always hidden.          */
-.close-menu {
-  display: none !important;
-}
-
 /* ── Mobile Hamburger (hidden on desktop) ────────────────────────────────── */
 .hamburger {
   display: none;
@@ -255,6 +249,10 @@ body.sidebar-expanded {
   object-fit: contain;
 }
 
+.sidebar.expanded nav {
+  padding-top: 15px;
+}
+
 /* Collapsed: show favicon, hide wordmark */
 .sidebar:not(.expanded) .sidebar-favicon {
   opacity: 1;
@@ -272,6 +270,8 @@ body.sidebar-expanded {
 .sidebar.expanded .sidebar-logo {
   display: flex;
   align-items: center;
+  margin-top: 10px;
+  margin-bottom: 0px;
 }
 
 /* Side bar logo (now in-flow, inside .sidebar-header) */
@@ -771,7 +771,6 @@ body.sidebar-expanded {
   .toggle-switch,
   .toggle-switch::after,
   .side-menu-backdrop,
-  .close-menu,
   .menu-item,
   .theme-selector-btn,
   .sidebar-toggle,
