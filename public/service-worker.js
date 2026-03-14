@@ -9,21 +9,18 @@ const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 // Files to cache immediately
 const STATIC_ASSETS = [
   "/",
-  // main pages
+  // main page and create-quiz page only
   "/index.html",
-  "/quiz.html",
-  "/result.html",
+  "/create-quiz.html",
 
   // used css files
-  "/src/styles/themes.css",
   "/src/styles/index.css",
-  "/src/styles/quiz.css",
-  "/src/styles/result.css",
+  "/src/styles/create-quiz.css",
+  "/src/styles/themes.css",
 
   // used js files
   "/src/scripts/index.js",
-  "/src/scripts/quiz.js",
-  "/src/scripts/result.js",
+  "/src/scripts/create-quiz.js",
   "/src/shared/theme-controller.js",
 
   // Notifications and side menu
