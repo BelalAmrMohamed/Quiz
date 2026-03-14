@@ -179,6 +179,25 @@ export async function exportToPdf(
     };
 
     // =========================================================
+    // BARE LATEX AUTO-WRAPPER  (Markdown + KaTeX integration)
+    //
+    // Some quiz data stores LaTeX without $ delimiters, e.g.:
+    //   "x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"
+    // This helper detects such lines and wraps them in $...$ so the
+    // standard $...$ pipeline (parseInlineRuns / collectMathExpressions)
+    // can render them.  Only fires when NO $ or ` already present on the line.
+    // =========================================================
+    const BARE_LATEX_CMD_RE =
+      /\\(?:frac|sqrt|sum|int|prod|lim|pm|mp|cdot|times|div|leq|geq|neq|approx|equiv|infty|partial|alpha|beta|gamma|delta|epsilon|theta|lambda|mu|nu|pi|sigma|phi|psi|omega|vec|hat|bar|tilde|dot|binom|mathbb|mathbf|mathrm|mathit)\b/;
+
+    const wrapBareLaTeXLines = (text) => {
+      if (!text || !BARE_LATEX_CMD_RE.test(text)) return text;
+      return String(text).replace(/^(?![^\n]*[$`])([^\n]+)$/gm, (line) =>
+        BARE_LATEX_CMD_RE.test(line) ? `$${line.trim()}$` : line,
+      );
+    };
+
+    // =========================================================
     // CANVAS MEASUREMENT CACHE  (#7 — avoids creating thousands of canvases)
     // =========================================================
     const CANVAS_DPR = 3;
@@ -300,6 +319,10 @@ export async function exportToPdf(
       if (typeof window.katex === "undefined" || !window.html2canvas)
         return null;
       const container = document.createElement("div");
+      // ── Fix: force LTR so the Arabic page's dir="rtl" is not inherited ───────
+      // Without this, KaTeX renders in an RTL context: "|r| < 1" visually flips
+      // to "1 > |r|", and \frac numerator tokens appear in reverse order.
+      container.setAttribute("dir", "ltr");
       Object.assign(container.style, {
         position: "absolute",
         left: "-9999px",
@@ -310,6 +333,8 @@ export async function exportToPdf(
         lineHeight: "1",
         color: "#1e293b",
         whiteSpace: "nowrap",
+        direction: "ltr", // belt-and-suspenders: style + attribute
+        unicodeBidi: "isolate",
       });
       document.body.appendChild(container);
       try {
@@ -343,8 +368,11 @@ export async function exportToPdf(
     const collectMathExpressions = (text) => {
       if (!text) return [];
       const exprs = [];
+      // ── Fix: normalize bare LaTeX lines before scanning for $ ──────────────
+      // Without this, "x = \frac{...}" (no delimiters) would be missed entirely.
+      const normalized = wrapBareLaTeXLines(String(text));
       // Strip block math first (avoids matching inner $ of $$...$$)
-      let remaining = String(text).replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+      let remaining = normalized.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
         exprs.push({
           key: `block:${m.trim()}`,
           expr: m.trim(),
@@ -732,8 +760,13 @@ export async function exportToPdf(
       const codeBlocks = [];
       const mathBlocks = [];
 
+      // ── Fix 0: Auto-wrap bare LaTeX lines ──────────────────────────────────
+      // Normalize before stashing so $$ / fenced-code stashing in steps 1–2
+      // sees the already-wrapped $...$ and handles them correctly.
+      let processed = wrapBareLaTeXLines(String(text));
+
       // 1. Stash block math $$...$$ (multi-line safe)
-      let processed = String(text).replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+      processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
         const idx = mathBlocks.length;
         mathBlocks.push(m.trim());
         return `\x00MB${idx}\x00`;
@@ -1228,9 +1261,19 @@ export async function exportToPdf(
             }
           }
           consumed += 2; // bottom padding
-          // Draw left accent bar covering the full blockquote height
-          setPdfFillColor(...COLORS.primary);
+          // ── Fix: call doc.setFillColor directly (bypass stale state cache) ──
+          // renderInlineLine calls setPdfTextColor which resets _fR to -1, but
+          // jsPDF's own fill state can still be stale in some code paths. Using
+          // the raw doc method guarantees the accent bar is drawn in primary color.
+          doc.setFillColor(...COLORS.primary);
           doc.rect(x, y + bqStart, 1.5, consumed - bqStart, "F");
+          // Sync cache so subsequent setPdf* calls behave correctly
+          _fR = COLORS.primary[0];
+          _fG = COLORS.primary[1];
+          _fB = COLORS.primary[2];
+          _tR = -1;
+          _tG = -1;
+          _tB = -1;
         } else if (seg.type === "list") {
           // ── Markdown + KaTeX integration ──
           const prefW = 5; // mm reserved for bullet / number

@@ -162,6 +162,15 @@
     <link rel="stylesheet" href="src/components/notifications.css">
     <link rel="stylesheet" href="src/styles/search.css">
 
+    <!-- ── Markdown + KaTeX integration (mirrored from create-quiz) ──
+         KaTeX must load as a classic (non-deferred) script so that
+         window.katex is synchronously available when ES modules execute.
+         No SRI hashes: jsDelivr serves the canonical npm release unmodified.
+         Pinned to 0.16.9 exactly — do NOT add defer/async. -->
+    <!-- For the PDF export -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
     <!-- Controller Scripts - with module preload -->
     <link rel="modulepreload" href="src/shared/theme-controller.js">
     <link rel="modulepreload" href="src/shared/canvas-animation.js">
