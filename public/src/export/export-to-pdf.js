@@ -1,6 +1,6 @@
 // src/scripts/exportToPdf.js
 // Downloads the quiz as a PDF file (.pdf)
-// Deals with the export from both main page and results page
+// Deals with the export from both main page and results/summary page
 // `jsPDF` library used, included in here `loadPdfLib`
 
 import { showNotification } from "../components/notifications.js";
@@ -19,6 +19,24 @@ const loadPdfLib = () =>
       "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
     s.onload = resolve;
     s.onerror = () => reject(new Error("PDF library failed to load"));
+    document.head.appendChild(s);
+  });
+
+// ── Markdown + KaTeX integration (mirrored from create-quiz) ──────────────────
+// html2canvas is used to rasterize KaTeX-rendered HTML to PNG images that
+// jsPDF's text-mode pipeline can embed.  Loaded lazily — only triggered when
+// window.katex is present and the quiz actually contains math expressions.
+const loadHtml2Canvas = () =>
+  new Promise((resolve, reject) => {
+    if (window.html2canvas) {
+      resolve();
+      return;
+    }
+    const s = document.createElement("script");
+    s.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("html2canvas failed to load"));
     document.head.appendChild(s);
   });
 
@@ -271,6 +289,83 @@ export async function exportToPdf(
     };
 
     // =========================================================
+    // KATEX → PNG RASTERISER  (Markdown + KaTeX integration)
+    //
+    // Renders a LaTeX expression via KaTeX (already loaded on the
+    // app page) then rasterises the DOM element to a PNG via
+    // html2canvas (loaded lazily by loadHtml2Canvas()).
+    // Returns { dataUrl, widthMm, heightMm } or null on failure.
+    // =========================================================
+    const renderKatexToDataUrl = async (mathStr, displayMode) => {
+      if (typeof window.katex === "undefined" || !window.html2canvas)
+        return null;
+      const container = document.createElement("div");
+      Object.assign(container.style, {
+        position: "absolute",
+        left: "-9999px",
+        top: "0",
+        background: "white",
+        padding: displayMode ? "6px 10px" : "0 2px",
+        fontSize: "16px",
+        lineHeight: "1",
+        color: "#1e293b",
+        whiteSpace: "nowrap",
+      });
+      document.body.appendChild(container);
+      try {
+        window.katex.render(mathStr, container, {
+          displayMode,
+          throwOnError: false,
+        });
+        const canvas = await window.html2canvas(container, {
+          backgroundColor: null,
+          scale: CANVAS_DPR,
+          logging: false,
+          useCORS: true,
+        });
+        document.body.removeChild(container);
+        const PX_PER_MM = CANVAS_DPR * 3.7795275591;
+        return {
+          dataUrl: canvas.toDataURL("image/png"),
+          widthMm: canvas.width / PX_PER_MM,
+          heightMm: canvas.height / PX_PER_MM,
+        };
+      } catch (err) {
+        if (document.body.contains(container))
+          document.body.removeChild(container);
+        console.warn("[PDF] KaTeX render error:", mathStr, err);
+        return null;
+      }
+    };
+
+    // Collect every unique math expression in a text string.
+    // Returns [{ key, expr, displayMode }] (no duplicates within the call).
+    const collectMathExpressions = (text) => {
+      if (!text) return [];
+      const exprs = [];
+      // Strip block math first (avoids matching inner $ of $$...$$)
+      let remaining = String(text).replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+        exprs.push({
+          key: `block:${m.trim()}`,
+          expr: m.trim(),
+          displayMode: true,
+        });
+        return " ";
+      });
+      // Inline math $...$
+      const re = /\$([^\$\n]+)\$/g;
+      let m;
+      while ((m = re.exec(remaining)) !== null) {
+        exprs.push({
+          key: `inline:${m[1].trim()}`,
+          expr: m[1].trim(),
+          displayMode: false,
+        });
+      }
+      return exprs;
+    };
+
+    // =========================================================
     // PDF STATE CACHE  (#7 — skip redundant set* calls)
     // =========================================================
     let _pfam = "",
@@ -338,17 +433,96 @@ export async function exportToPdf(
       }
     };
 
+    // ── Markdown + KaTeX integration (mirrored from create-quiz) ──
+    // Maps heading levels h1–h6 to jsPDF point sizes.
+    const getHeadingFontSize = (level) =>
+      [20, 16, 13, 12, SIZES.qFont + 1, SIZES.qFont][
+        Math.max(0, Math.min(5, level - 1))
+      ];
+
+    // ── Markdown + KaTeX integration ──────────────────────────────────────────
+    // Declared here (before wrapInlineRuns / renderInlineLine / renderSegments /
+    // calcSegmentsHeight, all of which reference it) so that the const is in scope
+    // for every closure that reads from it.  The Map is populated later, after
+    // imageCache pre-loading, by the MATH PRE-RENDERING block.
+    const mathImageCache = new Map();
+
     // =========================================================
-    // INLINE RUN WORD-WRAP  (#3 #4 #2)
+    // INLINE RUN PARSER  (Markdown + KaTeX integration)
     //
-    // Turns an array of InlineRun  { type:'text'|'inline-code', content }
-    // into display lines (array of arrays), respecting maxWidthMm.
+    // Parses a single line of text into typed InlineRun objects.
+    // Run types: text | inline-code | math-inline |
+    //            bold | italic | bold-italic | strikethrough | link
+    // =========================================================
+    const parseInlineRuns = (text) => {
+      if (!text) return [{ type: "text", content: "" }];
+      const stash = [];
+      const stashPush = (run) => {
+        const k = `\x01SR${stash.length}\x01`;
+        stash.push(run);
+        return k;
+      };
+      let s = String(text);
+      // 1. Stash inline math $...$ (before bold/italic so $ isn't misread as *)
+      s = s.replace(/\$([^\$\n]+)\$/g, (_, m) =>
+        stashPush({ type: "math-inline", content: m.trim() }),
+      );
+      // 2. Stash inline code `...`
+      s = s.replace(/`([^`\n]+)`/g, (_, m) =>
+        stashPush({ type: "inline-code", content: m }),
+      );
+      // 3. Bold-italic ***...*** (must precede bold/italic)
+      s = s.replace(/\*\*\*([^*]+)\*\*\*/g, (_, m) =>
+        stashPush({ type: "bold-italic", content: m }),
+      );
+      // 4. Bold **...** or __...__
+      s = s.replace(/\*\*([^*\n]+)\*\*/g, (_, m) =>
+        stashPush({ type: "bold", content: m }),
+      );
+      s = s.replace(/__([^_\n]+)__/g, (_, m) =>
+        stashPush({ type: "bold", content: m }),
+      );
+      // 5. Italic *...* or _..._
+      s = s.replace(/\*([^*\n]+)\*/g, (_, m) =>
+        stashPush({ type: "italic", content: m }),
+      );
+      s = s.replace(/_([^_\n]+)_/g, (_, m) =>
+        stashPush({ type: "italic", content: m }),
+      );
+      // 6. Strikethrough ~~...~~
+      s = s.replace(/~~([^~\n]+)~~/g, (_, m) =>
+        stashPush({ type: "strikethrough", content: m }),
+      );
+      // 7. Links [text](url)
+      s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (_, t, u) =>
+        stashPush({ type: "link", content: t, href: u }),
+      );
+      // 8. Restore stash tokens
+      const runs = [];
+      for (const part of s.split(/(\x01SR\d+\x01)/)) {
+        if (!part) continue;
+        const m = part.match(/^\x01SR(\d+)\x01$/);
+        if (m) runs.push(stash[parseInt(m[1])]);
+        else runs.push({ type: "text", content: part });
+      }
+      return runs.length ? runs : [{ type: "text", content: "" }];
+    };
+
+    // =========================================================
+    // INLINE RUN WORD-WRAP  (extended for new run types)
     //
-    // Side-effect: sets PDF font state. Always setPdfFont() before rendering.
+    // Turns an array of InlineRun into display lines (array of arrays),
+    // respecting maxWidthMm.  text runs are word-split; all other types
+    // are treated as atomic tokens (no mid-token line break).
     // =========================================================
     const wrapInlineRuns = (runs, maxWidthMm, fontSizePt, bold = false) => {
-      const getTextW = (t) => {
-        setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+      // Width measurement helpers
+      const getW = (t, fStyle) => {
+        setPdfFont(
+          "helvetica",
+          fStyle !== undefined ? fStyle : bold ? "bold" : "normal",
+          fontSizePt,
+        );
         return doc.getTextWidth(t);
       };
       const getCodeW = (t) => {
@@ -356,18 +530,29 @@ export async function exportToPdf(
         return doc.getTextWidth(t) + IC_PAD * 2 + IC_GAP;
       };
 
-      // Tokenise all runs into atomic chunks (words / spaces / code pills)
+      // Tokenise all runs into atomic chunks (words / spaces / pills / images)
       const tokens = [];
       for (const run of runs) {
         if (run.type === "inline-code") {
-          tokens.push({
-            type: "inline-code",
-            content: run.content,
-            w: getCodeW(run.content),
-          });
+          tokens.push({ ...run, w: getCodeW(run.content) });
+        } else if (run.type === "math-inline") {
+          // ── Markdown + KaTeX integration ──
+          const cached = mathImageCache.get(`inline:${run.content}`);
+          const w = cached ? cached.widthMm + 0.5 : getW(`$${run.content}$`);
+          tokens.push({ ...run, w });
+        } else if (run.type === "bold") {
+          // ── Markdown + KaTeX integration ── (atomic styled run)
+          tokens.push({ ...run, w: getW(run.content, "bold") });
+        } else if (run.type === "bold-italic") {
+          tokens.push({ ...run, w: getW(run.content, "bolditalic") });
+        } else if (run.type === "italic") {
+          tokens.push({ ...run, w: getW(run.content, "italic") });
+        } else if (run.type === "strikethrough" || run.type === "link") {
+          tokens.push({ ...run, w: getW(run.content) });
         } else {
+          // "text" run — split by whitespace tokens for correct word-wrap
           for (const p of run.content.split(/(\s+)/)) {
-            if (p) tokens.push({ type: "text", content: p, w: getTextW(p) });
+            if (p) tokens.push({ type: "text", content: p, w: getW(p) });
           }
         }
       }
@@ -418,9 +603,10 @@ export async function exportToPdf(
     };
 
     // =========================================================
-    // INLINE LINE RENDERER
+    // INLINE LINE RENDERER  (extended for Markdown + KaTeX)
     // baselineY = actual jsPDF baseline Y coordinate (NOT top-of-line).
-    // Draws inline-code as highlighted pills on the same baseline.
+    // Handles: inline-code pills, math-inline images, bold, italic,
+    //          bold-italic, strikethrough, link, plain text.
     // =========================================================
     const renderInlineLine = (
       lineTokens,
@@ -444,7 +630,75 @@ export async function exportToPdf(
           setPdfTextColor(...COLORS.codeText);
           doc.text(tok.content, curX + IC_PAD, baselineY);
           curX += codeW + IC_PAD * 2 + IC_GAP;
+        } else if (tok.type === "math-inline") {
+          // ── Markdown + KaTeX integration ──
+          const cached = mathImageCache.get(`inline:${tok.content}`);
+          if (cached) {
+            // Align image so its baseline ≈ 80 % down from its top edge
+            const imgY = baselineY - cached.heightMm * 0.8;
+            doc.addImage(
+              cached.dataUrl,
+              "PNG",
+              curX,
+              imgY,
+              cached.widthMm,
+              cached.heightMm,
+            );
+            curX += cached.widthMm + 0.5;
+          } else {
+            // Fallback: raw LaTeX source in courier
+            setPdfFont("courier", "normal", fontSizePt);
+            setPdfTextColor(...COLORS.codeText);
+            const fb = `$${tok.content}$`;
+            doc.text(fb, curX, baselineY);
+            curX += doc.getTextWidth(fb);
+          }
+        } else if (tok.type === "bold") {
+          // ── Markdown + KaTeX integration ──
+          setPdfFont("helvetica", "bold", fontSizePt);
+          setPdfTextColor(...color);
+          doc.text(tok.content, curX, baselineY);
+          curX += doc.getTextWidth(tok.content);
+        } else if (tok.type === "italic") {
+          // ── Markdown + KaTeX integration ──
+          setPdfFont("helvetica", "italic", fontSizePt);
+          setPdfTextColor(...color);
+          doc.text(tok.content, curX, baselineY);
+          curX += doc.getTextWidth(tok.content);
+        } else if (tok.type === "bold-italic") {
+          // ── Markdown + KaTeX integration ──
+          setPdfFont("helvetica", "bolditalic", fontSizePt);
+          setPdfTextColor(...color);
+          doc.text(tok.content, curX, baselineY);
+          curX += doc.getTextWidth(tok.content);
+        } else if (tok.type === "strikethrough") {
+          // ── Markdown + KaTeX integration ──
+          setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+          setPdfTextColor(...color);
+          const tw = doc.getTextWidth(tok.content);
+          doc.text(tok.content, curX, baselineY);
+          // Strikethrough line at mid-cap height
+          const strikeY = baselineY - fontSizePt * 0.352 * 0.5;
+          doc.setDrawColor(...color);
+          doc.setLineWidth(0.3);
+          doc.line(curX, strikeY, curX + tw, strikeY);
+          curX += tw;
+        } else if (tok.type === "link") {
+          // ── Markdown + KaTeX integration ──
+          setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+          setPdfTextColor(...COLORS.info);
+          const tw = doc.getTextWidth(tok.content);
+          doc.text(tok.content, curX, baselineY);
+          // Underline
+          doc.setDrawColor(...COLORS.info);
+          doc.setLineWidth(0.25);
+          doc.line(curX, baselineY + 0.5, curX + tw, baselineY + 0.5);
+          // Clickable annotation
+          const capH = fontSizePt * 0.352 * 0.85;
+          doc.link(curX, baselineY - capH, tw, capH + 1, { url: tok.href });
+          curX += tw;
         } else {
+          // "text" run (plain)
           setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
           setPdfTextColor(...color);
           doc.text(tok.content, curX, baselineY);
@@ -454,13 +708,19 @@ export async function exportToPdf(
     };
 
     // =========================================================
-    // MARKDOWN PARSER  (#3 #4)
+    // MARKDOWN PARSER  (Markdown + KaTeX integration — mirrored from create-quiz)
     //
     // Returns Block[]  where Block is one of:
-    //   { type: "code-block",        content: string      }
-    //   { type: "inline-paragraph",  runs:    InlineRun[] }
+    //   { type: "code-block",        content: string                       }
+    //   { type: "math-block",        content: string                       }
+    //   { type: "heading",           level: 1–6, runs: InlineRun[]        }
+    //   { type: "hr"                                                       }
+    //   { type: "blockquote",        runs: InlineRun[]                    }
+    //   { type: "list",              ordered: boolean, items: InlineRun[][] }
+    //   { type: "inline-paragraph",  runs: InlineRun[]                    }
     //
-    // InlineRun: { type: "text"|"inline-code", content: string }
+    // InlineRun types: text | inline-code | math-inline |
+    //                  bold | italic | bold-italic | strikethrough | link
     // =========================================================
     const parseMarkdown = (text) => {
       if (!text)
@@ -470,35 +730,126 @@ export async function exportToPdf(
 
       const result = [];
       const codeBlocks = [];
+      const mathBlocks = [];
 
-      // 1. Extract fenced code blocks
-      let processed = String(text).replace(/```([\s\S]*?)```/g, (_, code) => {
-        const idx = codeBlocks.length;
-        codeBlocks.push(code.trim());
-        return `\x00CB${idx}\x00`;
+      // 1. Stash block math $$...$$ (multi-line safe)
+      let processed = String(text).replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+        const idx = mathBlocks.length;
+        mathBlocks.push(m.trim());
+        return `\x00MB${idx}\x00`;
       });
 
-      // 2. Split by code-block placeholders
-      for (const part of processed.split(/(\x00CB\d+\x00)/)) {
-        if (!part) continue;
-        const cbM = part.match(/^\x00CB(\d+)\x00$/);
+      // 2. Stash fenced code blocks ```...```
+      processed = processed.replace(
+        /```(\w*)\n?([\s\S]*?)```/g,
+        (_, _lang, code) => {
+          const idx = codeBlocks.length;
+          codeBlocks.push(code.trim());
+          return `\x00CB${idx}\x00`;
+        },
+      );
+
+      // Helper: restore any $$...$$ stash tokens back to $...$ inline math
+      // so they are handled by parseInlineRuns in paragraph / heading context.
+      const restoreMathAsInline = (s) =>
+        s.replace(/\x00MB(\d+)\x00/g, (_, i) => `$${mathBlocks[+i]}$`);
+
+      // 3. Line-by-line block parsing
+      const rawLines = processed.split("\n");
+      let listBuf = [];
+      let listOrdered = false;
+
+      const flushList = () => {
+        if (listBuf.length) {
+          result.push({ type: "list", ordered: listOrdered, items: listBuf });
+          listBuf = [];
+        }
+      };
+
+      for (const rawLine of rawLines) {
+        // ── Block math stash on its own line ──────────────────────────
+        const mbM = rawLine.trim().match(/^\x00MB(\d+)\x00$/);
+        if (mbM) {
+          flushList();
+          result.push({ type: "math-block", content: mathBlocks[+mbM[1]] });
+          continue;
+        }
+
+        // ── Code block stash on its own line ─────────────────────────
+        const cbM = rawLine.trim().match(/^\x00CB(\d+)\x00$/);
         if (cbM) {
+          flushList();
           result.push({ type: "code-block", content: codeBlocks[+cbM[1]] });
           continue;
         }
 
-        // 3. Split by newlines → each line = one inline-paragraph
-        for (const line of part.split("\n")) {
-          const runs = [];
-          for (const ip of line.split(/(`[^`\n]+`)/)) {
-            if (!ip) continue;
-            const icM = ip.match(/^`([^`\n]+)`$/);
-            if (icM) runs.push({ type: "inline-code", content: icM[1] });
-            else runs.push({ type: "text", content: ip });
-          }
-          result.push({ type: "inline-paragraph", runs });
+        // ── Horizontal rule ---  ***  ___ ────────────────────────────
+        if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(rawLine)) {
+          flushList();
+          result.push({ type: "hr" });
+          continue;
         }
+
+        // ── Heading # … ###### ───────────────────────────────────────
+        const hM = rawLine.match(/^(#{1,6})\s+(.+)$/);
+        if (hM) {
+          flushList();
+          result.push({
+            type: "heading",
+            level: hM[1].length,
+            runs: parseInlineRuns(restoreMathAsInline(hM[2])),
+          });
+          continue;
+        }
+
+        // ── Blockquote > text ─────────────────────────────────────────
+        const bqM = rawLine.match(/^>\s*(.*)$/);
+        if (bqM) {
+          flushList();
+          result.push({
+            type: "blockquote",
+            runs: parseInlineRuns(restoreMathAsInline(bqM[1])),
+          });
+          continue;
+        }
+
+        // ── Unordered list  - / * / + ─────────────────────────────────
+        const ulM = rawLine.match(/^[-*+]\s+(.+)$/);
+        if (ulM) {
+          if (listBuf.length && listOrdered) flushList();
+          listOrdered = false;
+          listBuf.push(parseInlineRuns(restoreMathAsInline(ulM[1])));
+          continue;
+        }
+
+        // ── Ordered list  1. ──────────────────────────────────────────
+        const olM = rawLine.match(/^\d+\.\s+(.+)$/);
+        if (olM) {
+          if (listBuf.length && !listOrdered) flushList();
+          listOrdered = true;
+          listBuf.push(parseInlineRuns(restoreMathAsInline(olM[1])));
+          continue;
+        }
+
+        // ── Empty line ────────────────────────────────────────────────
+        if (!rawLine.trim()) {
+          flushList();
+          result.push({
+            type: "inline-paragraph",
+            runs: [{ type: "text", content: "" }],
+          });
+          continue;
+        }
+
+        // ── Regular paragraph line ────────────────────────────────────
+        flushList();
+        result.push({
+          type: "inline-paragraph",
+          runs: parseInlineRuns(restoreMathAsInline(rawLine)),
+        });
       }
+
+      flushList();
 
       return result.length
         ? result
@@ -538,6 +889,7 @@ export async function exportToPdf(
 
     // =========================================================
     // HEIGHT MEASUREMENT  (must mirror renderSegments exactly)
+    // Extended for: math-block, heading, hr, blockquote, list
     // =========================================================
     const calcSegmentsHeight = (
       segments,
@@ -572,7 +924,55 @@ export async function exportToPdf(
             }
           }
           h += blockLinesH + CODE_OVERHEAD + 2;
+        } else if (seg.type === "math-block") {
+          // ── Markdown + KaTeX integration ──
+          const cached = mathImageCache.get(`block:${seg.content}`);
+          h += cached ? cached.heightMm + 6 : LINE_H * 2;
+        } else if (seg.type === "heading") {
+          // ── Markdown + KaTeX integration ──
+          const hFontSize = getHeadingFontSize(seg.level);
+          const lineH = (hFontSize / SIZES.optFont) * LINE_H;
+          const fullText = seg.runs.map((r) => r.content).join("");
+          if (hasNonLatin(fullText)) {
+            h +=
+              measureUnicodeHeight(fullText, maxWidthMm, hFontSize, true) +
+              (seg.level <= 2 ? 3 : 1);
+          } else {
+            h +=
+              wrapInlineRuns(seg.runs, maxWidthMm, hFontSize, true).length *
+                lineH +
+              (seg.level <= 2 ? 3 : 1);
+          }
+        } else if (seg.type === "hr") {
+          // ── Markdown + KaTeX integration ──
+          h += LINE_H;
+        } else if (seg.type === "blockquote") {
+          // ── Markdown + KaTeX integration ──
+          const indW = maxWidthMm - 5;
+          const fullText = seg.runs.map((r) => r.content).join("");
+          h += 4; // 2mm top + 2mm bottom padding
+          if (hasNonLatin(fullText)) {
+            h += measureUnicodeHeight(fullText, indW, fontSizePt, bold);
+          } else {
+            h +=
+              wrapInlineRuns(seg.runs, indW, fontSizePt, bold).length * LINE_H;
+          }
+        } else if (seg.type === "list") {
+          // ── Markdown + KaTeX integration ──
+          const itemW = maxWidthMm - 5; // 5mm for bullet/number prefix
+          for (const item of seg.items) {
+            const fullText = item.map((r) => r.content).join("");
+            if (hasNonLatin(fullText)) {
+              h += measureUnicodeHeight(fullText, itemW, fontSizePt, bold) + 1;
+            } else {
+              h +=
+                wrapInlineRuns(item, itemW, fontSizePt, bold).length * LINE_H +
+                1;
+            }
+          }
+          h += 2; // bottom gap after list
         } else {
+          // inline-paragraph (existing behavior)
           const fullText = seg.runs.map((r) => r.content).join("");
           if (!fullText.trim()) {
             h += LINE_H * 0.5;
@@ -699,8 +1099,10 @@ export async function exportToPdf(
     };
 
     // =========================================================
-    // SEGMENT RENDERER  (core markdown render, mirrors calcSegmentsHeight)
+    // SEGMENT RENDERER  (extended for Markdown + KaTeX)
     // y = top of content area. Returns total height consumed (mm).
+    // Handles: code-block, math-block, heading, hr, blockquote,
+    //          list, inline-paragraph.
     // =========================================================
     const renderSegments = (
       segments,
@@ -717,7 +1119,161 @@ export async function exportToPdf(
       for (const seg of segments) {
         if (seg.type === "code-block") {
           consumed += renderCodeBlock(seg.content, x, y + consumed, maxWidthMm);
+        } else if (seg.type === "math-block") {
+          // ── Markdown + KaTeX integration ──
+          const cached = mathImageCache.get(`block:${seg.content}`);
+          if (cached) {
+            // Center image horizontally within the available width
+            const imgX = x + Math.max(0, (maxWidthMm - cached.widthMm) / 2);
+            doc.addImage(
+              cached.dataUrl,
+              "PNG",
+              imgX,
+              y + consumed + 2,
+              cached.widthMm,
+              cached.heightMm,
+            );
+            consumed += cached.heightMm + 6;
+          } else {
+            // Fallback: display raw LaTeX source in a code block
+            consumed += renderCodeBlock(
+              `$$${seg.content}$$`,
+              x,
+              y + consumed,
+              maxWidthMm,
+            );
+          }
+        } else if (seg.type === "heading") {
+          // ── Markdown + KaTeX integration ──
+          const hFontSize = getHeadingFontSize(seg.level);
+          const lineH = (hFontSize / SIZES.optFont) * LINE_H;
+          const fullText = seg.runs.map((r) => r.content).join("");
+          if (hasNonLatin(fullText)) {
+            consumed += renderUnicodeText(
+              fullText,
+              x,
+              y + consumed,
+              maxWidthMm,
+              color,
+              hFontSize,
+              true,
+              hasArabic(fullText),
+            );
+          } else {
+            const wrapped = wrapInlineRuns(
+              seg.runs,
+              maxWidthMm,
+              hFontSize,
+              true,
+            );
+            for (const lineRuns of wrapped) {
+              renderInlineLine(
+                lineRuns,
+                x,
+                y + consumed + lineH * BASELINE_RATIO,
+                color,
+                hFontSize,
+                true,
+              );
+              consumed += lineH;
+            }
+          }
+          // Decorative underline for h1 and h2
+          if (seg.level <= 2) {
+            doc.setDrawColor(...COLORS.textLight);
+            doc.setLineWidth(seg.level === 1 ? 0.5 : 0.25);
+            doc.line(x, y + consumed, x + maxWidthMm, y + consumed);
+            consumed += 2;
+          } else {
+            consumed += 1;
+          }
+        } else if (seg.type === "hr") {
+          // ── Markdown + KaTeX integration ──
+          const midY = y + consumed + LINE_H / 2;
+          doc.setDrawColor(...COLORS.btnNeutral);
+          doc.setLineWidth(0.4);
+          doc.line(x, midY, x + maxWidthMm, midY);
+          consumed += LINE_H;
+        } else if (seg.type === "blockquote") {
+          // ── Markdown + KaTeX integration ──
+          const indX = x + 4; // 4mm horizontal indent
+          const indW = maxWidthMm - 5;
+          const fullText = seg.runs.map((r) => r.content).join("");
+          const bqStart = consumed;
+          consumed += 2; // top padding
+
+          if (hasNonLatin(fullText)) {
+            consumed += renderUnicodeText(
+              fullText,
+              indX,
+              y + consumed,
+              indW,
+              COLORS.textLight,
+              fontSizePt,
+              false,
+              hasArabic(fullText),
+            );
+          } else {
+            const wrapped = wrapInlineRuns(seg.runs, indW, fontSizePt, false);
+            for (const lineRuns of wrapped) {
+              renderInlineLine(
+                lineRuns,
+                indX,
+                y + consumed + LINE_H * BASELINE_RATIO,
+                COLORS.textLight,
+                fontSizePt,
+                false,
+              );
+              consumed += LINE_H;
+            }
+          }
+          consumed += 2; // bottom padding
+          // Draw left accent bar covering the full blockquote height
+          setPdfFillColor(...COLORS.primary);
+          doc.rect(x, y + bqStart, 1.5, consumed - bqStart, "F");
+        } else if (seg.type === "list") {
+          // ── Markdown + KaTeX integration ──
+          const prefW = 5; // mm reserved for bullet / number
+          const itemX = x + prefW;
+          const itemW = maxWidthMm - prefW;
+          for (let li = 0; li < seg.items.length; li++) {
+            const item = seg.items[li];
+            const bullet = seg.ordered ? `${li + 1}.` : "-";
+            const fullText = item.map((r) => r.content).join("");
+            setPdfFont("helvetica", bold ? "bold" : "normal", fontSizePt);
+            setPdfTextColor(...color);
+            doc.text(bullet, x, y + consumed + LINE_H * BASELINE_RATIO);
+            if (hasNonLatin(fullText)) {
+              consumed +=
+                renderUnicodeText(
+                  fullText,
+                  itemX,
+                  y + consumed,
+                  itemW,
+                  color,
+                  fontSizePt,
+                  false,
+                  hasArabic(fullText),
+                ) + 1;
+            } else {
+              const wrapped = wrapInlineRuns(item, itemW, fontSizePt, false);
+              for (const lineRuns of wrapped) {
+                renderInlineLine(
+                  lineRuns,
+                  itemX,
+                  y + consumed + LINE_H * BASELINE_RATIO,
+                  color,
+                  fontSizePt,
+                  false,
+                );
+                consumed += LINE_H;
+              }
+              consumed += 1; // gap between items
+            }
+          }
+          consumed += 2; // bottom gap after list
         } else {
+          // inline-paragraph (existing behavior, unchanged)
           const fullText = seg.runs.map((r) => r.content).join("");
           if (!fullText.trim()) {
             consumed += LINE_H * 0.5;
@@ -1748,6 +2304,49 @@ export async function exportToPdf(
         }
       }),
     );
+
+    // =========================================================
+    // MATH PRE-RENDERING  (Markdown + KaTeX integration)
+    //
+    // Render all LaTeX expressions to PNG images BEFORE the main
+    // layout pass so that calcSegmentsHeight() — which determines
+    // page breaks — has the correct image dimensions.
+    // Mirrors the imageCache parallel-pre-load pattern above.
+    //
+    // Approach: generation-time rendering.  window.katex is already
+    // loaded synchronously on the app page (quiz.html, summary.html,
+    // create-quiz.html).  html2canvas rasterises the KaTeX HTML into
+    // a PNG that jsPDF's text-mode pipeline can embed via addImage().
+    // =========================================================
+    // mathImageCache was declared above (before wrapInlineRuns) so all closures
+    // that reference it are already in scope.  Populate it now.
+    if (typeof window.katex !== "undefined") {
+      try {
+        await loadHtml2Canvas();
+        const uniqueMath = new Map();
+        const mathTextFields = (q) =>
+          [q.q, q.explanation, q.answer, ...(q.options || [])].filter(Boolean);
+        for (const q of questions) {
+          for (const t of mathTextFields(q)) {
+            for (const e of collectMathExpressions(sanitizeText(t))) {
+              if (!uniqueMath.has(e.key)) uniqueMath.set(e.key, e);
+            }
+          }
+        }
+        await Promise.all(
+          [...uniqueMath.values()].map(async ({ key, expr, displayMode }) => {
+            const result = await renderKatexToDataUrl(expr, displayMode);
+            if (result) mathImageCache.set(key, result);
+          }),
+        );
+        if (mathImageCache.size > 0)
+          console.log(
+            `[PDF] Pre-rendered ${mathImageCache.size} math expression(s)`,
+          );
+      } catch (err) {
+        console.warn("[PDF] Math pre-rendering skipped:", err.message);
+      }
+    }
 
     // =========================================================
     // RENDER ALL QUESTIONS
