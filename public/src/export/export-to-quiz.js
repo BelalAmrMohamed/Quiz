@@ -19,6 +19,14 @@ export async function exportToQuiz(config, questions) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- ── Markdown + KaTeX integration (mirrored from create-quiz) ──
+       Classic (non-deferred) script so window.katex is synchronously
+       available before the inline quiz <script> at the bottom of <body> runs.
+       No SRI hashes. Pinned to 0.16.9 exactly — do NOT add defer/async. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
   <style>
   *, *::before, *::after {
     margin: 0;
@@ -1226,6 +1234,89 @@ export async function exportToQuiz(config, questions) {
     white-space: nowrap;
   }
 
+  /* ── Markdown + KaTeX (mirrored from create-quiz) ────────────────── */
+
+  /* Direction helper for code blocks and math output */
+  .ltr { direction: ltr; }
+
+  /* Headings */
+  .md-h1, .md-h2, .md-h3, .md-h4, .md-h5, .md-h6 {
+    margin: 0.6em 0 0.3em;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+  .md-h1 { font-size: 1.6em;  border-bottom: 2px solid var(--border-color); padding-bottom: 4px; }
+  .md-h2 { font-size: 1.35em; border-bottom: 1px solid var(--border-color); padding-bottom: 3px; }
+  .md-h3 { font-size: 1.15em; }
+  .md-h4 { font-size: 1.05em; }
+  .md-h5 { font-size: 0.95em; }
+  .md-h6 { font-size: 0.9em;  opacity: 0.85; }
+
+  /* Horizontal rule */
+  .md-hr {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 0.8em 0;
+  }
+
+  /* Blockquote */
+  .md-blockquote {
+    border-left: 4px solid var(--gradient-start);
+    margin: 0.5em 0;
+    padding: 8px 16px;
+    background: rgba(102, 126, 234, 0.07);
+    border-radius: 0 6px 6px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* Lists */
+  .md-list {
+    margin: 0.4em 0 0.4em 1.4em;
+    padding: 0;
+    color: var(--text-primary);
+  }
+  .md-list li { margin-bottom: 4px; line-height: 1.6; }
+
+  /* Inline link */
+  .md-link {
+    color: var(--gradient-start);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Inline image */
+  .md-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 4px 0;
+    display: block;
+  }
+
+  /* KaTeX block math */
+  .math-block {
+    display: block;
+    overflow-x: auto;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 1.05em;
+  }
+
+  /* KaTeX inline math */
+  .math-inline { display: inline; }
+
+  /* Fallback when KaTeX is unavailable */
+  .math-raw {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text-primary);
+  }
+
   /* ── Print ───────────────────────────────────────────────────── */
   @media print {
     body { background: white; padding: 0; }
@@ -1454,6 +1545,15 @@ export async function exportToQuiz(config, questions) {
   
   <script>
   const questions = ${JSON.stringify(processedQuestions)};
+  
+  // ── Markdown + KaTeX integration (mirrored from create-quiz) ──
+  // All four functions are serialised from module scope via .toString() so the
+  // generated file gets clean, self-contained source with no build step needed.
+  ${escHtml.toString()}
+  
+  ${applyInline.toString()}
+  
+  ${_renderMarkdownCore.toString()}
   
   ${renderMarkdown.toString()}
   
@@ -2436,44 +2536,216 @@ const isLocalPath = (url) => {
   return !/^(https?:|data:)/i.test(url);
 };
 
-// ─── Functions embedded into the generated quiz HTML via .toString() ─────────
-// Defined as real module-level functions so .toString() produces clean, valid
-// JS source — completely avoids null-byte / escape-sequence issues that arise
-// when complex regex and template literals are written inside an outer template.
+// ── Markdown + KaTeX integration (mirrored from create-quiz) ──────────────────
+// These four functions are defined at module scope so that Function.prototype
+// .toString() produces clean, valid JS source that can be serialised directly
+// into the generated <script> block.  Null-byte / SOH escape sequences survive
+// .toString() because the method returns the literal source text, not the
+// runtime value — so \x00 in source serialises as the four-character sequence
+// \x00 and is valid JS when re-parsed in the downloaded file's <script>.
 
-function renderMarkdown(str) {
-  if (str === null || str === undefined) return "";
-  str = String(str);
-  const codeBlocks = [];
-
-  // 1. Extract fenced code blocks
-  str = str.replace(/```([\s\S]*?)```/g, (_, code) => {
-    const idx = codeBlocks.length;
-    const escaped = code
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    codeBlocks.push(
-      `<pre class="code-block"><code>${escaped.trim()}</code></pre>`,
-    );
-    return `MDBLOCK_${idx}_MDEND`;
-  });
-
-  // 2. Escape remaining HTML
-  str = str
+function escHtml(s) {
+  return (s || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
 
-  // 3. Inline code
-  str = str.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+function applyInline(s) {
+  // Inline math $...$ — stash before other replacements
+  const iMathStash = [];
+  s = s.replace(/\$([^\$\n]+)\$/g, (_, m) => {
+    const idx = iMathStash.length;
+    if (typeof window.katex !== "undefined") {
+      try {
+        iMathStash.push(
+          window.katex.renderToString(m.trim(), {
+            displayMode: false,
+            throwOnError: false,
+          }),
+        );
+      } catch {
+        iMathStash.push(
+          `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+        );
+      }
+    } else {
+      iMathStash.push(
+        `<span class="math-inline math-raw">$${escHtml(m)}$</span>`,
+      );
+    }
+    return `\x01IM${idx}\x01`;
+  });
 
-  // 4. Line breaks
-  str = str.replace(/\n/g, "<br>");
+  // Inline code
+  s = s.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+  // Bold + italic combined
+  s = s.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
+  // Bold: **...** or __...__
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
+  // Italic: *...* or _..._
+  s = s.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  s = s.replace(/_([^_\n]+)_/g, "<em>$1</em>");
+  // Strikethrough
+  s = s.replace(/~~([^~\n]+)~~/g, "<del>$1</del>");
+  // Links
+  s = s.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="md-link">$1</a>',
+  );
+  // Images
+  s = s.replace(
+    /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g,
+    '<img src="$2" alt="$1" class="md-img" loading="lazy">',
+  );
 
-  // 5. Restore code blocks
-  str = str.replace(/MDBLOCK_(\d+)_MDEND/g, (_, i) => codeBlocks[parseInt(i)]);
+  // Restore inline math
+  s = s.replace(/\x01IM(\d+)\x01/g, (_, i) => iMathStash[parseInt(i)]);
+  return s;
+}
 
-  return str;
+function renderMarkdown(str) {
+  if (!str) return "";
+  try {
+    return _renderMarkdownCore(str);
+  } catch (err) {
+    console.error("renderMarkdown error:", err);
+    return escHtml(str).replace(/\n/g, "<br>");
+  }
+}
+
+function _renderMarkdownCore(str) {
+  const stash = [];
+  const stashPush = (html) => {
+    const idx = stash.length;
+    stash.push(html);
+    return `\x00ST${idx}\x00`;
+  };
+
+  // 1. Block math  $$...$$
+  str = str.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => {
+    let rendered;
+    if (typeof window.katex !== "undefined") {
+      try {
+        rendered = window.katex.renderToString(m.trim(), {
+          displayMode: true,
+          throwOnError: false,
+        });
+      } catch {
+        rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+      }
+    } else {
+      rendered = `<span class="math-raw">$$${escHtml(m)}$$</span>`;
+    }
+    return stashPush(`<div class="math-block">${rendered}</div>`);
+  });
+
+  // 2. Fenced code blocks  ```lang\n...\n```
+  str = str.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const safe = escHtml(code.trim());
+    const cls = `code-block ltr${lang ? " language-" + lang : ""}`;
+    return stashPush(`<pre class="${cls}"><code>${safe}</code></pre>`);
+  });
+
+  // 3. Line-by-line block processing
+  const rawLines = str.split("\n");
+  const outParts = [];
+  let listBuf = [];
+  let listTag = null;
+
+  const flushList = () => {
+    if (listBuf.length) {
+      outParts.push(
+        `<${listTag} class="md-list">${listBuf.join("")}</${listTag}>`,
+      );
+      listBuf = [];
+      listTag = null;
+    }
+  };
+
+  const escapeAroundTokens = (line) => {
+    const TOKEN_RE = /(\x00ST\d+\x00)/g;
+    const parts = line.split(TOKEN_RE);
+    return parts
+      .map((part, i) => (i % 2 === 1 ? part : escHtml(part)))
+      .join("");
+  };
+
+  for (const rawLine of rawLines) {
+    if (/\x00ST\d+\x00/.test(rawLine)) {
+      flushList();
+      outParts.push(escapeAroundTokens(rawLine));
+      continue;
+    }
+    if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(rawLine)) {
+      flushList();
+      outParts.push('<hr class="md-hr">');
+      continue;
+    }
+
+    const hMatch = rawLine.match(/^(#{1,6})\s+(.+)$/);
+    if (hMatch) {
+      flushList();
+      const lvl = hMatch[1].length;
+      outParts.push(
+        `<h${lvl} class="md-h${lvl}">${applyInline(escHtml(hMatch[2]))}</h${lvl}>`,
+      );
+      continue;
+    }
+
+    const bqMatch = rawLine.match(/^>\s*(.*)$/);
+    if (bqMatch) {
+      flushList();
+      outParts.push(
+        `<blockquote class="md-blockquote">${applyInline(escHtml(bqMatch[1]))}</blockquote>`,
+      );
+      continue;
+    }
+
+    const ulMatch = rawLine.match(/^[-*+]\s+(.+)$/);
+    if (ulMatch) {
+      if (listTag === "ol") flushList();
+      listTag = "ul";
+      listBuf.push(`<li>${applyInline(escHtml(ulMatch[1]))}</li>`);
+      continue;
+    }
+
+    const olMatch = rawLine.match(/^\d+\.\s+(.+)$/);
+    if (olMatch) {
+      if (listTag === "ul") flushList();
+      listTag = "ol";
+      listBuf.push(`<li>${applyInline(escHtml(olMatch[1]))}</li>`);
+      continue;
+    }
+
+    if (rawLine.trim() === "") {
+      flushList();
+      outParts.push("");
+      continue;
+    }
+
+    flushList();
+    outParts.push(applyInline(escHtml(rawLine)));
+  }
+
+  flushList();
+
+  // 4. Join — insert <br> only between consecutive inline segments
+  const BLOCK_START = /^<(h[1-6]|ul|ol|blockquote|hr|div|pre|p)[\s>\/]/;
+  const BLOCK_END = /^<\/(h[1-6]|ul|ol|blockquote|div|pre|p)>/;
+  const isBlock = (s) =>
+    s === undefined || s === "" || BLOCK_START.test(s) || BLOCK_END.test(s);
+
+  let result = "";
+  for (let i = 0; i < outParts.length; i++) {
+    result += outParts[i];
+    if (!isBlock(outParts[i]) && !isBlock(outParts[i + 1])) result += "<br>";
+  }
+
+  // 5. Restore stashed blocks
+  result = result.replace(/\x00ST(\d+)\x00/g, (_, i) => stash[parseInt(i)]);
+
+  return result;
 }
