@@ -2785,21 +2785,23 @@ window.startQuiz = startQuiz;
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ── Bug 1 Fix: listen for back / forward navigation ───────────────────────
-  // history.pushState (used by renderCategory / renderUserQuizzesView) does NOT
-  // fire popstate by itself. The browser fires popstate when the user presses
-  // the back or forward button (or hardware back on mobile). We then read the
-  // new URL and re-render the matching view — the same logic as a first load.
+  // ── Page guard ────────────────────────────────────────────────────────────
+  // index.js is imported as an ES module by side-menu.js (for the exported
+  // updateWelcomeMessage function).  ES module imports cause the ENTIRE module
+  // to execute, including this DOMContentLoaded listener, on EVERY page that
+  // loads side-menu.js (quiz.html, result.html, etc.).
   //
-  // _isRestoringState prevents the render functions from pushing yet another
-  // history entry while we are already replaying an existing one.
-  //
-  // NOTE: hashchange is intentionally NOT used here.  pushState + popstate is
-  // the modern SPA pattern and it gives us proper state objects.
-  window.addEventListener("popstate", () => {
-    // Manifest not yet loaded → ignore (initApp will render correctly on load)
-    if (!categoryTree) return;
+  // Without this guard, initApp() would run on quiz.html and call
+  // renderRootCategories() → history.replaceState("", "", pathname), stripping
+  // the ?id= query parameter from the quiz URL before quiz.js could read it.
+  const p = window.location.pathname;
+  const isIndexPage =
+    p === "/" || p.endsWith("/index.html") || p.endsWith("/index");
+  if (!isIndexPage) return;
 
+  // ── Bug 1 Fix: listen for back / forward navigation ───────────────────────
+  window.addEventListener("popstate", () => {
+    if (!categoryTree) return;
     _isRestoringState = true;
     try {
       restoreViewFromURL();

@@ -491,13 +491,21 @@ async function loadExamModule(config) {
 }
 
 async function init() {
+  // ── Bug 2 Fix: reset all in-flight state before (re-)initialising ─────────
+  // init() may be called a second time via the popstate listener when the user
+  // presses the back button from the results page.  Without resetting, the
+  // previous timer and answer state would bleed into the new session.
+  resetQuizState();
+
   const params = new URLSearchParams(window.location.search);
 
-  // ── Quiz ID ──────────────────────────────────────────────────────────────
-  // URL param `?id=` takes priority — this is what makes quizzes shareable.
-  // Fall back to localStorage so existing sessions and user-quiz flows
-  // (which use `?type=user`) continue to work without changes.
-  examId = decodeURIComponent(params.get("id"));
+  // ── Bug 2 Fix: safe param extraction ─────────────────────────────────────
+  // params.get("id") returns null when the parameter is absent.
+  // decodeURIComponent(null) produces the string "null", which is truthy and
+  // bypasses the !examId guard below — leading to a confusing "Exam not found"
+  // error.  Guard against null explicitly before decoding.
+  const rawId = params.get("id");
+  examId = rawId !== null ? decodeURIComponent(rawId) : null;
 
   // ── Quiz Mode ────────────────────────────────────────────────────────────
   // Mode is intentionally NOT in the URL (links stay mode-agnostic).
@@ -564,7 +572,34 @@ async function init() {
 
     if (quizType === "user") {
       // === LOGIC FOR USER QUIZ ===
-      const userQuizData = sessionStorage.getItem("active_user_quiz");
+      let userQuizData = sessionStorage.getItem("active_user_quiz");
+
+      // ── Bug 2 Fix: recover from localStorage when sessionStorage is empty ──
+      // sessionStorage is tab-scoped and survives within a session.  However,
+      // pressing the browser back button from the results page causes a full
+      // page reload of quiz.html?id=…&type=user.  If the session storage item
+      // was cleared (e.g. another quiz was opened in the same tab), the quiz
+      // would show "Quiz not found!" and redirect to root instead of reloading.
+      // As a fallback, scan the localStorage user_quizzes array for a matching
+      // entry and restore it into sessionStorage so the quiz can continue.
+      if (!userQuizData && examId) {
+        try {
+          const allUserQuizzes = JSON.parse(
+            localStorage.getItem("user_quizzes") || "[]",
+          );
+          const recovered = allUserQuizzes.find((q) => q.id === examId);
+          if (recovered) {
+            userQuizData = JSON.stringify(recovered);
+            // Restore so subsequent page interactions keep working normally.
+            sessionStorage.setItem("active_user_quiz", userQuizData);
+          }
+        } catch (e) {
+          console.warn(
+            "[Quiz] Could not recover user quiz from localStorage:",
+            e,
+          );
+        }
+      }
 
       if (!userQuizData) {
         alert("Quiz not found!");
@@ -1610,8 +1645,33 @@ function saveStateDebounced() {
   saveStateDebounce = setTimeout(() => {
     const state = { currentIdx, userAnswers, timeElapsed, lockedQuestions };
     localStorage.setItem(`quiz_state_${examId}`, JSON.stringify(state));
+    // NOTE: Do NOT call history.replaceState here (neither directly nor via
+    // safeReplaceState).  This function only persists quiz progress to
+    // localStorage.  Touching the browser history from a periodic debounce
+    // timer is the root cause of the URL-stripping bug — if window.location
+    // has been altered by another module, replaceState would stamp the
+    // already-wrong URL into history and make it permanent.
   }, 300); // Wait 300ms before saving
 }
+
+// ── Bug 2 Fix: popstate listener ─────────────────────────────────────────────
+// If future development adds history.pushState calls inside quiz.js (e.g. to
+// give each question its own URL so the user can share a direct link), the back
+// button will fire popstate *within* the quiz rather than causing a full page
+// reload.  This listener handles that case by re-running init() so the quiz
+// re-reads the (still-intact) URL parameters and restores to the correct state.
+//
+// For the current navigation model (finish() → window.location.href →
+// result.html), pressing back causes a full reload and popstate never fires —
+// init() is simply called fresh by the script loader, which is equally correct.
+window.addEventListener("popstate", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const hasQuizParams =
+    params.get("id") !== null || params.get("type") !== null;
+  if (hasQuizParams) {
+    await init();
+  }
+});
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
@@ -1652,6 +1712,49 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
+}
+
+// ============================================================================
+// Bug 2 Fix — safeReplaceState
+// Any history.replaceState call inside quiz.js MUST go through this helper.
+// It updates the state object only and NEVER touches the URL string, so query
+// parameters (?id=…&type=…) are preserved at all times.  If we were to pass a
+// bare pathname such as "quiz.html" the params would be stripped and pressing
+// the back button from the results page would return to a param-less URL that
+// shows the "Exam not found" error.
+// ============================================================================
+function safeReplaceState(stateObj) {
+  // Preserve the full URL (pathname + search + hash) — only update state.
+  history.replaceState(stateObj, "", window.location.href);
+}
+
+// ============================================================================
+// Bug 2 Fix — resetQuizState
+// Cleans up all in-flight timers and resets every module-level variable to its
+// initial value so that init() can be safely called again (e.g. when the user
+// presses the back button and the browser re-fires the popstate event on a
+// quiz.html?id=… history entry).
+// ============================================================================
+function resetQuizState() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  if (autoSubmitTimeout) {
+    clearTimeout(autoSubmitTimeout);
+    autoSubmitTimeout = null;
+  }
+  if (saveStateDebounce) {
+    clearTimeout(saveStateDebounce);
+    saveStateDebounce = null;
+  }
+  questions = [];
+  metaData = {};
+  currentIdx = 0;
+  userAnswers = {};
+  lockedQuestions = {};
+  timeElapsed = 0;
+  timeRemaining = 0;
 }
 
 init();
