@@ -83,6 +83,7 @@
 <body>
     <!-- The status bar at the top -->
     <div class="stats-bar" id="statsBar">
+        <!-- Mobile-only hamburger button (hidden on desktop via CSS) -->
         <button class="hamburger-stats" id="menuBtn" aria-label="فتح القائمة" aria-controls="sidebar"
             aria-expanded="false" type="button">
             <svg class="hamburger-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
@@ -130,7 +131,8 @@
         </div>
     </div>
 
-    <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true"></div>
+    <!-- Backdrop (mobile overlay) -->
+    <div class="side-menu-backdrop" id="sideMenuBackdrop" aria-hidden="true" role="presentation"></div>
 
     <!-- Side-menu (using side-menu.js and side-menu.css) -->
     <aside class="sidebar" id="sidebar" role="dialog" aria-modal="true" aria-label="القائمة الجانبية" aria-hidden="true"
@@ -155,8 +157,7 @@
             </svg>
         </div>
 
-
-        <nav role="navigation">
+        <nav role="navigation" aria-label="روابط التنقل">
             <button id="finishBtn" class="menu-item action-btn" data-action="finishEarly" title="تسليم الإمتحان"
                 data-tooltip="تسليم الإمتحان">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
