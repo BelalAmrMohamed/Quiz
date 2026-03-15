@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "id": "BRPEW4J6",
+    "path": "quizzes/Computer Science/2/2/Website demo/Testing Features/Markdown_LaTeX_Stress_Test_Quiz.json",
+    "title": "Markdown & LaTeX Stress Test Quiz",
+    "author": "بلال",
+    "createdAt": "3/14/2026, 7:19:36 AM"
+  },
+  "stats": {
+    "questionCount": 10,
+    "questionTypes": ["Essay", "MCQ", "True/False"]
+  },
+  "questions": [
+    {
+      "q": "What does the following **Markdown** render as?\n> `**Hello World**`",
+      "correct": 3,
+      "options": [
+        "Plain text: `**Hello World**`",
+        "Bold text: **Hello World**",
+        "Italic text: *Hello World*",
+        "A blockquote with inline code"
+      ],
+      "explanation": "The `>` symbol creates a **blockquote**, and the backticks create `inline code` inside it. The `**...**` inside backticks is *not* rendered — it's treated as literal characters."
+    },
+    {
+      "q": "What is the result of the following integral?\n$$\\int_0^1 x^2 \\, dx$$",
+      "correct": 2,
+      "options": ["$\\frac{1}{4}$", "$\\frac{1}{2}$", "$\\frac{1}{3}$", "$1$"],
+      "explanation": "Using the **Power Rule** for integration:"
+    },
+    {
+      "q": "Which of the following are valid Markdown emphasis syntaxes? ***(Select all that apply)***",
+      "answer": "A, B, C, D",
+      "explanation": "All four are valid:"
+    },
+    {
+      "q": "Euler's Identity is often called the most beautiful equation in mathematics. Is the following statement true or false?\n> $e^{i\\pi} + 1 = 0$ contains **five** fundamental mathematical constants.",
+      "correct": 0,
+      "options": [
+        "True",
+        "False",
+        "$e$ — Euler's number ≈ $2.718...$",
+        "$i$ — the imaginary unit where $i^2 = -1$",
+        "$\\pi$ — pi ≈ $3.14159...$",
+        "$1$ — the multiplicative identity",
+        "$0$ — the additive identity"
+      ],
+      "explanation": "Yes — it contains exactly **five** constants:"
+    },
+    {
+      "q": "What does this code print?\n```cpp\n#include <iostream>\n#include <cmath>\nint main() {\ndouble x = 9.0;\nstd::cout << std::sqrt(x) << std::endl;\nreturn 0;\n}\n```",
+      "correct": 2,
+      "options": ["`9`", "`4.5`", "`3`", "Compiler error"],
+      "explanation": "`std::sqrt(9.0)` computes $\\sqrt{9} = 3$. The mathematical relationship is:"
+    },
+    {
+      "q": "A matrix $A$ is invertible if and only if:",
+      "correct": 1,
+      "options": [
+        "$\\det(A) = 1$",
+        "$\\det(A) \\neq 0$",
+        "$A$ is a square matrix",
+        "$A^T = A$"
+      ],
+      "explanation": "A square matrix $A$ is **invertible** (non-singular) if and only if its determinant is non-zero:"
+    },
+    {
+      "q": "True or False: The following Python snippet runs without error.\n```python\ndata = {\"key\": [1, 2, 3]}\nprint(data[\"key\"][4])\n```",
+      "correct": 1,
+      "options": ["True", "False"],
+      "explanation": "This raises an `IndexError` at runtime. The list `[1, 2, 3]` has valid indices $0, 1, 2$. Accessing index $4$ is out of bounds."
+    },
+    {
+      "q": "Write a LaTeX expression for the **Quadratic Formula**.",
+      "answer": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}",
+      "explanation": "The quadratic formula solves any equation of the form $ax^2 + bx + c = 0$:"
+    },
+    {
+      "q": "Which Big-O complexity describes **binary search**?",
+      "correct": 2,
+      "options": ["$O(n)$", "$O(n^2)$", "$O(\\log n)$", "$O(n \\log n)$"],
+      "explanation": "Binary search **halves** the search space each step. If we start with $n$ elements:"
+    },
+    {
+      "q": "What is the **sum of an infinite geometric series** $\\sum_{n=0}^{\\infty} ar^n$ when $|r| < 1$?",
+      "correct": 1,
+      "options": [
+        "$\\frac{a}{1+r}$",
+        "$\\frac{a}{1-r}$",
+        "$\\frac{r}{1-a}$",
+        "The series diverges"
+      ],
+      "explanation": "For $|r| < 1$, the infinite geometric series converges:"
+    }
+  ]
+}

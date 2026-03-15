@@ -42,6 +42,16 @@ let editingQuizId = null;
 // MARKDOWN & INLINE EDITOR SYSTEM
 // ============================================================================
 
+// ── Fix: normalize literal \n sequences to real newlines ──────────────────
+// JSON.parse converts \n → real newline, but a double-serialization path
+// (e.g. localStorage read as raw string, or JSON.stringify called twice)
+// produces the literal two-char sequence \n. The Markdown renderer splits
+// on real newlines only — so this normalizes before anything else runs.
+const normalizeLiteralNewlines = (text) => {
+  if (!text || !text.includes("\\n")) return text; // fast-exit: nothing to do
+  return text.replace(/\\n/g, "\n");
+};
+
 // ── Escape HTML for safe insertion ───────────────────────────────────────────
 function escHtml(s) {
   return (s || "")
@@ -314,7 +324,7 @@ function _renderMarkdownCore(str) {
  */
 function mdEditorHtml(id, value, placeholder, rows = 2) {
   const safeValue = (value || "").replace(/\\n/g, "\n");
-  const rendered = safeValue.trim() ? renderMarkdown(safeValue) : "";
+  const rendered = safeValue.trim() ? renderMarkdown(normalizeLiteralNewlines(safeValue)) : "";
   const escaped = safeValue
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -373,7 +383,7 @@ function setupMdEditor(id, onChange) {
     if (!livePreview) return;
     const val = source.value;
     if (val.trim()) {
-      livePreview.innerHTML = `<div class="md-live-preview-inner">${renderMarkdown(val)}</div>`;
+      livePreview.innerHTML = `<div class="md-live-preview-inner">${renderMarkdown(normalizeLiteralNewlines(val))}</div>`;
       livePreview.style.display = "block";
     } else {
       livePreview.innerHTML = "";
@@ -384,7 +394,7 @@ function setupMdEditor(id, onChange) {
   const refreshRenderedDiv = () => {
     const val = source.value;
     if (val.trim()) {
-      renderedDiv.innerHTML = renderMarkdown(val);
+      renderedDiv.innerHTML = renderMarkdown(normalizeLiteralNewlines(val));
       renderedDiv.classList.remove("md-empty");
     } else {
       renderedDiv.innerHTML = `<span class="md-placeholder">${source.placeholder}</span>`;

@@ -21,6 +21,16 @@ const userName = localStorage.getItem("username") || "User";
 const result = JSON.parse(localStorage.getItem("last_quiz_result"));
 if (!result) window.location.href = "/";
 
+// ── Fix: normalize literal \n sequences to real newlines ──────────────────
+// JSON.parse converts \n → real newline, but a double-serialization path
+// (e.g. localStorage read as raw string, or JSON.stringify called twice)
+// produces the literal two-char sequence \n. The Markdown renderer splits
+// on real newlines only — so this normalizes before anything else runs.
+const normalizeLiteralNewlines = (text) => {
+  if (!text || !text.includes("\\n")) return text; // fast-exit: nothing to do
+  return text.replace(/\\n/g, "\n");
+};
+
 // ─── Helper: HTML escape (raw user-supplied strings only) ────────────────────
 function escapeHTML(input) {
   if (input === undefined || input === null) return "";
@@ -724,11 +734,11 @@ function renderReview(container, questions, userAnswers) {
               : "essay-score-none";
 
       const userText = userAns
-        ? renderMarkdown(String(userAns))
+        ? renderMarkdown(normalizeLiteralNewlines(String(userAns)))
         : "<em>Not answered</em>";
-      const formalText = renderMarkdown(getEssayAnswer(q));
+      const formalText = renderMarkdown(normalizeLiteralNewlines(getEssayAnswer(q)));
       const explanationText = q.explanation
-        ? renderMarkdown(q.explanation)
+        ? renderMarkdown(normalizeLiteralNewlines(q.explanation))
         : "";
 
       html += `
@@ -740,7 +750,7 @@ function renderReview(container, questions, userAnswers) {
               <span class="essay-score-badge ${scoreLabelClass}">${stars} ${scoreLabel} (${score}/5)</span>
             </div>
           </div>
-          <p class="q-text">${renderMarkdown(q.q)}</p>
+          <p class="q-text">${renderMarkdown(normalizeLiteralNewlines(q.q))}</p>
           ${renderQuestionImage(q.image)}
           <div class="essay-comparison">
             <div class="essay-answer-box user-essay">
@@ -779,10 +789,10 @@ function renderReview(container, questions, userAnswers) {
 
       const userText = isSkipped
         ? "<em>Skipped</em>"
-        : renderMarkdown(q.options[userAns]);
-      const correctText = renderMarkdown(q.options[correctIdx]);
+        : renderMarkdown(normalizeLiteralNewlines(q.options[userAns]));
+      const correctText = renderMarkdown(normalizeLiteralNewlines(q.options[correctIdx]));
       const explanationText = q.explanation
-        ? renderMarkdown(q.explanation)
+        ? renderMarkdown(normalizeLiteralNewlines(q.explanation))
         : "";
 
       html += `
@@ -791,7 +801,7 @@ function renderReview(container, questions, userAnswers) {
             <span class="q-num">#${index + 1}</span>
             <span class="status-icon status-${statusClass}">${statusIcon}</span>
           </div>
-          <p class="q-text">${renderMarkdown(q.q)}</p>
+          <p class="q-text">${renderMarkdown(normalizeLiteralNewlines(q.q))}</p>
           ${renderQuestionImage(q.image)}
           <div class="ans-comparison">
             <div class="ans-box ${isCorrect ? "ans-correct" : isSkipped ? "ans-skipped" : "ans-wrong"}">

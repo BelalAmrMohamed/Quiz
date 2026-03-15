@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-13T08:55:13.502Z",
+  "generatedAt": "2026-03-15T02:05:42.278Z",
   "dataRoot": "data/quizzes",
   "subjects": [
     {
@@ -1336,6 +1336,18 @@
             "True/False"
           ],
           "source": "https://www.w3schools.com/CPP/default.asp"
+        },
+        {
+          "id": "BRPEW4J6",
+          "title": "Markdown & LaTeX Stress Test Quiz",
+          "path": "/data/quizzes/Computer Science/2/2/Website demo/Testing Features/Markdown_LaTeX_Stress_Test_Quiz.json",
+          "questionCount": 10,
+          "questionTypes": [
+            "Essay",
+            "MCQ",
+            "True/False"
+          ],
+          "author": "بلال"
         },
         {
           "id": "3SVMT2U3",

@@ -116,6 +116,16 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
+// ── Fix: normalize literal \n sequences to real newlines ──────────────────
+// JSON.parse converts \n → real newline, but a double-serialization path
+// (e.g. localStorage read as raw string, or JSON.stringify called twice)
+// produces the literal two-char sequence \n. The Markdown renderer splits
+// on real newlines only — so this normalizes before anything else runs.
+const normalizeLiteralNewlines = (text) => {
+  if (!text || !text.includes("\\n")) return text;
+  return text.replace(/\\n/g, "\n");
+};
+
 // ── Markdown + KaTeX integration (mirrored from create-quiz) ──
 
 // ── Escape HTML for safe insertion ───────────────────────────────────────────
@@ -378,7 +388,7 @@ function _renderMarkdownCore(str) {
 }
 
 // === Helper: Get the model answer for an essay question ===
-const getEssayAnswer = (q) => q.answer ?? q.options?.[0] ?? "";
+const getEssayAnswer = (q) => q.answer ?? "";
 
 // === Helper: Render Question Image ===
 const renderQuestionImage = (imageUrl) => {
@@ -1080,12 +1090,12 @@ function buildVerticalQuestionCard(q, idx) {
       isCorrect = essayScore >= 3;
       feedbackClass += " essay-feedback show";
       const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
-      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
+      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(normalizeLiteralNewlines(explanationText))}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
       const statusMsg = isCorrect ? "Correct" : "Wrong";
-      feedbackText = `${statusMsg}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
+      feedbackText = `${statusMsg}<div style="margin-top:8px">${renderMarkdown(normalizeLiteralNewlines(explanationText))}</div>`;
     }
   }
 
@@ -1102,7 +1112,7 @@ function buildVerticalQuestionCard(q, idx) {
       ${actionBtns}
     </div>
     ${renderQuestionImage(q.image)}
-    <h2 class="question-text">${renderMarkdown(q.q)}</h2>
+    <h2 class="question-text">${renderMarkdown(normalizeLiteralNewlines(q.q))}</h2>
   `;
 
   if (isEssay) {
@@ -1115,7 +1125,7 @@ function buildVerticalQuestionCard(q, idx) {
         </div>
         <button class="check-answer-btn ${isLocked || !showCheckButton ? "hidden" : ""}" onclick="window.checkAnswerForQuestion(${idx})" ${!userSelected || String(userSelected).trim() === "" ? "disabled" : ""}>Check Answer</button>
         <div class="${feedbackClass}">${feedbackText}</div>
-        ${isLocked ? `<div class="formal-answer"><strong>Formal Answer:</strong><div class="formal-answer-text">${renderMarkdown(getEssayAnswer(q))}</div></div>` : ""}
+        ${isLocked ? `<div class="formal-answer"><strong>Formal Answer:</strong><div class="formal-answer-text">${renderMarkdown(normalizeLiteralNewlines(getEssayAnswer(q)))}</div></div>` : ""}
       </div>
     `;
   }
@@ -1134,7 +1144,7 @@ function buildVerticalQuestionCard(q, idx) {
       return `
         <div class="${optionClass}" ${isLocked ? "" : `onclick="window.handleSelectForQuestion(${idx}, ${i})"`}>
           <input type="radio" name="answer-${idx}" ${isSelected ? "checked" : ""} ${isLocked ? "disabled" : ""} aria-label="Option ${i + 1}">
-          <span class="option-label">${renderMarkdown(opt)}</span>
+          <span class="option-label">${renderMarkdown(normalizeLiteralNewlines(opt))}</span>
         </div>`;
     })
     .join("");
@@ -1208,13 +1218,13 @@ function renderQuestion() {
       isCorrect = essayScore >= 3;
       feedbackClass += " essay-feedback show";
       const stars = "★".repeat(essayScore) + "☆".repeat(5 - essayScore);
-      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(explanationText)}</div>`;
+      feedbackText = `<strong>Score: ${essayScore}/5</strong> ${stars}<div style="margin-top:8px">${renderMarkdown(normalizeLiteralNewlines(explanationText))}</div>`;
     } else {
       isCorrect = userSelected === correctIdx;
       feedbackClass += isCorrect ? " correct show" : " wrong show";
       const statusMsg = isCorrect ? "Correct" : "Wrong";
       feedbackText = `${statusMsg}<div style="margin-top:8px">${renderMarkdown(
-        explanationText,
+        normalizeLiteralNewlines(explanationText),
       )}</div>`;
     }
   }
@@ -1240,7 +1250,7 @@ function renderQuestion() {
       ${actionButtons}
     </div>
     ${renderQuestionImage(q.image)}
-    <h2 class="question-text">${renderMarkdown(q.q)}</h2>
+    <h2 class="question-text">${renderMarkdown(normalizeLiteralNewlines(q.q))}</h2>
   `;
 
   if (isEssay) {
@@ -1275,7 +1285,7 @@ function renderQuestion() {
             ? `
           <div class="formal-answer">
             <strong>Formal Answer:</strong>
-            <div class="formal-answer-text">${renderMarkdown(getEssayAnswer(q))}</div>
+            <div class="formal-answer-text">${renderMarkdown(normalizeLiteralNewlines(getEssayAnswer(q)))}</div>
           </div>
         `
             : ""
@@ -1308,7 +1318,7 @@ function renderQuestion() {
                        ${isLocked ? "disabled" : ""} aria-label="Option ${
                          i + 1
                        }">
-                <span class="option-label">${renderMarkdown(opt)}</span>
+                <span class="option-label">${renderMarkdown(normalizeLiteralNewlines(opt))}</span>
               </div>`;
             })
             .join("")}

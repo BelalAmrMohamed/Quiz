@@ -22,6 +22,16 @@ import { gradeEssay, isEssayQuestion } from "../shared/rate-essays.js";
 //     (e.g. if someone opens the file offline first and the app page later, or
 //     if a future caller invokes renderMarkdown in a non-KaTeX context).
 
+// ── Fix: normalize literal \n sequences to real newlines ──────────────────
+// JSON.parse converts \n → real newline, but a double-serialization path
+// (e.g. localStorage read as raw string, or JSON.stringify called twice)
+// produces the literal two-char sequence \n. The Markdown renderer splits
+// on real newlines only — so this normalizes before anything else runs.
+const normalizeLiteralNewlines = (text) => {
+  if (!text || !text.includes("\\n")) return text;
+  return text.replace(/\\n/g, "\n");
+};
+
 function escHtml(s) {
   return (s || "")
     .replace(/&/g, "&amp;")
@@ -422,7 +432,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
               <span>${isEssayQuestion(q) ? "Essay" : "MCQ"}</span>
           </div>
           ${q.image ? `<img src="${q.image}" class="question-image" alt="Question Image" onerror="this.alt='[Image not available]'; this.style.border='2px dashed #666';">` : ""}
-          <div class="q-text">${renderMarkdown(q.q)}</div>`;
+          <div class="q-text">${renderMarkdown(normalizeLiteralNewlines(q.q))}</div>`;
 
     if (isEssayQuestion(q)) {
       const userText = userAns || "";
@@ -434,7 +444,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
         htmlContent += `
           <div class="essay-box" style="border-left: 3px solid #3b82f6;">
               <strong style="color: #60a5fa; display:block; margin-bottom:5px;">Your Answer:</strong>
-              ${renderMarkdown(userText || "Not answered")}
+              ${renderMarkdown(normalizeLiteralNewlines(userText || "Not answered"))}
           </div>
           <div class="essay-score ${scoreClass}">
             Score: ${score}/5 &nbsp;<span style="font-size:1.1em;color:#f59e0b">${stars}</span>
@@ -443,13 +453,13 @@ export async function exportToHtml(config, questions, userAnswers = []) {
 
       htmlContent += `<div class="essay-box">
               <strong style="color: #f59e0b; display:block; margin-bottom:5px;">Formal Answer / Key Points:</strong>
-              ${renderMarkdown(q.answer)}
+              ${renderMarkdown(normalizeLiteralNewlines(q.answer))}
           </div>`;
     } else {
       htmlContent += `<div class="options-list">`;
       q.options.forEach((opt, i) => {
         const letter = String.fromCharCode(65 + i);
-        htmlContent += `<div class="option"><strong>${letter}.</strong> ${renderMarkdown(opt)}</div>`;
+        htmlContent += `<div class="option"><strong>${letter}.</strong> ${renderMarkdown(normalizeLiteralNewlines(opt))}</div>`;
       });
       htmlContent += `</div>`;
 
@@ -457,7 +467,7 @@ export async function exportToHtml(config, questions, userAnswers = []) {
       const userLetter = isSkipped ? "" : String.fromCharCode(65 + userAns);
       const userAnswer = isSkipped
         ? "Skipped"
-        : `${userLetter}. ${renderMarkdown(q.options[userAns])}`;
+        : `${userLetter}. ${renderMarkdown(normalizeLiteralNewlines(q.options[userAns]))}`;
       const userIcon = isSkipped ? "⚪" : isCorrect ? "✅" : "❌";
 
       if (isResultsMode)
@@ -465,12 +475,12 @@ export async function exportToHtml(config, questions, userAnswers = []) {
 
       const correctLetter = String.fromCharCode(65 + q.correct);
       htmlContent += `<div class="correct-answer">✓ Correct Answer: ${correctLetter}. ${renderMarkdown(
-        q.options[q.correct],
+        normalizeLiteralNewlines(q.options[q.correct]),
       )}</div>`;
     }
 
     if (q.explanation) {
-      htmlContent += `<div class="explanation"><strong>💡 Explanation:</strong> ${renderMarkdown(q.explanation)}</div>`;
+      htmlContent += `<div class="explanation"><strong>💡 Explanation:</strong> ${renderMarkdown(normalizeLiteralNewlines(q.explanation))}</div>`;
     }
 
     htmlContent += `</div>`;
