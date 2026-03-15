@@ -364,6 +364,10 @@ try {
 
 let navigationStack = [];
 let categoriesCache = null;
+// ── Bug 1 Fix: guard flag — when true, renderCategory / renderUserQuizzesView
+// must NOT call history.pushState (we are replaying an existing history entry
+// via popstate and must not create a new forward entry).
+let _isRestoringState = false;
 
 function getCategoriesLazy() {
   if (categoriesCache) return categoriesCache;
@@ -419,81 +423,24 @@ async function initApp() {
 
   // ── 3. Full render now that manifest is ready ────────────────────────────
   try {
-    // ── Obj 4: Hash-based routing ──
-    const hash = window.location.hash.slice(1); // strip leading #
-    let navigatedViaHash = false;
+    // ── Bug 1 Fix: Stamp initial history entry ──────────────────────────────
+    // Replace the browser's synthetic state-less entry with one that carries a
+    // proper state object.  This guarantees that popstate fires (with non-null
+    // event.state) if/when the user navigates forward and then returns here.
+    history.replaceState({ view: "initial" }, "", window.location.href);
 
-    if (hash === "my-quizzes") {
-      navigatedViaHash = true;
-      renderUserQuizzesView();
-    } else if (hash.startsWith("category/")) {
-      const rawIdentifier = hash.slice("category/".length);
-
-      // Try resolving by ID first (shorter URLs), then fallback to name/key
-      // Note: We perform decoding manually on the different segments instead of decodeURIComponent once.
-      let cat = null;
-      let catKey = null;
-
-      if (categoryTree) {
-        // Parse the identifier
-        // It could be `[id]`, `[id]/b64:[encodedSub]`, `[id]/[sub]`, `b64:[encodedKey]`, or `[un-encoded-key]`
-        const parts = rawIdentifier.split("/").map(decodeURIComponent);
-
-        if (parts.length === 1) {
-          const part = parts[0];
-          if (part.startsWith("b64:")) {
-            catKey = decodeB64(part.slice(4));
-            cat = categoryTree[catKey];
-          } else {
-            // Try ID
-            const entryWithId = Object.entries(categoryTree).find(
-              ([k, v]) => v.id === part,
-            );
-            if (entryWithId) {
-              cat = entryWithId[1];
-              catKey = entryWithId[0];
-            } else {
-              // Fallback to name
-              catKey = part;
-              cat = categoryTree[catKey];
-            }
-          }
-        } else {
-          // It has multiple parts: e.g. `[rootId]/b64:[encodedSubfolder]` or `[rootId]/[subfolder]`
-          const rootIdentifier = parts[0];
-          const rootEntry = Object.entries(categoryTree).find(
-            ([k, v]) => v.id === rootIdentifier || k === rootIdentifier,
-          );
-          if (rootEntry) {
-            const rootName = rootEntry[0];
-
-            let subfolderPath = parts.slice(1).join("/");
-            if (subfolderPath.startsWith("b64:")) {
-              subfolderPath =
-                decodeB64(subfolderPath.slice(4)) || subfolderPath;
-            }
-
-            catKey = `${rootName}/${subfolderPath}`;
-            cat = categoryTree[catKey];
-          }
-        }
-      }
-
-      if (cat) {
-        navigatedViaHash = true;
-        // Reconstruct ancestor chain so breadcrumb "back" works correctly
-        // e.g. for subfolder_2, ancestors = [root_cat, subfolder_1]
-        const ancestors = findCategoryAncestors(catKey, categoryTree);
-        navigationStack = [...ancestors]; // pre-load ancestors without re-rendering
-        renderCategory(cat); // pushes cat, renders content
-      }
-    }
-
-    if (!navigatedViaHash) {
-      renderRootCategories();
+    // ── Restore the view indicated by the current URL ───────────────────────
+    // _isRestoringState suppresses pushState inside renderCategory /
+    // renderUserQuizzesView so we don't create a phantom forward entry on
+    // the very first load.
+    _isRestoringState = true;
+    try {
+      restoreViewFromURL();
+    } finally {
+      _isRestoringState = false;
     }
   } catch (error) {
-    console.error("Error in renderRootCategories:", error);
+    console.error("Error in initApp render phase:", error);
     renderRootCategories(); // retry once
   }
 }
@@ -519,6 +466,94 @@ function findCategoryAncestors(targetKey, tree) {
     }
   }
   return []; // targetKey is a root-level category
+}
+
+// ============================================================================
+// Bug 1 Fix — restoreViewFromURL
+// Re-renders the correct SPA view from the current window.location.hash.
+// Called by:
+//   • initApp()            — on initial page load / deep-link / refresh
+//   • popstate listener    — on every browser back / forward navigation
+//
+// IMPORTANT: This function must always be called with _isRestoringState = true
+// so that renderCategory / renderUserQuizzesView use history.replaceState
+// (stamp the state object) rather than history.pushState (add a new entry).
+// ============================================================================
+function restoreViewFromURL() {
+  const hash = window.location.hash.slice(1); // strip leading #
+
+  // ── Root view ──────────────────────────────────────────────────────────────
+  if (!hash) {
+    renderRootCategories();
+    return;
+  }
+
+  // ── User-quizzes folder ────────────────────────────────────────────────────
+  if (hash === "my-quizzes") {
+    navigationStack = []; // reset so renderUserQuizzesView can push cleanly
+    renderUserQuizzesView();
+    return;
+  }
+
+  // ── Category / subfolder ──────────────────────────────────────────────────
+  if (hash.startsWith("category/")) {
+    const rawIdentifier = hash.slice("category/".length);
+    let cat = null;
+    let catKey = null;
+
+    if (categoryTree) {
+      // Identifier segments: each part is URI-encoded; b64: prefix means
+      // the segment was additionally Base-64 encoded to shorten Arabic text.
+      const parts = rawIdentifier.split("/").map(decodeURIComponent);
+
+      if (parts.length === 1) {
+        const part = parts[0];
+        if (part.startsWith("b64:")) {
+          catKey = decodeB64(part.slice(4));
+          cat = categoryTree[catKey];
+        } else {
+          // Try resolving by short ID first, then fall back to key name
+          const entryWithId = Object.entries(categoryTree).find(
+            ([k, v]) => v.id === part,
+          );
+          if (entryWithId) {
+            cat = entryWithId[1];
+            catKey = entryWithId[0];
+          } else {
+            catKey = part;
+            cat = categoryTree[catKey];
+          }
+        }
+      } else {
+        // Multi-part: e.g. `[rootId]/b64:[encodedSubfolder]`
+        const rootIdentifier = parts[0];
+        const rootEntry = Object.entries(categoryTree).find(
+          ([k, v]) => v.id === rootIdentifier || k === rootIdentifier,
+        );
+        if (rootEntry) {
+          const rootName = rootEntry[0];
+          let subfolderPath = parts.slice(1).join("/");
+          if (subfolderPath.startsWith("b64:")) {
+            subfolderPath = decodeB64(subfolderPath.slice(4)) || subfolderPath;
+          }
+          catKey = `${rootName}/${subfolderPath}`;
+          cat = categoryTree[catKey];
+        }
+      }
+    }
+
+    if (cat) {
+      // Reconstruct ancestor chain so breadcrumb "back" works correctly
+      // e.g. for subfolder_2 ancestors = [root_cat, subfolder_1]
+      const ancestors = findCategoryAncestors(catKey, categoryTree);
+      navigationStack = [...ancestors]; // pre-load ancestors without re-rendering
+      renderCategory(cat); // pushes cat itself and renders content
+      return;
+    }
+  }
+
+  // ── Fallback: unknown / unresolvable hash → root ───────────────────────────
+  renderRootCategories();
 }
 
 /**
@@ -921,8 +956,16 @@ function renderRootCategories() {
     navigationStack = [];
     updateBreadcrumb();
 
-    // ── Obj 4: Update URL hash ──
-    history.replaceState(null, "", window.location.pathname);
+    // ── Bug 1 Fix: update history entry ──────────────────────────────────────
+    // • During popstate restoration (_isRestoringState = true): the URL is
+    //   already correct — just stamp the state object via replaceState.
+    // • During forward navigation (breadcrumb click, search reset, etc.):
+    //   push a new root entry so the back button can return here.
+    if (_isRestoringState) {
+      history.replaceState({ view: "root" }, "", window.location.pathname);
+    } else {
+      history.pushState({ view: "root" }, "", window.location.pathname);
+    }
 
     // Update search context when returning to root
     if (searchManager) {
@@ -1034,8 +1077,15 @@ function renderUserQuizzesView() {
     navigationStack.push({ name: "إمتحاناتك" });
     updateBreadcrumb();
 
-    // ── Obj 4: Update URL hash ──
-    window.location.hash = "my-quizzes";
+    // ── Bug 1 Fix: record this navigation in the browser history ─────────────
+    // pushState so the back button can return to root after entering this view.
+    // During popstate restoration only stamp the state — do not create a new
+    // forward entry, which would confuse the back/forward stack.
+    if (!_isRestoringState) {
+      history.pushState({ view: "my-quizzes" }, "", "#my-quizzes");
+    } else {
+      history.replaceState({ view: "my-quizzes" }, "", "#my-quizzes");
+    }
 
     // Update Title & Clear Container
     if (title) title.textContent = "إمتحاناتك";
@@ -2006,10 +2056,27 @@ function renderCategory(category) {
         }
       }
 
-      // Split by '/' to encode each part without encoding the '/' itself
-      window.location.hash = `category/${identifier.split("/").map(encodeURIComponent).join("/")}`;
+      // ── Bug 1 Fix: record this navigation in the browser history ─────────────
+      // Use pushState (not window.location.hash) so the back button fires
+      // popstate rather than hashchange. The popstate listener in
+      // DOMContentLoaded then calls restoreViewFromURL() to re-render the
+      // correct view without adding another forward entry.
+      // During popstate restoration only stamp the state — do not push a new
+      // entry, which would break the back/forward stack.
+      if (!_isRestoringState) {
+        history.pushState(
+          { view: "category", catHash: identifier },
+          "",
+          `#category/${identifier.split("/").map(encodeURIComponent).join("/")}`,
+        );
+      } else {
+        history.replaceState(
+          { view: "category", catHash: identifier },
+          "",
+          `#category/${identifier.split("/").map(encodeURIComponent).join("/")}`,
+        );
+      }
     }
-
     // Update search context when entering a category
     if (searchManager) {
       searchManager.updateContextVisibility();
@@ -2718,6 +2785,29 @@ window.startQuiz = startQuiz;
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ── Bug 1 Fix: listen for back / forward navigation ───────────────────────
+  // history.pushState (used by renderCategory / renderUserQuizzesView) does NOT
+  // fire popstate by itself. The browser fires popstate when the user presses
+  // the back or forward button (or hardware back on mobile). We then read the
+  // new URL and re-render the matching view — the same logic as a first load.
+  //
+  // _isRestoringState prevents the render functions from pushing yet another
+  // history entry while we are already replaying an existing one.
+  //
+  // NOTE: hashchange is intentionally NOT used here.  pushState + popstate is
+  // the modern SPA pattern and it gives us proper state objects.
+  window.addEventListener("popstate", () => {
+    // Manifest not yet loaded → ignore (initApp will render correctly on load)
+    if (!categoryTree) return;
+
+    _isRestoringState = true;
+    try {
+      restoreViewFromURL();
+    } finally {
+      _isRestoringState = false;
+    }
+  });
+
   initApp().catch((err) => {
     console.error("Init error:", err);
     if (typeof renderRootCategories === "function") renderRootCategories();
