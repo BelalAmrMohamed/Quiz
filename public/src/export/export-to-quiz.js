@@ -2744,12 +2744,20 @@ function _renderMarkdownCore(str) {
       continue;
     }
 
+    // Empty line → paragraph break
+    // ── Fix: push "<br>" instead of "" so blank lines produce visible output ──
+    // "" was silently swallowed: isBlock("") = true → join step added no <br>
+    // around it → the two surrounding content pieces were concatenated with
+    // nothing between them. "<br>" produces an actual line break and is also
+    // treated as a block-separator (see isBlock below) so no extra <br> is
+    // added around it.
     if (rawLine.trim() === "") {
       flushList();
-      outParts.push("");
+      outParts.push("<br>");
       continue;
     }
 
+    // Regular text line
     flushList();
     outParts.push(applyInline(escHtml(rawLine)));
   }
@@ -2760,7 +2768,11 @@ function _renderMarkdownCore(str) {
   const BLOCK_START = /^<(h[1-6]|ul|ol|blockquote|hr|div|pre|p)[\s>\/]/;
   const BLOCK_END = /^<\/(h[1-6]|ul|ol|blockquote|div|pre|p)>/;
   const isBlock = (s) =>
-    s === undefined || s === "" || BLOCK_START.test(s) || BLOCK_END.test(s);
+    s === undefined ||
+    s === "" ||
+    s === "<br>" ||
+    BLOCK_START.test(s) ||
+    BLOCK_END.test(s);
 
   let result = "";
   for (let i = 0; i < outParts.length; i++) {
